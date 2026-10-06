@@ -20,6 +20,11 @@ INSTANCE_DIR = ONTOLOGY_DIR / "instances"
 ECOSYSTEM_INSTANCE_DIR = INSTANCE_DIR / "ecosystem"
 ECOSYSTEM_REAL_DIR = ECOSYSTEM_INSTANCE_DIR / "agents"
 ECOSYSTEM_FIXTURE_DIR = ECOSYSTEM_INSTANCE_DIR / "fixtures"
+# Framework vocabularies and their shapes (ADR 0061): BSC's catalog model left
+# SSTIM's universal namespaces for one of these. They are outside the manifest
+# on purpose, so no SSTIM release carries them, but the public instances use
+# their terms, and every check below that follows a reference has to see them.
+FRAMEWORK_VOCAB_DIR = ONTOLOGY_DIR / "frameworks"
 W3ID_STAGING_FILE = ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
 MANIFEST_PATH = ONTOLOGY_DIR / "manifest.json"
 MANIFEST = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -43,6 +48,7 @@ VOID = Namespace("http://rdfs.org/ns/void#")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
 TERM_NAMESPACES = (str(SSTIM), str(VOCAB), str(EXPOSURE), str(ECOSYSTEM))
+FRAMEWORK_TERM_NAMESPACES = ("https://w3id.org/sstim/framework/bsc/vocab#",)
 INSTANCE_PREFIXES = (
     "https://w3id.org/sstim/framework/",
     "https://w3id.org/sstim/implementation/",
@@ -65,6 +71,7 @@ LIVE_PROJECTION_REFERENCES = {
 }
 ECOSYSTEM_AGENTS_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-agents")
 ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture")
+BSC_FRAMEWORK_SUBSET = URIRef("https://w3id.org/sstim/void#bsc-framework")
 ECOSYSTEM_PUBLIC_DUMP = URIRef(
     "https://biosyncare-lab.web.app/current.ttl"
 )
@@ -193,6 +200,7 @@ def parse_graph(paths: list[Path]) -> Graph:
 
 module_paths = list(MODULES)
 instance_paths = sorted(INSTANCE_DIR.rglob("*.ttl"))
+framework_paths = sorted(FRAMEWORK_VOCAB_DIR.rglob("*.ttl"))
 ecosystem_real_paths = sorted(ECOSYSTEM_REAL_DIR.glob("*.ttl"))
 ecosystem_fixture_paths = sorted(ECOSYSTEM_FIXTURE_DIR.glob("*.ttl"))
 ecosystem_instance_paths = ecosystem_real_paths + ecosystem_fixture_paths
@@ -214,7 +222,8 @@ instances = parse_graph(instance_paths)
 ecosystem_real_instances = parse_graph(ecosystem_real_paths)
 ecosystem_fixture_instances = parse_graph(ecosystem_fixture_paths)
 ecosystem_instances = parse_graph(ecosystem_instance_paths)
-all_graph = modules + instances
+frameworks = parse_graph(framework_paths)
+all_graph = modules + instances + frameworks
 
 
 # All live modules must carry one identical whole-set version (ADR 0020), and
@@ -290,6 +299,7 @@ declared_module_properties = list(void_graph.objects(dataset_iri, VOID.propertie
 declared_instance_triples = list(void_graph.objects(instance_dataset_iri, VOID.triples))
 declared_ecosystem_triples = list(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.triples))
 declared_fixture_triples = list(void_graph.objects(ECOSYSTEM_FIXTURE_GRAPH, VOID.triples))
+declared_framework_triples = list(void_graph.objects(BSC_FRAMEWORK_SUBSET, VOID.triples))
 dataset_versions = list(void_graph.objects(dataset_iri, DCAT.version))
 
 # VoID describes the latest immutable release, while the top-level sources may
@@ -386,6 +396,7 @@ def published_instance_url(path: Path) -> URIRef:
 
 expected_ecosystem_dumps = {ECOSYSTEM_PUBLIC_DUMP}
 expected_fixture_dumps = {published_instance_url(path) for path in ecosystem_fixture_paths}
+expected_framework_dumps = {published_instance_url(path) for path in framework_paths}
 expected_ecosystem_uri_spaces = {
     Literal("https://w3id.org/sstim/organization/"),
     Literal("https://w3id.org/sstim/specialist/"),
@@ -404,8 +415,17 @@ if declared_module_classes != [Literal(len(published_named_classes))]:
     fail(f"void.ttl: void:classes must be {len(published_named_classes)} named OWL classes")
 if declared_module_properties != [Literal(len(published_declared_properties))]:
     fail(f"void.ttl: void:properties must be {len(published_declared_properties)} OWL properties")
-if declared_instance_triples != [Literal(len(instances))]:
-    fail(f"void.ttl: instance void:triples must be {len(instances)}")
+# The framework vocabulary is a subset of the public instance dataset, so the
+# dataset's count includes it, as it includes the fixture graph's.
+public_instances = instances + frameworks
+if declared_instance_triples != [Literal(len(public_instances))]:
+    fail(f"void.ttl: instance void:triples must be {len(public_instances)}")
+if declared_framework_triples != [Literal(len(frameworks))]:
+    fail(f"void.ttl: BSC framework vocabulary void:triples must be {len(frameworks)}")
+if set(void_graph.objects(BSC_FRAMEWORK_SUBSET, VOID.dataDump)) != expected_framework_dumps:
+    fail("void.ttl: BSC framework data dumps must cover every framework vocabulary file exactly")
+if (instance_dataset_iri, VOID.subset, BSC_FRAMEWORK_SUBSET) not in void_graph:
+    fail("void.ttl: public instance dataset must include the BSC framework vocabulary as a subset")
 if declared_ecosystem_triples:
     fail(
         "void.ttl: mutable ecosystem-agent graph must omit volatile void:triples counts"
@@ -540,6 +560,15 @@ for term in sorted(class_property_overlap, key=str):
 for _, predicate, _ in all_graph:
     if str(predicate).startswith(TERM_NAMESPACES) and predicate not in declared_properties:
         fail(f"undeclared local predicate in use: {predicate}")
+
+framework_properties = {
+    subject
+    for kind in (OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty)
+    for subject in frameworks.subjects(RDF.type, kind)
+}
+for predicate in set(all_graph.predicates()):
+    if str(predicate).startswith(FRAMEWORK_TERM_NAMESPACES) and predicate not in framework_properties:
+        fail(f"undeclared framework predicate in use: {predicate}")
 
 for predicate in object_properties:
     for subject, value in all_graph.subject_objects(predicate):

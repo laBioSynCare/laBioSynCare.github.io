@@ -21,10 +21,10 @@ bsclab-experiment:sensory-field-example a sstim-ex:ExploratoryProtocol, sstim:Se
     rdfs:label "Sensory Field reference exposure"@en ;
     dct:description "Reference profile for the Sensory Field interface: a full-screen color field (static or gently blinking) with an independent per-ear tone forming a binaural beat. Non-clinical; no physiological benefit is asserted."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim:usesTechnique sstim-v:techBinauralBeats, sstim-v:techPhoticDriving ;
-    sstim-ex:hasExperimentContext sstim-ex:contextBscLabPrototype, sstim-ex:contextSelfObservation ;
+    sstim-ex:hasExperimentContext sstim-ex:contextImplementationPrototype, sstim-ex:contextSelfObservation ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
     sstim-ex:hasExposureProfile this:profile .
 

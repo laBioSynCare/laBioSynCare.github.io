@@ -137,24 +137,25 @@ sstim:hasReportPhase a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:breathingPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "initial breathing period (s)"@en ;
-    skos:definition "User override for mp0. Must be >= 3.0 s for breathing guidance. Absent means use preset default."@en ;
+    skos:definition "Initial period of a breathing-shaped oscillation, in seconds. On a track it is the configured value; on a session specification it overrides the configuration's value for that session, and absence means the configured value holds. At least 3 s wherever it guides breathing: shorter cycles are tremolo, not breathing guidance."@en ;
+    skos:historyNote "Until 0.19.0 a session-only override, defined against the BSC catalog field mp0. ADR 0061 widened it to the tracks themselves, so a generic configuration states its breathing period without the catalog's vocabulary."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:breathingPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "final breathing period (s)"@en ;
-    skos:definition "Optional user override for the final guided-breathing cycle period in seconds; absence means use the preset default."@en ;
+    skos:definition "Final period of a breathing-shaped oscillation after its transition, in seconds. On a track it is the configured value; on a session specification it overrides the configuration's value for that session, and absence means the configured value holds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "breathing transition duration (s)"@en ;
-    skos:definition "Optional duration in seconds over which guided breathing changes from its initial to final cycle period; absence means use the preset default."@en ;
+    skos:definition "Duration in seconds over which a breathing-shaped oscillation moves from its initial to its final period. On a track it is the configured value; on a session specification it overrides the configuration's value for that session, and absence means the configured value holds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;

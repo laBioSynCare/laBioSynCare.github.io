@@ -31,7 +31,8 @@ interoperability claim.
 
     fixed       a constant stimulus. Events are the whole story.
     segmented   discrete parameter changes carried as piecewise events.
-    modulated   a Martigli voice whose breathing period glides from mp0 to mp1.
+    modulated   a breathing-shaped oscillation whose period glides from its
+                initial to its final value.
 
 Decision 5 says a time-varying stimulus "requires either piecewise events or a
 linked trace; it must not be flattened into a misleading single row". SSTIM has
@@ -198,26 +199,31 @@ def read_sweep(graph: Graph) -> dict | None:
 
     A steady periodic modulation — a flicker rate, a beat frequency — is fully
     described by its rate, so one row carrying that rate is honest. A *parameter
-    that itself changes across the session* is not: a Martigli breathing period
-    gliding from mp0 to mp1 over md seconds has no single value to put in a
-    column. That distinction, not "is anything oscillating", is what decision 5
+    that itself changes across the session* is not: a breathing period gliding
+    from its initial to its final value over a transition has no single value to
+    put in a column. That distinction, not "is anything oscillating", is what decision 5
     is about, so only the sweep is detected here.
 
     Returns None when the configuration is fixed.
     """
-    for track in graph.subjects(S("martigliPeriodInitial"), None):
-        mp0 = next(graph.objects(track, S("martigliPeriodInitial")), None)
-        mp1 = next(graph.objects(track, S("martigliPeriodFinal")), None)
-        md = next(graph.objects(track, S("martigliTransitionDuration")), None)
-        if mp0 is None or mp1 is None or md is None:
+    # The generic SSTIM breathing terms (ADR 0061). A framework's own names for
+    # them, such as the BSC catalog's Martigli parameters, are sub-properties a
+    # reasoner would fold in; this reads the generic ones only.
+    for track in graph.subjects(S("breathingPeriodInitial"), None):
+        if (track, RDF.type, S("SessionSpecification")) in graph:
+            continue  # a session's override, not a configured track
+        initial = next(graph.objects(track, S("breathingPeriodInitial")), None)
+        final = next(graph.objects(track, S("breathingPeriodFinal")), None)
+        transition = next(graph.objects(track, S("breathingTransitionDuration")), None)
+        if initial is None or final is None or transition is None:
             continue
-        if float(mp0) == float(mp1):
+        if float(initial) == float(final):
             continue  # declared, but not actually sweeping
         return {
             "track": local(track),
-            "mp0": float(mp0),
-            "mp1": float(mp1),
-            "md": float(md),
+            "initialPeriodSeconds": float(initial),
+            "finalPeriodSeconds": float(final),
+            "transitionSeconds": float(transition),
         }
     return None
 
@@ -246,8 +252,8 @@ def delivery_spans(events: list[dict]) -> list[tuple[float, float]]:
 def build_trace(sweep: dict, events: list[dict]) -> list[tuple[float, str, str]]:
     """Sample the breathing arc on the session clock.
 
-    P(d) = mp0 + (mp1 - mp0) * min(d / md, 1), where d is *delivered* time —
-    BREATHING_MODEL.md. Delivered time is what the engine advances, so it stops
+    P(d) = initial + (final - initial) * min(d / transition, 1), where d is
+    *delivered* time (BREATHING_MODEL.md). Delivered time is what the engine advances, so it stops
     during a pause and the remainder of the arc slides later on the session
     clock. Samples outside a delivery span are n/a: nothing was being delivered,
     and a number there would assert an exposure that did not occur.
@@ -261,9 +267,9 @@ def build_trace(sweep: dict, events: list[dict]) -> list[tuple[float, str, str]]
         delivered = sum(max(0.0, min(t, b) - a) for a, b in spans)
         inside = any(a <= t < b for a, b in spans)
         if inside:
-            period = sweep["mp0"] + (sweep["mp1"] - sweep["mp0"]) * min(
-                delivered / sweep["md"], 1.0
-            )
+            period = sweep["initialPeriodSeconds"] + (
+                sweep["finalPeriodSeconds"] - sweep["initialPeriodSeconds"]
+            ) * min(delivered / sweep["transitionSeconds"], 1.0)
             out.append((t, f"{period:.4f}", f"{1.0 / period:.6f}"))
         else:
             out.append((t, "n/a", "n/a"))
@@ -454,10 +460,12 @@ def write_trace(out: Path, trace: list[tuple[float, str, str]], sweep: dict) -> 
                 "Columns": ["breathing_period_s", "breathing_rate_hz"],
                 "breathing_period_s": {
                     "Description": (
-                        "Instantaneous breathing-cycle period of the Martigli control "
-                        f"track '{sweep['track']}', from "
-                        "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1) with "
-                        f"mp0={sweep['mp0']}, mp1={sweep['mp1']}, md={sweep['md']}. "
+                        "Instantaneous breathing-cycle period of the breathing-"
+                        f"oscillation track '{sweep['track']}', from "
+                        "P(d) = initial + (final - initial) * min(d / transition, 1) with "
+                        f"initial={sweep['initialPeriodSeconds']}, "
+                        f"final={sweep['finalPeriodSeconds']}, "
+                        f"transition={sweep['transitionSeconds']}. "
                         "d is delivered time, not session time."
                     ),
                     "Units": "s",
@@ -533,7 +541,8 @@ def build(bundle: dict, out: Path) -> dict:
         if len({p for _, p, _ in trace if p != "n/a"}) < 2:
             raise SystemExit(
                 f"hed-bundle[{bundle['id']}]: the source declares a sweep "
-                f"({sweep['mp0']}s -> {sweep['mp1']}s over {sweep['md']}s) but the "
+                f"({sweep['initialPeriodSeconds']}s -> {sweep['finalPeriodSeconds']}s "
+                f"over {sweep['transitionSeconds']}s) but the "
                 f"trace is constant. Emitting it would flatten a time-varying "
                 f"stimulus, which ADR 0025 decision 5 forbids."
             )
@@ -542,11 +551,11 @@ def build(bundle: dict, out: Path) -> dict:
         modulation = {
             "timeVarying": True,
             "shape": "continuous",
-            "parameter": "breathing-cycle period (Martigli)",
-            "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
-            "mp0": sweep["mp0"],
-            "mp1": sweep["mp1"],
-            "md": sweep["md"],
+            "parameter": "breathing-cycle period",
+            "law": "P(d) = initial + (final - initial) * min(d / transition, 1)",
+            "initialPeriodSeconds": sweep["initialPeriodSeconds"],
+            "finalPeriodSeconds": sweep["finalPeriodSeconds"],
+            "transitionSeconds": sweep["transitionSeconds"],
             "track": sweep["track"],
             "representation": "linked trace",
             "why": (
@@ -631,7 +640,8 @@ def build(bundle: dict, out: Path) -> dict:
         )
         manifest["notValidated"].append(
             "The trace carries the breathing period, which is fully determined by "
-            "mp0/mp1/md. It does not carry the instantaneous carrier frequency, "
+            "its initial and final periods and its transition. It does not carry "
+            "the instantaneous carrier frequency, "
             "which would require integrating the oscillator phase and is a "
             "rendering concern rather than a semantic one."
         )

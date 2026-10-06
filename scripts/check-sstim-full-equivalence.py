@@ -18,6 +18,7 @@ so growth stays visible in CI output.
 """
 
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -45,6 +46,7 @@ SSTIM = Namespace("https://w3id.org/sstim#")
 SSTIM_V = Namespace("https://w3id.org/sstim/vocab#")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 SSTIM_EX = Namespace("https://w3id.org/sstim/exposure#")
+SSTIM_ECO = Namespace("https://w3id.org/sstim/ecosystem#")
 WD = Namespace("http://www.wikidata.org/entity/")
 OLD_CHANNEL_DEFINITION = Literal(
     "A channel within an exposure profile, such as an audio, visual, haptic, "
@@ -315,19 +317,27 @@ EXCLUDED_SHAPE_PROPERTY_ROOTS = (
 PUBLIC_CLAIM_GATE_MARKER = "requiresEvidenceTierRank"
 
 
+# ADR 0061 moved the gate, unchanged, from the BSC catalog shape to
+# sstim-sh:PresetShape, which holds it for every preset. The baseline has it in
+# the first place and the live graph in the second; exactly one must exist.
+PUBLIC_CLAIM_GATE_HOSTS = (SSTIM_SH.BscCatalogPresetShape, SSTIM_SH.PresetShape)
+
+
 def public_claim_gate_nodes(graph: Graph) -> set:
     """The anonymous SPARQL constraint implementing the public-claim gate."""
     matched = [
         node
-        for node in graph.objects(SSTIM_SH.BscCatalogPresetShape, SH.sparql)
+        for host in PUBLIC_CLAIM_GATE_HOSTS
+        for node in graph.objects(host, SH.sparql)
         if isinstance(node, BNode)
         and any(PUBLIC_CLAIM_GATE_MARKER in str(query) for query in graph.objects(node, SH.select))
     ]
     if len(matched) != 1:
         raise ValueError(
             f"expected exactly one public-claim gate constraint on "
-            f"sstim-sh:BscCatalogPresetShape, found {len(matched)} — the gate was "
-            f"renamed, duplicated or deleted, and this exception no longer describes it"
+            f"sstim-sh:BscCatalogPresetShape or sstim-sh:PresetShape, found "
+            f"{len(matched)} — the gate was renamed, duplicated or deleted, and this "
+            f"exception no longer describes it"
         )
     reachable: set[BNode] = set()
     frontier = list(matched)
@@ -340,6 +350,106 @@ def public_claim_gate_nodes(graph: Graph) -> set:
             if isinstance(obj, BNode) and obj not in reachable:
                 frontier.append(obj)
     return reachable
+
+
+# ADR 0061 retired six shapes from SSTIM's shapes graph: the BSC catalog preset
+# shape and the five catalog voice shapes. They moved, renamed, to the BSC
+# framework's own shapes (static/ontology/frameworks/bsc/bsc-shapes.ttl), which
+# is not part of any SSTIM release, because they hold one framework's catalog
+# rules rather than anything true of sensory stimulation in general.
+#
+# A consumer pinned to 0.12 that validated BSC catalog data against SSTIM's
+# shapes alone loses these constraints; validating against SSTIM's shapes and
+# the BSC shapes together restores them, with the generic parts (bands, the
+# primary-band rule, the public-claim gate) now held by sstim-sh:PresetShape for
+# every preset. The rules themselves are not compared here: `make
+# preset-contract` reads their bounds back out and drives adversarial fixtures
+# through them, and `make shacl-adr-0061` does the same for the new rules.
+ADR_0061_RETIRED_SHAPES = {
+    SSTIM_SH.BscCatalogPresetShape,
+    SSTIM_SH.VoiceShape,
+    SSTIM_SH.BinauralVoiceShape,
+    SSTIM_SH.SymmetryVoiceShape,
+    SSTIM_SH.MartigliVoiceShape,
+    SSTIM_SH.MartigliBinauralVoiceShape,
+}
+
+
+# ADR 0061 also rewrote these baseline fields, every one deliberately.
+#
+#   - Twenty-five baseline definitions changed. Nineteen depended on BSC, BSC
+#     Lab or BioSynCare and lost the dependence: provenance moved to
+#     skos:historyNote and policy notes to skos:editorialNote, and an
+#     implementation's status left the term record, because status is data
+#     carried by scoped knowledge-status assertions. Six describe generic terms
+#     whose meaning widened: the breathing period, transition and amplitude now
+#     describe tracks as well as session overrides, note count and octave span
+#     describe any note sequence, and knowledge scope admits an implementation.
+#   - Sixteen domains changed. Thirteen track parameters dropped the deprecated
+#     catalog class sstim:Voice from their domains; since sstim:Voice is a
+#     subclass of sstim:AudioTrack, a union of the two is the same class, so no
+#     entailment is lost. The three session breathing terms widened from
+#     sstim:SessionSpecification to tracks as well, as ADR 0040 widened the
+#     visual and haptic ones: a weaker entailment, so no earlier assertion
+#     changes meaning.
+#   - Two shapes changed what they constrain. ControlTrackShape holds the 3 s
+#     floor on the generic breathing terms instead of the Martigli ones, and
+#     ExposureProfileShape accepts a knowledge status through a scoped
+#     assertion as well as directly, because a delivery status can now only be
+#     asserted the first way.
+#
+# Matched by subject and predicate, like the ADR 0049 and 0052 fields above, and
+# with the blank nodes of the rewritten domains and shape properties excluded by
+# reachability.
+ADR_0061_MIGRATION_FIELDS = {
+    (SSTIM.FrequencyBand, SKOS.definition),
+    (SSTIM.PublicSafeReference, SKOS.definition),
+    (SSTIM.requiresEvidenceTierRank, SKOS.definition),
+    (SSTIM.composedOfTrack, SKOS.definition),
+    (SSTIM.noteCount, SKOS.definition),
+    (SSTIM.octaveSpan, SKOS.definition),
+    (SSTIM.breathingAmplitude, SKOS.definition),
+    (SSTIM.breathingPeriodInitial, SKOS.definition),
+    (SSTIM.breathingPeriodFinal, SKOS.definition),
+    (SSTIM.breathingTransitionDuration, SKOS.definition),
+    (SSTIM_ECO.peerProject, SKOS.definition),
+    (SSTIM_ECO.scientificAdvisor, SKOS.definition),
+    (SSTIM_EX.KnowledgeStatus, SKOS.definition),
+    (SSTIM_EX.KnowledgeStatusScheme, SKOS.definition),
+    (SSTIM_EX.hasKnowledgeStatus, SKOS.definition),
+    (SSTIM_EX.knowledgeScope, SKOS.definition),
+    (SSTIM_EX.capabilityInfraredLightOutput, SKOS.definition),
+    (SSTIM_EX.capabilityUltravioletLightOutput, SKOS.definition),
+    (SSTIM_EX.limitHearingNiosh, SKOS.definition),
+    (SSTIM_EX.limitUvActinicIec, SKOS.definition),
+    (SSTIM_EX.mediumUltravioletRadiation, SKOS.definition),
+    (SSTIM_V.allFrequencyBands, SKOS.definition),
+    (SSTIM_V.cautionUltraSlowBreathing, SKOS.definition),
+    (SSTIM_V.modalityAuditory, SKOS.definition),
+    (SSTIM_V.temporalAdaptive, SKOS.definition),
+}
+ADR_0061_REWRITTEN_ROOTS = (
+    *((prop, RDFS.domain) for prop in (
+        SSTIM.carrierFreqLeft, SSTIM.carrierFreqRight, SSTIM.initialVolume,
+        SSTIM.panPosition, SSTIM.baseFrequency, SSTIM.beatHz,
+        SSTIM.noteDurationFraction, SSTIM.pulseRateHz, SSTIM.noteCount,
+        SSTIM.octaveSpan, SSTIM.cycleDuration, SSTIM.breathingPhaseRatio,
+        SSTIM.breathingAmplitude, SSTIM.breathingPeriodInitial,
+        SSTIM.breathingPeriodFinal, SSTIM.breathingTransitionDuration,
+    )),
+    (SSTIM_SH.ControlTrackShape, SH.property),
+    (SSTIM_SH.ExposureProfileShape, SH.property),
+)
+
+
+def retired_shape_closure(graph: Graph) -> set:
+    """Every blank node hanging off a shape ADR 0061 retired."""
+    roots = tuple(
+        (shape, predicate)
+        for shape in ADR_0061_RETIRED_SHAPES
+        for predicate in set(graph.predicates(shape))
+    )
+    return bnode_closure(graph, roots)
 
 
 def bnode_closure(graph: Graph, roots: tuple[tuple, ...]) -> set:
@@ -410,9 +520,13 @@ def normalized(
     ontology_subjects = set(graph.subjects(RDF.type, OWL.Ontology))
     excluded_bnodes = bnode_closure(graph, EXCLUDED_SHAPE_PROPERTY_ROOTS)
     excluded_bnodes |= public_claim_gate_nodes(graph)
+    excluded_bnodes |= retired_shape_closure(graph)
+    excluded_bnodes |= bnode_closure(graph, ADR_0061_REWRITTEN_ROOTS)
     for triple in graph:
         subject, predicate, obj = triple
         if subject in ontology_subjects or predicate == RDFS.isDefinedBy:
+            continue
+        if subject in ADR_0061_RETIRED_SHAPES:
             continue
         if subject in VALIDATION_HARDENING_NODES or obj in VALIDATION_HARDENING_NODES:
             continue
@@ -450,6 +564,10 @@ def normalized(
             continue
         if (subject, predicate) in SIGNAL_EXTENT_MIGRATION_FIELDS:
             continue
+        if (subject, predicate) in ADR_0061_MIGRATION_FIELDS:
+            continue
+        if (subject, predicate) in ADR_0061_REWRITTEN_ROOTS:
+            continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue
         if triple == (SSTIM.Track, SKOS.scopeNote, track_scope_note):
@@ -479,7 +597,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052/0061 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )
@@ -494,7 +612,7 @@ def main() -> int:
         "lists if it is deliberate.",
         file=sys.stderr,
     )
-    for triple in lost[:20]:
+    for triple in lost[: int(os.environ.get("FULL_EQUIVALENCE_SHOW", "20"))]:
         print(f"    {triple!r}", file=sys.stderr)
     return 1
 

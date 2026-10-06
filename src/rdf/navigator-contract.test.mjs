@@ -60,7 +60,7 @@ describe('unified navigator source boundary', () => {
     expect(sources).toEqual([
       ...Object.values(ONTOLOGY_SOURCES),
       INSTANCE_SOURCES.programmes[0],
-      INSTANCE_SOURCES.frameworks[0],
+      ...INSTANCE_SOURCES.frameworks,
       INSTANCE_SOURCES.implementations[0],
       ...INSTANCE_SOURCES.presets,
       INSTANCE_SOURCES.references[0],
@@ -73,6 +73,9 @@ describe('unified navigator source boundary', () => {
     // One reference preset per catalog group since 2026-09-10.
     expect(urls.filter(url => url.includes('/presets/'))).toHaveLength(5)
     expect(urls.filter(url => url.includes('/references/'))).toHaveLength(1)
+    // The presets use the BSC framework's vocabulary (ADR 0061), which sits
+    // outside the manifest, so the navigator has to load it explicitly.
+    expect(urls.filter(url => url.endsWith('/ontology/frameworks/bsc/bsc-vocab.ttl'))).toHaveLength(1)
     expect(urls.some(url => url.includes('/fixtures/'))).toBe(false)
   })
 

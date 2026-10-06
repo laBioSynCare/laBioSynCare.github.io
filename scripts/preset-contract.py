@@ -9,7 +9,11 @@ documentation agree.
 Three artifacts, and the relationship between them is not symmetric:
 
     static/schemas/preset.schema.json   SSTIM's own preset contract
-    static/ontology/sstim-shapes.ttl    the RDF contract for the same parameters
+    static/ontology/frameworks/bsc/bsc-shapes.ttl
+                                        the BSC catalog's RDF contract for the
+                                        same parameters (moved out of SSTIM's
+                                        shapes by ADR 0061; SSTIM's schema has
+                                        no RDF form of its own for these kinds)
     docs/technical/PRESET_FORMAT.md     the BioSynCare catalog format
 
 The third is an *input*, not an authority. That format is one application's,
@@ -54,37 +58,51 @@ from rdflib.namespace import SKOS
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "static" / "schemas" / "preset.schema.json"
 SHAPES = ROOT / "static" / "ontology" / "sstim-shapes.ttl"
+BSC_SHAPES = ROOT / "static" / "ontology" / "frameworks" / "bsc" / "bsc-shapes.ttl"
+BSC_VOCAB = ROOT / "static" / "ontology" / "frameworks" / "bsc" / "bsc-vocab.ttl"
 FORMAT_DOC = ROOT / "docs" / "technical" / "PRESET_FORMAT.md"
 ONTOLOGY = ROOT / "static" / "ontology"
 
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SSTIM = Namespace("https://w3id.org/sstim#")
 SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
+BSC_V = Namespace("https://w3id.org/sstim/framework/bsc/vocab#")
+BSC_SH = Namespace("https://w3id.org/sstim/framework/bsc/shapes#")
 SH = Namespace("http://www.w3.org/ns/shacl#")
 
-# SSTIM parameter -> (SSTIM property, catalog field it was derived from).
+# SSTIM parameter -> (RDF property, catalog field it was derived from). The
+# property is a full IRI because since ADR 0061 they come from two vocabularies:
+# generic parameters stay SSTIM's, the Martigli ones are the BSC framework's.
 # The one hand-written fact: no artifact records the correspondence, because the
 # names deliberately differ. A catalog field of None means SSTIM introduced the
 # parameter rather than inheriting it.
 PARAMETER_MAP = {
-    "carrierLeftHz": ("carrierFreqLeft", "fl"),
-    "carrierRightHz": ("carrierFreqRight", "fr"),
-    "centerHz": ("martigliCenterFreq", "mf0"),
-    "amplitudeHz": ("martigliAmplitude", "ma"),
-    "initialPeriodSeconds": ("martigliPeriodInitial", "mp0"),
-    "finalPeriodSeconds": ("martigliPeriodFinal", "mp1"),
-    "transitionSeconds": ("martigliTransitionDuration", "md"),
-    "baseHz": ("baseFrequency", "f0"),
-    "noteCount": ("noteCount", "nnotes"),
-    "octaveSpan": ("octaveSpan", "noctaves"),
-    "cycleSeconds": ("cycleDuration", "d"),
+    "carrierLeftHz": (SSTIM.carrierFreqLeft, "fl"),
+    "carrierRightHz": (SSTIM.carrierFreqRight, "fr"),
+    "centerHz": (BSC_V.martigliCenterFreq, "mf0"),
+    "amplitudeHz": (BSC_V.martigliAmplitude, "ma"),
+    "initialPeriodSeconds": (BSC_V.martigliPeriodInitial, "mp0"),
+    "finalPeriodSeconds": (BSC_V.martigliPeriodFinal, "mp1"),
+    "transitionSeconds": (BSC_V.martigliTransitionDuration, "md"),
+    "baseHz": (SSTIM.baseFrequency, "f0"),
+    "noteCount": (SSTIM.noteCount, "nnotes"),
+    "octaveSpan": (SSTIM.octaveSpan, "noctaves"),
+    "cycleSeconds": (SSTIM.cycleDuration, "d"),
     # The catalog states the volume bound in prose rather than in a range
     # column, and states it twice inconsistently: the per-type tables said
     # "0-1" while the global limits section says 1.0 is invalid. The prose
     # is now corrected there, but there is still no range cell to read, so
     # only the SHACL half of this one is compared.
-    "level": ("initialVolume", None),
+    "level": (SSTIM.initialVolume, None),
 }
+
+
+def curie(iri) -> str:
+    """A readable name for a property in a failure message."""
+    for prefix, namespace in (("sstim", SSTIM), ("bsc-v", BSC_V)):
+        if str(iri).startswith(str(namespace)):
+            return f"{prefix}:{str(iri)[len(str(namespace)):]}"
+    return str(iri)
 
 # Schema enum -> the SSTIM class whose concepts' skos:notation it must draw from.
 # Without this the schema could invent controlled values that resolve to nothing,
@@ -94,7 +112,8 @@ ENUM_SCHEMES = {
     ("$defs", "frequencyBand"): "FrequencyBand",
     ("$defs", "caution"): "CautionTag",
     ("$defs", "modality"): "SensoryModality",
-    ("properties", "group"): "PresetGroup",
+    # `group` left this table with ADR 0061: the schema no longer enumerates one
+    # framework's groups, so there is no enum to hold to a scheme.
     ("properties", "publicClaimLevel"): "PublicClaimLevel",
 }
 
@@ -178,7 +197,7 @@ def schema_bounds(schema: dict) -> tuple[dict[str, dict], list[str]]:
 
 
 def shacl_bounds(graph: Graph) -> tuple[dict[str, dict], list[str]]:
-    """Bounds each SSTIM property carries across the four voice shapes.
+    """Bounds each property carries across the four BSC catalog voice shapes.
 
     Two things are deliberately out of scope. The Patch Studio Track shapes
     reuse several of these properties under a different model (CLAUDE.md §4:
@@ -189,15 +208,15 @@ def shacl_bounds(graph: Graph) -> tuple[dict[str, dict], list[str]]:
     contradiction that is not one.
     """
     voice_shapes = [
-        SSTIM_SH.BinauralVoiceShape,
-        SSTIM_SH.MartigliVoiceShape,
-        SSTIM_SH.MartigliBinauralVoiceShape,
-        SSTIM_SH.SymmetryVoiceShape,
+        BSC_SH.BinauralVoiceShape,
+        BSC_SH.MartigliVoiceShape,
+        BSC_SH.MartigliBinauralVoiceShape,
+        BSC_SH.SymmetryVoiceShape,
     ]
     # permutationFunction is not in PARAMETER_MAP — it is a named enum in JSON
     # and an ordinal in RDF — but its ceiling is compared against the number
     # of names, so it must still be collected.
-    wanted = {prop for prop, _ in PARAMETER_MAP.values()} | {"permutationFunction"}
+    wanted = {prop for prop, _ in PARAMETER_MAP.values()} | {BSC_V.permutationFunction}
     collected: dict[str, list[dict]] = {}
     for node_shape in voice_shapes:
         if (node_shape, None, None) not in graph:
@@ -210,9 +229,9 @@ def shacl_bounds(graph: Graph) -> tuple[dict[str, dict], list[str]]:
             if not isinstance(shape, BNode):
                 continue
             for path in graph.objects(shape, SH.path):
-                local = str(path)[len(str(SSTIM)):] if str(path).startswith(str(SSTIM)) else None
-                if local not in wanted:
+                if path not in wanted:
                     continue
+                local = path
                 entry = {
                     "min": number(graph.value(shape, SH.minInclusive)),
                     "minExclusive": number(graph.value(shape, SH.minExclusive)),
@@ -228,7 +247,7 @@ def shacl_bounds(graph: Graph) -> tuple[dict[str, dict], list[str]]:
         first = entries[0]
         if any(entry != first for entry in entries[1:]):
             problems.append(
-                f"sstim:{local}: constrained differently in different voice shapes "
+                f"{curie(local)}: constrained differently in different voice shapes "
                 f"({entries}) — the same parameter must mean the same thing in "
                 f"every subtype that carries it"
             )
@@ -463,6 +482,7 @@ PREAMBLE = """
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sstim:   <https://w3id.org/sstim#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsc-v:   <https://w3id.org/sstim/framework/bsc/vocab#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 """
 
@@ -474,13 +494,12 @@ ex:preset a sstim:Preset ;
     dct:modified "2026-08-15"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha10 ;
     sstim:primaryFrequencyBand sstim-v:alpha10 ;
-    sstim:inGroup sstim-v:groupPerform ;
-    sstim:hasBreathGuide false ;
+    bsc-v:inGroup bsc-v:groupPerform ;
     sstim:presetVersion "1.0.0" ;
     sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
     sstim:forImplementation ex:implementation ;
     sstim:followsProtocol ex:protocol ;
-    sstim:composedOf VOICES .
+    sstim:composedOfTrack VOICES .
 
 ex:framework a sstim:SensoryStimulationFramework ;
     rdfs:label "KR-07 fixture framework"@en ;
@@ -509,7 +528,7 @@ def rdf_preset(voices: str, blocks: str, extra: str = "") -> str:
 def binaural_voice(left: float, right: float, volume: float = 0.16, comment: str = "") -> str:
     note = f'    rdfs:comment "{comment}"@en ;\n' if comment else ""
     return f"""
-ex:voice a sstim:Voice, sstim:BinauralVoice ;
+ex:voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:BinauralVoice ;
     rdfs:label "KR-07 fixture binaural voice"@en ;
 {note}    sstim:carrierFreqLeft {left} ;
     sstim:carrierFreqRight {right} ;
@@ -519,22 +538,42 @@ ex:voice a sstim:Voice, sstim:BinauralVoice ;
 
 def symmetry_voice(count: int, cycle: float, base: float = 200.0) -> str:
     return f"""
-ex:voice a sstim:Voice, sstim:SymmetryVoice ;
+ex:voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:SymmetryVoice ;
     rdfs:label "KR-07 fixture symmetry voice"@en ;
     sstim:baseFrequency {base} ;
     sstim:noteCount {count} ;
     sstim:octaveSpan 0.0 ;
     sstim:cycleDuration {cycle} ;
-    sstim:permutationFunction 4 ;
+    bsc-v:permutationFunction 4 ;
     sstim:initialVolume 0.13 .
 """
+
+
+def martigli_binaural_voice(initial: float) -> str:
+    return f"""
+ex:voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:MartigliBinauralVoice ;
+    rdfs:label "KR-07 fixture Martigli-Binaural voice"@en ;
+    sstim:carrierFreqLeft 200.0 ;
+    sstim:carrierFreqRight 206.0 ;
+    bsc-v:martigliAmplitude 80.0 ;
+    bsc-v:martigliPeriodInitial {initial} ;
+    bsc-v:martigliPeriodFinal 8.0 ;
+    bsc-v:martigliTransitionDuration 600.0 ;
+    sstim:initialVolume 0.25 .
+"""
+
+
+# ADR 0061: breath guidance is one pointer from the preset to a track. The
+# catalog adds two rules on top of SSTIM's: the guide is a Martigli-type voice,
+# and its initial period is at least 3 s.
+BREATH_GUIDE = "\nex:preset sstim:breathGuideTrack ex:voice .\n"
 
 
 def many_voices(count: int) -> tuple[str, str]:
     names = ", ".join(f"ex:voice-{i}" for i in range(count))
     blocks = "".join(
         f"""
-ex:voice-{i} a sstim:Voice, sstim:BinauralVoice ;
+ex:voice-{i} a sstim:AudioTrack, bsc-v:Voice, bsc-v:BinauralVoice ;
     rdfs:label "KR-07 fixture voice {i}"@en ;
     sstim:carrierFreqLeft 200.0 ;
     sstim:carrierFreqRight 210.0 ;
@@ -605,22 +644,23 @@ def main() -> int:
 
     # ── 1. Three-way bound agreement ─────────────────────────────────────────
     shapes = Graph().parse(SHAPES, format="turtle")
+    shapes.parse(BSC_SHAPES, format="turtle")
     from_schema, schema_problems = schema_bounds(schema)
     from_shacl, shacl_problems = shacl_bounds(shapes)
     from_doc = doc_bounds()
     failures.extend(schema_problems)
     failures.extend(shacl_problems)
 
-    ceiling = normalized(from_shacl.get("permutationFunction", {})).get("max")
+    ceiling = normalized(from_shacl.get(BSC_V.permutationFunction, {})).get("max")
     if ceiling is None:
         failures.append(
-            "sstim:permutationFunction carries no upper bound, so the named "
+            "bsc-v:permutationFunction carries no upper bound, so the named "
             "permutations here cannot be checked against the ordinal encoding"
         )
     elif int(ceiling) != len(PERMUTATIONS) - 1:
         failures.append(
             f"the schema offers {len(PERMUTATIONS)} named permutations but "
-            f"sstim:permutationFunction admits ordinals 0..{int(ceiling)} — one "
+            f"bsc-v:permutationFunction admits ordinals 0..{int(ceiling)} — one "
             f"of them accepts a value the other rejects"
         )
 
@@ -635,12 +675,12 @@ def main() -> int:
         shacl_entry = normalized(from_shacl.get(prop, {}))
         if not shacl_entry:
             failures.append(
-                f"{parameter} (sstim:{prop}): bounded {schema_entry} in the schema "
+                f"{parameter} ({curie(prop)}): bounded {schema_entry} in the schema "
                 f"but no SHACL property shape constrains it"
             )
         elif schema_entry != shacl_entry:
             failures.append(
-                f"{parameter} (sstim:{prop}): schema says {schema_entry}, "
+                f"{parameter} ({curie(prop)}): schema says {schema_entry}, "
                 f"SHACL says {shacl_entry}"
             )
         else:
@@ -705,6 +745,9 @@ def main() -> int:
     ontology = Graph()
     for path in module_paths():
         ontology.parse(path, format="turtle")
+    # The catalog terms the fixtures use, and the subclass link that makes a
+    # catalog voice a sstim:AudioTrack for the generic track shapes.
+    ontology.parse(BSC_VOCAB, format="turtle")
 
     # One pySHACL run for all of them. It costs ~7s over the 13,020-triple
     # closure no matter how few fixture triples ride along, so a run per fixture
@@ -727,9 +770,11 @@ def main() -> int:
         ("a louder voice that records why",
          rdf_preset("ex:voice", binaural_voice(200.0, 210.0, 0.35, "Quiet ambient bed at -18 LUFS."))),
         ("a Symmetry voice at exactly 50 Hz", rdf_preset("ex:voice", symmetry_voice(10, 0.2))),
+        ("a Martigli-Binaural breath guide at 4 s",
+         rdf_preset("ex:voice", martigli_binaural_voice(4.0)) + BREATH_GUIDE),
     ]
     rdf_negative = [
-        ("seven voices", rdf_preset(seven_names, seven_blocks), "1-6 Voices"),
+        ("seven voices", rdf_preset(seven_names, seven_blocks), "1-6 catalog voices"),
         ("a 36 Hz beat", rdf_preset("ex:voice", binaural_voice(200.0, 236.0)), "35 Hz"),
         ("a 40 Hz beat without the gamma-40 target",
          rdf_preset("ex:voice", binaural_voice(200.0, 240.0)), "35 Hz"),
@@ -738,6 +783,11 @@ def main() -> int:
         ("a Symmetry voice at 60 Hz", rdf_preset("ex:voice", symmetry_voice(3, 0.05)), "50 Hz"),
         ("a carrier below 80 Hz", rdf_preset("ex:voice", binaural_voice(60.0, 70.0)), "[80, 1000]"),
         ("a Symmetry base note below 80 Hz", rdf_preset("ex:voice", symmetry_voice(4, 1.0, 60.0)), ">= 80 Hz"),
+        ("a Binaural voice as the breath guide",
+         rdf_preset("ex:voice", binaural_voice(200.0, 210.0)) + BREATH_GUIDE,
+         "breath guide must be one Martigli"),
+        ("a breath guide below 3 s",
+         rdf_preset("ex:voice", martigli_binaural_voice(2.0)) + BREATH_GUIDE, "at least 3 s"),
     ]
 
     combined = Graph()

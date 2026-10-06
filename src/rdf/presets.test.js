@@ -6,6 +6,7 @@ import { listPresets } from './presets.js'
 const PRESET_GRAPH = 'https://w3id.org/sstim/implementation/bsclab/preset/'
 const VOCAB_GRAPH = 'https://w3id.org/sstim/graph/vocab'
 const REFERENCE_GRAPH = 'https://w3id.org/sstim/ref/'
+const FRAMEWORK_GRAPH = 'https://w3id.org/sstim/graph/frameworks'
 
 async function parseFixture(relativePath, graphIri) {
   const turtle = readFileSync(new URL(relativePath, import.meta.url), 'utf8')
@@ -25,6 +26,7 @@ describe('listPresets', () => {
         PRESET_GRAPH,
       ),
       await parseFixture('../../static/ontology/sstim-vocab.ttl', VOCAB_GRAPH),
+      await parseFixture('../../static/ontology/frameworks/bsc/bsc-vocab.ttl', FRAMEWORK_GRAPH),
       await parseFixture(
         '../../static/ontology/instances/references/references.ttl',
         REFERENCE_GRAPH,
@@ -38,9 +40,14 @@ describe('listPresets', () => {
     expect(preset).toMatchObject({
       graphIri: PRESET_GRAPH,
       created: '2026-06-17',
-      modified: '2026-07-10',
+      modified: '2026-10-06',
       version: '0.1.0',
+      hasBreathGuide: false,
     })
+    // The group and the voice type now come from the BSC framework vocabulary
+    // (ADR 0061), and still reach the page unchanged.
+    expect(preset.groups).toEqual([expect.objectContaining({ label: 'Perform' })])
+    expect(preset.voiceTypes).toEqual([expect.objectContaining({ label: 'Binaural' })])
     expect(preset.cautions).toEqual(expect.arrayContaining([
       expect.objectContaining({
         label: 'Driving Unsafe',

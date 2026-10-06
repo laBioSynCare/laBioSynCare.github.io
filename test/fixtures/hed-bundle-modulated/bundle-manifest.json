@@ -19,7 +19,7 @@
   },
   "source": {
     "file": "test/fixtures/rdf/hed-bundle/modulated-session.ttl",
-    "sha256": "4beeb21022dbbda543bf9dfb76a6e02d1eb1bf7f48417326a501ecb325bb58c8",
+    "sha256": "87513d72a41241e1eeb0ac2ddc7faaa5e2050e95ca88ea541ddcd174dc7d67b0",
     "eventCount": 5
   },
   "crossArtifactIds": {
@@ -36,11 +36,11 @@
   "modulation": {
     "timeVarying": true,
     "shape": "continuous",
-    "parameter": "breathing-cycle period (Martigli)",
-    "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
-    "mp0": 4.0,
-    "mp1": 10.0,
-    "md": 300.0,
+    "parameter": "breathing-cycle period",
+    "law": "P(d) = initial + (final - initial) * min(d / transition, 1)",
+    "initialPeriodSeconds": 4.0,
+    "finalPeriodSeconds": 10.0,
+    "transitionSeconds": 300.0,
     "track": "voice",
     "representation": "linked trace",
     "why": "ADR 0025 decision 5 allows piecewise events or a linked trace. The trace is used because the source specification already declares the continuous modulation in full; synthesising breakpoint events would create a second source able to disagree with it. The constraint is SSTIM's, not HED's: a placeholder definition such as (Definition/Sstim-breath-period/#, (Time-interval/# s)) used as (Def/Sstim-breath-period/7.774, Inset) validates against 8.4.0.",
@@ -61,7 +61,7 @@
     },
     {
       "file": "stimulus.json",
-      "sha256": "e4bdefa56e796c2c977b581e7fe4aeb2f3f56279a31334ab7bea44360929d038"
+      "sha256": "016112484275a48f952eb13caac0dcd581725320502ad8ba2a996ec8f3f2fbd4"
     }
   ],
   "declaredLoss": {
@@ -82,6 +82,6 @@
   "notValidated": [
     "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
     "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision.",
-    "The trace carries the breathing period, which is fully determined by mp0/mp1/md. It does not carry the instantaneous carrier frequency, which would require integrating the oscillator phase and is a rendering concern rather than a semantic one."
+    "The trace carries the breathing period, which is fully determined by its initial and final periods and its transition. It does not carry the instantaneous carrier frequency, which would require integrating the oscillator phase and is a rendering concern rather than a semantic one."
   ]
 }

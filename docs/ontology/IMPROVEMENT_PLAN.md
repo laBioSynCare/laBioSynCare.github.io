@@ -311,7 +311,10 @@ multi-modal component does project to RDF today, through the generic
 `sstim:composedOfTrack`; what remains is that it and the catalog-profile
 `sstim:composedOf` share the domain `sstim:Preset` with nothing marking which
 profile a preset follows. See
-[SSTIM_DIRECTIONS.md](SSTIM_DIRECTIONS.md).
+[SSTIM_DIRECTIONS.md](SSTIM_DIRECTIONS.md). *Resolved 2026-10-06 by
+[ADR 0061](../decisions/0061-universal-namespaces-carry-no-framework-structure.md):
+`sstim:composedOf` is deprecated in favour of `sstim:composedOfTrack`, and a BSC
+catalog preset is the one that names a `bsc-v:inGroup`.*
 
 Closed by ADR 0051: the parameter matrix, executed rather than tabulated
 (`make preset-contract` reads every bound from the schema, the shapes and the
@@ -328,8 +331,9 @@ where execution actually happens.
   neither has an SSTIM parameter to constrain; see
   [design directions](SSTIM_DIRECTIONS.md) §1, §2 and §5.
 - Link RDF controlled values to their concept IRIs, keeping application numeric
-  codes only as versioned adapter values. `sstim:permutationFunction` is still
-  an ordinal where the schema uses a named enum.
+  codes only as versioned adapter values. The BSC catalog's
+  `bsc-v:permutationFunction` (formerly `sstim:`, ADR 0061) is still an ordinal
+  where SSTIM's schema uses a named enum.
 
 #### 1.4 Repair SKOS and external mappings
 
@@ -380,10 +384,11 @@ provenance as `owl:Axiom` annotations.
   now reports 100% and guards against regression rather than tracking debt.
 
   What remains of KR-16 is narrower and should not be confused with coverage:
-  the 276 new labels have had **no native review**, `skos:definition` is
-  English-only for all 551 concepts by deliberate decision, and `skos:altLabel`
-  coverage is 15 labels on 8 of the 551 concepts, all English — thin, but not the
-  zero this said until it was measured. Locale-aware label fallback in the
+  the 276 new labels have had **no native review** (nor have the twelve ADR
+  0061 added), `skos:definition` is English-only for all 555 concepts by
+  deliberate decision, and `skos:altLabel` coverage is 52 labels on 38
+  of the 555 concepts, all English, measured 2026-10-06
+  (15 on 8 when first counted): thin, but not the zero this said until it was measured. Locale-aware label fallback in the
   application is also untouched. So the *label-coverage* half of this item is
   closed and the *quality, alias and runtime* halves are not.
 
@@ -429,7 +434,9 @@ explicit instruction naming each file.
   BSC's structure moves to a BSC framework vocabulary outside the manifest, and
   implementation status becomes neutral and scoped. [Directions](SSTIM_DIRECTIONS.md)
   §3 names the set. The migration is a 0.19.0 release gate, tracked in
-  `TODO.md`.*
+  `TODO.md`. Migrated 2026-10-06 on the 0.19.0-dev line, with every moved term
+  deprecated in place; Directions §3 records what moved and what stayed. The
+  upstream route for the BSC vocabulary is the one step left before 0.19.0.*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
   live in the universal namespaces.
   - *Next step:* extend [Directions](SSTIM_DIRECTIONS.md) §3 to name these
@@ -486,6 +493,9 @@ explicit instruction naming each file.
     and a coverage check for `context.jsonld`.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
 - [ ] **GB-10 Presets page neutrality** (after GB-01).
+  *The GB-01 migration made the group and the breath guide optional and reads
+  voices through `sstim:composedOfTrack`. The query still requires a version
+  and a frequency band, which `PresetShape` does not.*
   - *Next step:* make the BSC-specific patterns in `src/rdf/presets.js`
     optional.
   - *Done when* a modality-neutral preset that satisfies `PresetShape` is listed.

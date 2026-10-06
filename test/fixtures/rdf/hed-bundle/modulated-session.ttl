@@ -10,9 +10,12 @@
 #    piecewise events or a linked trace; it must not be flattened into a
 #    misleading single row."
 #
-# A Martigli voice is the repository's canonical time-varying case: the
-# breathing-cycle period glides linearly from mp0 to mp1 over md seconds and
-# holds thereafter (docs/technical/BREATHING_MODEL.md). Nothing in
+# A breathing-shaped oscillation is the repository's canonical time-varying
+# case: the breathing-cycle period glides linearly from its initial to its final
+# value over the transition and holds thereafter (docs/technical/BREATHING_MODEL.md,
+# where the BSC catalog's Martigli voice calls the three values mp0, mp1 and md).
+# The track is generic SSTIM on purpose: SSTIM's HED path needs no framework's
+# vocabulary to carry a sweep. Nothing in
 # sstim-v:SessionEventTypeScheme can express that — the ten event types name
 # session and playback lifecycle, safety and observation, and none of them is a
 # parameter change. So a HED events table built from events alone *would* flatten
@@ -39,24 +42,26 @@
 ###########################################################################
 # The configuration, and the modulation that makes it time-varying
 #
-# P(t) = mp0 + (mp1 - mp0) * min(t / md, 1)   — BREATHING_MODEL.md
+# P(t) = P0 + (P1 - P0) * min(t / T, 1), as in BREATHING_MODEL.md, with P0, P1
+# and T the track's breathingPeriodInitial, breathingPeriodFinal and
+# breathingTransitionDuration.
 #
 # 4 s cycles decelerating to 10 s over the first 300 s of delivery, then held.
-# mp0 >= 3 s because this voice is the breathing reference (CLAUDE.md §4.5).
+# P0 >= 3 s because this track guides breathing (CLAUDE.md §4.5).
 ###########################################################################
 
 example:preset a sstim:Preset ;
     rdfs:label "Synthetic decelerating-breath configuration"@en ;
-    sstim:composedOfTrack example:voice .
+    sstim:composedOfTrack example:voice ;
+    sstim:breathGuideTrack example:voice .
 
-example:voice a sstim:MartigliVoice ;
-    rdfs:label "Synthetic Martigli voice"@en ;
-    sstim:isBreathReference true ;
-    sstim:martigliCenterFreq 220.0 ;
-    sstim:martigliAmplitude 4.0 ;
-    sstim:martigliPeriodInitial 4.0 ;
-    sstim:martigliPeriodFinal 10.0 ;
-    sstim:martigliTransitionDuration 300.0 .
+example:voice a sstim:AudioTrack ;
+    rdfs:label "Synthetic breathing-oscillation tone"@en ;
+    sstim:baseFrequency 220.0 ;
+    sstim:breathingAmplitude 4.0 ;
+    sstim:breathingPeriodInitial 4.0 ;
+    sstim:breathingPeriodFinal 10.0 ;
+    sstim:breathingTransitionDuration 300.0 .
 
 example:specification a sstim:SessionSpecification, prov:Plan ;
     rdfs:label "Synthetic modulated session specification"@en ;

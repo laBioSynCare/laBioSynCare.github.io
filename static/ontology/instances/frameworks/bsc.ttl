@@ -4,6 +4,7 @@
 @prefix sstim:  <https://w3id.org/sstim#> .
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsc-v: <https://w3id.org/sstim/framework/bsc/vocab#> .
 @prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 
@@ -41,7 +42,7 @@
 bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
     rdfs:label "Martigli breathing oscillation"@en ;
     dct:description "Auditory breathing-guide technique using a sinusoidal frequency sweep over a decelerating respiratory arc."@en ;
-    skos:relatedMatch sstim-v:voiceMartigli ;
+    skos:relatedMatch bsc-v:voiceMartigli ;
     sstim:proposedMechanism sstim-v:mechAutonomic ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityInteroceptive ;
@@ -51,7 +52,7 @@ bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
 bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
     rdfs:label "Martigli-Binaural hybrid"@en ;
     dct:description "Hybrid auditory technique combining a maintained binaural beat difference with Martigli carrier-frequency breathing motion."@en ;
-    skos:relatedMatch sstim-v:voiceMartigliBinaural ;
+    skos:relatedMatch bsc-v:voiceMartigliBinaural ;
     sstim:proposedMechanism sstim-v:mechAutonomic ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
@@ -62,7 +63,7 @@ bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
 bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
     rdfs:label "Symmetry permutation entrainment"@en ;
     dct:description "Auditory technique using cyclic pitch permutations; the isochronic special case uses pulse rate as the target."@en ;
-    skos:relatedMatch sstim-v:voiceSymmetry ;
+    skos:relatedMatch bsc-v:voiceSymmetry ;
     sstim:proposedMechanism sstim-v:mechAttentional ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;

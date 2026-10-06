@@ -179,7 +179,7 @@ export function fieldStateToQuads(state, opts = {}) {
   // Baseline/capability exception: a static field with no beat or blink uses no
   // entrainment technique, so an editorial note satisfies the protocol contract.
   add(protocol, SKOS('editorialNote'), en('Configurable exposure exported from the Sensory Field instrument; techniques are present only when the corresponding beat or flicker feature is enabled.'))
-  add(protocol, SSTIM_EX('hasExperimentContext'), SSTIM_EX('contextBscLabPrototype'))
+  add(protocol, SSTIM_EX('hasExperimentContext'), SSTIM_EX('contextImplementationPrototype'))
   add(protocol, SSTIM_EX('hasExperimentContext'), SSTIM_EX('contextSelfObservation'))
   add(protocol, SSTIM_EX('hasKnowledgeStatus'), SSTIM_EX('knownInSSTIM'))
   add(protocol, SSTIM_EX('hasExposureProfile'), profile)

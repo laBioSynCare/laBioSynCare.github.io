@@ -230,6 +230,8 @@ instruction in the current session naming the file: "modify [filename]".
 static/ontology/*.ttl              every manifest-owned module, its shapes,
                                    and its profile entry points
 static/ontology/instances/**/*.ttl public reference data
+static/ontology/frameworks/**/*.ttl framework vocabularies and their shapes
+                                   (BSC's, ADR 0061); outside the manifest
 static/ontology/<version>/**       frozen releases — immutable, never edited
 docs/technical/BREATHING_MODEL.md
 docs/technical/SYMMETRY_SYSTEM.md
@@ -485,6 +487,8 @@ The canonical BSC namespace prefixes:
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
 @prefix bsc-fw:   <https://w3id.org/sstim/framework/bsc/> .
+@prefix bsc-v:    <https://w3id.org/sstim/framework/bsc/vocab#> .
+@prefix bsc-sh:   <https://w3id.org/sstim/framework/bsc/shapes#> .
 @prefix bsclab:   <https://w3id.org/sstim/implementation/bsclab/> .
 @prefix biosyncare: <https://w3id.org/sstim/implementation/biosyncare/> .
 ```
@@ -497,6 +501,12 @@ The canonical BSC namespace prefixes:
   in `static/ontology/` declares its prefixes here.
 - `https://w3id.org/sstim/framework/bsc` — the **BSC framework**: techniques,
   composition rules, evidence rules, grouping logic, and design principles.
+  Its own vocabulary (`bsc-v:`, the catalog's voice classes, preset groups and
+  Martigli parameters) and shapes (`bsc-sh:`) live in
+  `static/ontology/frameworks/bsc/`, outside the manifest, so no SSTIM release
+  carries them. A term belongs in the SSTIM namespaces only if its meaning holds
+  without any one framework, product, catalog format or implementation
+  ([ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md)).
 - `https://w3id.org/sstim/implementation/biosyncare` — the commercial
   **BioSynCare** implementation and catalog.
 - `https://w3id.org/sstim/implementation/bsclab` — the open **BSC Lab**
@@ -691,6 +701,8 @@ static/ontology/       Turtle served same-origin (copied to dist/); §3.4 protec
 static/_headers        COOP/COEP/CORP for a future custom host; GitHub Pages ignores it
 src/rdf/namespaces.js  the only place an ontology IRI may be written (§5.1)
 src/service-worker.js  three binding constraints — see §9 and ADR 0009
+static/ontology/frameworks/bsc/  BSC framework vocabulary + shapes; not SSTIM,
+                       in no profile or snapshot (ADR 0061, §3.4 protects it)
 static/schemas/        preset.schema.json + session.schema.json — SSTIM's own
                        contracts, checked by `make preset-contract` and
                        `make session-contract`. Not under `schemas/`.

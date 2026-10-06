@@ -15,10 +15,10 @@ bsclab-experiment:colored-audio-noise a sstim-ex:ExploratoryProtocol, sstim:Sens
     rdfs:label "Colored audio noise exposure"@en ;
     dct:description "Non-clinical exploratory setup for comparing white, pink, brown/red, blue, violet/purple, grey, and black/silence audio conditions as defined stimulus patterns."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim:usesTechnique sstim-v:techBroadbandNoise ;
-    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBscLabPrototype ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextImplementationPrototype ;
     sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
     sstim-ex:hasExposureProfile this:profile .
 

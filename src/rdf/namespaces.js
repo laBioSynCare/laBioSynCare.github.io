@@ -35,6 +35,10 @@ export const ECOSYSTEM_AGENTS_GRAPH_IRI = namedNode('https://w3id.org/sstim/grap
 export const ECOSYSTEM_FIXTURE_GRAPH_IRI = namedNode('https://w3id.org/sstim/graph/ecosystem-fixture')
 export const BSC_FRAMEWORK = ns('https://w3id.org/sstim/framework/bsc/')
 export const BSC_FRAMEWORK_TECHNIQUE = ns('https://w3id.org/sstim/framework/bsc/technique/')
+// The BSC framework's own vocabulary and shapes (ADR 0061): its catalog voice
+// model, preset groups and Martigli parameters, outside SSTIM's term space.
+export const BSC_V = ns('https://w3id.org/sstim/framework/bsc/vocab#')
+export const BSC_SH = ns('https://w3id.org/sstim/framework/bsc/shapes#')
 export const BIOSYNCARE = ns('https://w3id.org/sstim/implementation/biosyncare/')
 export const BIOSYNCARE_PRESET = ns('https://w3id.org/sstim/implementation/biosyncare/preset/')
 export const BIOSYNCARE_EVIDENCE = ns('https://w3id.org/sstim/implementation/biosyncare/evidence/')
@@ -101,6 +105,8 @@ export const PREFIXES = {
   'sstim-ecosystem': 'https://w3id.org/sstim/ecosystem/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
   'bsc-fw-tech': 'https://w3id.org/sstim/framework/bsc/technique/',
+  'bsc-v': 'https://w3id.org/sstim/framework/bsc/vocab#',
+  'bsc-sh': 'https://w3id.org/sstim/framework/bsc/shapes#',
   'biosyncare': 'https://w3id.org/sstim/implementation/biosyncare/',
   'biosyncare-preset': 'https://w3id.org/sstim/implementation/biosyncare/preset/',
   'biosyncare-evidence': 'https://w3id.org/sstim/implementation/biosyncare/evidence/',

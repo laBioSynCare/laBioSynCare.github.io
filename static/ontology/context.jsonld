@@ -634,6 +634,10 @@
       "@id": "sstim:composedOfTrack",
       "@type": "@id"
     },
+    "breathGuideTrack": {
+      "@id": "sstim:breathGuideTrack",
+      "@type": "@id"
+    },
     "describesStimulation": {
       "@id": "sstim:describesStimulation",
       "@type": "@id"

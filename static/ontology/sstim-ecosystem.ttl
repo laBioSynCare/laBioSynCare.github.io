@@ -470,7 +470,7 @@ sstim-eco:scientificAdvisor a owl:NamedIndividual, sstim-eco:RelationshipType, s
                    "Consultor científico"@pt,
                    "Asesor científico"@es ;
     skos:notation "scientific-advisor" ;
-    skos:definition "An agent providing scientific guidance to the SSTIM/BSC Lab effort."@en .
+    skos:definition "An agent providing scientific guidance to the initiative the relationship names as its target."@en .
 
 sstim-eco:citedAuthor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
@@ -532,7 +532,7 @@ sstim-eco:peerProject a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Co
                    "Projeto congênere"@pt,
                    "Proyecto afín"@es ;
     skos:notation "peer-project" ;
-    skos:definition "A peer initiative or platform with goals adjacent to SSTIM/BSC Lab."@en .
+    skos:definition "A peer initiative or platform whose goals are adjacent to those of the initiative the relationship names as its target."@en .
 
 sstim-eco:referencedSource a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;

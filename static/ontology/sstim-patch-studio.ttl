@@ -1,6 +1,6 @@
 ###########################################################################
 #
-#  SSTIM BSC Catalog and Patch Studio Profile Module
+#  SSTIM Track Parameter Module
 #
 #  Version:    0.19.0-dev
 #  Date:       2026-09-23
@@ -10,6 +10,11 @@
 #  Protected ontology source. Public term IRIs remain stable across the
 #  0.13 modular redistribution (ADR 0043).
 #
+#  Until 0.19.0 this module also held the BSC catalog's structure. ADR 0061
+#  moved that to the BSC framework vocabulary; the terms remain here,
+#  deprecated, each pointing at its replacement with dct:isReplacedBy. The
+#  module IRI keeps its historical name.
+#
 ###########################################################################
 
 @prefix sstim:     <https://w3id.org/sstim#> .
@@ -17,6 +22,7 @@
 @prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
 @prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
 @prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix bsc-v:     <https://w3id.org/sstim/framework/bsc/vocab#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -40,8 +46,8 @@
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
     owl:versionInfo "0.19.0-dev" ;
-    dct:title "SSTIM BSC Catalog and Patch Studio Profile Module"@en ;
-    dct:description "BSC-specific voice, grouping, permutation, audio synthesis, visual, haptic, and authoring parameters over the generic configuration and session model."@en ;
+    dct:title "SSTIM Track Parameter Module"@en ;
+    dct:description "Audio, visual, haptic, control and authoring-tempo parameters for the tracks of an engine configuration, over the generic configuration and session model. Its former BSC catalog terms are deprecated in favour of the BSC framework vocabulary (ADR 0061)."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/session> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
@@ -53,28 +59,44 @@
 
 
 ###########################################################################
-# BSC catalog and Patch Studio profile terms
+# Deprecated BSC catalog terms (ADR 0061)
+#
+# Kept so that data written against earlier releases still resolves. Each
+# points at its replacement: a BSC framework term where the meaning is BSC's,
+# a generic SSTIM term where it is not.
 ###########################################################################
 
 sstim:PresetGroup a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:PresetGroup ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:PresetGroup."@en ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Preset Group"@en ;
     skos:definition "A classification of BSC presets by design character, evidence strength, and use context. Five groups: Heal, Support, Perform, Indulge, Transcend."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:VoiceType a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:VoiceType ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC catalog's voice taxonomy. Use bsc-v:VoiceType."@en ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Voice Type"@en ;
     skos:definition "A named category of BSC audio voice (Binaural, Martigli, Martigli-Binaural, Symmetry) identifying the synthesis technique a voice realizes. Classification anchor for the SKOS voice-type vocabulary; distinct from the sstim:Voice parameter-bundle classes in Part 6."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:PermutationFunction a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:PermutationFunction ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:PermutationFunction."@en ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Permutation Function"@en ;
     skos:definition "A named reordering rule applied to a Symmetry voice note sequence at each cycle boundary (identity, rotate forward, rotate backward, reversal, shuffle)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:Voice a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:Voice ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC catalog's voice model. Use bsc-v:Voice."@en ;
     # AudioTrack is owned by Configuration, which this Patch Studio profile
     # requires. The specialization is asserted once near the end of this module;
     # Configuration therefore remains independent of the optional BSC profile.
@@ -87,30 +109,45 @@ sstim:Voice a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:BinauralVoice a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:BinauralVoice ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:BinauralVoice."@en ;
     rdfs:subClassOf sstim:Voice ;
     rdfs:label "Binaural Voice"@en ;
     skos:definition "Two sine tones at slightly different frequencies (fl, fr) presented dichotically to produce a perceived beat at |fr - fl| Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:MartigliVoice a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:MartigliVoice ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:MartigliVoice."@en ;
     rdfs:subClassOf sstim:Voice ;
     rdfs:label "Martigli Voice"@en ;
     skos:definition "A single tone whose frequency oscillates sinusoidally with a breathing arc that decelerates linearly from mp0 to mp1 over md seconds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:MartigliBinauralVoice a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:MartigliBinauralVoice ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:MartigliBinauralVoice."@en ;
     rdfs:subClassOf sstim:Voice ;
     rdfs:label "Martigli-Binaural Voice"@en ;
     skos:definition "Binaural beat combined with Martigli breathing oscillation. Both carriers sweep in parallel, maintaining constant beat frequency while timbral register evolves with breathing."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:SymmetryVoice a owl:Class ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:SymmetryVoice ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:SymmetryVoice."@en ;
     rdfs:subClassOf sstim:Voice ;
     rdfs:label "Symmetry Voice"@en ;
     skos:definition "N notes log-distributed over I octaves, repeated with algebraic group permutation at each cycle boundary, at pulse rate N/d Hz. When I=0, reduces to traditional isochronous tone stimulation."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:composedOf a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim:composedOfTrack ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a catalog voice is a track, so the generic composition link carries it. Use sstim:composedOfTrack."@en ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:Voice ;
     rdfs:label  "composed of"@en ;
@@ -118,6 +155,9 @@ sstim:composedOf a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:inGroup a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:inGroup ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:inGroup."@en ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:PresetGroup ;
     rdfs:label  "in group"@en ;
@@ -125,6 +165,9 @@ sstim:inGroup a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim:breathGuideTrack ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: one pointer to the guiding track cannot contradict itself, where a preset flag and a flag per voice could. Use sstim:breathGuideTrack."@en ;
     rdfs:domain sstim:Preset ;
     rdfs:range  xsd:boolean ;
     rdfs:label  "has breath guide"@en ;
@@ -140,83 +183,86 @@ sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
     ) .
 
 sstim:carrierFreqLeft a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "left carrier frequency"@en ;
     skos:definition "Left-ear carrier frequency for binaural presentation, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:carrierFreqRight a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "right carrier frequency"@en ;
     skos:definition "Right-ear carrier frequency for binaural presentation, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:initialVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "initial volume"@en ;
     skos:definition "Initial output gain or amplitude for a voice."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:panPosition a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "pan position"@en ;
     skos:definition "Stereo position from left to right."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:baseFrequency a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "base frequency"@en ;
     skos:definition "Base, carrier, or center frequency for a voice, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:beatHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "beat frequency"@en ;
     skos:definition "Driven or perceived beat frequency in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:pulseRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack sstim:ControlTrack ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "pulse rate"@en ;
     skos:definition "Rhythmic pulse or sequence step rate in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:noteDurationFraction a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "note duration fraction"@en ;
     skos:definition "Fraction of a rhythmic pulse occupied by the active note envelope."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:noteCount a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "note count"@en ;
-    skos:definition "Number of notes or sequence positions in a Symmetry cycle."@en ;
+    skos:definition "Number of notes or sequence positions in one cycle of a repeating sequence."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:octaveSpan a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "octave span"@en ;
-    skos:definition "Pitch span covered by a Symmetry sequence."@en ;
+    skos:definition "Pitch span covered by a note sequence, in octaves. Zero means every note sounds at the base frequency."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:cycleDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "cycle duration"@en ;
     skos:definition "Duration of one repeated control or sequence cycle, in seconds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:permutationFunction a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permutationFunction ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC catalog's integer coding. Use bsc-v:permutationFunction."@en ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:integer ;
     rdfs:label "permutation function"@en ;
@@ -224,20 +270,23 @@ sstim:permutationFunction a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:breathingPhaseRatio a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing phase ratio"@en ;
     skos:definition "Fraction of a breathing cycle assigned to the inhale phase."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:breathingAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing amplitude"@en ;
-    skos:definition "Depth or excursion of a breathing-shaped control signal."@en ;
+    skos:definition "Depth or excursion of a breathing-shaped oscillation, in the unit of the parameter it modulates: hertz for a frequency sweep."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:martigliCenterFreq ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a parameter of a BSC catalog voice type. Use bsc-v:martigliCenterFreq."@en ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli center frequency"@en ;
@@ -246,6 +295,9 @@ sstim:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:martigliAmplitude ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a parameter of a BSC catalog voice type. Use bsc-v:martigliAmplitude."@en ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli oscillation amplitude"@en ;
@@ -254,6 +306,9 @@ sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:martigliPeriodInitial ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a parameter of a BSC catalog voice type. Use bsc-v:martigliPeriodInitial."@en ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli initial period"@en ;
@@ -262,6 +317,9 @@ sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:martigliPeriodFinal ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a parameter of a BSC catalog voice type. Use bsc-v:martigliPeriodFinal."@en ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli final period"@en ;
@@ -270,6 +328,9 @@ sstim:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:martigliTransitionDuration ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a parameter of a BSC catalog voice type. Use bsc-v:martigliTransitionDuration."@en ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli transition duration"@en ;
@@ -278,6 +339,9 @@ sstim:martigliTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty 
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:isBreathReference a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim:breathGuideTrack ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the breath reference is a property of the preset, not a flag on each track. Use sstim:breathGuideTrack."@en ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:boolean ;
     rdfs:label "is breath reference"@en ;
@@ -314,6 +378,8 @@ sstim:stimulationIntensity a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:hapticPattern a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061, with no replacement. An index into one engine's list of haptic patterns means nothing outside that engine; describe the haptic waveform with sstim:hasSignalShape instead."@en ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:HapticTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "haptic pattern"@en ;

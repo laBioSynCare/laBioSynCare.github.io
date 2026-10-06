@@ -187,6 +187,33 @@ breathing, and §5's modulation model for an oscillating parameter. SSTIM has no
 generic permuted-sequence term (the only permutation terms in the term index are
 Symmetry's), and gains one when a second framework needs it.
 
+**Landed 2026-10-06, and narrower than the list above.** Classifying each term by
+ADR 0061's rule, rather than by where it sat, moved fewer of them:
+
+- *Moved to the BSC vocabulary* (`bsc-v:`, in
+  `static/ontology/frameworks/bsc/`): the voice classes and `VoiceType`,
+  `PresetGroup` and `inGroup`, `PermutationFunction` and `permutationFunction`,
+  the five Martigli parameters, and the fourteen concepts with their three
+  schemes. Each Martigli parameter is a sub-property of the generic breathing
+  term it specialises, so a query for the generic term still finds a catalog
+  voice's values.
+- *Replaced by generic SSTIM terms:* `composedOf` by `sstim:composedOfTrack`, and
+  `hasBreathGuide` with `isBreathReference` by one pointer,
+  `sstim:breathGuideTrack`, from a preset to the track that guides breathing.
+- *Stayed, with neutral definitions:* `sstim:noteCount`, `sstim:octaveSpan` and
+  `sstim:cycleDuration`. A count of notes per cycle, the octaves they span and
+  the cycle's length mean the same in any tone-sequence scheme, so the claim
+  above that `noteCount` was Symmetry's parameter was wrong.
+- *Deprecated with no replacement:* `sstim:hapticPattern`, an index into one
+  engine's pattern list. `sstim:hasSignalShape` is the generic way to say what a
+  haptic signal does.
+- *Status:* `notCurrentlyDeliverable`, `notCurrentlyUsed` and
+  `outsideImplementationScope` replace the three BSC Lab values and are valid
+  only in a `KnowledgeStatusAssertion` whose scope is the implementation's IRI;
+  `contextImplementationPrototype` replaces `contextBscLabPrototype`.
+
+Every old IRI stays in SSTIM, deprecated, with `dct:isReplacedBy`.
+
 ---
 
 ## 4. All known senses, and the shape of a stimulation event
@@ -299,12 +326,18 @@ ADR 0048.
 is the BSC catalog *profile's* relation, not the generic one. So the multi-modal
 composition the direction asks for is already expressible — a fact this
 repository's own ADR 0051 initially got wrong, and which is corrected there.
+Since ADR 0061 (§3), `composedOf` is deprecated in favour of `composedOfTrack`,
+and the catalog's voice is `bsc-v:Voice`, still a sub-class of
+`sstim:AudioTrack`.
 
 **What genuinely remains open, then, is narrower than it appeared:**
 
 1. **Nothing marks which profile a preset follows.** `composedOf` and
    `composedOfTrack` share the domain `sstim:Preset`, so a document could mix
    them. A profile marker, or a `CatalogPreset` subclass, would fix it.
+   *Resolved by ADR 0061: there is one composition relation, and a BSC catalog
+   preset is the one that names a `bsc-v:inGroup`, which is what the BSC shapes
+   target.*
 2. **`Track` is a rendering-oriented word.** "Track" comes from multitrack
    audio. For a standard that includes olfactory and proprioceptive stimulation,
    *component* or *stimulation layer* carries the meaning without the studio

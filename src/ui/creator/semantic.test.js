@@ -126,7 +126,7 @@ describe('semantic mapping registries (KR-17)', () => {
     for (const type of VISUAL_TRACK_TYPES) {
       const { kind, uri } = semanticForTrackType(type)
       expect(kind, type).toBe('Visual track type')
-      expect(uri, type).not.toBe(SSTIM('Voice').value)
+      expect(uri, type).not.toBe(SSTIM('AudioTrack').value)
     }
   })
 
@@ -168,9 +168,9 @@ describe('semantic mapping registries (KR-17)', () => {
     })
 
     it('declines to deep-link a term many types share', () => {
-      // sstim:Voice covers four audio types; fourteen "add" links would be
+      // sstim:AudioTrack covers four audio types; fourteen "add" links would be
       // noise, not an affordance.
-      const affordance = studioAffordanceForIri(SSTIM('Voice').value)
+      const affordance = studioAffordanceForIri(SSTIM('AudioTrack').value)
       expect(affordance.href).toBe(applicationRoute('/creator/'))
       expect(affordance.title).toMatch(/4 track types/)
     })
@@ -181,7 +181,7 @@ describe('semantic mapping registries (KR-17)', () => {
     })
   })
 
-  it('an unknown track type falls back to the declared generic Voice class', () => {
+  it('an unknown track type falls back to the declared generic Track class', () => {
     const { uri } = semanticForTrackType('MysteryTrack')
     expect(declared.has(uri)).toBe(true)
   })

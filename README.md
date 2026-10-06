@@ -395,8 +395,9 @@ and domain sense, not knowledge of this repository.
 
 **[Review the translations](https://github.com/w3c-cg/sstim/issues/new).**
 SSTIM publishes in English, Italian, Portuguese and Spanish, and as of
-2026-08-19 all 551 concepts carry all four — but 282 of those labels were
-written by the maintainers and have had no native review. If you speak one
+2026-10-06 all 555 concepts carry all four, but 294 of those labels (282
+measured on 2026-08-19, and twelve added since for ADR 0061) were written by
+the maintainers and have had no native review. If you speak one
 of these languages and know the domain, reading a scheme and saying which terms
 a practitioner would not actually use is the most valuable thing you can do
 here. These are controlled-vocabulary labels, so the bar is idiomatic usage, not

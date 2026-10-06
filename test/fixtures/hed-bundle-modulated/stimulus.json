@@ -6,7 +6,7 @@
     "breathing_rate_hz"
   ],
   "breathing_period_s": {
-    "Description": "Instantaneous breathing-cycle period of the Martigli control track 'voice', from P(d) = mp0 + (mp1 - mp0) * min(d / md, 1) with mp0=4.0, mp1=10.0, md=300.0. d is delivered time, not session time.",
+    "Description": "Instantaneous breathing-cycle period of the breathing-oscillation track 'voice', from P(d) = initial + (final - initial) * min(d / transition, 1) with initial=4.0, final=10.0, transition=300.0. d is delivered time, not session time.",
     "Units": "s"
   },
   "breathing_rate_hz": {

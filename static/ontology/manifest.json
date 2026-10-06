@@ -183,7 +183,7 @@
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "349c29ce8ca77e813bd118d3d3c68f2447d5ef784c4b62515b29e9d98f3795b6"
+        "sha256": "58fe34bdf4d71fdd0e4a04e0d2ceff0722b6a0fb44ad6bcb74609ccface0afd6"
       },
       "runtime": {
         "url": "sstim-common.ttl",
@@ -247,7 +247,7 @@
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d9391df7d7f875c9a00bae53ead371d45d7de0a417e65e5cae17042ab32b0607"
+        "sha256": "88dd3ab0da2a8ded3d9b51cce4a33cb257a73fc4d87cdf594186c0db16d146e6"
       },
       "runtime": {
         "url": "sstim-configuration.ttl",
@@ -281,7 +281,7 @@
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0947a9bfc38aa17136b30c4a42e3356119dc5d10aedadfeffd0852cb077e46c4"
+        "sha256": "f4b8c35b44795bdfc0aff9c93398fd4e693f6ff049981fbae3a0b370e6d18b92"
       },
       "runtime": {
         "url": "sstim-session.ttl",
@@ -316,7 +316,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "646da4eb8e66699ea5341678c731d1cb6c05d2e21459eff3697234ace92771e6"
+        "sha256": "9151ed63d18858c5f312244761afbe3f0c600f2dd62214ae45af1e5b458641ea"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -376,17 +376,16 @@
     },
     {
       "id": "patch-studio",
-      "title": "SSTIM BSC Catalog and Patch Studio Profile Module",
+      "title": "SSTIM Track Parameter Module",
       "roles": [
-        "semantic",
-        "implementation-profile"
+        "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/patch-studio",
       "version": "0.19.0-dev",
       "source": {
         "path": "static/ontology/sstim-patch-studio.ttl",
         "mediaType": "text/turtle",
-        "sha256": "a78ece5c45818612ce3d583acdb0e6398a7c3c78d2a6484743de1a1fad483a61"
+        "sha256": "ac259f5f44d58b7f4c7c761bc53ff0b5cbc5ba49bbc5eaa0c776a352931495e0"
       },
       "runtime": {
         "url": "sstim-patch-studio.ttl",
@@ -421,7 +420,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "847e66607555049e57924e5999f04a41fb3573acfdd5283fe095c3cc2cf36bcb"
+        "sha256": "07d629d73089de4536427f80f7a4800d8a2e808b68c00b4d79f923241775c530"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -460,7 +459,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "09f48b529f5dfd848d7183d190d4bc25dca81925d33e0a5c75ea524009c4dca5"
+        "sha256": "db9b10165863cfa78d15459477905c0d2e756f046d15168ee484747b55e5845f"
       },
       "runtime": {
         "url": "sstim-exposure.ttl",
@@ -497,7 +496,7 @@
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "30a12ab9a787d7f6f003b047e2c8b479b4672b6f1fc4990dc841eb791c8d7411"
+        "sha256": "5eca6e40b35fb4a24268950050eeaa546ecc7ecf1cb95489ce3dc20a1672497d"
       },
       "runtime": {
         "url": "sstim-ecosystem.ttl",
@@ -672,7 +671,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f965cd1ae648abbbfc8f1a9349ffdea8428f0a0578cebdb3ba303f5ea3989211"
+        "sha256": "01f24d0b2f7f8c56a00352ca6a858266b4c7647075bfaba45edc9109409f4877"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -841,7 +840,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "fd16822bce63da59b6d0cebd3c8550ef8fec84442d0b6b75cf1df46d0391423d"
+      "sha256": "ef1c30e82b0f4c34a6433ecc2523d48e87e74c3ad551f2c8b19228c1f0d0884a"
     },
     {
       "id": "full",
@@ -904,7 +903,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "ef6a49064f0266589bc8413ba9cb481e98200de01cab9702789aea087dafe722"
+      "sha256": "ac8a0f6bbf67316e5e6ac1a4b7cc63e43b92cfea2bd1c146b3e6e6e25e6bcd35"
     }
   ]
 }

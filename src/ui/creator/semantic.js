@@ -5,43 +5,45 @@ const TRACK_SEMANTICS = {
   BinauralBeat: {
     label: 'Binaural Beat',
     kind: 'Audio voice type',
-    uri: SSTIM('BinauralVoice').value,
+    // The technique the track realises (ADR 0061): the catalog voice class it
+    // used to name belongs to the BSC framework, and a studio track is not one.
+    uri: SSTIM_V('techBinauralBeats').value,
     description: 'Two carrier tones presented dichotically so their frequency difference defines the perceived beat target.',
   },
   IsochronicTone: {
     label: 'Isochronic Tone',
     kind: 'Audio voice type',
-    uri: SSTIM('SymmetryVoice').value,
-    description: 'A pulsed tone mode represented in the ontology as the isochronous case of SymmetryVoice.',
+    uri: SSTIM_V('techIsochronicTones').value,
+    description: 'A pulsed tone: the isochronic-tone technique, a single repeated note.',
   },
   Carrier: {
     label: 'Carrier',
     kind: 'Audio voice type',
-    uri: SSTIM('Voice').value,
+    uri: SSTIM('AudioTrack').value,
     description: 'A direct audio layer used as a carrier tone or continuous voice component in a patch.',
   },
   Noise: {
     label: 'Noise',
     kind: 'Audio voice type',
-    uri: SSTIM('Voice').value,
+    uri: SSTIM('AudioTrack').value,
     description: 'A broadband noise layer (white, pink, or brown) shaped by a filter, used for masking and calming textures.',
   },
   Drone: {
     label: 'Drone',
     kind: 'Audio voice type',
-    uri: SSTIM('Voice').value,
+    uri: SSTIM('AudioTrack').value,
     description: 'A sustained pad built from a stack of detuned oscillators for a lush, slowly beating continuous tone.',
   },
   Sample: {
     label: 'Sample',
     kind: 'Audio voice type',
-    uri: SSTIM('Voice').value,
+    uri: SSTIM('AudioTrack').value,
     description: 'A looping ambient field recording (synthetic CC0 soundscape) layered as a continuous background voice.',
   },
   // These point at sstim:ControlTrack, not at the catalog voice classes they
   // used to name. A control track is silent — it modulates other tracks — while
-  // sstim:MartigliVoice and sstim:SymmetryVoice are audible layers of a catalog
-  // preset. Linking a silent modulator to an audible voice was the category
+  // the catalog's Martigli and Symmetry voices (bsc-v: since ADR 0061) are
+  // audible layers of a catalog preset. Linking a silent modulator to an audible voice was the category
   // error ADR 0041 removed along with the names (see LEGACY_CONTROL_TYPES).
   LFO: {
     label: 'LFO',
@@ -170,8 +172,8 @@ const PARAM_SEMANTICS = {
   inhaleRatio: ['Inhale ratio', 'Timing parameter', SSTIM('breathingPhaseRatio').value, 'Fraction of a breathing cycle assigned to the inhale phase.'],
   amplitude: ['Amplitude', 'Control parameter', SSTIM('breathingAmplitude').value, 'Control signal depth or excursion.'],
   rateHz: ['Rate', 'Rhythmic parameter', SSTIM('pulseRateHz').value, 'Control or sequence step rate in Hz.'],
-  nnotes: ['Note count', 'Sequence parameter', SSTIM('noteCount').value, 'Number of notes or sequence positions in a Symmetry cycle.'],
-  noctaves: ['Octave span', 'Pitch parameter', SSTIM('octaveSpan').value, 'Pitch span covered by a Symmetry sequence.'],
+  nnotes: ['Note count', 'Sequence parameter', SSTIM('noteCount').value, 'Number of notes or sequence positions in one cycle of a repeating sequence.'],
+  noctaves: ['Octave span', 'Pitch parameter', SSTIM('octaveSpan').value, 'Pitch span covered by a note sequence, in octaves.'],
   cutoff: ['Cutoff', 'Filter parameter', null, 'Filter cutoff / centre frequency in Hz applied to a broadband noise source.'],
   resonance: ['Resonance', 'Filter parameter', null, 'Filter resonance (Q) of the noise shaping filter.'],
   detune: ['Detune', 'Pitch parameter', null, 'Detune spread in cents across a drone oscillator stack.'],
@@ -198,14 +200,16 @@ const PARAM_SEMANTICS = {
   opacity: ['Opacity', 'Visual parameter', null, 'Blend weight of a visual layer. Distinct from luminance, which the ontology does name, so no term is claimed.'],
   hue: ['Hue', 'Visual parameter', null, 'Colour angle of a visual layer. RenderableParameterScheme names no colour category yet.'],
   intensity: ['Intensity', 'Haptic parameter', SSTIM('stimulationIntensity').value, 'Strength of haptic or sensory output.'],
-  pattern: ['Pattern', 'Haptic parameter', SSTIM('hapticPattern').value, 'Pattern index or selector for haptic delivery.'],
+  // An index into this engine's haptic pattern list means nothing outside it,
+  // so SSTIM deprecated sstim:hapticPattern without a replacement (ADR 0061).
+  pattern: ['Pattern', 'Haptic parameter', null, 'Index into the studio\'s own haptic pattern list. Engine-specific, so no ontology term is claimed.'],
 }
 
 export function semanticForTrackType(type) {
   return TRACK_SEMANTICS[type] ?? {
     label: type ?? 'Track type',
     kind: 'Track type',
-    uri: SSTIM('Voice').value,
+    uri: SSTIM('Track').value,
     description: 'A patch track type used by Patch Studio.',
   }
 }
@@ -270,7 +274,7 @@ export function parametersForIri(iri) {
  * has nothing to offer for it.
  *
  * A term that exactly one track type realises gets a deep link that adds that
- * track. Anything broader (sstim:Voice covers four audio types,
+ * track. Anything broader (sstim:AudioTrack covers four audio types,
  * sstim-v:modalityVisual covers fourteen visual ones) gets a plain link and
  * names the coverage in the tooltip instead, because fourteen "add" links in a
  * detail panel is not an affordance, it is noise.

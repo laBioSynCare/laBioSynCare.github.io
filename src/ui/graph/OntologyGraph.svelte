@@ -316,13 +316,13 @@
 
   const SCHEME_COLORS = {
     'https://w3id.org/sstim/vocab#FrequencyBandScheme':       '#4db6ac',
-    'https://w3id.org/sstim/vocab#PresetGroupScheme':         '#ff8a65',
+    [PREFIXES['bsc-v'] + 'PresetGroupScheme']:                '#ff8a65',
     'https://w3id.org/sstim/vocab#EvidenceTierScheme':        '#9575cd',
     'https://w3id.org/sstim/vocab#EvidenceModalityScheme':    '#f06292',
-    'https://w3id.org/sstim/vocab#VoiceTypeScheme':           '#4dd0e1',
+    [PREFIXES['bsc-v'] + 'VoiceTypeScheme']:                  '#4dd0e1',
     'https://w3id.org/sstim/vocab#SensoryModalityScheme':     '#aed581',
     'https://w3id.org/sstim/vocab#StimulationMechanismScheme':'#ffd54f',
-    'https://w3id.org/sstim/vocab#PermutationFunctionScheme': '#a1887f',
+    [PREFIXES['bsc-v'] + 'PermutationFunctionScheme']:        '#a1887f',
     'https://w3id.org/sstim/vocab#CautionTagScheme':          '#ef9a9a',
   }
 
@@ -343,13 +343,16 @@
   // that can slice the controlled terms.
   const V_SCHEME = 'https://w3id.org/sstim/vocab#'
   const EX_SCHEME = 'https://w3id.org/sstim/exposure#'
+  // The catalog's voice types, permutation functions and preset groups are the
+  // BSC framework's own schemes since ADR 0061; the sstim-v ones are deprecated.
+  const BSC_SCHEME = PREFIXES['bsc-v']
   const SCOPE_SCHEMES = {
     frequency: [V_SCHEME + 'FrequencyBandScheme'],
     modality:  [V_SCHEME + 'SensoryModalityScheme', EX_SCHEME + 'PerceivedModalityScheme'],
     mechanism: [V_SCHEME + 'StimulationMechanismScheme'],
     technique: [V_SCHEME + 'TechniqueScheme'],
-    voice:     [V_SCHEME + 'VoiceTypeScheme', V_SCHEME + 'PermutationFunctionScheme', V_SCHEME + 'StimulusTemporalStructureScheme'],
-    group:     [V_SCHEME + 'PresetGroupScheme'],
+    voice:     [BSC_SCHEME + 'VoiceTypeScheme', BSC_SCHEME + 'PermutationFunctionScheme', V_SCHEME + 'StimulusTemporalStructureScheme'],
+    group:     [BSC_SCHEME + 'PresetGroupScheme'],
     evidence:  [V_SCHEME + 'EvidenceTierScheme', V_SCHEME + 'EvidenceModalityScheme', V_SCHEME + 'PublicClaimLevelScheme', V_SCHEME + 'ClaimDirectionScheme', V_SCHEME + 'ReviewStatusScheme', V_SCHEME + 'EffectDirectionScheme'],
     caution:   [V_SCHEME + 'CautionTagScheme', V_SCHEME + 'CautionSeverityScheme'],
     neuromodulation: [V_SCHEME + 'NeuralAccessRouteScheme', V_SCHEME + 'StimulationDeliveryApproachScheme',

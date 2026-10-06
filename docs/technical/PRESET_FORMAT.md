@@ -823,16 +823,27 @@ reference presets are:
 
 - `_id` or `uuid` → IRI at `https://w3id.org/sstim/implementation/bsclab/preset/{normalized-id}` for BSC Lab reference presets
 - Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/bsclab`
-- `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
+- `header.group` → `bsc-v:inGroup` → group concept in the BSC framework vocabulary
+  (`static/ontology/frameworks/bsc/bsc-vocab.ttl`; SSTIM itself names no groups, ADR 0061)
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
 - `header.evidenceTier` → a separately identified
   `sstim:EvidenceAssessmentClaim` that evaluates the preset and carries the
   tier, direction, bounded proposition, qualified basis, provenance and review
   decision required by ADR 0027; the tier is not asserted on the preset itself
 - `header.cautionTags` → `sstim:hasCautionTag` → caution tag individuals
-- Voice array → `sstim:composedOf` → voice component individuals
+- Voice array → `sstim:composedOfTrack` → voice individuals typed `sstim:AudioTrack`,
+  `bsc-v:Voice` and their catalog voice class (`bsc-v:BinauralVoice`, …)
+- `header.hasBreathGuide` with the one voice whose `isOn` is true →
+  `sstim:breathGuideTrack` naming that voice; no pointer when no voice is on
+- Voice fields → generic SSTIM track parameters (`fl`/`fr` → `sstim:carrierFreqLeft`/
+  `Right`, `f0` → `sstim:baseFrequency`, `nnotes`/`noctaves`/`d` → `sstim:noteCount`/
+  `octaveSpan`/`cycleDuration`, `iniVolume` → `sstim:initialVolume`), except the
+  Martigli fields and the permutation code, which are the BSC framework's
+  (`mf0`/`ma`/`mp0`/`mp1`/`md` → `bsc-v:martigliCenterFreq`/`Amplitude`/`PeriodInitial`/
+  `PeriodFinal`/`TransitionDuration`, `permfunc` → `bsc-v:permutationFunction`)
 
-Public RDF instances are validated against `static/ontology/sstim-shapes.ttl`.
+Public RDF instances are validated against `static/ontology/sstim-shapes.ttl`
+together with the BSC framework shapes (`static/ontology/frameworks/bsc/bsc-shapes.ttl`).
 No public BSC Lab preset that fails SHACL validation should be published or
 included in a runtime JSON bundle.
 

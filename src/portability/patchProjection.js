@@ -18,8 +18,9 @@
 // parameter configuration for some engine — and the difference between BSC's two
 // serialisations is a fact about BSC, not about sensory stimulation. So the
 // projection is a `sstim:Preset` composed of `sstim:Track` instances, and the
-// BSC catalog's curation requirements moved to a profile shape targeting
-// configurations built from catalog `sstim:Voice`s.
+// BSC catalog's curation requirements moved to a profile shape, then with ADR
+// 0061 out of SSTIM into the BSC framework's own shapes, which target presets
+// built from its catalog voices (`bsc-v:Voice`).
 //
 // What a preset is *not* is the stimulation itself. The engine-independent
 // description of what reaches the subject is `sstim:StimulusSpecification`,
@@ -55,22 +56,22 @@ const XSD = 'http://www.w3.org/2001/XMLSchema#'
  * where a patch puts the value — see `STRUCTURAL_FINDINGS`.
  */
 export const PARAM_PROPERTIES = {
-  // Audio track parameters → sstim:Voice
-  gain:             { property: 'initialVolume',        domain: 'Voice', datatype: 'decimal' },
-  pan:              { property: 'panPosition',          domain: 'Voice', datatype: 'decimal' },
-  frequency:        { property: 'baseFrequency',        domain: 'Voice', datatype: 'decimal' },
-  pulseRate:        { property: 'pulseRateHz',          domain: 'Voice', datatype: 'decimal' },
-  noteDurationFrac: { property: 'noteDurationFraction', domain: 'Voice', datatype: 'decimal' },
+  // Audio track parameters → sstim:AudioTrack
+  gain:             { property: 'initialVolume',        domain: 'AudioTrack', datatype: 'decimal' },
+  pan:              { property: 'panPosition',          domain: 'AudioTrack', datatype: 'decimal' },
+  frequency:        { property: 'baseFrequency',        domain: 'AudioTrack', datatype: 'decimal' },
+  pulseRate:        { property: 'pulseRateHz',          domain: 'AudioTrack', datatype: 'decimal' },
+  noteDurationFrac: { property: 'noteDurationFraction', domain: 'AudioTrack', datatype: 'decimal' },
 
-  // BinauralBeat is parameterised as a carrier pair, which is exactly what
-  // ADR 0005 requires of a catalog Binaural voice — so these four map directly.
+  // BinauralBeat is parameterised as a carrier pair, the same generic carrier
+  // properties a BSC catalog Binaural voice uses (ADR 0005), so these map directly.
   // An earlier draft of this table wrongly listed the carrier properties as
   // having no Patch Studio counterpart; the ontology-conformance test below now
   // makes that class of mistake visible instead of silent.
-  leftFreq:         { property: 'carrierFreqLeft',      domain: 'Voice', datatype: 'decimal' },
-  rightFreq:        { property: 'carrierFreqRight',     domain: 'Voice', datatype: 'decimal' },
-  centerFreq:       { property: 'baseFrequency',        domain: 'Voice', datatype: 'decimal' },
-  beatFreq:         { property: 'beatHz',               domain: 'Voice', datatype: 'decimal' },
+  leftFreq:         { property: 'carrierFreqLeft',      domain: 'AudioTrack', datatype: 'decimal' },
+  rightFreq:        { property: 'carrierFreqRight',     domain: 'AudioTrack', datatype: 'decimal' },
+  centerFreq:       { property: 'baseFrequency',        domain: 'AudioTrack', datatype: 'decimal' },
+  beatFreq:         { property: 'beatHz',               domain: 'AudioTrack', datatype: 'decimal' },
 
   // Visual track parameters → sstim:SessionSpecification (see finding V1)
   rotationSpeed:    { property: 'rotationSpeed',        domain: 'SessionSpecification', datatype: 'decimal' },
@@ -78,21 +79,27 @@ export const PARAM_PROPERTIES = {
 
   // Haptic track parameters → sstim:SessionSpecification (see finding V1)
   intensity:        { property: 'stimulationIntensity', domain: 'SessionSpecification', datatype: 'decimal' },
-  pattern:          { property: 'hapticPattern',        domain: 'SessionSpecification', datatype: 'integer' },
+  // `pattern` has no entry: it indexes this engine's own list of haptic
+  // patterns, which means nothing outside it, so SSTIM deprecated
+  // sstim:hapticPattern without a replacement (ADR 0061). It is reported in
+  // `unmapped` and travels only in the lossless patch.
 }
 
 /** Control-track parameters, keyed by control type then parameter. */
 export const CONTROL_PROPERTIES = {
+  // The generic breathing-oscillation terms since ADR 0061. The LFO used to be
+  // written with the BSC catalog's Martigli properties, which are now the BSC
+  // framework's own, while semantic.js already named these generic ones.
   LFO: {
-    periodSec:       { property: 'martigliPeriodInitial', domain: 'Voice', datatype: 'decimal' },
-    targetPeriodSec: { property: 'martigliPeriodFinal',   domain: 'Voice', datatype: 'decimal' },
-    inhaleRatio:     { property: 'breathingPhaseRatio',   domain: 'Voice', datatype: 'decimal' },
-    amplitude:       { property: 'martigliAmplitude',     domain: 'Voice', datatype: 'decimal' },
+    periodSec:       { property: 'breathingPeriodInitial', domain: 'ControlTrack', datatype: 'decimal' },
+    targetPeriodSec: { property: 'breathingPeriodFinal',   domain: 'ControlTrack', datatype: 'decimal' },
+    inhaleRatio:     { property: 'breathingPhaseRatio',    domain: 'ControlTrack', datatype: 'decimal' },
+    amplitude:       { property: 'breathingAmplitude',     domain: 'ControlTrack', datatype: 'decimal' },
   },
   Permutation: {
-    nnotes:          { property: 'noteCount',             domain: 'Voice', datatype: 'integer' },
-    rateHz:          { property: 'pulseRateHz',           domain: 'Voice', datatype: 'decimal' },
-    amplitude:       { property: 'breathingAmplitude',    domain: 'Voice', datatype: 'decimal' },
+    nnotes:          { property: 'noteCount',             domain: 'ControlTrack', datatype: 'integer' },
+    rateHz:          { property: 'pulseRateHz',           domain: 'ControlTrack', datatype: 'decimal' },
+    amplitude:       { property: 'breathingAmplitude',    domain: 'ControlTrack', datatype: 'decimal' },
   },
 }
 
@@ -111,13 +118,12 @@ export const TIMING_PROPERTIES = {
  * track is not.
  */
 export const DELIBERATELY_UNUSED = {
-  hasBreathGuide: 'This relation identifies a catalog Voice used as the breathing guide; Patch Studio tracks are generic configuration tracks, not catalog voices.',
-  martigliCenterFreq: 'A Martigli control track modulates other tracks; it has no carrier of its own.',
-  martigliTransitionDuration: 'Patch Studio expresses the transition through control-track automation, not a single scalar.',
-  isBreathReference: 'The one-breath-reference rule (CLAUDE.md §4.5) is a catalog preset constraint; Patch Studio does not mark a reference track.',
-  cycleDuration: 'Symmetry timing is expressed as rateHz in Patch Studio; d = nnotes / rateHz is derivable but not stored.',
-  octaveSpan: 'Patch Studio Symmetry controls are isochronic (noctaves = 0) and do not expose an octave span.',
-  permutationFunction: 'The plain-hunt family is fixed; no numeric permutation function is stored.',
+  // Only live properties belong here. The BSC catalog terms this table used to
+  // explain (hasBreathGuide, isBreathReference, the Martigli parameters,
+  // permutationFunction) are deprecated since ADR 0061, and the test reads
+  // deprecated properties as absent.
+  cycleDuration: 'Permutation timing is expressed as rateHz in Patch Studio; d = nnotes / rateHz is derivable but not stored.',
+  octaveSpan: 'Patch Studio Permutation controls are isochronic (noctaves = 0) and do not expose an octave span.',
   visualDensity: 'No Patch Studio visual parameter corresponds; particle count is not exposed as a density.',
 }
 
@@ -149,9 +155,9 @@ export const STRUCTURAL_FINDINGS = [
     resolvedIn: 'ADR 0040, retained by ADR 0041',
     finding: 'Configuration layers had no SSTIM class.',
     detail:
-      'sstim-sh:VoiceShape requires one of four catalog voice types, which Carrier, Noise, Drone, Sample, the nine visual types and Vibration are not.',
+      'sstim-sh:VoiceShape required one of four catalog voice types, which Carrier, Noise, Drone, Sample, the nine visual types and Vibration are not.',
     consequence:
-      'sstim:Track with four disjoint subtypes, linked by sstim:composedOfTrack. Retained by ADR 0041 as genuinely general: any multi-layer configuration has layers. Whether sstim:Voice is a sstim:AudioTrack is still open.',
+      'sstim:Track with four disjoint subtypes, linked by sstim:composedOfTrack. Retained by ADR 0041 as genuinely general: any multi-layer configuration has layers. ADR 0061 settled the last question: the catalog voice, now bsc-v:Voice, is a sstim:AudioTrack.',
   },
   {
     id: 'V1',

@@ -5,8 +5,9 @@ PREFIX dct:     <http://purl.org/dc/terms/>
 PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
 PREFIX sstim:   <https://w3id.org/sstim#>
+PREFIX bsc-v:   <https://w3id.org/sstim/framework/bsc/vocab#>
 
-SELECT ?preset ?presetGraph ?label ?description ?version ?created ?modified ?hasBreathGuide
+SELECT ?preset ?presetGraph ?label ?description ?version ?created ?modified ?breathGuide
        ?group ?groupLabel ?band ?bandLabel
        ?voiceType ?protocol ?implementation
        ?publicClaimLevel ?publicClaimLevelLabel
@@ -19,9 +20,12 @@ WHERE {
     ?preset a sstim:Preset ;
             rdfs:label ?label ;
             sstim:presetVersion ?version ;
-            sstim:hasBreathGuide ?hasBreathGuide ;
-            sstim:inGroup ?group ;
             sstim:targetsFrequencyBand ?band .
+
+    # Breath guidance is one pointer to a track, and a group is a framework's
+    # editorial scheme rather than something every preset has (ADR 0061).
+    OPTIONAL { ?preset sstim:breathGuideTrack ?breathGuide . }
+    OPTIONAL { ?preset bsc-v:inGroup ?group . }
 
     OPTIONAL { ?preset dct:description ?description . }
     OPTIONAL { ?preset dct:created ?created . }
@@ -33,6 +37,7 @@ WHERE {
   }
 
   OPTIONAL {
+    FILTER(BOUND(?group))
     GRAPH ?groupGraph {
       ?group skos:prefLabel ?groupLabel .
       FILTER(LANG(?groupLabel) = "en")
@@ -47,14 +52,12 @@ WHERE {
 
   OPTIONAL {
     GRAPH ?voiceGraph {
-      ?preset sstim:composedOf ?voice .
+      ?preset sstim:composedOfTrack ?voice .
       ?voice a ?voiceType .
-      VALUES ?voiceType {
-        sstim:BinauralVoice
-        sstim:MartigliVoice
-        sstim:MartigliBinauralVoice
-        sstim:SymmetryVoice
-      }
+      # The most specific type a track declares: a catalog voice's technique
+      # type, not the generic track kind every track also carries.
+      FILTER(?voiceType NOT IN (sstim:Track, sstim:AudioTrack, sstim:VisualTrack,
+                                sstim:HapticTrack, sstim:ControlTrack, bsc-v:Voice))
     }
   }
   OPTIONAL {
@@ -167,7 +170,7 @@ export async function listPresets(store) {
         version: literalValue(row.version),
         created: literalValue(row.created),
         modified: literalValue(row.modified),
-        hasBreathGuide: literalValue(row.hasBreathGuide) === 'true',
+        hasBreathGuide: Boolean(row.breathGuide),
         graphIri: row.presetGraph?.value ?? '',
         groups: [],
         bands: [],

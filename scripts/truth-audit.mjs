@@ -488,8 +488,16 @@ if (!indexCounts) {
     'docs/ontology/IMPROVEMENT_PLAN.md', 'docs/ontology/REGISTRY_SUBMISSIONS.md']
   let claims = 0
   for (const file of scanned) {
-    const text = read(file)
+    let text = read(file)
     if (!text) continue
+    // A released changelog section is history: its totals were true of that
+    // release and must not move when the vocabulary grows. Until 2026-10-06 they
+    // were scanned too, and c8ef5d9 changed the 0.16.0 section's 545 to 551 to
+    // satisfy this check. Only [Unreleased] speaks in the present tense.
+    if (file === 'CHANGELOG.md') {
+      const released = text.search(/\n## \[\d+\.\d+\.\d+\]/)
+      if (released !== -1) text = text.slice(0, released)
+    }
     text.split('\n').forEach((line, i) => {
       if (IS_HISTORY.test(line)) return
       for (const m of line.matchAll(TOTAL_CLAIM)) {
@@ -510,6 +518,12 @@ if (!indexCounts) {
 // regenerates it, so both go stale at the next release and the archive of record
 // then misdescribes itself to anyone who cites it. This is the only guard: a
 // deposit sends whatever the file says.
+//
+// Its totals are the release's, counted from the frozen snapshot by the term
+// index's own code. Until 2026-10-06 they were compared with the live index,
+// which is the same number only until the development line adds a term: GB-01
+// added five, and this check then demanded a description reading "This release
+// freezes SSTIM 0.18.0" with totals 0.18.0 does not have.
 
 {
   const zenodo = read('.zenodo.json')
@@ -526,15 +540,25 @@ if (!indexCounts) {
       const claim = new RegExp(`(?<![\\d.])(\\d+)(?:\\s+[A-Za-z]+){0,2}\\s+${key}\\b`)
       stated[key] = description.match(claim)?.[1] ?? null
     }
+    let released = null
+    try {
+      released = JSON.parse(execSync(
+        `python3 scripts/generate-term-index.py --counts ${RELEASE_VERSION}`,
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+      ))
+    } catch (error) {
+      // An unreachable count must not read as agreement (CLAUDE.md §3.6).
+      fail('.zenodo.json', `cannot count the ${RELEASE_VERSION} release: ${String(error.stderr || error.message).trim().split('\n').pop()}`)
+    }
     const wanted = {
-      classes: indexCounts?.[1],
-      properties: indexCounts?.[2],
-      concepts: indexCounts?.[3],
-      modules: String(MODULE_COUNT),
+      classes: released && String(released.classes),
+      properties: released && String(released.properties),
+      concepts: released && String(released.concepts),
+      modules: released && String(released.modules),
     }
     for (const [key, value] of Object.entries(stated)) {
-      if (value && value !== wanted[key]) {
-        fail('.zenodo.json', `the description claims ${value} ${key}; the sources say ${wanted[key]}`)
+      if (value && released && value !== wanted[key]) {
+        fail('.zenodo.json', `the description claims ${value} ${key}; the ${RELEASE_VERSION} release has ${wanted[key]}`)
       }
     }
     // A version other than the citable one is the stale-after-release case: the

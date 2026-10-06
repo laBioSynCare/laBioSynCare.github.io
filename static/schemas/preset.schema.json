@@ -26,8 +26,9 @@
     },
 
     "group": {
-      "enum": ["Heal", "Support", "Perform", "Indulge", "Transcend"],
-      "description": "Optional BSC framework grouping (sstim:inGroup). Optional because grouping is a framework's editorial scheme, not a property every standard-conformant preset must have."
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional grouping in a framework's own editorial scheme, given as that scheme's notation or IRI. SSTIM names no groups: grouping is a framework's editorial choice, not a property every standard-conformant preset must have. The BSC framework's five groups are its own (bsc-v:PresetGroupScheme, ADR 0061)."
     },
     "targetBands": {
       "type": "array",
@@ -56,7 +57,7 @@
     "components": {
       "type": "array",
       "minItems": 1,
-      "description": "At least one stimulation component; each declares its own modality, so a preset is not implicitly audio. Deliberately un-capped: the six-layer ceiling belongs to the BSC catalog profile, where it is a real engine limit (sstim:composedOf, \"1-6 voice specifications\"), and carrying it into a modality-neutral contract would have been exactly the transcription this schema exists to avoid. A preset combining audio, visual and haptic layers has no principled reason to stop at six.",
+      "description": "At least one stimulation component; each declares its own modality, so a preset is not implicitly audio. Deliberately un-capped: the six-layer ceiling belongs to the BSC catalog profile, where it is a real engine limit (the BSC catalog shapes, \"1-6 catalog voices\"), and carrying it into a modality-neutral contract would have been exactly the transcription this schema exists to avoid. A preset combining audio, visual and haptic layers has no principled reason to stop at six.",
       "items": { "$ref": "#/$defs/component" }
     }
   },
@@ -210,7 +211,7 @@
         "cycleSeconds": { "type": "number", "exclusiveMinimum": 0 },
         "permutation": {
           "enum": ["shuffle", "rotate-forward", "rotate-backward", "reverse", "identity"],
-          "description": "Named rather than the catalog's integer code. The ordinal encoding 0-4 survives only where RDF needs a number (sstim:permutationFunction), in the order listed here."
+          "description": "Named rather than the catalog's integer code. The ordinal encoding 0-4 survives only where the BSC catalog's RDF needs a number (bsc-v:permutationFunction), in the order listed here."
         }
       }
     }

@@ -20,6 +20,7 @@
 
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix bsc-v:   <https://w3id.org/sstim/framework/bsc/vocab#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -72,7 +73,7 @@ sstim-v:allFrequencyBands a owl:NamedIndividual, sstim:FrequencyBandGroup, skos:
     skos:narrower sstim-v:delta, sstim-v:theta, sstim-v:alpha,
                   sstim-v:smr, sstim-v:beta, sstim-v:gamma ;
     skos:notation "all" ;
-    skos:definition "Top concept of the frequency band scheme: the set of all EEG-derived neural oscillation bands and sub-bands used in BSC protocol design. A grouping root, not a stimulation target in itself."@en .
+    skos:definition "Top concept of the frequency band scheme: the set of all EEG-derived neural oscillation bands and sub-bands used in protocol design. A grouping root, not a stimulation target in itself."@en .
 
 # --- Primary bands ---
 
@@ -268,6 +269,9 @@ sstim-v:gamma40 a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
 ###########################################################################
 
 sstim-v:PresetGroupScheme a skos:ConceptScheme ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:PresetGroupScheme ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC framework scheme. Use bsc-v:PresetGroupScheme."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Preset Group Vocabulary"@en ;
     skos:hasTopConcept sstim-v:groupHeal, sstim-v:groupSupport,
@@ -275,30 +279,45 @@ sstim-v:PresetGroupScheme a skos:ConceptScheme ;
                        sstim-v:groupTranscend .
 
 sstim-v:groupHeal a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:groupHeal ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:groupHeal."@en ;
     skos:inScheme sstim-v:PresetGroupScheme ;
     skos:prefLabel "Heal"@en, "Heal"@it, "Heal"@pt, "Heal"@es ;
     skos:notation "Heal" ;
     skos:definition "Wellness goals with comparatively stronger evidence and conservative design. Guided breathing often appropriate. Warm, lower-complexity character."@en .
 
 sstim-v:groupSupport a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:groupSupport ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:groupSupport."@en ;
     skos:inScheme sstim-v:PresetGroupScheme ;
     skos:prefLabel "Support"@en, "Support"@it, "Support"@pt, "Support"@es ;
     skos:notation "Support" ;
     skos:definition "Meaningful user needs where evidence is promising but limited, mixed, indirect, or modality-mismatched. Explicit limitation statements required in techDesc."@en .
 
 sstim-v:groupPerform a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:groupPerform ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:groupPerform."@en ;
     skos:inScheme sstim-v:PresetGroupScheme ;
     skos:prefLabel "Perform"@en, "Perform"@it, "Perform"@pt, "Perform"@es ;
     skos:notation "Perform" ;
     skos:definition "Cognitive performance, focus, work, creativity. Background (minimal, no breathing) and Active (engaging, breathing may apply) sub-types."@en .
 
 sstim-v:groupIndulge a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:groupIndulge ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:groupIndulge."@en ;
     skos:inScheme sstim-v:PresetGroupScheme ;
     skos:prefLabel "Indulge"@en, "Indulge"@it, "Indulge"@pt, "Indulge"@es ;
     skos:notation "Indulge" ;
     skos:definition "Experiential, playful, intense, or recreational sonic worlds. High personality, diverse design, bloom intentional. No medical implication."@en .
 
 sstim-v:groupTranscend a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:groupTranscend ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: the BSC framework's own grouping. Use bsc-v:groupTranscend."@en ;
     skos:inScheme sstim-v:PresetGroupScheme ;
     skos:prefLabel "Transcend"@en, "Transcend"@it, "Transcend"@pt, "Transcend"@es ;
     skos:notation "Transcend" ;
@@ -959,30 +978,45 @@ sstim-v:reproEquivalentPresentation a owl:NamedIndividual, sstim:Reproducibility
 ###########################################################################
 
 sstim-v:VoiceTypeScheme a skos:ConceptScheme ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:VoiceTypeScheme ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC framework scheme. Use bsc-v:VoiceTypeScheme."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Voice Type Vocabulary"@en ;
     skos:hasTopConcept sstim-v:voiceBinaural, sstim-v:voiceMartigli,
         sstim-v:voiceMartigliBinaural, sstim-v:voiceSymmetry .
 
 sstim-v:voiceBinaural a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:voiceBinaural ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:voiceBinaural."@en ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
     skos:prefLabel "Binaural"@en, "Binaurale"@it, "Binaural"@pt, "Binaural"@es ;
     skos:notation "Binaural" ;
     skos:definition "Two dichotic sine tones producing a binaural beat at |fr - fl| Hz."@en .
 
 sstim-v:voiceMartigli a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:voiceMartigli ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:voiceMartigli."@en ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
     skos:prefLabel "Martigli"@en, "Martigli"@it, "Martigli"@pt, "Martigli"@es ;
     skos:notation "Martigli" ;
     skos:definition "Single tone with sinusoidal frequency oscillation following a decelerating breathing arc."@en .
 
 sstim-v:voiceMartigliBinaural a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:voiceMartigliBinaural ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:voiceMartigliBinaural."@en ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
     skos:prefLabel "Martigli-Binaural"@en, "Martigli-Binaurale"@it, "Martigli-Binaural"@pt, "Martigli-Binaural"@es ;
     skos:notation "Martigli-Binaural" ;
     skos:definition "Binaural beat combined with Martigli oscillation. Constant beat frequency despite sweeping carriers."@en .
 
 sstim-v:voiceSymmetry a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:voiceSymmetry ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC catalog voice type. Use bsc-v:voiceSymmetry."@en ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
     skos:prefLabel "Symmetry"@en, "Simmetria"@it, "Simetria"@pt, "Simetría"@es ;
     skos:notation "Symmetry" ;
@@ -1004,7 +1038,7 @@ sstim-v:modalityAuditory a owl:NamedIndividual, sstim:SensoryModality, skos:Conc
     skos:inScheme sstim-v:SensoryModalityScheme ;
     skos:prefLabel "Auditory"@en, "Uditivo"@it, "Auditivo"@pt, "Auditivo"@es ;
     skos:notation "auditory" ;
-    skos:definition "The auditory sensory modality: perception of sound via the ear and auditory pathway. The primary BSC delivery channel."@en ;
+    skos:definition "The auditory sensory modality: perception of sound via the ear and auditory pathway."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean .
 
 sstim-v:modalityVisual a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
@@ -1236,18 +1270,27 @@ sstim-v:mechMultisensory a owl:NamedIndividual, sstim:StimulationMechanism, skos
 ###########################################################################
 
 sstim-v:PermutationFunctionScheme a skos:ConceptScheme ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:PermutationFunctionScheme ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: a BSC framework scheme. Use bsc-v:PermutationFunctionScheme."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en ;
     skos:hasTopConcept sstim-v:permShuffle, sstim-v:permRotateForward,
         sstim-v:permRotateBackward, sstim-v:permReverse, sstim-v:permIdentity .
 
 sstim-v:permShuffle a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permShuffle ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:permShuffle."@en ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
     skos:prefLabel "Shuffle"@en, "Shuffle"@it, "Shuffle"@pt, "Shuffle"@es ;
     skos:notation "0" ;
     skos:definition "Uniform random permutation (Fisher-Yates) at each cycle boundary. Maximum cross-cycle unpredictability. Highest cognitive engagement."@en .
 
 sstim-v:permRotateForward a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permRotateForward ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:permRotateForward."@en ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
     skos:prefLabel "Rotate Forward"@en, "Rotazione in Avanti"@it,
                    "Rotação para Frente"@pt, "Rotación hacia Adelante"@es ;
@@ -1255,6 +1298,9 @@ sstim-v:permRotateForward a owl:NamedIndividual, sstim:PermutationFunction, skos
     skos:definition "Cyclic left shift at each cycle boundary. Systematic upward pitch drift over N cycles."@en .
 
 sstim-v:permRotateBackward a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permRotateBackward ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:permRotateBackward."@en ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
     skos:prefLabel "Rotate Backward"@en, "Rotazione all'Indietro"@it,
                    "Rotação para Trás"@pt, "Rotación hacia Atrás"@es ;
@@ -1262,12 +1308,18 @@ sstim-v:permRotateBackward a owl:NamedIndividual, sstim:PermutationFunction, sko
     skos:definition "Cyclic right shift. Systematic downward pitch drift over N cycles."@en .
 
 sstim-v:permReverse a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permReverse ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:permReverse."@en ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
     skos:prefLabel "Reverse"@en, "Inversione"@it, "Inversão"@pt, "Inversión"@es ;
     skos:notation "3" ;
     skos:definition "Alternating reversal — ascending and descending passes alternate with period 2 cycles."@en .
 
 sstim-v:permIdentity a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy bsc-v:permIdentity ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: BSC Symmetry's permutation set. Use bsc-v:permIdentity."@en ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
     skos:prefLabel "Identity"@en, "Identità"@it, "Identidade"@pt, "Identidad"@es ;
     skos:notation "4" ;
@@ -1450,7 +1502,7 @@ sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:
     skos:prefLabel "Ultra-Slow Breathing"@en, "Respirazione Ultra-Lenta"@it,
                    "Respiração Ultra-Lenta"@pt, "Respiración Ultra-Lenta"@es ;
     skos:notation "ultra-slow-breathing" ;
-    skos:definition "Preset requests a breathing cadence below 3 cycles per minute, outside the ordinary BSC guided-breathing range and unsuitable for forced following."@en ;
+    skos:definition "Preset requests a breathing cadence below 3 cycles per minute, outside the ordinary guided-breathing range and unsuitable for forced following."@en ;
     sstim:hasCautionSeverity sstim-v:cautionSeverityHigh ;
     sstim:triggerCondition "The breathing guide requests fewer than 3 cycles per minute or following it causes breath hunger, dizziness, or discomfort." ;
     sstim:affectedPopulation "All users, especially anyone with breathing limitations or unfamiliarity with very slow breathing practices." ;
@@ -1502,7 +1554,7 @@ sstim-v:temporalAdaptive a owl:NamedIndividual, sstim:StimulusTemporalStructure,
     skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
     skos:prefLabel "Adaptive"@en, "Adattivo"@it, "Adaptativo"@pt, "Adaptativo"@es ;
     skos:notation "adaptive" ;
-    skos:definition "A closed-loop stimulus whose temporal structure is adjusted in response to a measured signal. Outside current BSC delivery scope; reserved for future biofeedback-driven implementations."@en .
+    skos:definition "A closed-loop stimulus whose temporal structure is adjusted in response to a measured signal, as in biofeedback-driven delivery."@en .
 
 
 ###########################################################################
@@ -4268,7 +4320,8 @@ sstim-v:shapeSine a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Senoide"@es ;
     skos:altLabel "sine wave"@en, "sinusoid"@en ;
     skos:notation "sine" ;
-    skos:definition "A single-frequency sinusoid. The default periodic shape, and the only one the BSC catalog ever used."@en .
+    skos:definition "A single-frequency sinusoid. The default periodic shape."@en ;
+    skos:historyNote "The only periodic shape the BSC catalog ever used."@en .
 
 sstim-v:shapeSquare a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
@@ -4442,7 +4495,8 @@ sstim-v:paramSpatialPosition a owl:NamedIndividual, sstim:RenderableParameter, s
                    "Posição espacial"@pt,
                    "Posición espacial"@es ;
     skos:notation "spatial-position" ;
-    skos:definition "Where the stimulus appears in space. A signal rendered onto this parameter is what the BSC catalog encoded as a Martigli-synced panning mode."@en .
+    skos:definition "Where the stimulus appears in space: its position relative to the participant, which a signal rendered onto this parameter moves."@en ;
+    skos:historyNote "The BSC catalog encoded a signal rendered onto this parameter as a Martigli-synced panning mode."@en .
 
 sstim-v:paramVibrationIntensity a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;

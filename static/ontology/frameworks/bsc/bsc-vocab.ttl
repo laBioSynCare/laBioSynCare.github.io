@@ -1,0 +1,344 @@
+###########################################################################
+#
+#  BSC Framework Vocabulary
+#
+#  Version:    1.0.0
+#  Date:       2026-10-06
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  The terms that belong to the BSC framework rather than to sensory
+#  stimulation in general: the catalog's voice model, its five preset
+#  groups, the parameterisation of the Martigli oscillation, and the
+#  integer coding of Symmetry's permutation functions.
+#
+#  SSTIM ADR 0061 moved them out of SSTIM's universal namespaces. SSTIM
+#  keeps each old term, deprecated, with dct:isReplacedBy pointing here.
+#  The dependency runs one way: this vocabulary uses SSTIM terms, SSTIM
+#  never uses these. It is part of no SSTIM profile or snapshot, and the
+#  W3C Community Group that publishes SSTIM does not publish it.
+#
+#  What did not move: a parameter whose meaning holds without BSC stayed in
+#  SSTIM. A Symmetry voice's note count, octave span and cycle are
+#  sstim:noteCount, sstim:octaveSpan and sstim:cycleDuration; composition
+#  and breath guidance are sstim:composedOfTrack and sstim:breathGuideTrack.
+#  The Martigli parameters stay BSC's because each carries the catalog's
+#  own bounds, but each is declared a sub-property of the generic SSTIM
+#  breathing-oscillation term it specialises.
+#
+###########################################################################
+
+@prefix bsc-v:  <https://w3id.org/sstim/framework/bsc/vocab#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+
+
+###########################################################################
+# Vocabulary metadata
+###########################################################################
+
+<https://w3id.org/sstim/framework/bsc/vocab> a owl:Ontology ;
+    owl:versionInfo "1.0.0" ;
+    dct:title "BSC Framework Vocabulary"@en ;
+    dct:description "The BSC framework's own terms: the catalog's voice model, its five preset groups, the Martigli oscillation's parameterisation, and the integer coding of Symmetry's permutation functions. Moved out of SSTIM's universal namespaces by SSTIM ADR 0061; it uses SSTIM 0.19.0 terms and is part of no SSTIM profile or snapshot."@en ;
+    dct:isPartOf <https://w3id.org/sstim/framework/bsc> ;
+    dct:requires <https://w3id.org/sstim> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
+    # Published by the framework's maintainer. Not by the W3C Community Group,
+    # which publishes SSTIM: keeping that distinction is why this file exists.
+    dct:publisher <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-06"^^xsd:date ;
+    dct:issued "2026-10-06"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/main/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
+
+# SSTIM's modules declare every other annotation property used here; this one
+# only this header uses, and OWL 2 DL requires the declaration.
+dct:contributor a owl:AnnotationProperty .
+
+
+###########################################################################
+# Catalog voice model
+###########################################################################
+
+bsc-v:Voice a owl:Class ;
+    rdfs:subClassOf sstim:AudioTrack ;
+    rdfs:label "Voice"@en ;
+    skos:definition "An audio layer of a BSC catalog preset, of exactly one of the four catalog voice types (Binaural, Martigli, Martigli-Binaural, Symmetry). A catalog preset composes one to six voices through sstim:composedOfTrack."@en ;
+    skos:scopeNote "The catalog's specialisation of sstim:AudioTrack: every voice is an audio track, while an audio track in another schema need not be one of the four catalog types. Its parameters are SSTIM's generic track parameters; the catalog rules about which a voice must carry are in the BSC shapes."@en ;
+    skos:historyNote "Formerly sstim:Voice, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:BinauralVoice a owl:Class ;
+    rdfs:subClassOf bsc-v:Voice ;
+    rdfs:label "Binaural Voice"@en ;
+    skos:definition "Two sine tones at slightly different frequencies (fl, fr) presented dichotically to produce a perceived beat at |fr - fl| Hz."@en ;
+    skos:historyNote "Formerly sstim:BinauralVoice, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:MartigliVoice a owl:Class ;
+    rdfs:subClassOf bsc-v:Voice ;
+    rdfs:label "Martigli Voice"@en ;
+    skos:definition "A single tone whose frequency oscillates sinusoidally with a breathing arc whose period decelerates linearly from mp0 to mp1 over md seconds."@en ;
+    skos:historyNote "Formerly sstim:MartigliVoice, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:MartigliBinauralVoice a owl:Class ;
+    rdfs:subClassOf bsc-v:Voice ;
+    rdfs:label "Martigli-Binaural Voice"@en ;
+    skos:definition "A binaural beat combined with a Martigli oscillation. Both carriers sweep in parallel, so the beat frequency stays constant while the timbral register follows the breathing arc."@en ;
+    skos:historyNote "Formerly sstim:MartigliBinauralVoice, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:SymmetryVoice a owl:Class ;
+    rdfs:subClassOf bsc-v:Voice ;
+    rdfs:label "Symmetry Voice"@en ;
+    skos:definition "N notes log-distributed over I octaves, repeated with an algebraic group permutation at each cycle boundary, at pulse rate N/d Hz. N, I and d are sstim:noteCount, sstim:octaveSpan and sstim:cycleDuration. When I = 0 it reduces to a traditional isochronous tone."@en ;
+    skos:historyNote "Formerly sstim:SymmetryVoice, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+[] a owl:AllDisjointClasses ;
+    owl:members (
+        bsc-v:BinauralVoice
+        bsc-v:MartigliVoice
+        bsc-v:MartigliBinauralVoice
+        bsc-v:SymmetryVoice
+    ) .
+
+bsc-v:VoiceType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice Type"@en ;
+    skos:definition "A named category of BSC catalog voice (Binaural, Martigli, Martigli-Binaural, Symmetry), identifying the synthesis technique a voice realizes. Classification anchor for the voice-type concepts; distinct from the bsc-v:Voice classes that carry parameters."@en ;
+    skos:historyNote "Formerly sstim:VoiceType, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:PermutationFunction a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Permutation Function"@en ;
+    skos:definition "A named reordering rule applied to a Symmetry voice's note sequence at each cycle boundary (identity, rotate forward, rotate backward, reversal, shuffle)."@en ;
+    skos:historyNote "Formerly sstim:PermutationFunction, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:permutationFunction a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain bsc-v:SymmetryVoice ;
+    rdfs:range xsd:integer ;
+    rdfs:label "permutation function"@en ;
+    skos:definition "The catalog's integer selector for a Symmetry voice's permutation function. Values are the skos:notation of the bsc-v:PermutationFunctionScheme members: 0 shuffle, 1 rotate forward, 2 rotate backward, 3 reverse, 4 identity."@en ;
+    skos:historyNote "Formerly sstim:permutationFunction, deprecated in SSTIM 0.19.0 by ADR 0061. Its domain narrows from any catalog voice to the Symmetry voice, the only one the selector has ever applied to."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+
+###########################################################################
+# Martigli oscillation parameters
+#
+# The catalog fields mf0, ma, mp0, mp1 and md. Each specialises a generic
+# SSTIM breathing-oscillation term, so a consumer that reasons with
+# rdfs:subPropertyOf reads a Martigli voice as a breathing-shaped oscillation
+# without knowing this vocabulary. They stay here rather than in SSTIM
+# because each carries the catalog's own bounds in the BSC shapes.
+###########################################################################
+
+bsc-v:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:baseFrequency ;
+    rdfs:domain bsc-v:MartigliVoice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli center frequency"@en ;
+    skos:definition "Center frequency (mf0) of a Martigli voice's oscillating tone, in Hz; the frequency sweeps mf0 ± ma. Martigli voices only: a Martigli-Binaural voice uses the carrier pair."@en ;
+    skos:historyNote "Formerly sstim:martigliCenterFreq, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:breathingAmplitude ;
+    rdfs:domain bsc-v:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli oscillation amplitude"@en ;
+    skos:definition "Frequency-sweep amplitude (ma) of a Martigli oscillation, in Hz; the carrier or carriers sweep ± ma around the center."@en ;
+    skos:historyNote "Formerly sstim:martigliAmplitude, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:breathingPeriodInitial ;
+    rdfs:domain bsc-v:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli initial period"@en ;
+    skos:definition "Initial breathing-cycle duration (mp0) of a Martigli oscillation, in seconds. At least 3 s when the voice is its preset's breath guide."@en ;
+    skos:historyNote "Formerly sstim:martigliPeriodInitial, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:breathingPeriodFinal ;
+    rdfs:domain bsc-v:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli final period"@en ;
+    skos:definition "Final breathing-cycle duration (mp1) of a Martigli oscillation after the transition, in seconds."@en ;
+    skos:historyNote "Formerly sstim:martigliPeriodFinal, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:martigliTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:breathingTransitionDuration ;
+    rdfs:domain bsc-v:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli transition duration"@en ;
+    skos:definition "Time (md) over which the breathing cycle moves linearly from mp0 to mp1, in seconds; mp1 is held afterwards."@en ;
+    skos:historyNote "Formerly sstim:martigliTransitionDuration, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+
+###########################################################################
+# Preset groups
+###########################################################################
+
+bsc-v:PresetGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Preset Group"@en ;
+    skos:definition "The BSC framework's editorial classification of its catalog presets by design character, evidence strength and use context. Five groups: Heal, Support, Perform, Indulge, Transcend."@en ;
+    skos:historyNote "Formerly sstim:PresetGroup, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+bsc-v:inGroup a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range bsc-v:PresetGroup ;
+    rdfs:label "in group"@en ;
+    skos:definition "Links a BSC catalog preset to its group. Each catalog preset belongs to exactly one group."@en ;
+    skos:historyNote "Formerly sstim:inGroup, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/framework/bsc/vocab> .
+
+
+###########################################################################
+# Concept schemes
+###########################################################################
+
+bsc-v:PresetGroupScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "BSC Preset Group Vocabulary"@en ;
+    skos:definition "The BSC framework's five catalog groups, by intended design character and use context."@en ;
+    skos:hasTopConcept bsc-v:groupHeal, bsc-v:groupSupport, bsc-v:groupPerform,
+        bsc-v:groupIndulge, bsc-v:groupTranscend .
+
+bsc-v:VoiceTypeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "BSC Voice Type Vocabulary"@en ;
+    skos:definition "The four BSC catalog voice types used by preset parameter bundles."@en ;
+    skos:hasTopConcept bsc-v:voiceBinaural, bsc-v:voiceMartigli,
+        bsc-v:voiceMartigliBinaural, bsc-v:voiceSymmetry .
+
+bsc-v:PermutationFunctionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en ;
+    skos:definition "Reordering functions available to cyclic BSC Symmetry note sequences, with the catalog's integer coding as notation."@en ;
+    skos:hasTopConcept bsc-v:permShuffle, bsc-v:permRotateForward,
+        bsc-v:permRotateBackward, bsc-v:permReverse, bsc-v:permIdentity .
+
+
+###########################################################################
+# Concepts
+###########################################################################
+
+bsc-v:groupHeal a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
+    skos:inScheme bsc-v:PresetGroupScheme ;
+    skos:topConceptOf bsc-v:PresetGroupScheme ;
+    skos:prefLabel "Heal"@en, "Heal"@it, "Heal"@pt, "Heal"@es ;
+    skos:notation "Heal" ;
+    skos:definition "Wellness goals with comparatively stronger evidence and conservative design. Guided breathing often appropriate. Warm, lower-complexity character."@en .
+
+bsc-v:groupSupport a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
+    skos:inScheme bsc-v:PresetGroupScheme ;
+    skos:topConceptOf bsc-v:PresetGroupScheme ;
+    skos:prefLabel "Support"@en, "Support"@it, "Support"@pt, "Support"@es ;
+    skos:notation "Support" ;
+    skos:definition "Meaningful user needs where evidence is promising but limited, mixed, indirect, or modality-mismatched. Explicit limitation statements required in techDesc."@en .
+
+bsc-v:groupPerform a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
+    skos:inScheme bsc-v:PresetGroupScheme ;
+    skos:topConceptOf bsc-v:PresetGroupScheme ;
+    skos:prefLabel "Perform"@en, "Perform"@it, "Perform"@pt, "Perform"@es ;
+    skos:notation "Perform" ;
+    skos:definition "Cognitive performance, focus, work, creativity. Background (minimal, no breathing) and Active (engaging, breathing may apply) sub-types."@en .
+
+bsc-v:groupIndulge a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
+    skos:inScheme bsc-v:PresetGroupScheme ;
+    skos:topConceptOf bsc-v:PresetGroupScheme ;
+    skos:prefLabel "Indulge"@en, "Indulge"@it, "Indulge"@pt, "Indulge"@es ;
+    skos:notation "Indulge" ;
+    skos:definition "Experiential, playful, intense, or recreational sonic worlds. High personality, diverse design, bloom intentional. No medical implication."@en .
+
+bsc-v:groupTranscend a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
+    skos:inScheme bsc-v:PresetGroupScheme ;
+    skos:topConceptOf bsc-v:PresetGroupScheme ;
+    skos:prefLabel "Transcend"@en, "Transcend"@it, "Transcend"@pt, "Transcend"@es ;
+    skos:notation "Transcend" ;
+    skos:definition "Meditation, contemplative, altered-state, and perceptual exploration. May progressively reduce grounding. Claims remain conservative."@en .
+
+bsc-v:voiceBinaural a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
+    skos:inScheme bsc-v:VoiceTypeScheme ;
+    skos:topConceptOf bsc-v:VoiceTypeScheme ;
+    skos:prefLabel "Binaural"@en, "Binaurale"@it, "Binaural"@pt, "Binaural"@es ;
+    skos:notation "Binaural" ;
+    skos:definition "Two dichotic sine tones producing a binaural beat at |fr - fl| Hz."@en .
+
+bsc-v:voiceMartigli a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
+    skos:inScheme bsc-v:VoiceTypeScheme ;
+    skos:topConceptOf bsc-v:VoiceTypeScheme ;
+    skos:prefLabel "Martigli"@en, "Martigli"@it, "Martigli"@pt, "Martigli"@es ;
+    skos:notation "Martigli" ;
+    skos:definition "Single tone with sinusoidal frequency oscillation following a decelerating breathing arc."@en .
+
+bsc-v:voiceMartigliBinaural a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
+    skos:inScheme bsc-v:VoiceTypeScheme ;
+    skos:topConceptOf bsc-v:VoiceTypeScheme ;
+    skos:prefLabel "Martigli-Binaural"@en, "Martigli-Binaurale"@it, "Martigli-Binaural"@pt, "Martigli-Binaural"@es ;
+    skos:notation "Martigli-Binaural" ;
+    skos:definition "Binaural beat combined with Martigli oscillation. Constant beat frequency despite sweeping carriers."@en .
+
+bsc-v:voiceSymmetry a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
+    skos:inScheme bsc-v:VoiceTypeScheme ;
+    skos:topConceptOf bsc-v:VoiceTypeScheme ;
+    skos:prefLabel "Symmetry"@en, "Simmetria"@it, "Simetria"@pt, "Simetría"@es ;
+    skos:notation "Symmetry" ;
+    skos:definition "Log-distributed pitch sequence with algebraic group permutation at each cycle. Includes the isochronic special case (noctaves = 0)."@en .
+
+bsc-v:permShuffle a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
+    skos:inScheme bsc-v:PermutationFunctionScheme ;
+    skos:topConceptOf bsc-v:PermutationFunctionScheme ;
+    skos:prefLabel "Shuffle"@en, "Shuffle"@it, "Shuffle"@pt, "Shuffle"@es ;
+    skos:notation "0" ;
+    skos:definition "Uniform random permutation (Fisher-Yates) at each cycle boundary. Maximum cross-cycle unpredictability. Highest cognitive engagement."@en .
+
+bsc-v:permRotateForward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
+    skos:inScheme bsc-v:PermutationFunctionScheme ;
+    skos:topConceptOf bsc-v:PermutationFunctionScheme ;
+    skos:prefLabel "Rotate Forward"@en, "Rotazione in Avanti"@it,
+                   "Rotação para Frente"@pt, "Rotación hacia Adelante"@es ;
+    skos:notation "1" ;
+    skos:definition "Cyclic left shift at each cycle boundary. Systematic upward pitch drift over N cycles."@en .
+
+bsc-v:permRotateBackward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
+    skos:inScheme bsc-v:PermutationFunctionScheme ;
+    skos:topConceptOf bsc-v:PermutationFunctionScheme ;
+    skos:prefLabel "Rotate Backward"@en, "Rotazione all'Indietro"@it,
+                   "Rotação para Trás"@pt, "Rotación hacia Atrás"@es ;
+    skos:notation "2" ;
+    skos:definition "Cyclic right shift. Systematic downward pitch drift over N cycles."@en .
+
+bsc-v:permReverse a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
+    skos:inScheme bsc-v:PermutationFunctionScheme ;
+    skos:topConceptOf bsc-v:PermutationFunctionScheme ;
+    skos:prefLabel "Reverse"@en, "Inversione"@it, "Inversão"@pt, "Inversión"@es ;
+    skos:notation "3" ;
+    skos:definition "Alternating reversal: ascending and descending passes alternate with a period of two cycles."@en .
+
+bsc-v:permIdentity a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
+    skos:inScheme bsc-v:PermutationFunctionScheme ;
+    skos:topConceptOf bsc-v:PermutationFunctionScheme ;
+    skos:prefLabel "Identity"@en, "Identità"@it, "Identidade"@pt, "Identidad"@es ;
+    skos:notation "4" ;
+    skos:definition "No permutation. Pure repetition. Lowest cognitive engagement; habituation risk for long sessions."@en .

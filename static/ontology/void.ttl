@@ -354,9 +354,9 @@
 <https://w3id.org/sstim/void#instances>
     a void:Dataset ;
     dct:title "BSC Lab public SSTIM instance data"@en ;
-    dct:description "Public, non-clinical BSC Lab programme, framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
+    dct:description "Public, non-clinical BSC Lab programme, framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, the BSC framework's own vocabulary and shapes, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static files, the framework vocabulary included; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 2187 ;
+    void:triples 2928 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ecosystem/",
@@ -366,6 +366,7 @@
         "https://w3id.org/sstim/ecosystem-record/" ;
     void:vocabulary <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>,
         <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem>,
+        <https://w3id.org/sstim/framework/bsc/vocab>,
         <http://www.w3.org/ns/prov#>, <https://schema.org/>,
         <http://www.w3.org/ns/org#>, <http://xmlns.com/foaf/0.1/> ;
     void:exampleResource <https://w3id.org/sstim/ecosystem/biosyncare>,
@@ -379,8 +380,30 @@
         <https://w3id.org/sstim/specialist/synthetic-alex-rivera>,
         <https://w3id.org/sstim/specialist/renato-fabbri> ;
     void:subset <https://w3id.org/sstim/graph/ecosystem-agents>,
-        <https://w3id.org/sstim/graph/ecosystem-fixture> ;
+        <https://w3id.org/sstim/graph/ecosystem-fixture>,
+        <https://w3id.org/sstim/void#bsc-framework> ;
     dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances> .
+
+
+# The BSC framework's own vocabulary and shapes (ADR 0061): its catalog voice
+# model, preset groups, Martigli parameterisation and permutation coding, moved
+# out of SSTIM's universal namespaces. Published beside the instances and
+# outside the manifest, so no SSTIM release carries it. Counts are checked.
+<https://w3id.org/sstim/void#bsc-framework>
+    a void:Dataset ;
+    dct:title "BSC framework vocabulary and shapes"@en ;
+    dct:description "The BSC framework's catalog voice classes, preset groups, voice types, Martigli oscillation parameters and Symmetry permutation coding, with the SHACL shapes that enforce its catalog rules. It imports SSTIM, is versioned by the framework's maintainers, and belongs to no SSTIM profile or snapshot."@en ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    void:triples 615 ;
+    void:dataDump <https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-vocab.ttl>,
+        <https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-shapes.ttl> ;
+    void:uriSpace "https://w3id.org/sstim/framework/bsc/vocab#",
+        "https://w3id.org/sstim/framework/bsc/shapes#" ;
+    void:vocabulary <https://w3id.org/sstim>,
+        <http://www.w3.org/2002/07/owl#>,
+        <http://www.w3.org/2004/02/skos/core#>,
+        <http://www.w3.org/ns/shacl#> ;
+    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/frameworks/bsc> .
 
 
 # Mutable runtime named graph for reviewed real ecosystem records. Its public

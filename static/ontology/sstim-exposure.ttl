@@ -158,7 +158,7 @@ sstim-ex:PerceptualLoss a owl:Class ;
 sstim-ex:KnowledgeStatus a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Knowledge Status"@en ;
-    skos:definition "Local status vocabulary for distinguishing known SSTIM patterns, hypotheses, unknowns, lack of known SSTIM evidence, and BSC Lab capability boundaries."@en ;
+    skos:definition "Status vocabulary distinguishing known SSTIM patterns, hypotheses, unknowns, and lack of known SSTIM evidence, together with the delivery boundaries of an implementation named by a scoped assertion."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:StimulusPattern a owl:Class ;
@@ -317,7 +317,7 @@ sstim-ex:hasExperimentContext a owl:ObjectProperty ;
 sstim-ex:hasKnowledgeStatus a owl:ObjectProperty ;
     rdfs:range sstim-ex:KnowledgeStatus ;
     rdfs:label "has knowledge status"@en ;
-    skos:definition "Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled SSTIM/BSC Lab knowledge or capability status value. Carries no OWL domain (ADR 0027, KR-05): SHACL enforces allowed subjects, admitting the DeviceCapability use promised here and preventing status links from re-inferring evidence semantics."@en ;
+    skos:definition "Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled knowledge or capability status value. Carries no OWL domain (ADR 0027, KR-05): SHACL enforces allowed subjects, admitting the DeviceCapability use promised here and preventing status links from re-inferring evidence semantics."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasStimulusPattern a owl:ObjectProperty ;
@@ -751,12 +751,15 @@ sstim-ex:EffectDimensionScheme a skos:ConceptScheme ;
 sstim-ex:KnowledgeStatusScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Knowledge Status Scheme"@en ;
-    skos:definition "Local SSTIM/BSC Lab knowledge and delivery status markers. These statuses do not assert global scientific absence unless a separate literature review supports that claim."@en ;
+    skos:definition "Knowledge and delivery status markers. The SSTIM values speak for SSTIM's own corpus; the delivery values speak for the implementation a knowledge-status assertion names as its scope. Neither asserts global scientific absence unless a separate literature review supports that claim."@en ;
     skos:hasTopConcept
         sstim-ex:knownInSSTIM,
         sstim-ex:hypothesisInSSTIM,
         sstim-ex:unknownToSSTIM,
         sstim-ex:noKnownEvidenceInSSTIM,
+        sstim-ex:notCurrentlyUsed,
+        sstim-ex:notCurrentlyDeliverable,
+        sstim-ex:outsideImplementationScope,
         sstim-ex:notCurrentlyUsedInBSCLab,
         sstim-ex:notCurrentlyDeliverableByBSCLab,
         sstim-ex:outsideBSCLabScope .
@@ -768,6 +771,7 @@ sstim-ex:ExperimentContextScheme a skos:ConceptScheme ;
     skos:hasTopConcept
         sstim-ex:contextExploratoryNonClinical,
         sstim-ex:contextBiohacking,
+        sstim-ex:contextImplementationPrototype,
         sstim-ex:contextBscLabPrototype,
         sstim-ex:contextSelfObservation,
         sstim-ex:contextSocialProtocol,
@@ -1113,7 +1117,7 @@ sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeli
                    "radiação ultravioleta"@pt,
                    "radiación ultravioleta"@es ;
     skos:notation "ultraviolet-radiation" ;
-    skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure. Any at-body delivery is bounded by the optical-radiation comfort boundary (sstim-ex:boundaryOpticalRadiation), which carries an exposure limit citing IEC 62471 / ICNIRP. BSC Lab does not currently deliver ultraviolet radiation at the body."@en ;
+    skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure. Any at-body delivery is bounded by the optical-radiation comfort boundary (sstim-ex:boundaryOpticalRadiation), which carries an exposure limit citing IEC 62471 / ICNIRP."@en ;
     skos:scopeNote "Ultraviolet exposure to skin and especially the eyes is hazardous; model it with sstim-ex:boundaryOpticalRadiation and an appropriate knowledge status rather than as a benign visual cue."@en .
 
 sstim-ex:modalityAuditory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
@@ -1510,7 +1514,7 @@ sstim-ex:capabilityInfraredLightOutput a owl:NamedIndividual, sstim-ex:DeviceCap
                    "emissão de luz infravermelha"@pt,
                    "emisión de luz infrarroja"@es ;
     skos:notation "infrared-light-output" ;
-    skos:definition "Capability to emit non-visible infrared optical radiation. Exploratory; not a current BSC Lab delivery capability."@en ;
+    skos:definition "Capability to emit non-visible infrared optical radiation. Exploratory."@en ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumInfraredRadiation .
 
 sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
@@ -1521,7 +1525,7 @@ sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:Device
                    "emissão de luz ultravioleta"@pt,
                    "emisión de luz ultravioleta"@es ;
     skos:notation "ultraviolet-light-output" ;
-    skos:definition "Capability to emit non-visible ultraviolet optical radiation. Exploratory and optical-safety-bounded; not a current BSC Lab delivery capability."@en ;
+    skos:definition "Capability to emit non-visible ultraviolet optical radiation. Exploratory, and bounded by optical safety limits."@en ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumUltravioletRadiation .
 
 sstim-ex:placementEars a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
@@ -1954,7 +1958,37 @@ sstim-ex:noKnownEvidenceInSSTIM a owl:NamedIndividual, sstim-ex:KnowledgeStatus,
     skos:notation "noKnownEvidenceInSSTIM" ;
     skos:definition "No supporting evidence is currently recorded in SSTIM. This is not a global scientific absence claim."@en .
 
+sstim-ex:notCurrentlyDeliverable a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    skos:inScheme sstim-ex:KnowledgeStatusScheme ;
+    skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
+    skos:prefLabel "not currently deliverable"@en,
+                   "attualmente non erogabile"@it,
+                   "atualmente não entregável"@pt,
+                   "actualmente no entregable"@es ;
+    skos:notation "notCurrentlyDeliverable" .
+
+sstim-ex:notCurrentlyUsed a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    skos:inScheme sstim-ex:KnowledgeStatusScheme ;
+    skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
+    skos:prefLabel "not currently used"@en,
+                   "attualmente non usato"@it,
+                   "atualmente não usado"@pt,
+                   "actualmente no usado"@es ;
+    skos:notation "notCurrentlyUsed" .
+
+sstim-ex:outsideImplementationScope a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    skos:inScheme sstim-ex:KnowledgeStatusScheme ;
+    skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
+    skos:prefLabel "outside implementation scope"@en,
+                   "fuori dall'ambito dell'implementazione"@it,
+                   "fora do escopo da implementação"@pt,
+                   "fuera del alcance de la implementación"@es ;
+    skos:notation "outsideImplementationScope" .
+
 sstim-ex:notCurrentlyUsedInBSCLab a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:notCurrentlyUsed ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: it named one implementation; the neutral value is asserted through a KnowledgeStatusAssertion whose scope names the implementation. Use sstim-ex:notCurrentlyUsed."@en ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
     skos:prefLabel "not currently used in BSC Lab"@en,
@@ -1964,6 +1998,9 @@ sstim-ex:notCurrentlyUsedInBSCLab a owl:NamedIndividual, sstim-ex:KnowledgeStatu
     skos:notation "notCurrentlyUsedInBSCLab" .
 
 sstim-ex:notCurrentlyDeliverableByBSCLab a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:notCurrentlyDeliverable ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: it named one implementation; the neutral value is asserted through a KnowledgeStatusAssertion whose scope names the implementation. Use sstim-ex:notCurrentlyDeliverable."@en ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
     skos:prefLabel "not currently deliverable by BSC Lab"@en,
@@ -1973,6 +2010,9 @@ sstim-ex:notCurrentlyDeliverableByBSCLab a owl:NamedIndividual, sstim-ex:Knowled
     skos:notation "notCurrentlyDeliverableByBSCLab" .
 
 sstim-ex:outsideBSCLabScope a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:outsideImplementationScope ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: it named one implementation; the neutral value is asserted through a KnowledgeStatusAssertion whose scope names the implementation. Use sstim-ex:outsideImplementationScope."@en ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
     skos:prefLabel "outside BSC Lab scope"@en,
@@ -1999,7 +2039,19 @@ sstim-ex:contextBiohacking a owl:NamedIndividual, sstim-ex:BiohackingContext, sk
                    "biohacking"@es ;
     skos:notation "biohacking" .
 
+sstim-ex:contextImplementationPrototype a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
+    skos:inScheme sstim-ex:ExperimentContextScheme ;
+    skos:topConceptOf sstim-ex:ExperimentContextScheme ;
+    skos:prefLabel "implementation prototype"@en,
+                   "prototipo di implementazione"@it,
+                   "protótipo de implementação"@pt,
+                   "prototipo de implementación"@es ;
+    skos:notation "implementation-prototype" .
+
 sstim-ex:contextBscLabPrototype a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:contextImplementationPrototype ;
+    skos:historyNote "Deprecated in 0.19.0 by ADR 0061: it named one implementation. Use sstim-ex:contextImplementationPrototype."@en ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
     skos:prefLabel "BSC Lab prototype"@en,
@@ -2530,11 +2582,15 @@ sstim-ex:effectTemperaturePerception skos:definition "Perceptual dimension conce
 
 # Experiment contexts and local knowledge status
 sstim-ex:contextBiohacking skos:definition "Exploratory self-experimentation context outside clinical care, requiring explicit uncertainty and safety boundaries."@en .
+sstim-ex:contextImplementationPrototype skos:definition "Prototype context used to test an implementation's representation, controls, or delivery capabilities. The implementation is the one the record belongs to or names."@en .
 sstim-ex:contextBscLabPrototype skos:definition "Prototype context used to test BSC Lab representation, controls, or delivery capabilities."@en .
 sstim-ex:contextCapabilityBoundary skos:definition "Design-analysis context used to document what current hardware or software can and cannot deliver."@en .
 sstim-ex:contextExploratoryNonClinical skos:definition "Research or demonstration context that does not provide clinical care, diagnosis, or treatment."@en .
 sstim-ex:contextSelfObservation skos:definition "Context in which a participant records their own experience or measurements without inferring general efficacy."@en .
 sstim-ex:contextSocialProtocol skos:definition "Context in which two or more participants coordinate, communicate, or share sensory events under an explicit protocol."@en .
+sstim-ex:notCurrentlyDeliverable skos:definition "Delivery status: the implementation named by the knowledge-status assertion's scope cannot currently deliver the described exposure, even if the concept remains relevant to the domain. Asserted only through a scoped sstim-ex:KnowledgeStatusAssertion."@en .
+sstim-ex:notCurrentlyUsed skos:definition "Delivery status: the implementation named by the knowledge-status assertion's scope does not currently use the described technique, capability, or exposure. Asserted only through a scoped sstim-ex:KnowledgeStatusAssertion."@en .
+sstim-ex:outsideImplementationScope skos:definition "Delivery status: the resource is useful for boundary documentation but is not planned as a delivery feature of the implementation named by the knowledge-status assertion's scope. Asserted only through a scoped sstim-ex:KnowledgeStatusAssertion."@en .
 sstim-ex:notCurrentlyDeliverableByBSCLab skos:definition "Local status indicating that the current BSC Lab implementation cannot deliver the described exposure, even if the concept remains relevant to the domain."@en .
 sstim-ex:notCurrentlyUsedInBSCLab skos:definition "Local status indicating that BSC Lab does not currently use the described technique, capability, or exposure in its public implementation."@en .
 sstim-ex:outsideBSCLabScope skos:definition "Local status indicating that the resource is useful for boundary documentation but is not planned as a BSC Lab delivery feature."@en .
@@ -2607,7 +2663,7 @@ sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitAveragingTimeSeconds "28800"^^xsd:decimal ;
     sstim-ex:appliesToPlacement sstim-ex:placementEars ;
     sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/docs/98-126/> ;
-    skos:definition "NIOSH occupational recommended exposure limit of 85 dBA as an 8-hour time-weighted average, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). This occupational limit is not a general-public listening recommendation. BSC Lab cannot measure delivered sound pressure level and treats this record as advisory rather than a safety guarantee."@en .
+    skos:definition "NIOSH occupational recommended exposure limit of 85 dBA as an 8-hour time-weighted average, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). This occupational limit is not a general-public listening recommendation. An implementation that cannot measure delivered sound pressure level can use this record only as advisory, never as a safety guarantee."@en .
 
 sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     rdfs:label "actinic ultraviolet exposure limit"@en ;
@@ -2618,7 +2674,7 @@ sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:appliesToPlacement sstim-ex:placementEyes , sstim-ex:placementWholeBody ;
     sstim-ex:conformsToStandard <https://www.icnirp.org/cms/upload/publications/ICNIRPUV2004.pdf> ,
         <https://webstore.iec.ch/publication/7076> ;
-    skos:definition "ICNIRP daily exposure limit of 30 J/m2 spectrally weighted effective ultraviolet radiant exposure for unprotected skin and eye, calculated over 180-400 nm. IEC 62471 supplies lamp photobiological risk classification; it is not the source of the 30 J/m2 value. BSC Lab does not deliver ultraviolet radiation at the body."@en ;
+    skos:definition "ICNIRP daily exposure limit of 30 J/m2 spectrally weighted effective ultraviolet radiant exposure for unprotected skin and eye, calculated over 180-400 nm. IEC 62471 supplies lamp photobiological risk classification; it is not the source of the 30 J/m2 value."@en ;
     skos:editorialNote "The historical IRI suffix 'Iec' is retained for identifier stability. The value is attributed explicitly to ICNIRP after the 2026-07-10 external review."@en .
 
 
@@ -2760,7 +2816,7 @@ sstim-ex:knowledgeAsOfDate a owl:DatatypeProperty, owl:FunctionalProperty ;
 
 sstim-ex:knowledgeScope a owl:ObjectProperty ;
     rdfs:label "knowledge scope"@en ;
-    skos:definition "The identified corpus or repository a knowledge-status assertion is scoped to."@en ;
+    skos:definition "The identified corpus, repository, or implementation a knowledge-status assertion is scoped to. A delivery status (not currently deliverable, not currently used, outside implementation scope) is scoped to the implementation it describes."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:knowledgeScopeNote a owl:DatatypeProperty ;

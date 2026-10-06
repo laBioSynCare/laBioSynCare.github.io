@@ -198,7 +198,17 @@ sstim:composedOfTrack a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:Track ;
     rdfs:label  "composed of track"@en ;
-    skos:definition "Links an engine configuration to the layers it is composed of. Distinct from sstim:composedOf, which links a BSC catalog preset to its voices: a configuration whose schema has generic layers uses this, one whose schema has the four catalog voice types uses that."@en ;
+    skos:definition "Links an engine configuration to the layers it is composed of, whatever schema the configuration follows."@en ;
+    skos:historyNote "Until 0.19.0 a parallel property, sstim:composedOf, linked a BSC catalog preset to its voices. ADR 0061 deprecated it in favour of this one: a catalog voice is a track, so one composition link serves every schema."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:breathGuideTrack a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Track ;
+    rdfs:label  "breath guide track"@en ;
+    skos:definition "The track whose oscillation paces the participant's breathing, when the configuration guides breathing at all. At most one, and it must be one of the configuration's own tracks."@en ;
+    skos:scopeNote "A single pointer cannot contradict itself. It replaces a pair of fields that could: a preset-level flag saying breathing is guided, and a flag on each layer saying which one guides it. Absence means the configuration does not guide breathing."@en ;
+    skos:historyNote "Added in 0.19.0 by ADR 0061, replacing sstim:hasBreathGuide and sstim:isBreathReference. It matches the breathReference field of SSTIM's preset schema."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 [] a owl:AllDisjointClasses ;

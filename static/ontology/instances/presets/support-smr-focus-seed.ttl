@@ -5,6 +5,7 @@
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sstim:        <https://w3id.org/sstim#> .
 @prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix bsc-v:        <https://w3id.org/sstim/framework/bsc/vocab#> .
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 
 # Public reference preset. Claim level C0 (descriptive): the description states
@@ -16,25 +17,24 @@ bsclab-preset:support-smr-focus-seed a sstim:Preset ;
     rdfs:label "Support SMR Focus Seed" ;
     dct:description "A single isochronic voice: thirteen notes per second on a 180 Hz base, no octave span, so the pulse train runs at 13 Hz within the SMR band. Published as a reference configuration for the preset instance model. This seed is not a clinical, health, or performance claim." ;
     dct:created "2026-09-10"^^xsd:date ;
-    dct:modified "2026-09-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:smr ;
     sstim:primaryFrequencyBand sstim-v:smr ;
-    sstim:inGroup sstim-v:groupSupport ;
-    sstim:hasBreathGuide false ;
+    bsc-v:inGroup bsc-v:groupSupport ;
     sstim:presetVersion "0.1.0" ;
     sstim:hasPublicClaimLevel sstim-v:claimC0Descriptive ;
     sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
     sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
     sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
-    sstim:composedOf preset-local:symmetry-voice .
+    sstim:composedOfTrack preset-local:symmetry-voice .
 
 # 13 notes over a 1 s cycle is 13 Hz, well inside the 50 Hz engine ceiling that
 # SymmetryVoiceShape enforces as noteCount / cycleDuration.
-preset-local:symmetry-voice a sstim:Voice, sstim:SymmetryVoice ;
+preset-local:symmetry-voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:SymmetryVoice ;
     rdfs:label "Support SMR Focus Seed symmetry voice" ;
     sstim:baseFrequency 180.0 ;
     sstim:noteCount 13 ;
     sstim:octaveSpan 0.0 ;
     sstim:cycleDuration 1.0 ;
-    sstim:permutationFunction 0 ;
+    bsc-v:permutationFunction 0 ;
     sstim:initialVolume 0.13 .

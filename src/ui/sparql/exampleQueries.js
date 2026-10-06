@@ -63,9 +63,10 @@ ORDER BY ?relation ?neighborLabel`,
     category: 'Catalog',
     title: 'Versioned catalog — presets, band, and group',
     description:
-      'sstim:Preset instances from the versioned catalog joined to their frequency band and preset group labels — three different named graphs, joined via three independent GRAPH blocks.',
+      'sstim:Preset instances from the versioned catalog joined to their frequency band and their BSC framework group (bsc-v:inGroup, ADR 0061) — three different named graphs, joined via three independent GRAPH blocks.',
     requiresLive: false,
     sparql: `PREFIX sstim: <https://w3id.org/sstim#>
+PREFIX bsc-v: <https://w3id.org/sstim/framework/bsc/vocab#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -74,7 +75,7 @@ SELECT ?presetLabel ?bandLabel ?groupLabel WHERE {
     ?preset a sstim:Preset ;
             rdfs:label ?presetLabel ;
             sstim:targetsFrequencyBand ?band ;
-            sstim:inGroup ?group .
+            bsc-v:inGroup ?group .
   }
   GRAPH ?bandGraph { ?band skos:prefLabel ?bandLabel . FILTER(LANG(?bandLabel) = "en") }
   GRAPH ?groupGraph { ?group skos:prefLabel ?groupLabel . FILTER(LANG(?groupLabel) = "en") }

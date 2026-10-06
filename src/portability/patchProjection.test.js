@@ -25,6 +25,7 @@ const SSTIM = 'https://w3id.org/sstim#'
 const RDFS_DOMAIN = 'http://www.w3.org/2000/01/rdf-schema#domain'
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 const OWL_DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty'
+const OWL_DEPRECATED = 'http://www.w3.org/2002/07/owl#deprecated'
 
 const OWL_UNION_OF = 'http://www.w3.org/2002/07/owl#unionOf'
 const RDF_FIRST = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first'
@@ -64,9 +65,15 @@ function ontologyProperties(...files) {
     return out
   }
 
+  // A deprecated property is not something the projection may use or must
+  // explain: it stays declared so old data resolves, and that is all (ADR 0061).
+  const deprecated = new Set(
+    quads.filter((q) => q.predicate.value === OWL_DEPRECATED && q.object.value === 'true')
+      .map((q) => q.subject.value),
+  )
   const out = {}
   for (const iri of isDatatypeProperty) {
-    if (!iri.startsWith(SSTIM)) continue
+    if (!iri.startsWith(SSTIM) || deprecated.has(iri)) continue
     const domain = domains.get(iri)
     const members = domain && unionOf.has(domain) ? readList(unionOf.get(domain)) : [domain]
     out[iri.slice(SSTIM.length)] = members.filter(Boolean).map((m) => m.replace(SSTIM, ''))
@@ -108,7 +115,9 @@ function claimedProperties() {
 
 describe('the mapping table is grounded in the ontology', () => {
   it('parses the patch-studio module', () => {
-    expect(Object.keys(patchStudioProps).length).toBeGreaterThan(20)
+    // 19 live track parameters since ADR 0061 deprecated the catalog's own; a
+    // count this far below that means the parse, not the module, changed.
+    expect(Object.keys(patchStudioProps).length).toBeGreaterThan(15)
   })
 
   it('names only properties that actually exist in SSTIM', () => {
@@ -141,8 +150,9 @@ describe('the mapping table is grounded in the ontology', () => {
       ['carrierFreqLeft', 'AudioTrack'], ['carrierFreqRight', 'AudioTrack'],
       ['beatHz', 'AudioTrack'], ['noteDurationFraction', 'AudioTrack'],
       ['rotationSpeed', 'VisualTrack'], ['visualSideCount', 'VisualTrack'],
-      ['stimulationIntensity', 'HapticTrack'], ['hapticPattern', 'HapticTrack'],
-      ['martigliPeriodInitial', 'ControlTrack'], ['breathingPhaseRatio', 'ControlTrack'],
+      ['stimulationIntensity', 'HapticTrack'],
+      ['breathingPeriodInitial', 'ControlTrack'], ['breathingPeriodFinal', 'ControlTrack'],
+      ['breathingPhaseRatio', 'ControlTrack'], ['breathingAmplitude', 'ControlTrack'],
       ['noteCount', 'ControlTrack'],
       ['tempoBpm', 'Preset'], ['beatsPerBar', 'Preset'],
       ['durationSeconds', 'Preset'], ['masterVolume', 'Preset'],

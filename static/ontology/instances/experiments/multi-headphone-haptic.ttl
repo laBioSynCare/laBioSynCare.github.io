@@ -15,16 +15,18 @@ bsclab-experiment:multi-headphone-haptic a sstim-ex:ExploratoryProtocol, sstim:S
     rdfs:label "Multi-headphone haptic placement"@en ;
     dct:description "Non-clinical exploratory setup for placing multiple audio devices near hands, feet, and the top of the head to model acoustic vibration as tactile or body-perceived stimulation."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim:usesTechnique sstim-v:techAudioTactile, sstim-v:techVibroacoustic ;
     sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyUsedInBSCLab ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasKnowledgeStatusAssertion this:status-protocol-not-currently-used ;
     sstim-ex:hasExposureProfile this:profile .
 
 this:profile a sstim-ex:ExposureProfile ;
     rdfs:label "Multi-headphone haptic exposure profile"@en ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyUsedInBSCLab ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasKnowledgeStatusAssertion this:status-profile-not-currently-used ;
     sstim-ex:usesStimulusChannel this:hand-channel, this:feet-channel, this:head-channel ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityMultiDeviceBodyPlacement ;
     sstim-ex:hasPerceptualGain sstim-ex:gainBodyVibration ;
@@ -73,3 +75,29 @@ this:hearing-boundary-claim a sstim-ex:BoundaryApplicabilityStatement ;
     dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
+
+# Delivery statuses (ADR 0061). Each is scoped to the implementation it
+# describes, BSC Lab, instead of being spelled into the vocabulary. They were
+# re-expressed, not re-assessed: the as-of date is the record's own.
+
+this:status-protocol-not-currently-used a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of protocol: not currently used"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyUsed ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-profile-not-currently-used a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of profile: not currently used"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyUsed ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-migration a sstim-ex:KnowledgeStatusActivity ;
+    rdfs:label "ADR 0061 delivery-status migration"@en ;
+    rdfs:comment "Re-expressed this record's BSC Lab delivery statuses as scoped assertions when ADR 0061 removed the implementation-named status values from the vocabulary. The statuses were not re-assessed."@en ;
+    prov:endedAtTime "2026-10-06T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .

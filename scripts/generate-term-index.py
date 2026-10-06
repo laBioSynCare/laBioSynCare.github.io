@@ -16,9 +16,21 @@ concluding a term is missing.
     make term-index          regenerate
     make term-index-check    fail if the committed file is stale
 
+    scripts/generate-term-index.py --counts 0.18.0
+                             the same totals for a frozen release, as JSON
+
+The release totals exist for text that describes a release rather than the
+development line, `.zenodo.json` above all; the truth audit reads them here so
+that one implementation counts both.
+
 Concepts are included alongside classes and properties, and deliberately: the
 third mistake was asserting SSTIM had no proprioception concept when
 `sstim-ex:modalityProprioceptive` was sitting in the exposure module.
+
+Deprecated terms stay listed, marked, with their `dct:isReplacedBy` targets.
+ADR 0061 moved BSC's catalog model out to the BSC framework vocabulary, which
+is outside the manifest and so outside this index; the deprecation row is how
+a grep for a moved term finds where it went.
 """
 
 from __future__ import annotations
@@ -28,7 +40,7 @@ from pathlib import Path
 import sys
 
 from rdflib import BNode, Graph, Namespace, RDF, RDFS, OWL, URIRef
-from rdflib.namespace import SKOS
+from rdflib.namespace import DCTERMS, SKOS
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "static" / "ontology"
@@ -47,6 +59,10 @@ KNOWN_PREFIXES = {
     "exposure": "sstim-ex",
     "ecosystem": "sstim-eco",
     "core-shapes": "sstim-core-sh",
+    # Not SSTIM: the BSC framework's own vocabulary (ADR 0061). Named so the
+    # replacement of a moved term reads as the prefix its users write.
+    "framework/bsc/vocab": "bsc-v",
+    "framework/bsc/shapes": "bsc-sh",
 }
 
 PROPERTY_TYPES = {
@@ -83,6 +99,16 @@ def label_of(graph: Graph, node) -> str:
     return shorten(node) or str(node).rsplit("/", 1)[-1].replace("#", ":")
 
 
+def deprecation(graph: Graph, node) -> str:
+    """`deprecated → bsc-v:Voice` for a deprecated term, "" for a current one."""
+    if not any(str(v).lower() == "true" for v in graph.objects(node, OWL.deprecated)):
+        return ""
+    targets = sorted(shorten(t) or str(t) for t in graph.objects(node, DCTERMS.isReplacedBy))
+    if not targets:
+        return "**deprecated**, no replacement"
+    return "**deprecated** → " + ", ".join(f"`{target}`" for target in targets)
+
+
 def summarize(graph: Graph, node, limit: int = 150) -> str:
     for predicate in (SKOS.definition, RDFS.comment, SKOS.prefLabel, RDFS.label):
         for value in graph.objects(node, predicate):
@@ -95,21 +121,16 @@ def summarize(graph: Graph, node, limit: int = 150) -> str:
     return ""
 
 
-def main() -> int:
-    check = "--check" in sys.argv
-    manifest = json.loads((ONTOLOGY / "manifest.json").read_text(encoding="utf-8"))
-    modules = manifest["modules"]
-    if not modules:
-        raise SystemExit("term-index: the manifest listed no modules")
-
+def collect(sources: list[tuple[str, Path]]) -> tuple[list, list, list, int]:
+    """Index rows for (module id, Turtle path) pairs, and how many are deprecated."""
     classes: list[tuple] = []
     properties: list[tuple] = []
     concepts: list[tuple] = []
     seen: set[str] = set()
+    deprecated = 0
 
-    for module in modules:
-        module_id = module["id"]
-        graph = Graph().parse(ROOT / module["source"]["path"], format="turtle")
+    for module_id, path in sources:
+        graph = Graph().parse(path, format="turtle")
 
         for subject in set(graph.subjects(RDF.type, OWL.Class)):
             name = shorten(subject) if isinstance(subject, URIRef) else None
@@ -119,7 +140,12 @@ def main() -> int:
             parents = sorted(
                 filter(None, (shorten(p) for p in graph.objects(subject, RDFS.subClassOf)))
             )
-            classes.append((name, module_id, ", ".join(parents), summarize(graph, subject)))
+            note = deprecation(graph, subject)
+            deprecated += bool(note)
+            summary = summarize(graph, subject)
+            classes.append(
+                (name, module_id, ", ".join(parents), f"{note}. {summary}" if note else summary)
+            )
 
         for owl_type, kind in PROPERTY_TYPES.items():
             for subject in set(graph.subjects(RDF.type, owl_type)):
@@ -132,7 +158,12 @@ def main() -> int:
                 signature = " → ".join(
                     label_of(graph, n) if n is not None else "—" for n in (domain, rng)
                 )
-                properties.append((name, kind, module_id, signature, summarize(graph, subject)))
+                note = deprecation(graph, subject)
+                deprecated += bool(note)
+                summary = summarize(graph, subject)
+                properties.append(
+                    (name, kind, module_id, signature, f"{note}. {summary}" if note else summary)
+                )
 
         for subject in set(graph.subjects(RDF.type, SKOS.Concept)):
             name = shorten(subject) if isinstance(subject, URIRef) else None
@@ -150,11 +181,52 @@ def main() -> int:
                 )
             )
             notation = next(graph.objects(subject, SKOS.notation), "")
-            concepts.append((name, ", ".join(categories), module_id, str(notation)))
+            note = deprecation(graph, subject)
+            deprecated += bool(note)
+            concepts.append((name, ", ".join(categories), module_id, str(notation), note))
 
     classes.sort()
     properties.sort()
     concepts.sort()
+    return classes, properties, concepts, deprecated
+
+
+def release_counts(version: str) -> int:
+    """Print a frozen release's totals, counted exactly as the index counts."""
+    frozen = ONTOLOGY / version
+    manifest_path = frozen / "manifest.json"
+    if not manifest_path.is_file():
+        raise SystemExit(f"term-index: {frozen.relative_to(ROOT)} has no frozen manifest")
+    modules = json.loads(manifest_path.read_text(encoding="utf-8"))["modules"]
+    sources = [(m["id"], frozen / Path(m["source"]["path"]).name) for m in modules]
+    classes, properties, concepts, deprecated = collect(sources)
+    print(json.dumps({
+        "version": version,
+        "modules": len(modules),
+        "classes": len(classes),
+        "properties": len(properties),
+        "concepts": len(concepts),
+        "deprecated": deprecated,
+    }))
+    return 0
+
+
+def main() -> int:
+    if "--counts" in sys.argv:
+        position = sys.argv.index("--counts")
+        if position + 1 >= len(sys.argv):
+            raise SystemExit("term-index: --counts needs a release version")
+        return release_counts(sys.argv[position + 1])
+
+    check = "--check" in sys.argv
+    manifest = json.loads((ONTOLOGY / "manifest.json").read_text(encoding="utf-8"))
+    modules = manifest["modules"]
+    if not modules:
+        raise SystemExit("term-index: the manifest listed no modules")
+
+    classes, properties, concepts, deprecated = collect(
+        [(module["id"], ROOT / module["source"]["path"]) for module in modules]
+    )
 
     lines: list[str] = [
         "# SSTIM term index",
@@ -170,7 +242,12 @@ def main() -> int:
         "modules is more than anyone reliably searches by hand.",
         "",
         f"{len(classes)} classes · {len(properties)} properties · {len(concepts)} concepts "
-        f"· {len(modules)} modules",
+        f"· {len(modules)} modules · {deprecated} of them deprecated",
+        "",
+        "A deprecated term is still listed, marked, with what replaces it. Terms "
+        "ADR 0061 moved out of SSTIM point at the BSC framework vocabulary "
+        "(`bsc-v:`, in `static/ontology/frameworks/bsc/`), which is not part of "
+        "SSTIM and is not indexed here.",
         "",
         "## Classes",
         "",
@@ -195,10 +272,10 @@ def main() -> int:
         "Controlled values. A schema offering a controlled value that is not here "
         "is minting one (audit finding KR-17).",
         "",
-        "| Concept | Category | Module | Notation |",
-        "|---|---|---|---|",
+        "| Concept | Category | Module | Notation | Status |",
+        "|---|---|---|---|---|",
     ]
-    lines += [f"| `{n}` | {c} | {m} | {t} |" for n, c, m, t in concepts]
+    lines += [f"| `{n}` | {c} | {m} | {t} | {s} |" for n, c, m, t, s in concepts]
 
     rendered = "\n".join(lines) + "\n"
 

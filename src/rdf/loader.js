@@ -241,8 +241,11 @@ export const INSTANCE_URLS = {
   programmes: [
     applicationAsset('/ontology/instances/programmes/biosyncare-ecosystem.ttl'),
   ],
+  // The BSC framework record, and the framework's own vocabulary (ADR 0061):
+  // BSC Lab is a BSC implementation, so it loads the terms SSTIM no longer holds.
   frameworks: [
     applicationAsset('/ontology/instances/frameworks/bsc.ttl'),
+    applicationAsset('/ontology/frameworks/bsc/bsc-vocab.ttl'),
   ],
   implementations: [
     applicationAsset('/ontology/instances/implementations/implementations.ttl'),

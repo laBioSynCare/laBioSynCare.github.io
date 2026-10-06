@@ -1,0 +1,419 @@
+###########################################################################
+#
+#  BSC Framework Shapes
+#
+#  Version:    1.0.0
+#  Date:       2026-10-06
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  The BSC catalog profile: the curation a catalog preset owes, and the
+#  parameter rules of the four catalog voice types. Moved out of SSTIM's
+#  shapes by SSTIM ADR 0061, together with the terms in bsc-vocab.ttl.
+#
+#  Validate a catalog graph against SSTIM's shapes *and* these: SSTIM's
+#  hold what is true of any preset (sstim-sh:PresetShape, the track
+#  shapes, the public-claim gate), these hold what the BSC catalog adds.
+#  The numeric bounds are the catalog's and are compared against SSTIM's
+#  preset schema and the catalog format by `make preset-contract`.
+#
+###########################################################################
+
+@prefix bsc-sh: <https://w3id.org/sstim/framework/bsc/shapes#> .
+@prefix bsc-v:  <https://w3id.org/sstim/framework/bsc/vocab#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+
+
+<https://w3id.org/sstim/framework/bsc/shapes> a owl:Ontology ;
+    owl:versionInfo "1.0.0" ;
+    dct:title "BSC Framework Shapes"@en ;
+    dct:description "SHACL shapes for the BSC catalog profile: catalog preset curation and the four catalog voice types. Used together with SSTIM's shapes; part of no SSTIM profile or snapshot."@en ;
+    dct:isPartOf <https://w3id.org/sstim/framework/bsc> ;
+    dct:requires <https://w3id.org/sstim/framework/bsc/vocab>, <https://w3id.org/sstim/shapes> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
+    # Published by the framework's maintainer. Not by the W3C Community Group,
+    # which publishes SSTIM: keeping that distinction is why this file exists.
+    dct:publisher <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-06"^^xsd:date ;
+    dct:issued "2026-10-06"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Catalog preset
+###########################################################################
+
+bsc-sh:CatalogPresetShape a sh:NodeShape ;
+    # A catalog preset is one that names a BSC group: the group is the one
+    # predicate every catalog entry carries and no other configuration does. A
+    # half-written entry that omits its group is caught from the other side, by
+    # bsc-sh:VoiceShape, which requires every catalog voice to sit in a grouped
+    # preset.
+    sh:targetSubjectsOf bsc-v:inGroup ;
+    sh:name "BSC catalog preset"@en ;
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A catalog preset must have at least one rdfs:label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:description ;
+        sh:minCount 1 ;
+        sh:message "A catalog preset must have a dct:description with conservative scope and use context."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:targetsFrequencyBand ;
+        sh:minCount 1 ;
+        sh:maxCount 2 ;
+        sh:class sstim:FrequencyBand ;
+        sh:message "A catalog preset must target 1-2 frequency bands from sstim:FrequencyBand."@en ;
+    ] ;
+
+    sh:property [
+        sh:path bsc-v:inGroup ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class bsc-v:PresetGroup ;
+        sh:message "A catalog preset must belong to exactly one group from bsc-v:PresetGroup."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:presetVersion ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A catalog preset must carry exactly one presetVersion."@en ;
+    ] ;
+
+    # KR-07: the catalog format says 1-6 voices, an engine limit.
+    sh:property [
+        sh:path sstim:composedOfTrack ;
+        sh:minCount 1 ; sh:maxCount 6 ;
+        sh:class bsc-v:Voice ;
+        sh:message "A catalog preset must be composed of 1-6 catalog voices."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:forImplementation ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "A catalog preset must identify exactly one implementation whose parameter model it configures."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:followsProtocol ;
+        sh:minCount 1 ;
+        sh:message "A catalog preset must follow at least one declared sensory stimulation protocol."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:hasPublicClaimLevel ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "A catalog preset must declare exactly one public claim level."@en ;
+    ] ;
+
+    # CLAUDE.md §4.5, restated for a single pointer. The catalog's isOn flag
+    # exists only on Martigli and Martigli-Binaural voices, and a breathing
+    # reference below 3 s is tremolo rather than breathing guidance.
+    sh:property [
+        sh:path sstim:breathGuideTrack ;
+        sh:maxCount 1 ;
+        sh:or ( [ sh:class bsc-v:MartigliVoice ] [ sh:class bsc-v:MartigliBinauralVoice ] ) ;
+        sh:message "A catalog preset's breath guide must be one Martigli or Martigli-Binaural voice."@en ;
+    ] ;
+    sh:property [
+        sh:path ( sstim:breathGuideTrack bsc-v:martigliPeriodInitial ) ;
+        sh:minInclusive 3 ;
+        sh:message "A catalog breath guide's initial period (mp0) must be at least 3 s."@en ;
+    ] ;
+
+    # KR-07: the binaural beat |fl - fr| is capped at 35 Hz by the catalog
+    # format, with one exception: exactly 40 Hz in a preset that declares
+    # gamma-40 as a target band. Preset-level, because the exception depends on
+    # the preset's bands, which a voice cannot see.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Binaural beat frequency |fl - fr| must not exceed 35 Hz, unless it is exactly 40 Hz in a preset that declares gamma-40 as a target band."@en ;
+        sh:select """
+            SELECT $this ?beat WHERE {
+                $this <https://w3id.org/sstim#composedOfTrack> ?voice .
+                ?voice <https://w3id.org/sstim#carrierFreqLeft> ?fl ;
+                       <https://w3id.org/sstim#carrierFreqRight> ?fr .
+                BIND( ABS( ?fl - ?fr ) AS ?beat )
+                FILTER( ?beat > 35 )
+                FILTER( ! ( ?beat = 40 && EXISTS {
+                    $this <https://w3id.org/sstim#targetsFrequencyBand> <https://w3id.org/sstim/vocab#gamma40> .
+                } ) )
+            }
+        """ ;
+    ] .
+
+
+###########################################################################
+# Catalog voices
+###########################################################################
+
+bsc-sh:VoiceShape a sh:NodeShape ;
+    sh:targetClass bsc-v:Voice ;
+    sh:name "Voice"@en ;
+    # Exactly one of the four disjoint types. pyshacl runs without OWL
+    # inference, so the owl:AllDisjointClasses axiom alone would not be checked.
+    sh:xone (
+        [ sh:class bsc-v:BinauralVoice ]
+        [ sh:class bsc-v:MartigliVoice ]
+        [ sh:class bsc-v:MartigliBinauralVoice ]
+        [ sh:class bsc-v:SymmetryVoice ]
+    ) ;
+    sh:message "A catalog voice must be typed as exactly one of Binaural, Martigli, Martigli-Binaural or Symmetry."@en ;
+
+    # KR-07: above iniVolume 0.30 the catalog requires an explicit rationale.
+    # 1.0 stays invalid outright through each type's sh:maxExclusive.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A voice louder than iniVolume 0.30 must record why in an rdfs:comment (catalog format, conservative volume limits)."@en ;
+        sh:select """
+            SELECT $this ?volume WHERE {
+                $this <https://w3id.org/sstim#initialVolume> ?volume .
+                FILTER( ?volume > 0.30 )
+                FILTER NOT EXISTS { $this <http://www.w3.org/2000/01/rdf-schema#comment> ?rationale }
+            }
+        """ ;
+    ] ;
+
+    # The other half of catalog-preset targeting: a voice outside any grouped
+    # preset is a catalog entry that omitted its group.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A catalog voice must belong to a catalog preset, one that names its bsc-v:inGroup."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                FILTER NOT EXISTS {
+                    ?preset <https://w3id.org/sstim#composedOfTrack> $this ;
+                            <https://w3id.org/sstim/framework/bsc/vocab#inGroup> ?group .
+                }
+            }
+        """ ;
+    ] .
+
+
+bsc-sh:BinauralVoiceShape a sh:NodeShape ;
+    sh:targetClass bsc-v:BinauralVoice ;
+    sh:name "BinauralVoice"@en ;
+
+    sh:property [
+        sh:path sstim:carrierFreqLeft ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:carrierFreqRight ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "iniVolume must be in [0, 1)."@en ;
+    ] .
+
+
+bsc-sh:SymmetryVoiceShape a sh:NodeShape ;
+    sh:targetClass bsc-v:SymmetryVoice ;
+    sh:name "SymmetryVoice"@en ;
+
+    sh:property [
+        sh:path sstim:baseFrequency ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ;
+        sh:message "f0 must be >= 80 Hz."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:noteCount ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 2 ;
+        sh:message "nnotes must be an integer >= 2."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:octaveSpan ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "noctaves must be a non-negative decimal."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:cycleDuration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:message "d must be a positive decimal (seconds)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path bsc-v:permutationFunction ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ; sh:maxInclusive 4 ;
+        sh:message "permfunc must be 0, 1, 2, 3, or 4."@en ;
+    ] ;
+
+    # KR-07 and CLAUDE.md §4.7: the pulse rate nnotes/d is capped at 50 Hz, an
+    # onset interval of at least 20 ms.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Symmetry pulse rate (nnotes / d) must not exceed 50 Hz: the onset interval d/nnotes must stay at or above 20 ms."@en ;
+        sh:select """
+            SELECT $this ?rate WHERE {
+                $this <https://w3id.org/sstim#noteCount> ?nnotes .
+                $this <https://w3id.org/sstim#cycleDuration> ?d .
+                FILTER( ?d > 0 )
+                BIND( ?nnotes / ?d AS ?rate )
+                FILTER( ?rate > 50 )
+            }
+        """ ;
+    ] .
+
+
+# Martigli parameter ranges: ADR 0012 and docs/technical/{BREATHING_MODEL,
+# MARTIGLI_BINAURAL}.md. The breathing-reference rule that used to sit on
+# these voices is now on bsc-sh:CatalogPresetShape, since the reference is a
+# property of the preset (sstim:breathGuideTrack) rather than a flag per voice.
+
+bsc-sh:MartigliVoiceShape a sh:NodeShape ;
+    sh:targetClass bsc-v:MartigliVoice ;
+    sh:name "MartigliVoice"@en ;
+
+    sh:property [
+        sh:path bsc-v:martigliCenterFreq ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 400 ;
+        sh:message "mf0 must be a decimal in [80, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliAmplitude ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 1 ; sh:maxInclusive 400 ;
+        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliPeriodInitial ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
+        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliPeriodFinal ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
+        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliTransitionDuration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
+        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "iniVolume must be in [0, 1)."@en ;
+    ] ;
+    # A Martigli voice is a single tone: the carrier pair belongs to Martigli-Binaural.
+    sh:property [
+        sh:path sstim:carrierFreqLeft ; sh:maxCount 0 ;
+        sh:message "A Martigli voice must not declare carrierFreqLeft (use Martigli-Binaural)."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:carrierFreqRight ; sh:maxCount 0 ;
+        sh:message "A Martigli voice must not declare carrierFreqRight (use Martigli-Binaural)."@en ;
+    ] .
+
+
+bsc-sh:MartigliBinauralVoiceShape a sh:NodeShape ;
+    sh:targetClass bsc-v:MartigliBinauralVoice ;
+    sh:name "MartigliBinauralVoice"@en ;
+
+    sh:property [
+        sh:path sstim:carrierFreqLeft ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:carrierFreqRight ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliAmplitude ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 1 ; sh:maxInclusive 400 ;
+        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliPeriodInitial ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
+        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliPeriodFinal ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
+        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
+    ] ;
+    sh:property [
+        sh:path bsc-v:martigliTransitionDuration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
+        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "iniVolume must be in [0, 1)."@en ;
+    ] ;
+    # Martigli-Binaural uses the carrier pair (fl/fr), not a single-tone center.
+    sh:property [
+        sh:path bsc-v:martigliCenterFreq ; sh:maxCount 0 ;
+        sh:message "A Martigli-Binaural voice must not declare martigliCenterFreq (it uses the fl/fr carrier pair)."@en ;
+    ] .

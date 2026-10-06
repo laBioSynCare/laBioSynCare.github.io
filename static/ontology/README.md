@@ -53,6 +53,8 @@ static/ontology/
 |-- sstim-ecosystem-private-shapes.ttl  Separate access-controlled audit profile (rules only)
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
+|-- frameworks/bsc/         BSC framework vocabulary and shapes; not SSTIM, in no
+|                           profile or snapshot (ADR 0061)
 |-- 0.1.0/ ... <version>/  Immutable whole-set snapshots, one per release
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
@@ -157,6 +159,8 @@ evidence, safety, configuration, or session policy.
 | `sstim-ex:` | `https://w3id.org/sstim/exposure#` | Exposure identifiers owned across Stimulus and Exposure modules |
 | `sstim-eco:` | `https://w3id.org/sstim/ecosystem#` | Ecosystem relationship and consent terms |
 | `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework techniques |
+| `bsc-v:` | `https://w3id.org/sstim/framework/bsc/vocab#` | BSC framework vocabulary: catalog voices, preset groups, Martigli parameters. Not SSTIM ([ADR 0061](../../docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md)) |
+| `bsc-sh:` | `https://w3id.org/sstim/framework/bsc/shapes#` | BSC framework catalog shapes |
 | `bsclab-protocol:` | `https://w3id.org/sstim/implementation/bsclab/protocol/` | Public BSC Lab protocols |
 | `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | Public BSC Lab presets |
 | `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab editorial claims |

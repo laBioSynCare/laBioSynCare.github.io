@@ -18,6 +18,11 @@ WORKLET_DIR := static/worklets
 WASM_WAT   := $(WORKLET_DIR)/bsc-osc.wat
 WASM_OUT   := $(WORKLET_DIR)/bsc-osc.wasm
 SHAPES     := static/ontology/sstim-shapes.ttl
+# The BSC framework's own vocabulary and shapes (ADR 0061). Outside the
+# manifest and every SSTIM snapshot; validated here because the committed BSC
+# Lab instances use them.
+BSC_VOCAB  := static/ontology/frameworks/bsc/bsc-vocab.ttl
+BSC_SHAPES := static/ontology/frameworks/bsc/bsc-shapes.ttl
 CORE_SHAPES := static/ontology/sstim-core-shapes.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
@@ -88,7 +93,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -246,10 +251,11 @@ shacl-instances:
 	@if [ -z "$(strip $(INSTANCE_FILES))" ]; then \
 		echo "shacl-instances: skipped ($(INSTANCE_ROOT) has no .ttl instances)"; \
 	else \
-		tmp="$$(mktemp)"; \
-		trap 'rm -f "$$tmp"' EXIT; \
-		cat $(FULL_SEMANTIC_MODULES) $(INSTANCE_FILES) > "$$tmp"; \
-		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
+		tmp="$$(mktemp)"; shapes="$$(mktemp)"; \
+		trap 'rm -f "$$tmp" "$$shapes"' EXIT; \
+		cat $(FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmp"; \
+		cat $(SHAPES) $(BSC_SHAPES) > "$$shapes"; \
+		$(PYSHACL) -s "$$shapes" "$$tmp"; \
 	fi
 
 ## Validate the synthetic external/private audit ledger with its separate profile
@@ -271,6 +277,13 @@ shacl-session-negative:
 ## clause deleted by a careless edit would be invisible to every other check.
 shacl-public-claim-gate:
 	$(PYTHON) scripts/public-claim-gate-negative.py
+
+## ADR 0061's rules, made to fail one at a time: a delivery status outside a
+## scoped assertion, a breath guide that is not the preset's own or is under
+## 3 s, and a catalog voice in no grouped preset. Conforming data conforms with
+## or without a rule, so only a rejection proves it is there.
+shacl-adr-0061:
+	$(PYTHON) scripts/adr-0061-negative.py
 
 ## Validate the RDF the session projection actually emits, with SHACL-SPARQL
 ## active. The vitest harness beside the producer strips sh:sparql and
@@ -500,6 +513,8 @@ language-coverage:
 ## Archivo, whose fourth star is exactly "loading this ontology into a reasoner
 ## has a high chance of succeeding". Checks all four closures, because a
 ## violation can hide in a module the Full profile includes and Kernel does not.
+## The BSC framework vocabulary (ADR 0061) is checked over the Full closure it
+## builds on, because that is how a consumer loads it.
 validate-profile:
 	@set -e; \
 	tmpdir="$$(mktemp -d)"; \
@@ -514,7 +529,16 @@ validate-profile:
 			exit 1; \
 		fi; \
 		echo "validate-profile: $$profile closure in OWL 2 DL"; \
-	done
+	done; \
+	cat "$$tmpdir/full.ttl" $(BSC_VOCAB) > "$$tmpdir/bsc-framework.ttl"; \
+	if ! $(ROBOT) validate-profile --input "$$tmpdir/bsc-framework.ttl" \
+		--profile DL --output "$$tmpdir/bsc-framework-report.txt" \
+		> "$$tmpdir/robot.log" 2>&1; then \
+		echo "validate-profile: the BSC framework vocabulary over Full is NOT in OWL 2 DL" >&2; \
+		sed -n '1,40p' "$$tmpdir/bsc-framework-report.txt" >&2; \
+		exit 1; \
+	fi; \
+	echo "validate-profile: BSC framework vocabulary over full in OWL 2 DL"
 
 ## Assert the repaired OWL domains infer no unintended type (KR-05). The audit's
 ## concern was that a domain is an inference rule, not a validation hint: a
@@ -522,8 +546,8 @@ validate-profile:
 ## class. The repair was union domains, which entail membership in an anonymous
 ## union and therefore nothing named — but only a reasoner can show that, and
 ## only a fixture keeps it true. Materializes class assertions with HermiT over
-## the Full closure plus every committed instance, then fails if any query
-## returns a row.
+## the Full closure, the BSC framework vocabulary the presets use (ADR 0061) and
+## every committed instance, then fails if any query returns a row.
 entailment-check:
 	@set -e; \
 	tmpdir="$$(mktemp -d)"; \
@@ -534,7 +558,7 @@ entailment-check:
 		echo "entailment-check: no modules — the manifest query failed, and reasoning over instances alone infers nothing and passes" >&2; \
 		exit 1; \
 	fi; \
-	cat $(FULL_SEMANTIC_MODULES) $(INSTANCE_FILES) > "$$tmpdir/merged.ttl"; \
+	cat $(FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmpdir/merged.ttl"; \
 	$(ROBOT) reason --input "$$tmpdir/merged.ttl" --reasoner $(REASONER) \
 		--axiom-generators "ClassAssertion" --output "$$tmpdir/reasoned.owl" > "$$tmpdir/robot.log" 2>&1 \
 		|| { cat "$$tmpdir/robot.log"; exit 1; }; \
@@ -553,7 +577,7 @@ entailment-check:
 	echo "entailment-check: passed ($$count queries, no unintended type inferred)"
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:

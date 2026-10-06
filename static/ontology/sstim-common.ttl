@@ -62,7 +62,8 @@ sstim:FrequencyBand a owl:Class ;
                "Banda di Frequenza"@it,
                "Banda de Frequência"@pt,
                "Banda de Frecuencia"@es ;
-    skos:definition "An information entity describing a named Hz range used in BSC protocol design for targeting and evidence classification. BSC operational design category — not a medical diagnostic taxonomy or universal EEG ontology."@en ;
+    skos:definition "An information entity describing a named Hz range used in protocol design for targeting and evidence classification. An operational design category, not a medical diagnostic taxonomy or a universal EEG ontology."@en ;
+    skos:historyNote "The band set originates in the BSC framework's protocol design; ADR 0061 removed the framework from the definition in 0.19.0."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:NeuralOscillationType a owl:Class ;

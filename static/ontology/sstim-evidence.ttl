@@ -109,7 +109,8 @@ sstim:ReviewStatus a owl:Class ;
 sstim:PublicSafeReference a owl:Class ;
     rdfs:subClassOf sstim:BibliographicReference ;
     rdfs:label "Public-Safe Reference"@en ;
-    skos:definition "A peer-reviewed publication cleared for citation in BSC user-facing content. Must be cleared in the BSC Reference Agent before use in preset techDesc fields."@en ;
+    skos:definition "A peer-reviewed publication cleared for citation on a public surface, such as a preset's user-facing description. The clearance procedure is the publishing implementation's own; SSTIM requires that the reference be identified well enough to be checked."@en ;
+    skos:historyNote "Originally defined as a reference cleared in the BSC Reference Agent for BSC user-facing content; ADR 0061 generalised it in 0.19.0."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:hasEvidenceTier a owl:ObjectProperty, owl:FunctionalProperty ;
@@ -228,7 +229,8 @@ sstim:requiresEvidenceTierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:PublicClaimLevel ;
     rdfs:range  xsd:integer ;
     rdfs:label  "requires evidence tier rank"@en ;
-    skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition). PROVISIONAL policy mapping — reconcile with the BioSynCare Reference publicClaimLevel/clinicalScope enum and a qualified EU MDR adviser before launch."@en ;
+    skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition)."@en ;
+    skos:editorialNote "Provisional policy mapping: to be reconciled with the claim-level enumerations of the implementations that publish claims, and with a qualified EU MDR adviser, before any product launch."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 

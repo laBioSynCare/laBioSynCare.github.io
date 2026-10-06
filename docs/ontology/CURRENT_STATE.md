@@ -338,17 +338,20 @@ The main gaps are design and coverage gaps, not current parser failures:
   `Q141325360` was created on Wikidata on 2026-09-06 and **all 58 mapped Wikidata
   items now carry a `P2888` statement naming an SSTIM term**, measured by
   `make wikidata-inbound`. The three exceptions are the `relatedMatch` rows held
-  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 551 concepts carry
-  English, Italian, Portuguese and Spanish, across all 67 concept schemes, as of
-  2026-08-18. `make language-coverage` measures it and now guards against
+  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 555 concepts carry
+  English, Italian, Portuguese and Spanish, across all 68 concept schemes, and
+  have since 2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be
   recorded deliberately. The 276 labels added that day were written by the
-  maintainers and have **not yet had native review**; see the review request in
-  the repository issues. `skos:definition` remains English-only for all 551
+  maintainers and have **not yet had native review**, and neither have the twelve
+  added for ADR 0061's neutral status values; see the review request in the
+  repository issues. `skos:definition` remains English-only for all 555
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
-  than absent: 15 alternate labels on 8 of the 551 concepts, all English, mostly
-  the oscillation aliases [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
-  added. `make language-coverage` reports it but does not gate it.
+  than absent: 52 alternate labels on 38 of the 555 concepts, all English, 47 of
+  them in the vocabulary module, which includes the oscillation aliases
+  [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
+  added (measured 2026-10-06). `make language-coverage` reports it but does not
+  gate it.
 - VoID subsets are checked against the frozen release manifest but are not
   generated from the live manifest, leaving an avoidable maintenance seam.
 - Independent ontology, domain, privacy, and linked-data review remains

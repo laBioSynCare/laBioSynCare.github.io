@@ -6,6 +6,7 @@
 @prefix sstim:        <https://w3id.org/sstim#> .
 @prefix sstim-ref:    <https://w3id.org/sstim/ref/> .
 @prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix bsc-v:        <https://w3id.org/sstim/framework/bsc/vocab#> .
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
 @prefix prov:         <http://www.w3.org/ns/prov#> .
@@ -15,19 +16,18 @@ bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     rdfs:label "Perform Alpha 10 Seed" ;
     dct:description "Minimal Phase 1 RDF preset seed used to validate the BSC Lab preset instance model. This seed is not a clinical, health, or performance claim." ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha10 ;
     sstim:primaryFrequencyBand sstim-v:alpha10 ;
-    sstim:inGroup sstim-v:groupPerform ;
-    sstim:hasBreathGuide false ;
+    bsc-v:inGroup bsc-v:groupPerform ;
     sstim:presetVersion "0.1.0" ;
     sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
     sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
     sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
     sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
-    sstim:composedOf preset-local:binaural-voice .
+    sstim:composedOfTrack preset-local:binaural-voice .
 
-preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;
+preset-local:binaural-voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:BinauralVoice ;
     rdfs:label "Perform Alpha 10 Seed binaural voice" ;
     sstim:carrierFreqLeft 200.0 ;
     sstim:carrierFreqRight 210.0 ;

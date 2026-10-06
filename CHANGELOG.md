@@ -28,6 +28,57 @@ file is the human-readable summary.
   vocabulary; the files had not said so. The creator is unchanged, and the
   frozen releases keep the publisher they were issued with
   ([ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md)).
+- **SSTIM's universal namespaces carry no framework's structure**
+  ([ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md)).
+  A term belongs in `sstim#`, `sstim/vocab#`, `sstim/exposure#`, `sstim/shapes#`
+  or `sstim/ecosystem#` only if its meaning holds without any one framework,
+  product, catalog format or implementation. The BSC catalog's voice model,
+  preset groups, Martigli parameters and permutation coding failed that test
+  and moved to the BSC framework's own vocabulary and shapes
+  (`https://w3id.org/sstim/framework/bsc/vocab#`, files in
+  `static/ontology/frameworks/bsc/`), which belong to no SSTIM profile or
+  snapshot. The sstim-patch-studio module is now titled "SSTIM Track
+  Parameter Module".
+- 25 definitions are rewritten: those that took their meaning from BSC or
+  carried its remarks, and the track parameters whose domains widened. Where a
+  remark was provenance it moved to `skos:historyNote`; implementation status
+  and policy left the definition.
+- Domains that named the catalog's `sstim:Voice` now name `sstim:AudioTrack`.
+  The breathing-period and transition properties also apply to an audio or
+  control track, so a track's own oscillation needs no catalog term.
+- `PresetShape` no longer carries catalog rules. It bounds what a preset states
+  (at most two target bands, one breath guide that is one of the preset's own
+  tracks, an initial breathing period of at least 3 s) and hosts the
+  public-claim gate. `ExposureProfileShape` accepts a status given through a
+  `KnowledgeStatusAssertion`. The preset contract's `group` is a free string.
+
+### Added
+
+- `sstim:breathGuideTrack`: one pointer from a preset to the track that paces
+  breathing.
+- `sstim-ex:notCurrentlyDeliverable`, `sstim-ex:notCurrentlyUsed`,
+  `sstim-ex:outsideImplementationScope` and
+  `sstim-ex:contextImplementationPrototype`. The new
+  `sstim-sh:DeliveryStatusScopeShape` accepts the three statuses only inside a
+  `KnowledgeStatusAssertion` whose `knowledgeScope` is the implementation's IRI.
+
+### Deprecated
+
+- 39 terms, each still resolvable and pointing at its replacement with
+  `dct:isReplacedBy`: 8 classes, 10 properties, 18 concepts and 3 schemes.
+  The catalog's voice classes, `VoiceType`, `PresetGroup`, `inGroup`,
+  `PermutationFunction`, `permutationFunction`, the five Martigli parameters
+  and their concepts are replaced by the BSC vocabulary's terms;
+  `composedOf` by `sstim:composedOfTrack`; `hasBreathGuide` and
+  `isBreathReference` by `sstim:breathGuideTrack`; the four BSC Lab status and
+  context values by the neutral ones above.
+- `sstim:hapticPattern`, with no replacement: it indexed one engine's pattern
+  list.
+
+### Removed
+
+- `sstim-sh:BscCatalogPresetShape` and the five voice shapes. Their rules are in
+  the BSC framework's shapes.
 
 ## [0.18.0] - 2026-09-23
 
@@ -237,11 +288,11 @@ file is the human-readable summary.
   to let it drift. A scheme must be complete or wholly untranslated, a new scheme
   must ship translated or be recorded as debt, and a translated scheme must leave
   the ledger. Closes the metric KR-16 lacked. It also reports — without gating —
-  `skos:altLabel` coverage, which is 15 aliases on 8 of the 551 concepts. Four
+  `skos:altLabel` coverage, which is 15 aliases on 8 of the 545 concepts. Four
   documents had called that coverage zero; the aliases had been in the graph
   since [ADR 0049](docs/decisions/0049-neural-oscillations-and-frequency-ambits.md)
   landed on 2026-08-15, and nothing measured them, so the claim went unchallenged.
-- **The SKOS vocabulary is fully multilingual.** All 551 concepts now carry
+- **The SKOS vocabulary is fully multilingual.** All 545 concepts now carry
   English, Italian, Portuguese and Spanish `skos:prefLabel` values, across all 67
   concept schemes. The gate found 269 of 545 complete; the remaining 276 labels
   were added the same day, so `make language-coverage` reports 100% and its
@@ -250,7 +301,7 @@ file is the human-readable summary.
   Two honest qualifications travel with this. The 276 new labels were written by
   the maintainers and have had **no native review** — a review request is open,
   and several known soft spots are named in it rather than left to be found. And
-  `skos:definition` remains English-only for all 551 concepts: translating
+  `skos:definition` remains English-only for all 545 concepts: translating
   definitions is a substantially larger job and a separate decision, not an
   oversight.
 - `make definition-coverage` gained a bar against definitions that restate their

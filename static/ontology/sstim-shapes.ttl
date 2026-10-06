@@ -102,546 +102,6 @@ sstim-sh:OntologyMetadataShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Preset Shape
-###########################################################################
-
-sstim-sh:BscCatalogPresetShape a sh:NodeShape ;
-    # Targets anything bearing a catalog-model predicate, rather than every
-    # sstim:Preset (ADR 0041): a configuration that uses the catalog vocabulary
-    # owes the catalog's curation metadata, and one that does not is not held to
-    # it. Several predicates rather than one, because targeting only
-    # sstim:composedOf would let a half-written catalog entry escape the profile
-    # by omitting its voices — the union closes that without needing SPARQL
-    # targets, which the browser validator does not implement, or a marker
-    # property on every published instance.
-    sh:targetSubjectsOf sstim:composedOf ;
-    sh:targetSubjectsOf sstim:inGroup ;
-    sh:targetSubjectsOf sstim:presetVersion ;
-    sh:targetSubjectsOf sstim:targetsFrequencyBand ;
-    sh:targetSubjectsOf sstim:hasBreathGuide ;
-    sh:name "BSC catalog preset"@en ;
-
-    sh:property [
-        sh:path rdfs:label ;
-        sh:minCount 1 ;
-        sh:datatype xsd:string ;
-        sh:message "Preset must have at least one rdfs:label."@en ;
-    ] ;
-
-    sh:property [
-        sh:path dct:description ;
-        sh:minCount 1 ;
-        sh:message "Preset must have a dct:description with conservative scope and use context."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:targetsFrequencyBand ;
-        sh:minCount 1 ;
-        sh:maxCount 2 ;
-        sh:class sstim:FrequencyBand ;
-        sh:message "Preset must target 1–2 frequency bands from sstim:FrequencyBand."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:primaryFrequencyBand ;
-        sh:maxCount 1 ;
-        sh:class sstim:FrequencyBand ;
-        sh:message "primaryFrequencyBand, if present, must be a single sstim:FrequencyBand."@en ;
-    ] ;
-
-    # RDF-08 (2026-07-24 audit): primaryFrequencyBand must be one of the
-    # preset's own targetsFrequencyBand values, not an unrelated band.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "primaryFrequencyBand must be one of the preset's own targetsFrequencyBand values."@en ;
-        sh:select """
-            SELECT $this WHERE {
-                $this <https://w3id.org/sstim#primaryFrequencyBand> ?primary .
-                FILTER NOT EXISTS {
-                    $this <https://w3id.org/sstim#targetsFrequencyBand> ?primary .
-                }
-            }
-        """ ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:inGroup ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:class sstim:PresetGroup ;
-        sh:message "Preset must belong to exactly one group from sstim:PresetGroup."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:hasBreathGuide ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:boolean ;
-        sh:message "Preset must declare hasBreathGuide as a boolean."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:presetVersion ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:string ;
-        sh:pattern "^\\d+\\.\\d+\\.\\d+$" ;
-        sh:message "presetVersion must be a semantic version string X.Y.Z."@en ;
-    ] ;
-
-    # KR-07: the class definition caps a preset at six voices and the format
-    # specification says 1-6, but nothing enforced the ceiling.
-    sh:property [
-        sh:path sstim:composedOf ;
-        sh:minCount 1 ; sh:maxCount 6 ;
-        sh:class sstim:Voice ;
-        sh:message "Preset must be composed of 1-6 Voices."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:forImplementation ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:class sstim:SensoryStimulationImplementation ;
-        sh:message "Preset must identify exactly one implementation whose parameter model it configures."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:followsProtocol ;
-        sh:minCount 1 ;
-        sh:class sstim:SensoryStimulationProtocol ;
-        sh:message "Preset must follow at least one declared sensory stimulation protocol."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:hasPublicClaimLevel ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:class sstim:PublicClaimLevel ;
-        sh:message "Preset must declare exactly one public claim level."@en ;
-    ] ;
-
-    # CLAUDE.md §4.5: hasBreathGuide is true iff exactly one composed voice is the
-    # breathing reference (isBreathReference = true); at most one voice may be.
-    # SHACL-SPARQL is required because the rule counts across the preset's voices —
-    # a per-voice property shape cannot express it. Full IRIs avoid an sh:prefixes
-    # block.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "hasBreathGuide must be true iff exactly one composed voice has isBreathReference=true (found {?n} breathing-reference voice(s) for hasBreathGuide={?guide})."@en ;
-        sh:select """
-            SELECT $this ?guide (COUNT(?v) AS ?n) WHERE {
-                $this <https://w3id.org/sstim#hasBreathGuide> ?guide .
-                OPTIONAL {
-                    $this <https://w3id.org/sstim#composedOf> ?v .
-                    ?v <https://w3id.org/sstim#isBreathReference> true .
-                }
-            }
-            GROUP BY $this ?guide
-            HAVING ( ( ?guide && COUNT(?v) != 1 ) || ( !?guide && COUNT(?v) != 0 ) )
-        """ ;
-    ] ;
-
-    # KR-07: the binaural beat frequency is |fl - fr| and the format
-    # specification caps it at 35 Hz, with one exception — exactly 40 Hz for a
-    # deliberate gamma-40 design, which must then declare gamma-40 as a target
-    # band. Neither the cap nor the exception was enforced, so a voice whose
-    # carriers were each individually legal could produce any beat at all.
-    #
-    # This has to be a preset-level constraint: the exception depends on the
-    # preset's targetsFrequencyBand, which the voice cannot see. It covers both
-    # carrier-pair subtypes, since both derive the beat the same way.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "Binaural beat frequency |fl - fr| must not exceed 35 Hz, unless it is exactly 40 Hz in a preset that declares gamma-40 as a target band."@en ;
-        sh:select """
-            SELECT $this ?beat WHERE {
-                $this <https://w3id.org/sstim#composedOf> ?voice .
-                ?voice <https://w3id.org/sstim#carrierFreqLeft> ?fl ;
-                       <https://w3id.org/sstim#carrierFreqRight> ?fr .
-                BIND( ABS( ?fl - ?fr ) AS ?beat )
-                FILTER( ?beat > 35 )
-                FILTER( ! ( ?beat = 40 && EXISTS {
-                    $this <https://w3id.org/sstim#targetsFrequencyBand> <https://w3id.org/sstim/vocab#gamma40> .
-                } ) )
-            }
-        """ ;
-    ] ;
-
-    # P7.2 (ADR 0018), hardened for audit finding KR-04 (ADR 0050): the
-    # public-claim applicability contract.
-    #
-    # A preset asserting a public claim level whose requiresEvidenceTierRank >= 1
-    # must be authorized by at least one EvidenceAssessmentClaim that satisfies
-    # EVERY clause below. C0/C1/C2 (requires 0) need no evidence; C4 medical
-    # (sentinel 7, above max tier 6) can never be satisfied, so asserting it
-    # publicly always fails.
-    #
-    # The original constraint required only a tier rank reached via the now
-    # deprecated sstim:supportsRelation. That accepted a *refuting* claim, a
-    # claim about a different preset, a claim in an unrelated modality, an
-    # unreviewed or withdrawn claim, and a claim citing a reference it never
-    # read. Each clause below closes one of those, and each has an adversarial
-    # negative fixture in scripts/public-claim-gate-negative.py proving it is
-    # load-bearing — a conjunct nobody can fail is a conjunct that is not there.
-    #
-    # Note the consequence, which is intended: no EvidenceReviewDecision exists
-    # in SSTIM yet, so no claim can currently authorize C3 or C5. That is the
-    # honest state of the evidence base, not a defect. The tier mapping remains
-    # the PROVISIONAL default in sstim-vocab (PublicClaimLevelScheme) —
-    # reconcile with the BioSynCare Reference enum and legal advice before
-    # launch. Full IRIs avoid an sh:prefixes block.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "No evidence assessment satisfies the public-claim applicability contract for this preset's claim level. An authorizing assessment must: support (not refute or leave inconclusive) the claim; reach the tier rank the level requires; be about this preset in both its proposition subject and its scope intervention/context; declare a population or model; declare a sensory modality this preset actually delivers; cite a public-safe reference it also used as an evidence basis; carry a confirming review decision with no reject or revision-request against the same revision; and be neither deprecated nor superseded. Medical/condition (C4) claims are never publicly assertable."@en ;
-        sh:select """
-            SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim#hasPublicClaimLevel> ?level .
-                ?level <https://w3id.org/sstim#requiresEvidenceTierRank> ?req .
-                FILTER( ?req >= 1 )
-                FILTER NOT EXISTS {
-                    # Direction and strength. hasClaimDirection is where an
-                    # assessment's direction lives; evaluatesSubject is neutral,
-                    # which is exactly why the old gate could be satisfied by a
-                    # well-evidenced refutation.
-                    ?claim a <https://w3id.org/sstim#EvidenceAssessmentClaim> ;
-                           <https://w3id.org/sstim#evaluatesSubject> $this ;
-                           <https://w3id.org/sstim#hasClaimDirection> <https://w3id.org/sstim/vocab#claimSupports> ;
-                           <https://w3id.org/sstim#hasEvidenceTier> ?tier ;
-                           <https://w3id.org/sstim#assessesProposition> ?proposition ;
-                           <https://w3id.org/sstim#citesReference> ?reference .
-                    ?tier <https://w3id.org/sstim#tierRank> ?rank .
-                    FILTER( ?rank >= ?req )
-
-                    # Subject. The bounded proposition must itself be about this
-                    # preset, not merely attached to a claim that points at it.
-                    ?proposition <https://w3id.org/sstim#propositionSubject> $this ;
-                                 <https://w3id.org/sstim#hasAssessmentScope> ?scope .
-
-                    # Context and population. The scope must name this preset as
-                    # the intervention it was established under, and must say in
-                    # whom or in what model.
-                    ?scope <https://w3id.org/sstim#scopeInterventionOrContext> $this ;
-                           <https://w3id.org/sstim#scopePopulationOrModel> ?population ;
-                           <https://w3id.org/sstim#scopeSensoryModality> ?modality .
-
-                    # Modality compatibility. The scope's modality must be one
-                    # the preset actually delivers, derived through the protocol
-                    # it follows and that protocol's techniques.
-                    $this <https://w3id.org/sstim#followsProtocol> ?protocol .
-                    ?protocol <https://w3id.org/sstim#usesTechnique> ?technique .
-                    ?technique <https://w3id.org/sstim#techniqueModality> ?modality .
-
-                    # Citation integrity. The cited reference must be public-safe
-                    # (PublicSafeReferenceShape then forces title, creator, date
-                    # and DOI) and must be a source the assessment actually used,
-                    # not decoration borrowed from a stronger literature.
-                    ?reference a <https://w3id.org/sstim#PublicSafeReference> .
-                    ?claim <https://w3id.org/sstim#hasEvidenceBasis> ?basis .
-                    ?basis <https://w3id.org/sstim#basisSource> ?reference .
-
-                    # Review state. ADR 0027 derives review state from immutable
-                    # decision records, never from the deprecated mutable
-                    # hasReviewStatus. Decisions carry no date, so ordering them
-                    # is not possible; instead any adverse decision against the
-                    # same immutable revision blocks it. A revision that was
-                    # confirmed and rejected is contradictory, not merely stale.
-                    ?decision a <https://w3id.org/sstim#EvidenceReviewDecision> ;
-                              <https://w3id.org/sstim#reviewsAssessment> ?claim ;
-                              <https://w3id.org/sstim#hasReviewDecision> <https://w3id.org/sstim/vocab#reviewConfirm> .
-                    FILTER NOT EXISTS {
-                        ?adverseDecision <https://w3id.org/sstim#reviewsAssessment> ?claim ;
-                                         <https://w3id.org/sstim#hasReviewDecision> ?adverse .
-                        FILTER( ?adverse IN ( <https://w3id.org/sstim/vocab#reviewReject>,
-                                              <https://w3id.org/sstim/vocab#reviewRequestRevision> ) )
-                    }
-
-                    # Currency. Withdrawn or superseded evidence authorizes
-                    # nothing, in either direction the supersession was written.
-                    FILTER NOT EXISTS { ?claim <http://www.w3.org/2002/07/owl#deprecated> true }
-                    FILTER NOT EXISTS { ?claim <http://purl.org/dc/terms/isReplacedBy> ?successor }
-                    FILTER NOT EXISTS { ?replacement <http://purl.org/dc/terms/replaces> ?claim }
-                }
-            }
-        """ ;
-    ] .
-
-
-###########################################################################
-# Voice Shapes
-###########################################################################
-
-sstim-sh:VoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:Voice ;
-    sh:name "Voice"@en ;
-    # A Voice must be exactly one of the four disjoint subtypes. sh:xone enforces
-    # this at the data level (pyshacl runs without OWL inference, so the
-    # owl:AllDisjointClasses axiom alone would not be checked).
-    sh:xone (
-        [ sh:class sstim:BinauralVoice ]
-        [ sh:class sstim:MartigliVoice ]
-        [ sh:class sstim:MartigliBinauralVoice ]
-        [ sh:class sstim:SymmetryVoice ]
-    ) ;
-    sh:message "Voice must be typed as exactly one of the four subtypes: Binaural, Martigli, Martigli-Binaural, or Symmetry."@en ;
-
-    # KR-07: the shape admitted any volume below 1.0, while the format
-    # specification caps the conservative default at 0.30 and requires an
-    # explicit rationale above it. A hard ceiling would forbid a legitimately
-    # louder design outright, so the requirement is the rationale, not the
-    # ceiling: above 0.30 the voice must carry an rdfs:comment saying why.
-    # 1.0 stays invalid outright via the per-subtype sh:maxExclusive.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "A voice louder than iniVolume 0.30 must record why in an rdfs:comment (format specification, conservative volume limits)."@en ;
-        sh:select """
-            SELECT $this ?volume WHERE {
-                $this <https://w3id.org/sstim#initialVolume> ?volume .
-                FILTER( ?volume > 0.30 )
-                FILTER NOT EXISTS { $this <http://www.w3.org/2000/01/rdf-schema#comment> ?rationale }
-            }
-        """ ;
-    ] .
-
-
-sstim-sh:BinauralVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:BinauralVoice ;
-    sh:name "BinauralVoice"@en ;
-
-    sh:property [
-        sh:path sstim:carrierFreqLeft ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
-        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:carrierFreqRight ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
-        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:initialVolume ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0 ; sh:maxExclusive 1 ;
-        sh:message "iniVolume must be in [0, 1)."@en ;
-    ] .
-
-
-sstim-sh:SymmetryVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:SymmetryVoice ;
-    sh:name "SymmetryVoice"@en ;
-
-    sh:property [
-        sh:path sstim:baseFrequency ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ;
-        sh:message "f0 must be >= 80 Hz."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:noteCount ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:integer ;
-        sh:minInclusive 2 ;
-        sh:message "nnotes must be an integer >= 2."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:octaveSpan ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0 ;
-        sh:message "noctaves must be a non-negative decimal."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:cycleDuration ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minExclusive 0 ;
-        sh:message "d must be a positive decimal (seconds)."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:permutationFunction ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:integer ;
-        sh:minInclusive 0 ; sh:maxInclusive 4 ;
-        sh:message "permfunc must be 0, 1, 2, 3, or 4."@en ;
-    ] ;
-
-    # KR-07: the pulse rate is nnotes/d Hz and the engine supports at most 50 Hz
-    # (onset interval >= 20 ms). Nothing enforced it, so nnotes and d could each
-    # be individually legal and jointly produce a rate the engine cannot deliver.
-    # This is the constraint CLAUDE.md §4.7 states and the one an isochronic
-    # design is validated by.
-    sh:sparql [
-        a sh:SPARQLConstraint ;
-        sh:message "Symmetry pulse rate (nnotes / d) must not exceed 50 Hz — the onset interval d/nnotes must stay at or above 20 ms."@en ;
-        sh:select """
-            SELECT $this ?rate WHERE {
-                $this <https://w3id.org/sstim#noteCount> ?nnotes .
-                $this <https://w3id.org/sstim#cycleDuration> ?d .
-                FILTER( ?d > 0 )
-                BIND( ?nnotes / ?d AS ?rate )
-                FILTER( ?rate > 50 )
-            }
-        """ ;
-    ] .
-
-
-# Martigli & Martigli-Binaural voice parameter properties live in
-# sstim-patch-studio.ttl (domain sstim:Voice); these shapes enforce which subtype
-# requires which parameter. See ADR 0012 and docs/technical/{BREATHING_MODEL,
-# MARTIGLI_BINAURAL}.md for parameter ranges.
-
-sstim-sh:MartigliVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:MartigliVoice ;
-    sh:name "MartigliVoice"@en ;
-
-    sh:property [
-        sh:path sstim:martigliCenterFreq ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ; sh:maxInclusive 400 ;
-        sh:message "mf0 must be a decimal in [80, 400] Hz."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliAmplitude ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 1 ; sh:maxInclusive 400 ;
-        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliPeriodInitial ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
-        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliPeriodFinal ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
-        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliTransitionDuration ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
-        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:isBreathReference ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:boolean ;
-        sh:message "isOn must be a boolean."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:initialVolume ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0 ; sh:maxExclusive 1 ;
-        sh:message "iniVolume must be in [0, 1)."@en ;
-    ] ;
-    # A Martigli voice is a single tone — the carrier pair belongs to Martigli-Binaural.
-    sh:property [
-        sh:path sstim:carrierFreqLeft ; sh:maxCount 0 ;
-        sh:message "Martigli voice must not declare carrierFreqLeft (use Martigli-Binaural)."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:carrierFreqRight ; sh:maxCount 0 ;
-        sh:message "Martigli voice must not declare carrierFreqRight (use Martigli-Binaural)."@en ;
-    ] ;
-    # CLAUDE.md §4.5: when this voice is the breathing reference, mp0 must be >= 3 s.
-    sh:or (
-        [ sh:not [ sh:path sstim:isBreathReference ; sh:hasValue true ] ]
-        [ sh:path sstim:martigliPeriodInitial ; sh:minInclusive 3 ]
-    ) ;
-    sh:message "When isOn=true (breathing reference), mp0 must be >= 3 s."@en .
-
-
-sstim-sh:MartigliBinauralVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:MartigliBinauralVoice ;
-    sh:name "MartigliBinauralVoice"@en ;
-
-    sh:property [
-        sh:path sstim:carrierFreqLeft ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
-        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:carrierFreqRight ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
-        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliAmplitude ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 1 ; sh:maxInclusive 400 ;
-        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliPeriodInitial ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
-        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliPeriodFinal ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
-        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:martigliTransitionDuration ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
-        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:isBreathReference ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:datatype xsd:boolean ;
-        sh:message "isOn must be a boolean."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:initialVolume ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:decimal ;
-        sh:minInclusive 0 ; sh:maxExclusive 1 ;
-        sh:message "iniVolume must be in [0, 1)."@en ;
-    ] ;
-    # Martigli-Binaural uses the carrier pair (fl/fr), not a single-tone center.
-    sh:property [
-        sh:path sstim:martigliCenterFreq ; sh:maxCount 0 ;
-        sh:message "Martigli-Binaural voice must not declare martigliCenterFreq (uses the fl/fr carrier pair)."@en ;
-    ] ;
-    # CLAUDE.md §4.5: when this voice is the breathing reference, mp0 must be >= 3 s.
-    sh:or (
-        [ sh:not [ sh:path sstim:isBreathReference ; sh:hasValue true ] ]
-        [ sh:path sstim:martigliPeriodInitial ; sh:minInclusive 3 ]
-    ) ;
-    sh:message "When isOn=true (breathing reference), mp0 must be >= 3 s."@en .
-
-
-###########################################################################
 # Evidence Assessment Shapes (ADR 0027)
 ###########################################################################
 
@@ -837,7 +297,7 @@ sstim-sh:EvidenceSearchRecordShape a sh:NodeShape ;
         sh:message "EvidenceSearchRecord must record its as-of coverage-end date."@en ;
     ] .
 
-# The public-claim gate (BscCatalogPresetShape, ADR 0050) reads
+# The public-claim gate (sstim-sh:PresetShape since ADR 0061; ADR 0050) reads
 # requiresEvidenceTierRank to decide whether a preset needs evidence at all, and
 # tierRank to decide whether a claim is strong enough. Neither was mandatory.
 #
@@ -1124,6 +584,31 @@ sstim-sh:KnowledgeStatusAssertionShape a sh:NodeShape ;
         [ sh:path sstim-ex:knowledgeScopeNote ; sh:minCount 1 ]
     ) ;
     sh:message "KnowledgeStatusAssertion must name a corpus scope IRI or a scope note."@en .
+
+# ADR 0061: a delivery status describes one implementation, so it means
+# something only inside an assertion whose scope names that implementation.
+# The three implementation-named values it replaced carried the implementation
+# in their IRIs, which put one implementation's state into SSTIM's vocabulary.
+sstim-sh:DeliveryStatusScopeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasKnowledgeStatus ;
+    sh:name "Delivery status scope"@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A delivery status (not currently deliverable, not currently used, outside implementation scope) must be asserted by a KnowledgeStatusAssertion whose knowledgeScope is the IRI of the implementation it describes."@en ;
+        sh:select """
+            SELECT $this ?status WHERE {
+                $this <https://w3id.org/sstim/exposure#hasKnowledgeStatus> ?status .
+                FILTER( ?status IN ( <https://w3id.org/sstim/exposure#notCurrentlyDeliverable>,
+                                     <https://w3id.org/sstim/exposure#notCurrentlyUsed>,
+                                     <https://w3id.org/sstim/exposure#outsideImplementationScope> ) )
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/exposure#KnowledgeStatusAssertion> ;
+                          <https://w3id.org/sstim/exposure#knowledgeScope> ?scope .
+                    FILTER( isIRI( ?scope ) )
+                }
+            }
+        """ ;
+    ] .
 
 ###########################################################################
 # Session Specification Shape
@@ -2141,10 +1626,18 @@ sstim-sh:ExposureProfileShape a sh:NodeShape ;
         sh:message "ExposureProfile must use at least one declared StimulusChannel."@en ;
     ] ;
     sh:property [
-        sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ;
+        sh:path sstim-ex:hasKnowledgeStatus ;
         sh:class sstim-ex:KnowledgeStatus ;
-        sh:message "ExposureProfile must declare at least one local knowledge status."@en ;
+        sh:message "hasKnowledgeStatus values must be controlled sstim-ex:KnowledgeStatus values."@en ;
     ] ;
+    # Directly, or through a scoped assertion (ADR 0061): a delivery status
+    # names its implementation and so can only be asserted the second way, and
+    # a profile whose only statuses are delivery statuses has no direct one.
+    sh:or (
+        [ sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ]
+        [ sh:path sstim-ex:hasKnowledgeStatusAssertion ; sh:minCount 1 ]
+    ) ;
+    sh:message "ExposureProfile must declare at least one knowledge status, directly or through a scoped KnowledgeStatusAssertion."@en ;
     sh:property [
         sh:path sstim-ex:hasBoundaryApplicability ; sh:class sstim-ex:BoundaryApplicabilityStatement ;
         sh:message "hasBoundaryApplicability values must be BoundaryApplicabilityStatement nodes."@en ;
@@ -3308,11 +2801,11 @@ sstim-sh:PublicEcosystemPrivateDataShape a sh:NodeShape ;
 # sstim:Preset. What differs between BSC's two serialisations is a schema, and a
 # schema is a conformance profile rather than a class.
 #
-# Hence two shapes. sstim-sh:PresetShape holds what is true of *any* engine
-# configuration. sstim-sh:BscCatalogPresetShape holds the BSC catalog profile —
-# target bands, group, evidence-facing metadata — and targets configurations
-# built from catalog sstim:Voice instances rather than the class, so a Patch
-# Studio configuration is not required to carry catalog curation it does not have.
+# sstim-sh:PresetShape holds what is true of *any* engine configuration. The
+# BSC catalog profile that used to sit beside it (target bands, group,
+# evidence-facing curation, the four voice types) moved to the BSC framework's
+# own shapes with ADR 0061, so a configuration outside that catalog is never
+# held to curation it does not have, and SSTIM's shapes name no framework.
 ###########################################################################
 
 sstim-sh:PresetShape a sh:NodeShape ;
@@ -3350,6 +2843,172 @@ sstim-sh:PresetShape a sh:NodeShape ;
         sh:maxCount 1 ; sh:datatype xsd:decimal ;
         sh:minExclusive 0 ; sh:maxInclusive 400 ;
         sh:message "tempoBpm, if present, must be a positive decimal no greater than 400."@en ;
+    ] ;
+
+    # ADR 0061 moved these here from the BSC catalog shape: each is true of any
+    # preset, so each is held for every preset, bounded if present and required
+    # never. What the BSC catalog additionally *requires* lives in its own shapes.
+    sh:property [
+        sh:path sstim:targetsFrequencyBand ;
+        sh:maxCount 2 ;
+        sh:class sstim:FrequencyBand ;
+        sh:message "A preset targets at most two frequency bands, each a sstim:FrequencyBand."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:primaryFrequencyBand ;
+        sh:maxCount 1 ;
+        sh:class sstim:FrequencyBand ;
+        sh:message "primaryFrequencyBand, if present, must be a single sstim:FrequencyBand."@en ;
+    ] ;
+
+    # RDF-08 (2026-07-24 audit): primaryFrequencyBand must be one of the
+    # preset's own targetsFrequencyBand values, not an unrelated band.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "primaryFrequencyBand must be one of the preset's own targetsFrequencyBand values."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#primaryFrequencyBand> ?primary .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim#targetsFrequencyBand> ?primary .
+                }
+            }
+        """ ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:presetVersion ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\d+\\.\\d+\\.\\d+$" ;
+        sh:message "presetVersion, if present, must be one semantic version string X.Y.Z."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:forImplementation ;
+        sh:maxCount 1 ;
+        sh:class sstim:SensoryStimulationImplementation ;
+        sh:message "A preset configures the parameter model of at most one implementation."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:followsProtocol ;
+        sh:class sstim:SensoryStimulationProtocol ;
+        sh:message "followsProtocol must name a declared sensory stimulation protocol."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:hasPublicClaimLevel ;
+        sh:maxCount 1 ;
+        sh:class sstim:PublicClaimLevel ;
+        sh:message "A preset declares at most one public claim level."@en ;
+    ] ;
+
+    # Breath guidance (ADR 0061): one pointer to one of the preset's own tracks,
+    # and a guide below 3 s is tremolo rather than breathing guidance (CLAUDE.md
+    # §4.5, restated for a single pointer).
+    sh:property [
+        sh:path sstim:breathGuideTrack ;
+        sh:maxCount 1 ;
+        sh:class sstim:Track ;
+        sh:message "A preset has at most one breath guide, and it must be a track."@en ;
+    ] ;
+
+    sh:property [
+        sh:path ( sstim:breathGuideTrack sstim:breathingPeriodInitial ) ;
+        sh:minInclusive 3 ;
+        sh:message "A breath guide's initial breathing period must be at least 3 s: shorter cycles are tremolo, not breathing guidance."@en ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A preset's breath guide must be one of its own tracks (sstim:composedOfTrack)."@en ;
+        sh:select """
+            SELECT $this ?guide WHERE {
+                $this <https://w3id.org/sstim#breathGuideTrack> ?guide .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#composedOfTrack> ?guide }
+            }
+        """ ;
+    ] ;
+
+    # P7.2 (ADR 0018), hardened for KR-04 (ADR 0050), and held for every preset
+    # since ADR 0061: before it, only presets carrying a BSC catalog predicate
+    # were checked, so a preset outside the catalog could declare a public claim
+    # level that no evidence supported and pass.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "No evidence assessment satisfies the public-claim applicability contract for this preset's claim level. An authorizing assessment must: support (not refute or leave inconclusive) the claim; reach the tier rank the level requires; be about this preset in both its proposition subject and its scope intervention/context; declare a population or model; declare a sensory modality this preset actually delivers; cite a public-safe reference it also used as an evidence basis; carry a confirming review decision with no reject or revision-request against the same revision; and be neither deprecated nor superseded. Medical/condition (C4) claims are never publicly assertable."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim#hasPublicClaimLevel> ?level .
+                ?level <https://w3id.org/sstim#requiresEvidenceTierRank> ?req .
+                FILTER( ?req >= 1 )
+                FILTER NOT EXISTS {
+                    # Direction and strength. hasClaimDirection is where an
+                    # assessment's direction lives; evaluatesSubject is neutral,
+                    # which is exactly why the old gate could be satisfied by a
+                    # well-evidenced refutation.
+                    ?claim a <https://w3id.org/sstim#EvidenceAssessmentClaim> ;
+                           <https://w3id.org/sstim#evaluatesSubject> $this ;
+                           <https://w3id.org/sstim#hasClaimDirection> <https://w3id.org/sstim/vocab#claimSupports> ;
+                           <https://w3id.org/sstim#hasEvidenceTier> ?tier ;
+                           <https://w3id.org/sstim#assessesProposition> ?proposition ;
+                           <https://w3id.org/sstim#citesReference> ?reference .
+                    ?tier <https://w3id.org/sstim#tierRank> ?rank .
+                    FILTER( ?rank >= ?req )
+
+                    # Subject. The bounded proposition must itself be about this
+                    # preset, not merely attached to a claim that points at it.
+                    ?proposition <https://w3id.org/sstim#propositionSubject> $this ;
+                                 <https://w3id.org/sstim#hasAssessmentScope> ?scope .
+
+                    # Context and population. The scope must name this preset as
+                    # the intervention it was established under, and must say in
+                    # whom or in what model.
+                    ?scope <https://w3id.org/sstim#scopeInterventionOrContext> $this ;
+                           <https://w3id.org/sstim#scopePopulationOrModel> ?population ;
+                           <https://w3id.org/sstim#scopeSensoryModality> ?modality .
+
+                    # Modality compatibility. The scope's modality must be one
+                    # the preset actually delivers, derived through the protocol
+                    # it follows and that protocol's techniques.
+                    $this <https://w3id.org/sstim#followsProtocol> ?protocol .
+                    ?protocol <https://w3id.org/sstim#usesTechnique> ?technique .
+                    ?technique <https://w3id.org/sstim#techniqueModality> ?modality .
+
+                    # Citation integrity. The cited reference must be public-safe
+                    # (PublicSafeReferenceShape then forces title, creator, date
+                    # and DOI) and must be a source the assessment actually used,
+                    # not decoration borrowed from a stronger literature.
+                    ?reference a <https://w3id.org/sstim#PublicSafeReference> .
+                    ?claim <https://w3id.org/sstim#hasEvidenceBasis> ?basis .
+                    ?basis <https://w3id.org/sstim#basisSource> ?reference .
+
+                    # Review state. ADR 0027 derives review state from immutable
+                    # decision records, never from the deprecated mutable
+                    # hasReviewStatus. Decisions carry no date, so ordering them
+                    # is not possible; instead any adverse decision against the
+                    # same immutable revision blocks it. A revision that was
+                    # confirmed and rejected is contradictory, not merely stale.
+                    ?decision a <https://w3id.org/sstim#EvidenceReviewDecision> ;
+                              <https://w3id.org/sstim#reviewsAssessment> ?claim ;
+                              <https://w3id.org/sstim#hasReviewDecision> <https://w3id.org/sstim/vocab#reviewConfirm> .
+                    FILTER NOT EXISTS {
+                        ?adverseDecision <https://w3id.org/sstim#reviewsAssessment> ?claim ;
+                                         <https://w3id.org/sstim#hasReviewDecision> ?adverse .
+                        FILTER( ?adverse IN ( <https://w3id.org/sstim/vocab#reviewReject>,
+                                              <https://w3id.org/sstim/vocab#reviewRequestRevision> ) )
+                    }
+
+                    # Currency. Withdrawn or superseded evidence authorizes
+                    # nothing, in either direction the supersession was written.
+                    FILTER NOT EXISTS { ?claim <http://www.w3.org/2002/07/owl#deprecated> true }
+                    FILTER NOT EXISTS { ?claim <http://purl.org/dc/terms/isReplacedBy> ?successor }
+                    FILTER NOT EXISTS { ?replacement <http://purl.org/dc/terms/replaces> ?claim }
+                }
+            }
+        """ ;
     ] ;
 
     # A configuration is not an execution of itself.
@@ -3443,16 +3102,17 @@ sstim-sh:ControlTrackShape a sh:NodeShape ;
     sh:name "ControlTrack"@en ;
 
     # Below 3 s a breathing period is tremolo, not breathing guidance
-    # (CLAUDE.md 4.5). Enforced here as it is for catalog Martigli voices.
+    # (CLAUDE.md 4.5). The generic breathing terms since ADR 0061; the BSC
+    # catalog enforces the same floor on its own Martigli parameters.
     sh:property [
-        sh:path sstim:martigliPeriodInitial ;
+        sh:path sstim:breathingPeriodInitial ;
         sh:maxCount 1 ; sh:datatype xsd:decimal ;
         sh:minInclusive 3.0 ;
         sh:message "A breathing control period must be at least 3.0 s; below that it is tremolo, not breathing guidance."@en ;
     ] ;
 
     sh:property [
-        sh:path sstim:martigliPeriodFinal ;
+        sh:path sstim:breathingPeriodFinal ;
         sh:maxCount 1 ; sh:datatype xsd:decimal ;
         sh:minInclusive 3.0 ;
         sh:message "A breathing control target period must be at least 3.0 s."@en ;

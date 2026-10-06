@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Assert every clause of the public-claim applicability contract is load-bearing.
 
-Audit finding KR-04. The public-claim gate on `sstim-sh:BscCatalogPresetShape` used to ask
+Audit finding KR-04. The public-claim gate, on `sstim-sh:PresetShape` since ADR 0061 and on
+the BSC catalog shape before it, used to ask
 one question — does some claim linked by the deprecated `sstim:supportsRelation`
 reach the required tier — and so it accepted a well-evidenced *refutation*, a
 claim about a different subject, a claim in a modality the preset does not
@@ -63,13 +64,11 @@ ex:preset a sstim:Preset ;
     dct:modified "2026-08-15"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha ;
     sstim:primaryFrequencyBand sstim-v:alpha ;
-    sstim:inGroup sstim-v:groupPerform ;
-    sstim:hasBreathGuide false ;
     sstim:presetVersion "1.0.0" ;
     sstim:hasPublicClaimLevel sstim-v:claimC3StructureFunction ;
     sstim:forImplementation ex:implementation ;
     sstim:followsProtocol ex:protocol ;
-    sstim:composedOf ex:voice .
+    sstim:composedOfTrack ex:voice .
 
 ex:framework a sstim:SensoryStimulationFramework ;
     rdfs:label "KR-04 fixture framework"@en ;
@@ -87,8 +86,8 @@ ex:protocol a sstim:SensoryStimulationProtocol ;
     sstim:definedByFramework ex:framework ;
     sstim:usesTechnique sstim-v:techBinauralBeats .
 
-ex:voice a sstim:Voice, sstim:BinauralVoice ;
-    rdfs:label "KR-04 fixture binaural voice"@en ;
+ex:voice a sstim:AudioTrack ;
+    rdfs:label "KR-04 fixture binaural track"@en ;
     sstim:carrierFreqLeft 200.0 ;
     sstim:carrierFreqRight 210.0 ;
     sstim:initialVolume 0.16 .
@@ -155,13 +154,11 @@ ex:c1-preset a sstim:Preset ;
     dct:modified "2026-08-15"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha ;
     sstim:primaryFrequencyBand sstim-v:alpha ;
-    sstim:inGroup sstim-v:groupPerform ;
-    sstim:hasBreathGuide false ;
     sstim:presetVersion "1.0.0" ;
     sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
     sstim:forImplementation ex:implementation ;
     sstim:followsProtocol ex:protocol ;
-    sstim:composedOf ex:voice .
+    sstim:composedOfTrack ex:voice .
 
 ex:framework a sstim:SensoryStimulationFramework ;
     rdfs:label "KR-04 fixture framework"@en ;
@@ -179,8 +176,8 @@ ex:protocol a sstim:SensoryStimulationProtocol ;
     sstim:definedByFramework ex:framework ;
     sstim:usesTechnique sstim-v:techBinauralBeats .
 
-ex:voice a sstim:Voice, sstim:BinauralVoice ;
-    rdfs:label "KR-04 fixture binaural voice"@en ;
+ex:voice a sstim:AudioTrack ;
+    rdfs:label "KR-04 fixture binaural track"@en ;
     sstim:carrierFreqLeft 200.0 ;
     sstim:carrierFreqRight 210.0 ;
     sstim:initialVolume 0.16 .

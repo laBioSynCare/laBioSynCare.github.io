@@ -455,15 +455,21 @@ enforces all of this:
 - **Every non-null IRI must be declared** in the live ontology modules.
 - **Every track type the studio can add must be mapped explicitly**, and a
   visual track must never resolve to an audio class. The generic fallback
-  (`sstim:Voice`) exists only for a type that does not exist yet; it is not a
-  resting place. The five ADR 0046 colour and spatial types
+  (`sstim:Track` since ADR 0061; `sstim:Voice` before it) exists only for a type
+  that does not exist yet; it is not a resting place. The five ADR 0046 colour and spatial types
   (`ColorField`, `DepthMarkers`, `TreeScene`, `AbstractScene`, `LandscapeScene`)
   did rest there and reported `sstim:Voice` in the panel and in the graph link
   until they were mapped to `sstim-v:modalityVisual`. The older test proved the
   fallback *was declared*, which is not the same claim as its being *right*.
-- **Control tracks point at `sstim:ControlTrack`**, never at `sstim:MartigliVoice`
-  or `sstim:SymmetryVoice`. A control track is silent and modulates other tracks;
-  those two are audible catalog voices. See ADR 0041.
+- **Control tracks point at `sstim:ControlTrack`**, never at a catalog voice
+  class (`bsc-v:MartigliVoice`, `bsc-v:SymmetryVoice`, the BSC framework's own
+  since ADR 0061). A control track is silent and modulates other tracks; those
+  are audible catalog voices. See ADR 0041.
+- **Audio tracks point at a technique or the generic track kind**, not at a
+  catalog voice class: `BinauralBeat` at `sstim-v:techBinauralBeats`,
+  `IsochronicTone` at `sstim-v:techIsochronicTones`, and Carrier, Noise, Drone
+  and Sample at `sstim:AudioTrack` (ADR 0061). The haptic `pattern` index has no
+  term: it selects from this engine's own list, so SSTIM names nothing for it.
 
 ### 10.3 The link itself
 
@@ -483,7 +489,7 @@ pinned by tests:
   owner site. See [`PORTABLE_DEPLOYMENT.md`](PORTABLE_DEPLOYMENT.md).
 
 On arrival `OntologyGraph.resolveHashToNodeId` accepts either a CURIE
-(`sstim:BinauralVoice`, and a bare `prefix:` addresses the namespace root) or a
+(`sstim-v:techBinauralBeats`, and a bare `prefix:` addresses the namespace root) or a
 bare local name, widens the visible scope to contain the node, selects it, and
 pulses it so the reader can see where the link landed.
 
@@ -529,7 +535,7 @@ follows the coverage:
 | several track types, or parameters | `Open Patch Studio`, with the coverage named in the tooltip |
 | nothing in either registry | no row |
 
-The threshold is deliberate. `sstim:Voice` is realised by four audio types and
+The threshold is deliberate. `sstim:AudioTrack` is realised by four audio types and
 `sstim-v:modalityVisual` by fourteen visual ones; fourteen "add" links in a
 detail panel is not an affordance, it is noise.
 

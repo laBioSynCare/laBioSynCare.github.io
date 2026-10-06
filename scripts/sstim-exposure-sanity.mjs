@@ -127,10 +127,14 @@ SELECT ?claim ?status WHERE {
 ORDER BY ?claim ?status
 `, 7)
 
-await assertRows(store, 'not currently deliverable by BSC Lab', `${prefixes}
+// ADR 0061: a delivery status names its implementation through the scope of
+// the assertion that carries it, not through the status value's own IRI.
+await assertRows(store, 'not currently deliverable by BSC Lab, as a scoped assertion', `${prefixes}
 SELECT ?resource WHERE {
   GRAPH ?g {
-    ?resource sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab .
+    ?resource sstim-ex:hasKnowledgeStatusAssertion ?assertion .
+    ?assertion sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable ;
+               sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> .
   }
 }
 ORDER BY ?resource

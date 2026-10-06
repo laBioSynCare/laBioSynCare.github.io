@@ -954,36 +954,56 @@ indexed, examiner-searchable records.
             CLAUDE.md §3.4: needs "modify static/ontology/void.ttl". The quality
             audit's subset check (a download URL "ending in
             /ontology/sstim-<id>.ttl") moves with it.
-- [!] **Move BSC's structure out of the universal namespaces** `P1`
+- [ ] **Move BSC's structure out of the universal namespaces** `P1`
       *[ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md),
       accepted 2026-10-05; the term set is in
       [Directions](docs/ontology/SSTIM_DIRECTIONS.md) §3. A 0.19.0 release gate:
-      the release is not cut before this lands. Blocked on CLAUDE.md §3.4, since
-      it needs an instruction naming the protected files:
-      `sstim-patch-studio.ttl`, `sstim-vocab.ttl`, `sstim-exposure.ttl`,
-      `sstim-shapes.ttl`, `sstim-configuration.ttl`, `sstim-common.ttl`,
-      `sstim-session.ttl`, `sstim-evidence.ttl`, `sstim-ecosystem.ttl`, and the
-      instance files under `presets/` and `experiments/` that use the moved
-      terms.*
+      the release is not cut before this lands. Renato named the protected files
+      on 2026-10-06, and steps 1 to 5 landed that day. Step 6 is what still
+      holds the release.*
 
-      - [ ] 1. Classify every term in `sstim-patch-studio.ttl` by ADR 0061's
+      - [x] 1. Classify every term in `sstim-patch-studio.ttl` by ADR 0061's
             rule (generic stays; one framework's or tool's moves).
-      - [ ] 2. Create the BSC framework vocabulary and its shapes under
+            *Eighteen moved or were replaced, `hapticPattern` was deprecated
+            with no replacement, and `noteCount`, `octaveSpan` and
+            `cycleDuration` stayed generic. Directions §3 lists the result.*
+      - [x] 2. Create the BSC framework vocabulary and its shapes under
             `/sstim/framework/bsc/`, outside the manifest, importing SSTIM; load
             it in the Workbench; teach the quality audit and term index where it
             lives.
-      - [ ] 3. Deprecate each moved term with `dct:isReplacedBy`, record the
+            *`static/ontology/frameworks/bsc/bsc-vocab.ttl` and `bsc-shapes.ttl`.
+            The vocabulary states `dct:requires` SSTIM rather than `owl:imports`,
+            because the namespace resolves to 0.18.0, where
+            `sstim:breathingPeriodInitial` has the domain
+            `sstim:SessionSpecification`: imported, it would type every Martigli
+            voice a session specification. Import the 0.19.0 version IRI once
+            that release exists.
+            The quality audit, `validate-profile`, `entailment-check`,
+            `shacl-instances` and `preset-contract` load it; `void.ttl`
+            describes it as a subset of the instance dataset; the term index
+            points each deprecated term at its replacement.*
+      - [x] 3. Deprecate each moved term with `dct:isReplacedBy`, record the
             full-equivalence exception, and add the neutral breath-guide link and
             the implementation-neutral, scoped status values.
-      - [ ] 4. Rewrite the 22 generic definitions that carry BSC remarks
+            *`sstim:breathGuideTrack`; `DeliveryStatusScopeShape` requires the
+            scope; `make shacl-adr-0061` holds five adversarial cases to their
+            own rules.*
+      - [x] 4. Rewrite the 22 generic definitions that carry BSC remarks
             (provenance to `skos:historyNote`; status and policy out).
-      - [ ] 5. Move the committed presets and experiments to the new terms;
+      - [x] 5. Move the committed presets and experiments to the new terms;
             update `preset.schema.json` (`group` loses its enum),
             `src/rdf/presets.js` (GB-10) and every other file that names a moved
             term (a grep of `src/`, `scripts/`, `packages/`, `test/` and
             `static/schemas/` found fourteen more on 2026-10-05).
+            *17 delivery statuses became scoped assertions. GB-10 is not
+            closed by this: the presets page still requires a version and a
+            band.*
       - [ ] 6. Route the BSC vocabulary namespace upstream, after ADR 0060's
-            pull request.
+            pull request. *#6822 merged 2026-10-06. Wait until the deploy
+            serves `ontology/frameworks/bsc/bsc-vocab.ttl`, then route
+            `framework/bsc/vocab` and `framework/bsc/shapes` in the mirror and
+            upstream. ADR 0061's ordering: 0.19.0 is not cut until every
+            `dct:isReplacedBy` target dereferences.*
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module
@@ -1436,7 +1456,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
       ANS), the plain names the preferred labels bury, and the `systemAutonomic`
       label divergence the alignment work exposed. Proposal and the rejected
       candidates: `~/sstim-drafts/altlabel-proposal.md`. Still partial by design:
-      most of the 551 concepts have no alias worth writing, and non-English
+      most of the 555 concepts have no alias worth writing, and non-English
       aliases wait for the same native reviewer as the labels.*
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,

@@ -11,21 +11,21 @@
 
 # ADR 0034: deliberately NOT typed as any stimulation protocol — a capability-boundary document. Its own editorial note records that it
 # intentionally maps to no supported stimulation technique, and every channel is
-# notCurrentlyDeliverableByBSCLab or outsideBSCLabScope.
+# not currently deliverable by BSC Lab, or outside its scope, in scoped assertions.
 bsclab-experiment:smell-taste-device-boundary a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Smell and taste device boundary"@en ;
     dct:description "Non-clinical modeling example that treats olfactory and gustatory modalities as SSTIM-relevant while marking ordinary phone smell, device taste, and perfume-on-device usage as outside current BSC Lab delivery capability."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-10-06"^^xsd:date ;
     skos:editorialNote "Capability-boundary protocol: documents out-of-scope delivery paths and intentionally does not map them to a currently supported BSC stimulation technique."@en ;
     sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
+    sstim-ex:hasKnowledgeStatusAssertion this:status-protocol-not-currently-deliverable, this:status-protocol-outside-implementation-scope ;
     sstim-ex:hasExposureProfile this:profile .
 
 this:profile a sstim-ex:ExposureProfile ;
     rdfs:label "Smell/taste boundary exposure profile"@en ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
+    sstim-ex:hasKnowledgeStatusAssertion this:status-profile-not-currently-deliverable, this:status-profile-outside-implementation-scope ;
     sstim-ex:usesStimulusChannel this:phone-smell-channel, this:perfume-device-channel, this:device-taste-channel ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery, sstim-ex:capabilityTasteDelivery ;
     sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility  .
@@ -35,7 +35,7 @@ this:phone-smell-channel a sstim-ex:StimulusChannel ;
     sstim-ex:perceivedModality sstim-ex:modalityOlfactory ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery ;
     sstim-ex:hasBodyPlacement sstim-ex:placementNose ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab .
+    sstim-ex:hasKnowledgeStatusAssertion this:status-phone-smell-channel-not-currently-deliverable .
 
 this:perfume-device-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Perfume-on-device olfactory channel"@en ;
@@ -43,7 +43,7 @@ this:perfume-device-channel a sstim-ex:StimulusChannel ;
     sstim-ex:perceivedModality sstim-ex:modalityOlfactory ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery ;
     sstim-ex:hasBodyPlacement sstim-ex:placementNose ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:outsideBSCLabScope .
+    sstim-ex:hasKnowledgeStatusAssertion this:status-perfume-device-channel-outside-implementation-scope .
 
 this:device-taste-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Device taste channel"@en ;
@@ -51,5 +51,73 @@ this:device-taste-channel a sstim-ex:StimulusChannel ;
     sstim-ex:perceivedModality sstim-ex:modalityGustatory ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityTasteDelivery ;
     sstim-ex:hasBodyPlacement sstim-ex:placementMouth ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope .
+    sstim-ex:hasKnowledgeStatusAssertion this:status-device-taste-channel-not-currently-deliverable, this:status-device-taste-channel-outside-implementation-scope .
 
+
+# Delivery statuses (ADR 0061). Each is scoped to the implementation it
+# describes, BSC Lab, instead of being spelled into the vocabulary. They were
+# re-expressed, not re-assessed: the as-of date is the record's own.
+
+this:status-protocol-not-currently-deliverable a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of protocol: not currently deliverable"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-protocol-outside-implementation-scope a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of protocol: outside implementation scope"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:outsideImplementationScope ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-profile-not-currently-deliverable a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of profile: not currently deliverable"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-profile-outside-implementation-scope a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of profile: outside implementation scope"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:outsideImplementationScope ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-phone-smell-channel-not-currently-deliverable a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of phone-smell-channel: not currently deliverable"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-perfume-device-channel-outside-implementation-scope a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of perfume-device-channel: outside implementation scope"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:outsideImplementationScope ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-device-taste-channel-not-currently-deliverable a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of device-taste-channel: not currently deliverable"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-device-taste-channel-outside-implementation-scope a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "BSC Lab delivery status of device-taste-channel: outside implementation scope"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:outsideImplementationScope ;
+    sstim-ex:knowledgeAsOfDate "2026-07-10"^^xsd:date ;
+    sstim-ex:knowledgeScope <https://w3id.org/sstim/implementation/bsclab> ;
+    prov:wasGeneratedBy this:status-migration .
+
+this:status-migration a sstim-ex:KnowledgeStatusActivity ;
+    rdfs:label "ADR 0061 delivery-status migration"@en ;
+    rdfs:comment "Re-expressed this record's BSC Lab delivery statuses as scoped assertions when ADR 0061 removed the implementation-named status values from the vocabulary. The statuses were not re-assessed."@en ;
+    prov:endedAtTime "2026-10-06T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .

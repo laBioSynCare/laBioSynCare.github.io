@@ -146,7 +146,9 @@ async function main() {
       //    survive two levels of escaping to reach the page.
       const backLink = "[...document.querySelectorAll('.detail a')]" +
         ".find(a => (a.getAttribute('href') || '').includes('/creator/'))"
-      await session.navigate(`${base}/graph/#BinauralVoice`)
+      // The binaural-beat technique: what the studio's BinauralBeat track realises
+      // since ADR 0061 moved the catalog voice classes to the BSC framework.
+      await session.navigate(`${base}/graph/#techBinauralBeats`)
       await session.waitFor(`!!${backLink}`,
         { label: 'the graph detail panel', timeout: 300_000 })
       const back = await session.evaluate(`${backLink}.getAttribute('href')`)
