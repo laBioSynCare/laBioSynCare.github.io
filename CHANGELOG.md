@@ -82,6 +82,12 @@ file is the human-readable summary.
 
 ### Fixed
 
+- **VoID's downloads name the release it describes.** Every module and
+  catalogue `dcat:downloadURL` and `void:dataDump` in `void.ttl` named the
+  top-level development files, while its `dcat:accessURL` resolved to the
+  release (ADR 0060), so a catalogue that downloads would have fetched
+  unreleased content. All 73 now name `ontology/latest/`, as does the dataset
+  description the Workbench publishes for search engines.
 - **The ontology cites its source repository at fixed versions (GB-08).** 152
   links in the modules, profiles, framework vocabulary and instances named the
   legacy repository at its moving `main` branch. They now name

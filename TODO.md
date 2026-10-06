@@ -949,11 +949,14 @@ indexed, examiner-searchable records.
             `ecosystem`, `stimulus`, `kernel`, `module/exposure`,
             `profile/full` and `manifest` all redirect into `latest/` and
             declare 0.18.0. Both notes updated.*
-      - [!] 4. Point `void.ttl`'s module `dcat:downloadURL` and `void:dataDump`
-            at `latest/`, so each agrees with its `dcat:accessURL`. Blocked on
-            CLAUDE.md §3.4: needs "modify static/ontology/void.ttl". The quality
-            audit's subset check (a download URL "ending in
-            /ontology/sstim-<id>.ttl") moves with it.
+      - [x] 4. Point `void.ttl`'s module `dcat:downloadURL` and `void:dataDump`
+            at `latest/`, so each agrees with its `dcat:accessURL`.
+            *Done 2026-10-06, when Renato named void.ttl: 73 URLs, all 55
+            distinct ones answering 200 from `latest/` (0.18.0). The entrance's
+            `NAMESPACE_CATALOGUE_TTL`, which the schema.org dataset description
+            hands to crawlers, moved with them. The quality audit's subset check
+            now expects `latest/`, and it rejects any download naming a
+            top-level development file.*
 - [ ] **Move BSC's structure out of the universal namespaces** `P1`
       *[ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md),
       accepted 2026-10-05; the term set is in

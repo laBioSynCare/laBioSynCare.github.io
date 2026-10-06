@@ -85,6 +85,9 @@ were the development profiles' physical import endpoints.
   `dcat:accessURL` now yields a release, while its `dcat:downloadURL` and
   `void:dataDump` still name development files; both should name `latest/`.
   That is a protected-file edit (CLAUDE.md §3.4), recorded as a follow-up.
+  *Done 2026-10-06: all 73 module and catalogue downloads name `latest/`, as
+  does the schema.org dataset description's download, and the quality audit
+  rejects a VoID download that names a top-level development file.*
 - **The clients keep their behaviour.** Resolving through `owl:versionIRI` names
   the exact release, whatever the routes serve.
 

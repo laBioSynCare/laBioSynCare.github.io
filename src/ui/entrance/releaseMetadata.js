@@ -41,7 +41,7 @@ export const ONTOLOGY_LICENSE = 'https://creativecommons.org/licenses/by/4.0/'
 export const CREATOR_ORCID = 'https://orcid.org/0000-0002-9699-629X'
 export const CREATOR_NAME = 'Renato Fabbri'
 // One line on purpose: truth-audit reads these with a line-anchored regex.
-export const NAMESPACE_CATALOGUE_TTL = 'https://w3c-cg.github.io/sstim/ontology/sstim-namespace.ttl'
+export const NAMESPACE_CATALOGUE_TTL = 'https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.ttl'
 
 export const NAMESPACE_IRI = 'https://w3id.org/sstim'
 export const VERSION_IRI = `${NAMESPACE_IRI}/${RELEASE_VERSION}`

@@ -384,9 +384,11 @@ else:
                 f"frozen {dataset_versions[0]} release"
             )
         # A subset must distribute the module it is named for; a copied block
-        # that still points at its neighbour is otherwise invisible.
+        # that still points at its neighbour is otherwise invisible. It does so
+        # from latest/, the release VoID describes (ADR 0060), as its w3id
+        # accessURL does.
         for module_id in sorted(frozen_module_ids & declared_subsets):
-            expected = f"/ontology/sstim-{module_id}.ttl"
+            expected = f"/ontology/latest/sstim-{module_id}.ttl"
             subset_iri = URIRef(f"{VOID_BASE}{module_id}")
             # Distributions hang off the subset as blank nodes; void:dataDump is
             # asserted directly.
@@ -400,6 +402,16 @@ else:
                     f"void.ttl: subset <{VOID_BASE}{module_id}> has no dcat:downloadURL "
                     f"ending in {expected}"
                 )
+
+
+# VoID describes the release named by dcat:version, so no download may name the
+# top-level development files, which become the next release's draft the day a
+# release is cut. Until 0.19.0 every module download did (ADR 0060 follow-up).
+DEVELOPMENT_LINE_FILE = re.compile(r"/ontology/sstim-[a-z0-9-]+\.(?:ttl|jsonld|rdf)$")
+for predicate in (DCAT.downloadURL, VOID.dataDump):
+    for _, url in void_graph.subject_objects(predicate):
+        if DEVELOPMENT_LINE_FILE.search(str(url)):
+            fail(f"void.ttl: {url} is the development line; download the release from latest/")
 
 
 def published_instance_url(path: Path) -> URIRef:
