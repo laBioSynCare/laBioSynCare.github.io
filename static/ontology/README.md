@@ -540,7 +540,10 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    positive, out-of-scope, and adversarial fixture sets and at least one
    competency query. Every listed contract path must already name an existing
    repository file. Bump **`dct:issued`** and `dct:modified` to the release
-   date; leave `dct:created` alone. `dct:issued` is the RDF statement of the
+   date; leave `dct:created` alone. Between releases the headers keep that date,
+   so on the development line `dct:modified` names the last release rather
+   than the last edit. That is deliberate (GB-07): a per-edit date would touch
+   all 22 headers on every change and record nothing a commit does not. `dct:issued` is the RDF statement of the
    version's formal release date. BioPortal's current implementation instead
    populates its **Released** field by checking `dct:created` before
    `dct:issued`, so SSTIM keeps the

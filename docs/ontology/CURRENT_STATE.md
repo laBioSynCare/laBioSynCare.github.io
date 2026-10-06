@@ -110,8 +110,8 @@ and [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md).
 
 Committed instance RDF is public reference data, not ontology term space and
 not part of the immutable ontology snapshots. It currently includes the BSC
-framework and implementations, two reference protocols, two reference presets,
-seven DOI-identified references, ten exploratory exposure examples, evidence
+framework and implementations, two reference protocols, five reference presets,
+eleven DOI-identified references, ten exploratory exposure examples, evidence
 assessments, and one explicitly synthetic session with phased self-reports.
 
 The committed ecosystem graph is synthetic contract data. Real ecosystem

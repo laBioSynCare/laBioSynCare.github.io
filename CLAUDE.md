@@ -409,9 +409,11 @@ Always written exactly as shown. Case-sensitive. Never abbreviated.
 "waveform": "0"
 ```
 
-### 4.3 Frequency band values (SKOS concept local names)
+### 4.3 Frequency band values (SKOS concept notations)
 
-Always lowercase. These are the only valid values for `header.targetBand`:
+Always lowercase. These are the only valid values for `header.targetBand`. They
+are each band concept's `skos:notation`, not its local name, which is camelCase:
+`low-alpha` is the notation of `sstim-v:lowAlpha`, `alpha-10` of `sstim-v:alpha10`.
 
 ```
 Primary:   delta, theta, alpha, smr, beta, gamma

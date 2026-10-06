@@ -82,6 +82,10 @@ file is the human-readable summary.
 
 ### Fixed
 
+- **The Kernel's own record is accurate (GB-07).** Its declaration comments now
+  count what it declares (63 reused terms: 43 annotation properties, 19 classes
+  and 1 datatype, not 62, 41 and 2). Its release history notes run newest first,
+  and 0.8.0, which shipped without one, has its note.
 - **The four-language claim names its scope.** SSTIM's vocabulary is in English,
   Italian, Portuguese and Spanish; its class and property labels are English,
   with the other three on 21 of 154 current classes. The README and the Zenodo

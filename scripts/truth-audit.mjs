@@ -16,9 +16,10 @@
 //
 // Usage:  node scripts/truth-audit.mjs [--verbose]
 
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { execSync } from 'node:child_process'
-import { dirname, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
+import { Parser } from 'n3'
 
 const VERBOSE = process.argv.includes('--verbose')
 const problems = []
@@ -509,6 +510,79 @@ if (!indexCounts) {
     })
   }
   ok(`${claims} prose totals match the term index (${totals.concepts} concepts)`)
+}
+
+// ── 7. CURRENT_STATE's instance totals agree with the instances ─────────────
+//
+// CURRENT_STATE is the page every session starts from. Its data paragraph said
+// "two reference presets" and "seven DOI-identified references" for weeks after
+// the catalog grew to five and eleven (GB-07): the term totals above were
+// checked, and nothing compared the instance totals to the files. Each phrase is
+// counted from the committed instances by the type it names, and a phrase that
+// stops appearing fails too, so a rewording cannot retire the check silently.
+
+{
+  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+  const IDENTIFIER = 'http://purl.org/dc/terms/identifier'
+  const quadsIn = (dir) => {
+    const path = join('static/ontology/instances', dir)
+    return existsSync(path)
+      ? readdirSync(path).filter((f) => f.endsWith('.ttl'))
+        .flatMap((f) => new Parser().parse(readFileSync(join(path, f), 'utf8')))
+      : []
+  }
+  const typed = (quads, type) =>
+    new Set(quads.filter((q) => q.predicate.value === RDF_TYPE && q.object.value === type).map((q) => q.subject.value))
+  const references = quadsIn('references')
+  const doiIdentified = [...typed(references, 'https://w3id.org/sstim#PublicSafeReference')]
+    .filter((s) => references.some((q) =>
+      q.subject.value === s && q.predicate.value === IDENTIFIER && /^doi:/i.test(q.object.value)))
+  const totals = [
+    ['reference protocols', typed(quadsIn('protocols'), 'https://w3id.org/sstim#SensoryStimulationProtocol').size],
+    ['reference presets', typed(quadsIn('presets'), 'https://w3id.org/sstim#Preset').size],
+    ['DOI-identified references', doiIdentified.length],
+    ['exploratory exposure examples', typed(quadsIn('experiments'), 'https://w3id.org/sstim/exposure#ExploratoryProtocol').size],
+  ]
+  const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+    'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen',
+    'nineteen', 'twenty']
+  const state = (read('docs/ontology/CURRENT_STATE.md') ?? '').replace(/\s+/g, ' ')
+  for (const [phrase, actual] of totals) {
+    const stated = state.match(new RegExp(`\\b(\\w+) ${phrase}\\b`))?.[1]
+    const value = stated && (/^\d+$/.test(stated) ? Number(stated) : WORDS.indexOf(stated.toLowerCase()))
+    if (!stated) fail('docs/ontology/CURRENT_STATE.md', `no "<number> ${phrase}" total to check against the instances`)
+    else if (value !== actual) fail('docs/ontology/CURRENT_STATE.md', `says ${stated} ${phrase}; the instances hold ${actual}`)
+  }
+  ok(`CURRENT_STATE instance totals match the instances (${totals.map(([p, n]) => `${n} ${p}`).join(', ')})`)
+}
+
+// ── 8. the Kernel records every release, newest first ───────────────────────
+//
+// Each frozen release states what changed in a skos:historyNote on the Kernel.
+// release-prepare refuses to cut without one, but only from 0.15.0 on: 0.8.0
+// shipped without a note, and the notes ran 0.18, 0.17, 0.16, then 0.1 upward
+// with 0.9 before 0.7 (GB-07). Every frozen directory needs its note, and the
+// notes run newest first, the order a reader of the file expects.
+
+{
+  const kernelText = read('static/ontology/sstim-core.ttl') ?? ''
+  const noted = [...kernelText.matchAll(/"v(\d+)\.(\d+)\.(\d+)( erratum)? \(/g)]
+    .map((m) => ({ version: `${m[1]}.${m[2]}.${m[3]}`, key: [Number(m[1]), Number(m[2]), Number(m[3]), m[4] ? 1 : 0] }))
+  const frozen = readdirSync('static/ontology').filter((name) => /^\d+\.\d+\.\d+$/.test(name))
+  for (const version of frozen) {
+    if (!noted.some((n) => n.version === version)) {
+      fail('static/ontology/sstim-core.ttl', `the frozen ${version} release has no "v${version} (…)" history note`)
+    }
+  }
+  const before = (a, b) => a.key.findIndex((v, i) => v !== b.key[i])
+  for (let i = 1; i < noted.length; i++) {
+    const at = before(noted[i - 1], noted[i])
+    if (at === -1 || noted[i - 1].key[at] < noted[i].key[at]) {
+      fail('static/ontology/sstim-core.ttl', `history note v${noted[i].version} follows v${noted[i - 1].version}; notes run newest first`)
+      break
+    }
+  }
+  ok(`Kernel history notes: all ${frozen.length} frozen releases recorded, newest first`)
 }
 
 // ── 6. the Zenodo description states the release it actually describes ───────

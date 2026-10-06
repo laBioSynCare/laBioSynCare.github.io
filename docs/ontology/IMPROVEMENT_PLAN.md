@@ -486,7 +486,16 @@ explicit instruction naming each file.
     public data keeps asserting `supportsRelation`, and correct its "during
     0.7.x" wording.
   - *Done when* no deprecated term is silent about its successor.
-- [ ] **GB-07 Documentation drift** (partly *protected*: `sstim-core.ttl`).
+- [x] **GB-07 Documentation drift** (partly *protected*: `sstim-core.ttl`).
+  *Closed 2026-10-06. The Kernel's declaration comments say 63 reused terms and
+  43 annotation properties and 1 datatype, as declared; its history notes run
+  newest first and gained the missing 0.8.0 entry (0.4.0 was the exposure
+  module's own version, never a suite release, so it has none). CURRENT_STATE
+  says five presets and eleven references, and CLAUDE.md §4.3 calls the band
+  values notations. The truth audit now checks CURRENT_STATE's four instance
+  totals and that every frozen release has a Kernel note, newest first. The
+  `dct:modified` question is settled as designed: the development line carries
+  its last release date, now documented in the ontology README.*
   - *Next step:* correct the CURRENT_STATE instance totals, CLAUDE.md §4.3, and
     the Kernel's declaration counts and history-note order; settle the
     `dct:modified` question.
