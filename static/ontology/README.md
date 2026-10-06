@@ -528,7 +528,8 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    the rest of this step, step 4, and step 5: the release version in **every
    manifest-owned module and profile entry point**, the `owl:versionIRI` and
    `mod:status "released"` in the root Kernel, the frozen import and artifact
-   IRIs on every profile, the manifest's immutable release URLs, and the four
+   IRIs on every profile, the manifest's immutable release URLs, every link into
+   the repository pinned to the release's own tag (GB-08), and the four
    documents that describe the release — the changelog section, `CITATION.cff`,
    the entrance metadata, and `void.ttl`'s version and counts. Those four were
    hand edits for 0.14.0 and each was caught by a gate failing afterwards rather
@@ -711,6 +712,14 @@ For a new controlled concept:
 Do not add an `exactMatch` from label similarity alone, treat an intended effect
 as an observed outcome, attach evidence globally to a technique family, put
 private/user data in public instance files, or edit a frozen version directory.
+
+Cite a document in this repository at an immutable ref:
+`https://github.com/w3c-cg/sstim/blob/<ref>/<path>`, where the ref is the latest
+release tag that holds the document, or the commit `w3c-cg/main` points at for
+one no release holds yet. Never `main` or another branch: a frozen release that
+cites a branch cites whatever it says later. `make source-links` checks every
+live file, and release preparation re-pins modules and profiles to the release
+being cut.
 
 To retire a term, deprecate it rather than delete it: `owl:deprecated true`,
 and either `dct:isReplacedBy` naming the current term or terms that supplant it,

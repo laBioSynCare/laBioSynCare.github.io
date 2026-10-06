@@ -382,7 +382,7 @@
     void:subset <https://w3id.org/sstim/graph/ecosystem-agents>,
         <https://w3id.org/sstim/graph/ecosystem-fixture>,
         <https://w3id.org/sstim/void#bsc-framework> ;
-    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances> .
+    dcat:landingPage <https://github.com/w3c-cg/sstim/tree/main/static/ontology/instances> .
 
 
 # The BSC framework's own vocabulary and shapes (ADR 0061): its catalog voice
@@ -403,7 +403,7 @@
         <http://www.w3.org/2002/07/owl#>,
         <http://www.w3.org/2004/02/skos/core#>,
         <http://www.w3.org/ns/shacl#> ;
-    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/frameworks/bsc> .
+    dcat:landingPage <https://github.com/w3c-cg/sstim/tree/main/static/ontology/frameworks/bsc> .
 
 
 # Mutable runtime named graph for reviewed real ecosystem records. Its public
@@ -457,4 +457,4 @@
         <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora>,
         <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
     void:dataDump <https://w3c-cg.github.io/sstim/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl> ;
-    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances/ecosystem/fixtures> .
+    dcat:landingPage <https://github.com/w3c-cg/sstim/tree/main/static/ontology/instances/ecosystem/fixtures> .

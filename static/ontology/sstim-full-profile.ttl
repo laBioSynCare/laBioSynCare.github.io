@@ -72,7 +72,7 @@
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso
         <https://w3id.org/sstim/manifest>,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md> .
+        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md> .
 
 <https://w3id.org/sstim/profile/full#entrypoint> a prof:ResourceDescriptor ;
     prof:hasRole role:specification ;

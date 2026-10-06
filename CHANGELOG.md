@@ -82,6 +82,14 @@ file is the human-readable summary.
 
 ### Fixed
 
+- **The ontology cites its source repository at fixed versions (GB-08).** 152
+  links in the modules, profiles, framework vocabulary and instances named the
+  legacy repository at its moving `main` branch. They now name
+  `https://github.com/w3c-cg/sstim` at the `v0.18.0` tag, or at a published
+  commit for a document no release holds yet. Release preparation re-pins them
+  to the release being cut, so a frozen release cites the repository as it was
+  released. The three `void.ttl` landing pages for the public instance datasets
+  stay on `main`, since those datasets change between releases.
 - **Every deprecated term says what replaced it (GB-06).** Of the 25 deprecated
   terms with no `dct:isReplacedBy`, 12 now name their successors, which their
   definitions already pointed to in prose. The other

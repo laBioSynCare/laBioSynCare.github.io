@@ -15,6 +15,8 @@
 //                     prof:hasArtifact to the exact frozen sibling
 //   manifest.json     via prepareReleaseManifest, the same function
 //                     release-dryrun has been rehearsing against all along
+//   both              every link into the repository pinned to this release's
+//                     tag (GB-08), so the frozen files cite it as released
 //
 // `dct:created` is deliberately untouched. `dct:issued` is the version's formal
 // release date, so it moves with every release while the creation date does not.
@@ -37,6 +39,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { prepareReleaseManifest } from './release-dryrun.mjs'
+import { pinSourceLinks, treeHasPath } from './source-links.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const ONTOLOGY = join(ROOT, 'static/ontology')
@@ -72,6 +75,16 @@ if (current !== `${version}-dev`) {
 const base = `${manifest.suite.ontologyIri}/${version}/`
 const kernelPath = manifest.modules.find((m) => m.id === 'core').source.path
 const changes = []
+const releaseTag = `v${version}`
+let pinnedLinks = 0
+// A frozen file cites the repository as this release holds it. pinSourceLinks
+// throws on a path the tree lacks: the tag is cut from this tree, so such a link
+// would cite a file the release itself does not contain.
+function pinLinks(text, file) {
+  const { text: pinned, pinned: count } = pinSourceLinks(text, releaseTag, { file, existsInTree: treeHasPath })
+  pinnedLinks += count
+  return pinned
+}
 
 // Every frozen snapshot through 0.12.0 carried its own release note, and
 // CHANGELOG.md tells readers that per-change rationale lives in the ontology's
@@ -143,7 +156,7 @@ for (const module of manifest.modules) {
     text = replaceOnce(text, /mod:status "under development"@en/, 'mod:status "released"@en', 'mod:status', file)
   }
 
-  writeFileSync(path, text, 'utf8')
+  writeFileSync(path, pinLinks(text, file), 'utf8')
   changes.push(file)
 }
 
@@ -208,7 +221,7 @@ for (const profile of manifest.profiles) {
   text = rewritePredicateObjects(text, 'owl:imports', file)
   text = rewritePredicateObjects(text, 'prof:hasArtifact', file)
 
-  writeFileSync(path, text, 'utf8')
+  writeFileSync(path, pinLinks(text, file), 'utf8')
   changes.push(file)
 }
 
@@ -322,6 +335,7 @@ execFileSync('node', [join(ROOT, 'scripts/gen-codemeta.mjs')], { cwd: ROOT, stdi
 
 console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
 console.log('  HED demonstrator bundles and codemeta.json regenerated for the release version')
+console.log(`  ${pinnedLinks} links into the repository pinned to ${releaseTag}`)
 console.log(`  ${changes.length} files changed`)
 console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`,')
 console.log('        `make validate-release-source`, then commit the release-prepared sources.')

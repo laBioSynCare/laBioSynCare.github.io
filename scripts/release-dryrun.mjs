@@ -20,7 +20,7 @@
 // slow to run every time.
 
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -31,6 +31,7 @@ import {
   validateManifest,
 } from './sstim-manifest.mjs'
 import { generatedRegion } from './sstim-w3id-snapshot-routes.mjs'
+import { pinSourceLinks, treeHasPath } from './source-links.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
@@ -122,6 +123,21 @@ export function dryRunProblems({ manifest, version }) {
     }
   } catch (error) {
     problems.push(`snapshot routes for ${version} cannot be generated: ${error.message}`)
+  }
+
+  // 4. Preparation pins every link into the repository to the release's tag
+  //    (GB-08) and refuses one whose path the tag would not hold. Rehearse that
+  //    here, rather than find a dangling citation with the release half-cut.
+  for (const entry of [...manifest.modules, ...manifest.profiles]) {
+    const file = entry.source.path
+    try {
+      pinSourceLinks(readFileSync(join(repoRoot, file), 'utf8'), `v${version}`, {
+        file,
+        existsInTree: treeHasPath,
+      })
+    } catch (error) {
+      problems.push(`source links: ${error.message}`)
+    }
   }
 
   return problems

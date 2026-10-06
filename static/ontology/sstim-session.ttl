@@ -61,7 +61,7 @@ sstim:StimulationIntervention a owl:Class ;
     rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
     rdfs:label "Stimulation Intervention"@en ;
     skos:definition "A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer over sensory stimulation and neuromodulation interventions."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:SensoryStimulationIntervention a owl:Class ;

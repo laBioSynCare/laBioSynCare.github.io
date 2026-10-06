@@ -74,7 +74,7 @@
     # void.ttl and CITATION.cff carry it instead. Adding it here would leave the
     # development line self-citing a release it is no longer identical to — the
     # 0.8.0-0.10.0 defect found in the 2026-07-24 audit.
-    dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
+    dct:source <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     mod:status "under development"@en ;
@@ -87,9 +87,9 @@
         <https://w3id.org/sstim/profile/core>,
         <https://w3id.org/sstim/profile/core-plus>,
         <https://w3id.org/sstim/profile/full> ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0016-publication-obo-posture-and-registries.md> ,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ontology/MODULE_ARCHITECTURE.md> ,
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0016-publication-obo-posture-and-registries.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/ontology/MODULE_ARCHITECTURE.md> ,
         <https://w3id.org/sstim/manifest> ,
         <https://w3c-cg.github.io/sstim/ontology/docs/> ;
     skos:historyNote "v0.18.0 (2026-09-23): The agent-naming release. The Kernel's dct:creator and dct:publisher were bare ORCID and GitHub IRIs with no label anywhere in the namespace document, so a registry indexing agents, LOV's Agents index among them, had nothing to show without dereferencing either. The ORCID IRI is now a foaf:Person and the GitHub organization a foaf:Organization, each with the foaf:name its own authority records, and no mailbox is published. foaf:name, foaf:Person and foaf:Organization are declared, because using them undeclared took all four profile closures out of OWL 2 DL, the ADR 0054 defect. The descriptions are asserted in the Kernel alone, one authoritative source per subject, so the Stimulus plus Exposure catalogue names the two agents without labelling them; void.ttl carries the same two descriptions. No SSTIM term was added, removed or renamed, and every profile closure is unchanged in membership."@en,
@@ -148,7 +148,7 @@ sstim:Stimulation a owl:Class ;
                "Estimulación"@es ;
     skos:definition "A deliberately parameterized process in which structured physical energy, mechanical input, a chemical agent, or another controlled input is applied as a stimulus with a declared design intent to elicit, perturb, regulate, or probe an identified biological, sensory, or neural process. Mere exposure, administration, or energy transfer without that stimulation intent is insufficient. Classification does not assert excitation, conscious perception, response, benefit, or safety."@en ;
     skos:scopeNote "The neutral umbrella over sensory stimulation and interventional neuromodulation. It carries no commitment to an applied medium, delivery approach, biological access route, or anatomical target; those are recorded on separate facets (ADR 0034)."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:SensoryStimulation a owl:Class ;
@@ -160,7 +160,7 @@ sstim:SensoryStimulation a owl:Class ;
                "Estimulación Sensorial"@es ;
     skos:definition "A stimulation process whose defining intervention route engages canonical sensory transduction and afferent processing with structured input delivered according to specified parameters for a declared purpose. The class identifies the delivery process; any mechanism, response, or outcome is represented separately and requires its own evidence."@en ;
     skos:scopeNote "Conscious perception is not required, and an incidental sensation arising from another primary route is insufficient. Covers entrainment-based stimulation (binaural beats, isochronous tones), non-entrainment stimulation (stochastic resonance, attentional anchoring), and autonomic stimulation (paced respiratory entrainment). Does not include passive incidental sensory exposure."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 ###########################################################################

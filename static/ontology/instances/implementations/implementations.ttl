@@ -33,7 +33,7 @@
     dct:isPartOf <https://w3id.org/sstim/implementation/bsclab> ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> ;
     rdfs:seeAlso <https://w3id.org/sstim/patch-studio>,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PATCH_STUDIO.md> .
+        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/technical/PATCH_STUDIO.md> .
 
 <https://w3id.org/sstim/implementation/biosyncare> a sstim:SensoryStimulationImplementation, prov:SoftwareAgent ;
     rdfs:label "BioSynCare" ;

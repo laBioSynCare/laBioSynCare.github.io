@@ -61,7 +61,7 @@ sstim:outcomeNeuralAccessRoute a owl:ObjectProperty ;
     rdfs:range sstim:NeuralAccessRoute ;
     rdfs:label "outcome neural access route"@en ;
     skos:definition "Tags an evidence outcome concept with the neural access route the finding is about. This is how a demonstrated route that competes with a technique's declared intended route is recorded without altering that declaration."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
 
 sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
@@ -69,7 +69,7 @@ sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
     rdfs:range sstim:NeuralTargetSite ;
     rdfs:label "outcome neural target site"@en ;
     skos:definition "Tags an evidence outcome concept with the neural site the finding is about, which may differ from the intended target site of the technique assessed."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
 
 sstim:outcomeNeuralSystem a owl:ObjectProperty ;
@@ -77,7 +77,7 @@ sstim:outcomeNeuralSystem a owl:ObjectProperty ;
     rdfs:range sstim:NeuralSystem ;
     rdfs:label "outcome neural system"@en ;
     skos:definition "Tags an evidence outcome concept with the distributed neural system the finding is about."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
 
 sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
@@ -85,7 +85,7 @@ sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
     rdfs:range sstim:NeuralPhenomenon ;
     rdfs:label "outcome neural phenomenon"@en ;
     skos:definition "Tags an evidence outcome concept with the functional neural phenomenon the finding is about. This is the join that makes evidence about neural effects queryable across techniques and routes."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
 
 

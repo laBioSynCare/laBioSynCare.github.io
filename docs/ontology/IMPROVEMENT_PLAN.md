@@ -491,7 +491,14 @@ explicit instruction naming each file.
     the Kernel's declaration counts and history-note order; settle the
     `dct:modified` question.
   - *Done when* the truth audit also checks the CURRENT_STATE instance totals.
-- [ ] **GB-08 Source links** (*protected*; 20 files).
+- [x] **GB-08 Source links** (*protected*; 20 files). *Closed 2026-10-06 on the
+  0.19.0-dev line. 152 links in 23 live files now name `w3c-cg/sstim`: 147
+  pinned to `v0.18.0`, one to a published commit (ADR 0061, which no release
+  holds yet), the repository root, and three `void.ttl` landing pages that stay
+  on `main` because their datasets change between releases. All 39 distinct
+  URLs answered 200. `make source-links` fails on a branch or the legacy
+  repository, release preparation re-pins modules and profiles to the release's
+  tag, and the release dry run rehearses that.*
   - *Next step:* on the development line, point at `w3c-cg/sstim`, pinned to a
     tag or a persistent route rather than `main`.
   - *Done when* no live module links to a moving branch.

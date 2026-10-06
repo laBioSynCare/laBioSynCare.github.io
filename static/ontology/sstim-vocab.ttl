@@ -397,7 +397,7 @@ sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
     skos:definition "Deprecated ADR 0027: superseded by the orthogonal basis axes (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention). Survives only for the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
     dct:isReplacedBy sstim:basisSensoryModality, sstim:basisModalityApplicability,
         sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     skos:hasTopConcept sstim-v:modalityAUD, sstim-v:modalityAV, sstim-v:modalityBREATH,
         sstim-v:modalityGENERAL, sstim-v:modalityPRECLINICAL, sstim-v:modalityREVIEW,
         sstim-v:modalityVIS, sstim-v:modalityTACTILE, sstim-v:modalityMULTISENSORY .
@@ -1064,7 +1064,7 @@ sstim-v:modalitySomatosensory a owl:NamedIndividual, sstim:SensoryModality, skos
     skos:definition "The somatosensory modality: body-perceived sensation including touch, pressure, vibration, and related cutaneous and deep-tissue sensation. In SSTIM this is the superordinate body-sense channel — the tactile percept is a sub-modality, the haptic actuator (e.g. the Web Vibration API) is the device-delivery path, and vibrotactile is the driving mechanism (P5.5 convention; ADR 0019)."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean ;
     skos:scopeNote "BSC delivers somatosensory stimulation through the haptic actuator path (Web Vibration API on Android; unavailable on iOS Safari). Device capability, perceived modality, and mechanism are modeled separately in the exposure module (ADR 0010)."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0019-modality-nomenclature-cleanup.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0019-modality-nomenclature-cleanup.md> .
 
 sstim-v:modalityInteroceptive a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;
@@ -2929,20 +2929,20 @@ sstim-v:approachSystemic a owl:NamedIndividual, sstim:StimulationDeliveryApproac
 sstim-v:NonInvasiveApproachCollection a skos:Collection ;
     rdfs:label "Non-invasive delivery approaches"@en ;
     skos:definition "The rollup of delivery approaches that do not breach the skin or body: external, environmental / receptor-facing, transcutaneous, and transcranial."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     skos:member sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing,
         sstim-v:approachTranscutaneous, sstim-v:approachTranscranial .
 
 sstim-v:MinimallyInvasiveApproachCollection a skos:Collection ;
     rdfs:label "Minimally-invasive delivery approaches"@en ;
     skos:definition "The rollup of delivery approaches that cross the skin by needle puncture without leaving a permanent implant: percutaneous."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     skos:member sstim-v:approachPercutaneous .
 
 sstim-v:InvasiveApproachCollection a skos:Collection ;
     rdfs:label "Invasive delivery approaches"@en ;
     skos:definition "The rollup of delivery approaches that place a device or agent inside the body: implanted, intracranial, epidural, targeted local infusion, and intrathecal."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     skos:member sstim-v:approachImplanted, sstim-v:approachIntracranial, sstim-v:approachEpidural,
         sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal .
 
@@ -3369,7 +3369,7 @@ sstim-v:phenomenonAcousticStartleReflex a owl:NamedIndividual, sstim:NeuralPheno
 sstim-v:NeuromodulatoryEffectCollection a skos:Collection ;
     rdfs:label "Neuromodulatory effect (neural phenomena)"@en ;
     skos:definition "The state-change neural phenomena that constitute a neuromodulatory effect when asserted in the outcome role (sstim:outcomeNeuralPhenomenon): changes in excitability or firing, oscillatory dynamics, temporal coordination, synaptic transmission, neurochemical signaling, connectivity or plasticity, and autonomic neural regulation. Evoked or driven responses and reflex responses are excluded: they are the nervous system following a stimulus, not a modulation of its state (ADR 0036)."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
     skos:member sstim-v:phenomenonExcitabilityOrFiring, sstim-v:phenomenonOscillatoryDynamics,
         sstim-v:phenomenonTemporalCoordination, sstim-v:phenomenonSynapticTransmission,
         sstim-v:phenomenonNeurochemicalSignaling, sstim-v:phenomenonConnectivityOrPlasticity,
@@ -3394,7 +3394,7 @@ sstim-v:ParticipantEngagementModeScheme a skos:ConceptScheme ;
                    "Vocabulario de Modos de Participación del Participante SSTIM"@es ;
     skos:definition "The degree and kind of active participation a method requires of the individual, from passive reception through cue-following to active self-regulation."@en ;
     skos:scopeNote "A single coarse ordinal-ish axis, deliberately orthogonal to route, approach, target site, system, and phenomenon (ADR 0034). Engagement mode is a property of the method, not a claim about efficacy, and does not by itself decide whether a method is neuromodulation (ADR 0035)."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     skos:hasTopConcept sstim-v:engagementPassiveReceptive, sstim-v:engagementGuidedFollowing,
         sstim-v:engagementActiveSelfRegulatory .
 

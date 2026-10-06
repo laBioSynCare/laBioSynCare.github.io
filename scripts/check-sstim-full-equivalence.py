@@ -19,6 +19,7 @@ so growth stays visible in CI output.
 
 import json
 import os
+import re
 from pathlib import Path
 import sys
 
@@ -518,6 +519,26 @@ def live_files_from_manifest() -> tuple[str, ...]:
     return tuple(filenames)
 
 
+# GB-08 (2026-10-06): SSTIM cites its own repository by document. The repository
+# moved, from laBioSynCare/laBioSynCare.github.io to w3c-cg/sstim, and every
+# citation was pinned from `main` to a release tag or commit at the same time.
+# Compared as written, 114 citations of unchanged documents read as lost, so
+# both sides compare the document a link cites rather than where it is fetched.
+SOURCE_LINK = re.compile(
+    r"^https://github\.com/(?:laBioSynCare/laBioSynCare\.github\.io|w3c-cg/sstim)"
+    r"(?:/(blob|tree)/[^/]+/(.*))?$"
+)
+
+
+def cited_document(node):
+    if isinstance(node, URIRef):
+        match = SOURCE_LINK.match(str(node))
+        if match:
+            kind, path = match.groups()
+            return URIRef(f"urn:sstim-source:{kind}/{path}" if kind else "urn:sstim-source:")
+    return node
+
+
 def normalized(
     graph: Graph,
     channel_definition: Literal,
@@ -581,7 +602,7 @@ def normalized(
             continue
         if triple == (SSTIM.Track, SKOS.scopeNote, track_scope_note):
             continue
-        result.add(triple)
+        result.add((subject, predicate, cited_document(obj)))
     return result
 
 

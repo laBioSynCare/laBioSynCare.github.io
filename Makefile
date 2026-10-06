@@ -93,7 +93,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -792,6 +792,12 @@ w3id-routes:
 	node scripts/check-w3id-route-targets.mjs
 	node scripts/w3id-staged-routes.mjs --check
 
+## Every link into SSTIM's own repository names w3c-cg/sstim and an immutable
+## ref that holds its path, never a branch or the legacy repository (GB-08).
+## Needs the release tags, which CI fetches; it fails rather than guess without.
+source-links:
+	node scripts/source-links.mjs
+
 ## Rehearse the next release against the current sources without cutting one.
 ## Cutting 0.13.0 was blocked three times by gates that had been wrong for weeks
 ## and could only be found by pretending to release; nothing did that between
@@ -848,7 +854,7 @@ validate-status:
 ## require `void.ttl`'s selected frozen directory to exist yet. This explicit
 ## phase is used after release-prepare and before `make snapshot`; the complete
 ## `validate` target remains the post-snapshot gate.
-RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check sstim-package term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
+RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries source-links core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check sstim-package term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
 
 validate-release-source: $(RELEASE_SOURCE_VALIDATION_TARGETS)
 	@echo "validate-release-source: release-prepared semantic sources passed; snapshot-dependent gates remain"

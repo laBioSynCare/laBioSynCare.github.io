@@ -59,7 +59,7 @@
     dct:issued "2026-10-06"^^xsd:date ;
     dct:modified "2026-10-06"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/main/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/6421fe84843f8b506201ef5df65ead31a4e803a8/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
 
 # SSTIM's modules declare every other annotation property used here; this one
 # only this header uses, and OWL 2 DL requires the declaration.
