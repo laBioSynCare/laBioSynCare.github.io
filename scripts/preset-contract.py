@@ -660,7 +660,7 @@ def main() -> int:
     elif int(ceiling) != len(PERMUTATIONS) - 1:
         failures.append(
             f"the schema offers {len(PERMUTATIONS)} named permutations but "
-            f"bsc-v:permutationFunction admits ordinals 0..{int(ceiling)} — one "
+            f"bsc-v:permutationFunction admits ordinals 0..{int(ceiling)}, so one "
             f"of them accepts a value the other rejects"
         )
 

@@ -86,7 +86,8 @@ class's definition or ADR 0027 already says:
   planned outcome, protocol requirement or boundary applicability) has a label
   and a description, and carries no evidence tier or basis;
 - an exploratory protocol has a label and a description;
-- a comparator, population or outcome descriptor is an IRI with a label;
+- a comparator, population or outcome descriptor is an IRI with a label, and
+  an intervention an evidence basis names has a label;
 - `sstim-ex:concernsEffectDimension` is stated only by a hypothesis, research
   question, design objective or planned-outcome specification, and
   `sstim-ex:hasKnowledgeStatus` only by the kinds of record ADR 0027 lists.
@@ -102,16 +103,25 @@ They keep their local names in the BSC namespace,
 `https://w3id.org/sstim/framework/bsc/vocab#`, so `sstim:inGroup` becomes
 `bsc-v:inGroup` and `sstim-v:groupHeal` becomes `bsc-v:groupHeal`. A catalog voice
 is typed `sstim:AudioTrack` as well as its BSC voice class. Load the vocabulary
-from `https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-vocab.ttl`, and
-validate catalog data against `sstim-shapes.ttl` together with
-`https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-shapes.ttl`, which
-holds the catalog rules SSTIM's shapes no longer carry. Each Martigli parameter
+from its IRI, `https://w3id.org/sstim/framework/bsc/vocab`, and validate catalog
+data against `sstim-shapes.ttl` together with the BSC shapes,
+`https://w3id.org/sstim/framework/bsc/shapes`, which hold the catalog rules
+SSTIM's shapes no longer carry. (The files are also at
+`https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-vocab.ttl` and
+`bsc-shapes.ttl` beside it.) Each Martigli parameter
 is a sub-property of the generic breathing term it specialises, so a query for
 `sstim:breathingPeriodInitial` with RDFS inference still finds a catalog voice's
 `bsc-v:martigliPeriodInitial`.
 
 The BSC vocabulary is the BSC framework's, not SSTIM's: it belongs to no SSTIM
 profile or release.
+
+## If you use SSTIM's preset JSON contract
+
+`group` in `https://w3id.org/sstim/schemas/preset.schema.json` is now any
+non-empty string, a framework's own notation or IRI, where it enumerated the
+five BSC groups. A preset valid against 0.18.0's contract stays valid. Nothing
+else in the contract changed meaning.
 
 ## The terms
 

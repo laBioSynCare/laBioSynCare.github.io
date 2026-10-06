@@ -276,7 +276,7 @@ def main() -> int:
         if current_sstim_term(p)
     }
     print(
-        f"language-coverage: OWL layer (not gated) — "
+        f"language-coverage: OWL layer (not gated): "
         f"{sum(map(translated, classes))}/{len(classes)} current classes and "
         f"{sum(map(translated, properties))}/{len(properties)} current properties carry "
         f"{'/'.join(REQUIRED)}; the four-language claim covers the vocabulary only"

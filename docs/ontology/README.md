@@ -45,7 +45,8 @@ Describing a protocol or claim does not establish efficacy.
   covers eleven findings (GB-01 to GB-11), each present on a commit that passes
   `make validate`:
   - BSC implementation terms in the universal namespaces;
-  - 83 of 273 properties with no SHACL constraint;
+  - 83 of 273 properties with no SHACL constraint (84 when re-measured, and
+    closed for 0.19.0);
   - a reversible annotation pseudonym;
   - plain SPARQL returning nothing in the Workbench;
   - neuromodulation exclusions stated only in prose;

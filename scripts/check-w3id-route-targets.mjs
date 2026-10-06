@@ -161,7 +161,8 @@ export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontolo
 // routes, four profiles, the manifest and two catalogues all answered from it,
 // and every gate passed, because publishable was the only property checked.
 // VoID and the instance files are catalogue records that no snapshot contains,
-// so they are not ontology artifacts and do not match.
+// so they are not ontology artifacts and do not match. Nor does context.jsonld:
+// its route serves the live context, ADR 0060's one recorded exception.
 const DEVELOPMENT_LINE_ARTIFACT =
   /^(?:sstim-[a-z0-9-]+\.(?:ttl|jsonld|rdf)|manifest(?:\.schema)?\.json)$/
 

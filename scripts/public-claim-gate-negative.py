@@ -436,7 +436,7 @@ def main() -> int:
         elif clause == "deprecated alias":
             if not any("must name the same object as evaluatesSubject" in m for m in hits):
                 failures.append(
-                    f"{label}: not rejected by SupportsRelationAliasShape — a deprecated "
+                    f"{label}: not rejected by SupportsRelationAliasShape, so a deprecated "
                     f"alias can contradict the property that replaced it (GB-06)"
                 )
         elif not any(GATE in m for m in hits):

@@ -276,10 +276,12 @@ the model is going) and Phases 1.2b–1.2c, 1.5 and beyond in the
 The main gaps are design and coverage gaps, not current parser failures:
 
 - **Read the 2026-09-30 review before relying on a passing gate.** The
-  [review](reviews/2026-09-30-what-a-green-gate-does-not-see.md) found eleven
-  gaps that `make validate` does not see. They are sequenced in
-  [improvement plan §1.6](IMPROVEMENT_PLAN.md#16-close-what-a-green-gate-does-not-see).
-  Some counts in this document are among them (GB-07).
+  [review](reviews/2026-09-30-what-a-green-gate-does-not-see.md) found gaps that
+  `make validate` did not see, and
+  [improvement plan §1.6](IMPROVEMENT_PLAN.md#16-close-what-a-green-gate-does-not-see)
+  tracks each one, closed or open. `make truth-audit` now checks this
+  document's release facts, term totals and instance totals; its label and
+  translation counts are measured, not gated.
 
 - **Waveform and spatial position have terms; the preset contract does not use
   them yet.** [ADR 0052](../decisions/0052-abstract-signals-and-sensory-renderings.md)

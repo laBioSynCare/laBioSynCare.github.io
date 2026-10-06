@@ -980,8 +980,8 @@ assigns its own node URI on save.
 | Additional links | `https://github.com/w3c-cg/sstim` ; `https://w3id.org/sstim` |
 | Formats | search + add **SKOS**, **RDF/XML**, **Turtle**, **JSON-LD**, **OWL** (whatever BARTOC lists) |
 | Access | **freely available** |
-| Publisher — Name | live value BSC Lab (Æterni Anima); from 0.19.0, W3C Sensory Stimulation Vocabulary Community Group ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)) |
-| Publisher — URI | live value `https://github.com/laBioSynCare`; from 0.19.0, `https://www.w3.org/community/sstim/` |
+| Publisher name | live value BSC Lab (Æterni Anima); from 0.19.0, W3C Sensory Stimulation Vocabulary Community Group ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)) |
+| Publisher URI | live value `https://github.com/laBioSynCare`; from 0.19.0, `https://www.w3.org/community/sstim/` |
 | Address | optional — City: Modena, Country: Italy (or leave blank) |
 | Contact | `renato.fabbri@gmail.com` |
 | Listed In | optionally add **prefix.cc**, and **LOV** since its 2026-09-28 listing |
@@ -1986,7 +1986,7 @@ Account/maintainer: @ttm (fork ttm/ols4, branch add-sstim-ontology)
 External record ID or URL:  none. https://www.ebi.ac.uk/ols4/ontologies/sstim
                     would be the record URL if accepted; `api/ontologies/sstim`
                     answers 404 against a `go` control at 200, 2026-09-27
-Status:             PR CLOSED 2026-09-17 — reviewer said the long-term
+Status:             PR CLOSED 2026-09-17. The reviewer said the long-term
                     maintenance plan and active community development were not
                     yet convincing. The concern is stewardship, not parsing or
                     the proposed registry entry. Renato confirmed in the GitHub

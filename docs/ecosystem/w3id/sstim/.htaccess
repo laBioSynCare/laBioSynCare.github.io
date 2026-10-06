@@ -34,7 +34,7 @@ RewriteEngine On
 # Pre-modular snapshots, a closed set: their version IRI resolves to the
 # Kernel file, which was the whole ontology before ADR 0043 split it.
 # Every version IRI negotiates: JSON-LD, RDF/XML, the release page for a
-# browser, and Turtle for anything else, as it always answered (GB-09).
+# browser, and Turtle for anything else, as it always answered.
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
 RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\.10\.0|0\.11\.0|0\.12\.0)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-core.jsonld [R=302,L]
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]

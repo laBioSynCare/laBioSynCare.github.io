@@ -63,7 +63,7 @@ ORDER BY ?relation ?neighborLabel`,
     category: 'Catalog',
     title: 'Versioned catalog — presets, band, and group',
     description:
-      'sstim:Preset instances from the versioned catalog joined to their frequency band and their BSC framework group (bsc-v:inGroup, ADR 0061) — three different named graphs, joined via three independent GRAPH blocks.',
+      'sstim:Preset instances from the versioned catalog joined to their frequency band and their BSC framework group (bsc-v:inGroup, ADR 0061): three different named graphs, joined by three independent GRAPH blocks.',
     requiresLive: false,
     sparql: `PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX bsc-v: <https://w3id.org/sstim/framework/bsc/vocab#>

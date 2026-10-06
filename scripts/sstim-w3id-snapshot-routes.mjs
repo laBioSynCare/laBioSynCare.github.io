@@ -193,7 +193,7 @@ export function generatedRegion(inventory = snapshotInventory()) {
       '# Pre-modular snapshots, a closed set: their version IRI resolves to the',
       '# Kernel file, which was the whole ontology before ADR 0043 split it.',
       '# Every version IRI negotiates: JSON-LD, RDF/XML, the release page for a',
-      '# browser, and Turtle for anything else, as it always answered (GB-09).',
+      '# browser, and Turtle for anything else, as it always answered.',
       ...versionIriRules(`^(${legacy})/?$`, LEGACY_ROOT_ARTIFACT),
     )
   }
