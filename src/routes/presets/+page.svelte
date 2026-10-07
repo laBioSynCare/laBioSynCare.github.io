@@ -393,7 +393,9 @@
                 </div>
                 <h2 id={`preset-${preset.id}`}>{preset.label}</h2>
               </div>
-              <span class="version-badge" title="Preset record version">v{preset.version}</span>
+              {#if preset.version}
+                <span class="version-badge" title="Preset record version">v{preset.version}</span>
+              {/if}
             </header>
 
             {#if preset.description}
@@ -406,8 +408,13 @@
                 <dd>{joinLabels(preset.bands)}</dd>
               </div>
               <div>
-                <dt>Voice model</dt>
-                <dd>{joinLabels(preset.voiceTypes)}</dd>
+                {#if preset.voiceTypes.length}
+                  <dt>Voice model</dt>
+                  <dd>{joinLabels(preset.voiceTypes)}</dd>
+                {:else}
+                  <dt>Tracks</dt>
+                  <dd>{joinLabels(preset.trackKinds)}</dd>
+                {/if}
               </div>
               <div>
                 <dt>Breath guide</dt>

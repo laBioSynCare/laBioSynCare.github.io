@@ -9,7 +9,7 @@ PREFIX bsc-v:   <https://w3id.org/sstim/framework/bsc/vocab#>
 
 SELECT ?preset ?presetGraph ?label ?description ?version ?created ?modified ?breathGuide
        ?group ?groupLabel ?band ?bandLabel
-       ?voiceType ?protocol ?implementation
+       ?voiceType ?trackKind ?protocol ?implementation
        ?publicClaimLevel ?publicClaimLevelLabel
        ?caution ?cautionLabel ?cautionDefinition ?cautionAction
        ?claim ?claimDirection ?claimDirectionLabel
@@ -17,13 +17,15 @@ SELECT ?preset ?presetGraph ?label ?description ?version ?created ?modified ?bre
        ?reference ?referenceTitle ?referenceSource
 WHERE {
   GRAPH ?presetGraph {
+    # A label is all sstim-sh:PresetShape requires, so it is all this requires
+    # (GB-10). A version, a target band, a group and a breath guide are things a
+    # catalog preset states; a preset from another schema need state none of
+    # them, and a modality-neutral one has no band to target.
     ?preset a sstim:Preset ;
-            rdfs:label ?label ;
-            sstim:presetVersion ?version ;
-            sstim:targetsFrequencyBand ?band .
+            rdfs:label ?label .
 
-    # Breath guidance is one pointer to a track, and a group is a framework's
-    # editorial scheme rather than something every preset has (ADR 0061).
+    OPTIONAL { ?preset sstim:presetVersion ?version . }
+    OPTIONAL { ?preset sstim:targetsFrequencyBand ?band . }
     OPTIONAL { ?preset sstim:breathGuideTrack ?breathGuide . }
     OPTIONAL { ?preset bsc-v:inGroup ?group . }
 
@@ -44,20 +46,38 @@ WHERE {
     }
   }
   OPTIONAL {
+    FILTER(BOUND(?band))
     GRAPH ?bandGraph {
       ?band skos:prefLabel ?bandLabel .
       FILTER(LANG(?bandLabel) = "en")
     }
   }
 
+  # Both track lookups are subqueries. Written as an OPTIONAL whose FILTER can
+  # reject every track, Comunica drops the whole preset when it does, rather than
+  # keeping it with the variable unbound: a preset whose tracks are all generic
+  # vanished from the list (measured 2026-10-07, GB-10).
   OPTIONAL {
-    GRAPH ?voiceGraph {
-      ?preset sstim:composedOfTrack ?voice .
-      ?voice a ?voiceType .
+    SELECT ?preset ?voiceType WHERE {
+      GRAPH ?voiceGraph {
+        ?preset sstim:composedOfTrack ?voice .
+        ?voice a ?voiceType .
+      }
       # The most specific type a track declares: a catalog voice's technique
       # type, not the generic track kind every track also carries.
       FILTER(?voiceType NOT IN (sstim:Track, sstim:AudioTrack, sstim:VisualTrack,
                                 sstim:HapticTrack, sstim:ControlTrack, bsc-v:Voice))
+    }
+  }
+  # And the generic kinds, which every track has and which are all a preset
+  # outside the catalog may say about its tracks.
+  OPTIONAL {
+    SELECT ?preset ?trackKind WHERE {
+      GRAPH ?trackGraph {
+        ?preset sstim:composedOfTrack ?track .
+        ?track a ?trackKind .
+      }
+      FILTER(?trackKind IN (sstim:AudioTrack, sstim:VisualTrack, sstim:HapticTrack, sstim:ControlTrack))
     }
   }
   OPTIONAL {
@@ -175,6 +195,7 @@ export async function listPresets(store) {
         groups: [],
         bands: [],
         voiceTypes: [],
+        trackKinds: [],
         protocols: [],
         implementations: [],
         publicClaimLevels: [],
@@ -198,6 +219,10 @@ export async function listPresets(store) {
     addUnique(preset.voiceTypes, {
       iri: row.voiceType?.value,
       label: row.voiceType ? voiceLabel(row.voiceType.value) : '',
+    })
+    addUnique(preset.trackKinds, {
+      iri: row.trackKind?.value,
+      label: row.trackKind ? localName(row.trackKind.value).replace(/Track$/, '') : '',
     })
     addUnique(preset.protocols, {
       iri: row.protocol?.value,

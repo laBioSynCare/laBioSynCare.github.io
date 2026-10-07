@@ -86,3 +86,50 @@ describe('listPresets', () => {
     }
   })
 })
+
+describe('a preset outside the BSC catalog (GB-10)', () => {
+  // Visual and haptic only: no version, no frequency band, no group, no voice.
+  const NEUTRAL = `
+    @prefix ex:    <https://example.org/presets/> .
+    @prefix sstim: <https://w3id.org/sstim#> .
+    @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+    ex:calm-field a sstim:Preset ;
+        rdfs:label "Calm colour field with a soft pulse" ;
+        sstim:composedOfTrack ex:calm-field-light, ex:calm-field-touch .
+    ex:calm-field-light a sstim:VisualTrack ; rdfs:label "Colour field" .
+    ex:calm-field-touch a sstim:HapticTrack ; rdfs:label "Soft pulse" .
+  `
+
+  it('satisfies sstim-sh:PresetShape, which asks for nothing the catalog adds', async () => {
+    const { Parser, Store, DataFactory } = await import('n3')
+    const SHACLValidator = (await import('rdf-validate-shacl')).default
+    const root = new URL('../../', import.meta.url)
+    const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', root), 'utf8'))
+    const parse = (path) => new Parser().parse(readFileSync(new URL(path, root), 'utf8'))
+    const shapes = new Store(parse(manifest.modules.find(m => m.id === 'shapes').source.path))
+    // rdf-validate-shacl has no SPARQL constraints; pySHACL runs those in make validate.
+    for (const q of shapes.getQuads(null, DataFactory.namedNode('http://www.w3.org/ns/shacl#sparql'), null, null)) shapes.delete(q)
+    const full = manifest.profiles.find(p => p.id === 'full')
+    const data = new Store([
+      ...full.modules.flatMap(id => parse(manifest.modules.find(m => m.id === id).source.path)),
+      ...new Parser().parse(NEUTRAL),
+    ])
+    const report = new SHACLValidator(shapes).validate(data)
+    expect(report.results.map(r => `${r.focusNode?.value}: ${r.message?.[0]?.value}`)).toEqual([])
+  })
+
+  it('is listed, with its track kinds where a catalog preset has voice types', async () => {
+    const store = await parseIntoStore(NEUTRAL, 'text/turtle', 'https://example.org/presets/')
+    const presets = await listPresets(store)
+    expect(presets).toHaveLength(1)
+    expect(presets[0]).toMatchObject({
+      label: 'Calm colour field with a soft pulse',
+      version: '',
+      hasBreathGuide: false,
+      bands: [],
+      groups: [],
+      voiceTypes: [],
+    })
+    expect(presets[0].trackKinds.map(kind => kind.label).sort()).toEqual(['Haptic', 'Visual'])
+  })
+})

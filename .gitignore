@@ -43,3 +43,8 @@ dist-browser/
 # pushed. Never commit it. Publish config that is not secret belongs in
 # package.json, not here.
 .npmrc
+
+# Firebase CLI and emulator logs (make firestore-rules-test)
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
