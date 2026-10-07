@@ -1,12 +1,13 @@
 // Curated, verified-working example SPARQL queries for the /sparql/ playground.
 //
 // Every source (core, vocab, shapes, alignments, each catalog instance file,
-// the live ecosystem projection) is loaded into its own named graph — see
-// src/rdf/loader.js's ONTOLOGY_SOURCES / INSTANCE_SOURCES. A query joining
-// across sources therefore needs one independently wildcarded `GRAPH ?g { }`
-// block per source (the pattern already used in src/rdf/presets.js's
-// PRESET_QUERY), not a single shared graph variable — reusing one `?g` across
-// a cross-source join silently returns zero rows. Every query below was run
+// the live ecosystem projection) is loaded into its own named graph; see
+// src/rdf/loader.js's ONTOLOGY_SOURCES / INSTANCE_SOURCES. Since GB-04 a pattern
+// outside GRAPH reads the merge of the authoritative ones (src/rdf/query.js), so
+// plain SPARQL works too. The examples keep their GRAPH blocks, which say where
+// each statement comes from: a join across sources needs one independently
+// wildcarded `GRAPH ?g { }` block per source, since reusing one `?g` across a
+// cross-source join silently returns zero rows. Every query below was run
 // against the real running app before being added here.
 
 export const EXAMPLE_QUERIES = [

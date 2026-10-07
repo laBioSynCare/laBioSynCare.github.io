@@ -343,6 +343,19 @@ export function instanceUrls() {
   return Object.values(INSTANCE_URLS).flat()
 }
 
+/**
+ * The graphs a SPARQL query's default graph is made of (GB-04): every ontology
+ * module and every committed public instance source, which is what the
+ * repository versions. The live ecosystem projection is left out because it is
+ * external and mutable, so the same query would answer differently from one day
+ * to the next; annotation graphs, because they are users' content and never
+ * authoritative data (CLAUDE.md §5.5). Both stay reachable through GRAPH.
+ */
+export const AUTHORITATIVE_GRAPH_IRIS = Object.freeze([...new Set([
+  ...Object.values(ONTOLOGY_SOURCES).map(source => source.graph),
+  ...Object.values(INSTANCE_SOURCES).flat().filter(source => !source.external).map(source => source.graph),
+])])
+
 export function instanceSources() {
   return Object.values(INSTANCE_SOURCES).flat()
 }

@@ -541,7 +541,13 @@ sstim-v:alpha a skos:Concept ;
 
 ### 5.3 SPARQL query patterns
 
-Always use `src/rdf/query.js` for SPARQL execution. Standard patterns:
+Always use `src/rdf/query.js` for SPARQL execution. The loader keeps every
+source in its own named graph, and `query.js` reads a pattern outside `GRAPH`
+against the merge of the authoritative ones: every ontology module and every
+committed public instance source, each triple once. Annotation graphs and the
+live ecosystem projection are reachable only through `GRAPH` (GB-04, §5.5).
+`src/rdf/defaultGraph.test.js` runs the two queries below from this file and
+checks their row counts. Standard patterns:
 
 ```javascript
 // Get all presets with their target bands and any evidence tier.

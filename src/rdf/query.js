@@ -5,7 +5,16 @@
  * startup bundle stays small. See CLAUDE.md §9 "Comunica bundle size".
  */
 
+import { AUTHORITATIVE_GRAPH_IRIS } from './loader.js'
+import { withUnionDefaultGraph } from './unionDefaultGraph.js'
+
 let _engine = null
+
+// A query without a GRAPH clause reads the authoritative graphs as one default
+// graph; GRAPH patterns see every named graph, as before (GB-04).
+function querySource(store) {
+  return withUnionDefaultGraph(store, AUTHORITATIVE_GRAPH_IRIS)
+}
 
 async function getEngine() {
   if (_engine) return _engine
@@ -36,7 +45,7 @@ function queryStopError(kind, timeoutMs) {
  */
 export async function select(store, sparql) {
   const engine = await getEngine()
-  const bindings = await engine.queryBindings(sparql, { sources: [store] })
+  const bindings = await engine.queryBindings(sparql, { sources: [querySource(store)] })
   const rows = await bindings.toArray()
   return rows.map(bindingToRow)
 }
@@ -95,7 +104,7 @@ export async function selectLimited(store, sparql, limit, options = {}) {
   options.signal?.addEventListener('abort', abort, { once: true })
   if (timeoutMs > 0) timeoutId = setTimeout(() => stop('timeout'), timeoutMs)
 
-  const queryResultPromise = engine.query(sparql, { sources: [store] })
+  const queryResultPromise = engine.query(sparql, { sources: [querySource(store)] })
 
   const rows = []
 
@@ -142,7 +151,7 @@ export async function selectLimited(store, sparql, limit, options = {}) {
  */
 export async function ask(store, sparql) {
   const engine = await getEngine()
-  return engine.queryBoolean(sparql, { sources: [store] })
+  return engine.queryBoolean(sparql, { sources: [querySource(store)] })
 }
 
 /**
@@ -154,6 +163,6 @@ export async function ask(store, sparql) {
  */
 export async function construct(store, sparql) {
   const engine = await getEngine()
-  const quads = await engine.queryQuads(sparql, { sources: [store] })
+  const quads = await engine.queryQuads(sparql, { sources: [querySource(store)] })
   return quads.toArray()
 }

@@ -427,7 +427,7 @@ LIMIT 100`
               <span class="step" aria-hidden="true">2</span>
               <div>
                 <h2 id="query-heading">Inspect or write the query</h2>
-                <p id="query-help">Use <code>GRAPH ?graph</code> around patterns; press Ctrl/⌘ + Enter to run.</p>
+                <p id="query-help">Plain patterns read SSTIM’s ontology and public data; <code>GRAPH ?graph</code> also reaches annotations and the live ecosystem projection. Press Ctrl/⌘ + Enter to run.</p>
               </div>
             </div>
             <span class="query-kind" class:unsupported={queryKind !== 'SELECT'}>{queryKind}</span>
@@ -524,7 +524,7 @@ LIMIT 100`
             {#if rows.length === 0}
               <div class="empty-results">
                 <strong>No rows matched.</strong>
-                <p>The query ran successfully. Check IRIs, filters, and whether each pattern is inside the right named-graph block.</p>
+                <p>The query ran successfully. Check IRIs and filters. Annotations and the live ecosystem projection are only reachable inside a <code>GRAPH</code> block.</p>
               </div>
             {:else}
               <!-- svelte-ignore a11y_no_noninteractive_tabindex (keyboard access to the overflow region) -->
@@ -671,16 +671,20 @@ LIMIT 100`
         <section class="guide-card graph-card">
           <header>
             <p class="card-kicker">Essential pattern</p>
-            <h2>Query named graphs</h2>
+            <h2>The default graph and named graphs</h2>
           </header>
-          <p>All loaded statements retain source-family provenance. Start with:</p>
-          <pre><code>SELECT ?s ?p ?o WHERE {'{'}
+          <p>
+            A pattern outside <code>GRAPH</code> reads the merge of SSTIM’s ontology modules and its
+            committed public data, each statement once. Every source also keeps its own named graph:
+          </p>
+          <pre><code>SELECT ?graph ?s ?p ?o WHERE {'{'}
   GRAPH ?graph {'{'} ?s ?p ?o {'}'}
 {'}'}
 LIMIT 25</code></pre>
           <p>
-            For a join across different sources, use independent graph variables such as
-            <code>?g1</code> and <code>?g2</code>. One shared variable requires both patterns to occur in the same graph.
+            Annotations and the live ecosystem projection are only in their named graphs. For a join across
+            different sources inside <code>GRAPH</code>, use independent variables such as <code>?g1</code> and
+            <code>?g2</code>: one shared variable requires both patterns to occur in the same graph.
           </p>
         </section>
 
