@@ -483,7 +483,18 @@ explicit instruction naming each file.
     stricter rules).
   - *Done when* a signed-out reader can obtain neither the ID nor the email
     local part.
-- [ ] **GB-04 Default-graph SPARQL in the Workbench.**
+- [x] **GB-04 Default-graph SPARQL in the Workbench.** *Closed 2026-10-07.
+  `src/rdf/query.js` hands Comunica a source whose default graph is the RDF
+  merge of the store's own default graph and the authoritative named graphs,
+  each triple once: every ontology module and every committed public instance
+  source, as listed by the loader (`AUTHORITATIVE_GRAPH_IRIS`). Decided: the
+  live ecosystem projection stays out, because it is external and mutable and
+  the same query would answer differently from day to day; annotation graphs
+  stay out under CLAUDE.md §5.5. Both remain reachable through `GRAPH`.
+  `src/rdf/defaultGraph.test.js` reads PRESET_QUERY and SUBBANDS_QUERY out of
+  CLAUDE.md and checks their row counts against counts taken from the store;
+  in the real page they return 5 and 4 rows, where they returned 0 and 1.
+  CLAUDE.md §5.3 and the SPARQL page's guidance say so.*
   - *Next step:* a union view over the authoritative graphs only, excluding
     annotation graphs and with an explicit decision on the live ecosystem
     projection; correct CLAUDE.md §5.3.
@@ -556,7 +567,13 @@ explicit instruction naming each file.
     measure it live and drop the interim "until then use the site copy" note
     from static/ontology/README.md.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
-- [ ] **GB-10 Presets page neutrality** (after GB-01).
+- [x] **GB-10 Presets page neutrality** (after GB-01). *Closed 2026-10-07.
+  The query requires only a label, as `PresetShape` does; version, band, group
+  and breath guide are optional, and a preset without catalog voice types shows
+  its track kinds. A test validates a visual-and-haptic preset with no version
+  or band against `PresetShape` and finds it listed. Doing so found a Comunica
+  defect: an OPTIONAL whose FILTER rejects every match dropped the whole preset,
+  so the two track lookups are now subqueries.*
   *The GB-01 migration made the group and the breath guide optional and reads
   voices through `sstim:composedOfTrack`. The query still requires a version
   and a frequency band, which `PresetShape` does not.*
