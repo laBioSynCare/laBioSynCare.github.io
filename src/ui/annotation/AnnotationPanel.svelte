@@ -35,7 +35,7 @@
 
   function publicNotice(showName) {
     const signedAs = showName && publicName ? `signed ${publicName}` : 'signed “anonymous”'
-    const hint = publicName ? '' : ' Set a display name in your profile to sign with it.'
+    const hint = publicName || !auth.identity.authenticated ? '' : ' Set a display name in your profile to sign with it.'
     return `Anyone can read a public note, ${signedAs}. Your account and email address are never shown.${hint}`
   }
 

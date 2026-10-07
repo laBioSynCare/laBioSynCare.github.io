@@ -47,8 +47,9 @@ Describing a protocol or claim does not establish efficacy.
   - BSC implementation terms in the universal namespaces;
   - 83 of 273 properties with no SHACL constraint (84 when re-measured, and
     closed for 0.19.0);
-  - a reversible annotation pseudonym;
-  - plain SPARQL returning nothing in the Workbench;
+  - a reversible annotation pseudonym (closed 2026-10-07: no public record
+    holds the account ID any more);
+  - plain SPARQL returning nothing in the Workbench (closed 2026-10-07);
   - neuromodulation exclusions stated only in prose;
   - smaller hygiene, drift and publication items.
 

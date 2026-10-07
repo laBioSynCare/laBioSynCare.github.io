@@ -241,6 +241,21 @@ describe.skipIf(!EMULATOR)('annotation rules under the Firestore emulator (GB-03
     await denied(getDoc(doc(alice, LEGACY_ANNOTATION_COLLECTION, 'legacy-bob')))
   })
 
+  it('the legacy collection is closed: only its owner reads it, and nobody writes to it', async () => {
+    const legacy = {
+      userId: 'alice', userDisplayName: 'alice', targetIri: TARGET, annotationType: 'commenting', annotationText: 'Old.',
+    }
+    await seedLegacy('legacy-public', { ...legacy, visibility: 'public' })
+    // Public once, and still not readable by anyone else.
+    await denied(getDoc(doc(reader, LEGACY_ANNOTATION_COLLECTION, 'legacy-public')))
+    await denied(getDocs(query(collection(reader, LEGACY_ANNOTATION_COLLECTION), where('targetIri', '==', TARGET))))
+    await denied(getDoc(doc(bob, LEGACY_ANNOTATION_COLLECTION, 'legacy-public')))
+    // No new document, and no change to an old one, even by its owner.
+    await denied(setDoc(doc(alice, LEGACY_ANNOTATION_COLLECTION, 'legacy-new'), { ...legacy, visibility: 'private' }))
+    await denied(setDoc(doc(alice, LEGACY_ANNOTATION_COLLECTION, 'legacy-public'), { ...legacy, annotationText: 'Changed.', visibility: 'public' }))
+    expect((await getDoc(doc(alice, LEGACY_ANNOTATION_COLLECTION, 'legacy-public'))).data().annotationText).toBe('Old.')
+  })
+
   it('an own record holds only its fields', async () => {
     const own = doc(alice, 'users', 'alice', 'annotations', 'x')
     const record = { targetIri: TARGET, annotationType: 'commenting', annotationText: 'Text.', visibility: 'private', showName: false }

@@ -469,9 +469,24 @@ explicit instruction naming each file.
     `independencePolicy` and `reviewRubric`.
   - *Done when* the gate is in `make validate`, and the fixture fails for all
     four of its reasons.
-- [ ] **GB-03 Annotation identity.** Completes the KR-12 bullet on
-  authentication IDs (§1.5). *A Workbench item, not SSTIM, so it waits until
-  0.19.0 is out.*
+- [x] **GB-03 Annotation identity.** Completes the KR-12 bullet on
+  authentication IDs (§1.5). *Closed 2026-10-07. A note's full record is its
+  author's, at `users/{uid}/annotations/{id}`, and only they can read it. A
+  public note also has a copy at `publicAnnotations/{id}` holding its text,
+  target, dates and, only if the author chose to sign, the name on the
+  account; the rules check that name against the ID token and refuse the
+  email address's local part. The copy holds no account ID but an author key
+  (SHA-256 of a prefix, the ID and the note's id) that the rules recompute, so
+  only the author can write or withdraw it and no reader can link two
+  anonymous notes. The RDF pseudonym therefore needs no secret: no public
+  record holds the ID it is computed from. Legacy documents are readable by
+  their owner only and closed to writes, and move to the new shape on their
+  owner's next visit; the live count of public ones was 0. The rules went
+  out in the planned order: both shapes accepted (ruleset `c201ac61`), the
+  app, then the legacy collection closed (ruleset `8adce48e`).
+  `make firestore-rules-test` runs eleven cases under the Firestore emulator;
+  one caught a delete rule that would have refused every edit of a private
+  note.*
   - *Decided 2026-10-06 (Renato):* the author of a public comment chooses
     whether it shows their name; if not, it shows "anonymous". No pseudonym
     scheme is needed. Either way the public copy carries neither the account ID
@@ -483,18 +498,6 @@ explicit instruction naming each file.
     stricter rules).
   - *Done when* a signed-out reader can obtain neither the ID nor the email
     local part.
-  - *Progress 2026-10-07:* the app and the first rules are done. A note's full
-    record is its author's, at `users/{uid}/annotations/{id}`. A public note
-    also has a copy at `publicAnnotations/{id}` holding its text, target, dates
-    and, only if the author signs, the account's name. The copy holds no
-    account ID but an author key (SHA-256 of a prefix, the ID and the note's
-    id) that the rules recompute, so only the author can write or withdraw it
-    and no reader can link two anonymous notes. The RDF pseudonym therefore
-    needs no secret: no public record holds the ID it is computed from. Each
-    owner's legacy documents move on their next visit. `make
-    firestore-rules-test` runs the rules under the emulator. Rules accepting
-    both shapes are live (ruleset `c201ac61`); the stricter ones, which close
-    the legacy collection, follow once the app is.
 - [x] **GB-04 Default-graph SPARQL in the Workbench.** *Closed 2026-10-07.
   `src/rdf/query.js` hands Comunica a source whose default graph is the RDF
   merge of the store's own default graph and the authoritative named graphs,

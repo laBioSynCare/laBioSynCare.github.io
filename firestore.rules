@@ -58,25 +58,13 @@ service cloud.firestore {
     }
 
     // Legacy annotations, from before GB-03, which hold the account ID and a
-    // display name. TRANSITIONAL: while clients from before the change may still
-    // be open, a public one stays readable and the legacy shape stays writable.
-    // Once the current app is live the next deployment makes this collection
-    // owner-only and closed to new documents. The app moves each owner's
-    // documents out of it on their next visit.
+    // display name. Only their owner can read or delete them, which is all the
+    // app needs to move them into the shape above on the owner's next visit,
+    // and no new ones can be written.
     match /rdfAnnotations/{annotationId} {
-      allow read: if resource.data.get('visibility', '') == 'public'
-        || (signedIn() && resource.data.userId == request.auth.uid);
-
-      allow create: if signedIn()
-        && validAnnotationCreate();
-
-      allow update: if signedIn()
-        && resource.data.userId == request.auth.uid
-        && request.resource.data.userId == request.auth.uid
-        && validAnnotationPayload();
-
-      allow delete: if signedIn()
+      allow read, delete: if signedIn()
         && resource.data.userId == request.auth.uid;
+      allow create, update: if false;
     }
 
     match /users/{userId} {
@@ -145,32 +133,6 @@ service cloud.firestore {
       && data.annotationText.size() <= 4000
       && data.visibility in ['public', 'private']
       && data.showName is bool;
-  }
-
-  function validAnnotationCreate() {
-    return request.resource.data.userId == request.auth.uid
-      && validAnnotationPayload();
-  }
-
-  function validAnnotationPayload() {
-    return request.resource.data.keys().hasOnly([
-      'userId',
-      'userDisplayName',
-      'targetIri',
-      'annotationType',
-      'annotationText',
-      'visibility',
-      'createdAt',
-      'updatedAt'
-    ])
-    && request.resource.data.targetIri is string
-    && request.resource.data.annotationType is string
-    && request.resource.data.annotationText is string
-    && request.resource.data.annotationText.size() > 0
-    && request.resource.data.annotationText.size() <= 4000
-    && request.resource.data.visibility in ['public', 'private']
-    && request.resource.data.get('userDisplayName', '') is string
-    && request.resource.data.get('userDisplayName', '').size() <= 200;
   }
 
   function validPatchPayload() {
