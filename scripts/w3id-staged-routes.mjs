@@ -67,9 +67,14 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 //
 // 2026-10-06, the JSON-LD context: one route to the live context.jsonld, the
 // decided exception to ADR 0060. Total 90 -> 91, ontology 46 -> 47.
+//
+// 2026-10-07, an explicit Turtle request leads every route that offers JSON-LD
+// or RDF/XML, so a client listing Turtle among other types gets the source
+// format: the six manifest-owned groups and the two version-IRI patterns each
+// gain one Turtle rule ahead of JSON-LD. Total 91 -> 99, ontology 47 -> 55.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 91,
-  ontology: 47,
+  total: 99,
+  ontology: 55,
   pinnedOntology: 1,
   graph: 17,
   application: 6,

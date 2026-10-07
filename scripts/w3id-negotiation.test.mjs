@@ -124,6 +124,22 @@ test('Turtle is the default, including for an absent or wildcard Accept', () => 
   expect(go('', '*/*').doc).toBe('latest/sstim-namespace.ttl')
 })
 
+test('a client that lists Turtle among other types gets Turtle', () => {
+  // mod_rewrite cannot rank by q, so an explicit Turtle request leads the
+  // server order. Apache Jena asks like this; it used to be handed JSON-LD.
+  const jena = 'text/turtle,application/n-triples;q=0.9,application/ld+json;q=0.8,application/rdf+xml;q=0.7'
+  expect(go('', jena).doc).toBe('latest/sstim-namespace.ttl')
+  expect(go('vocab', jena).doc).toBe('latest/sstim-vocab.ttl')
+  expect(go('profile/full', jena).doc).toBe('latest/sstim-full-profile.ttl')
+  expect(go('kernel', 'application/ld+json, text/turtle;q=0.1').doc).toBe('latest/sstim-core.ttl')
+  // Ahead of the HTML override too, so vocab agrees with the other modules.
+  expect(go('vocab', 'text/turtle, text/html').doc).toBe('latest/sstim-vocab.ttl')
+  // */* is not an explicit request: browsers send it, and they still get HTML.
+  expect(go('', BROWSER).doc).toBe('https://w3c-cg.github.io/sstim/namespace/')
+  // Nor is a refused Turtle.
+  expect(go('', 'text/turtle;q=0, application/ld+json').doc).toBe('latest/sstim-namespace.jsonld')
+})
+
 test('q=0 makes a type unacceptable without poisoning the others', () => {
   // Only type offered is refused by the client, so nothing is acceptable.
   expect(go('', 'application/ld+json;q=0').status).toBe(406)

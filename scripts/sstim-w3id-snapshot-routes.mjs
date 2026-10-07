@@ -101,9 +101,12 @@ const LEGACY_ROOT_ARTIFACT = 'sstim-core.ttl'
 // else gets the Turtle it always got, so no client that worked before is
 // refused: a permanent identifier must not start answering 406. The conditions
 // are the ones every other negotiated SSTIM route uses, verbatim, in the same
-// precedence: JSON-LD, then RDF/XML, then HTML.
+// precedence: an explicit Turtle request first, so a client that lists Turtle
+// among other types gets the source format, then JSON-LD, RDF/XML and HTML.
+// mod_rewrite cannot rank by q, so a server order has to stand in for it.
 const Q_ZERO_GUARD = String.raw`(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$))`
 export const ACCEPT_CONDITIONS = {
+  turtle: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle)\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
   jsonld: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
   rdfxml: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
   html: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
@@ -113,6 +116,8 @@ export const ACCEPT_CONDITIONS = {
 function versionIriRules(pattern, turtle) {
   const stem = turtle.replace(/\.ttl$/, '')
   return [
+    ACCEPT_CONDITIONS.turtle,
+    `RewriteRule ${pattern} ${SITE}$1/${turtle} [R=302,L]`,
     ACCEPT_CONDITIONS.jsonld,
     `RewriteRule ${pattern} ${SITE}$1/${stem}.jsonld [R=302,L]`,
     ACCEPT_CONDITIONS.rdfxml,
@@ -192,8 +197,9 @@ export function generatedRegion(inventory = snapshotInventory()) {
     lines.push(
       '# Pre-modular snapshots, a closed set: their version IRI resolves to the',
       '# Kernel file, which was the whole ontology before ADR 0043 split it.',
-      '# Every version IRI negotiates: JSON-LD, RDF/XML, the release page for a',
-      '# browser, and Turtle for anything else, as it always answered.',
+      '# Every version IRI negotiates: Turtle when asked for, then JSON-LD,',
+      '# RDF/XML, the release page for a browser, and Turtle for anything else,',
+      '# as it always answered.',
       ...versionIriRules(`^(${legacy})/?$`, LEGACY_ROOT_ARTIFACT),
     )
   }
@@ -274,6 +280,8 @@ export function simulate(inventory = snapshotInventory(), region = generatedRegi
     for (const bare of [snapshot.version, `${snapshot.version}/`]) {
       for (const [accept, document] of [
         ['text/turtle', rootArtifact],
+        // Turtle listed among others, as Apache Jena asks: the source format wins.
+        ['text/turtle,application/ld+json;q=0.8,application/rdf+xml;q=0.7', rootArtifact],
         ['*/*', rootArtifact],
         ['', rootArtifact],
         ['application/n-triples', rootArtifact],

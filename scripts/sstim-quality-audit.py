@@ -188,11 +188,19 @@ _TURTLE_ACCEPT_RE = (
     r"(?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)"
     + _Q_ZERO_GUARD
 )
+# The same media types without */*, which leads every negotiated route so a
+# client listing Turtle among others gets it; */* stays last, after HTML, because
+# every browser sends it.
+_EXPLICIT_TURTLE_ACCEPT_RE = (
+    r"(?:^|,)\s*(?:text/turtle|application/x-turtle)\s*(?=;|,|$)"
+    + _Q_ZERO_GUARD
+)
 JSON_LD_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_JSON_LD_ACCEPT_RE} [NC]"
 RDF_XML_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_RDF_XML_ACCEPT_RE} [NC]"
 HTML_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_HTML_ACCEPT_RE} [NC]"
 EMPTY_ACCEPT = r"RewriteCond %{HTTP_ACCEPT} ^$ [OR]"
 TURTLE_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_TURTLE_ACCEPT_RE} [NC]"
+EXPLICIT_TURTLE_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_EXPLICIT_TURTLE_ACCEPT_RE} [NC]"
 
 errors: list[str] = []
 
@@ -1169,6 +1177,9 @@ else:
         manifest_route_end, 1
     )[0]
 
+    def turtle_first(pattern: str, turtle: str) -> tuple[str, ...]:
+        return (EXPLICIT_TURTLE_ACCEPT, f"RewriteRule {pattern} {turtle} [R=303,L]")
+
     def negotiated_directives(
         pattern: str,
         *,
@@ -1176,8 +1187,10 @@ else:
         rdf_xml: str,
         html: str,
         turtle: str,
+        lead: bool = True,
     ) -> tuple[str, ...]:
         return (
+            *(turtle_first(pattern, turtle) if lead else ()),
             JSON_LD_ACCEPT,
             f"RewriteRule {pattern} {json_ld} [R=303,L]",
             RDF_XML_ACCEPT,
@@ -1254,6 +1267,9 @@ else:
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
             turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure.ttl",
         ),
+        # An explicit Turtle request leads every group, ahead of the HTML
+        # override too, so the vocab and ecosystem modules agree with the rest.
+        *turtle_first(module_pattern, "https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.ttl"),
         *documentation_overrides,
         *negotiated_directives(
             module_pattern,
@@ -1261,6 +1277,7 @@ else:
             rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.rdf",
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
             turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.ttl",
+            lead=False,
         ),
         # No route in this block serves the working tree. RDF and JSON come from
         # `latest/`, the newest frozen release, so what dereferencing any
@@ -1314,9 +1331,12 @@ else:
 
 # Prove that the canonical Accept expressions are case-insensitive, reject
 # explicit q=0, return 406 for unsupported-only requests, and retain a stable
-# precedence when a client lists more than one supported representation.
+# precedence when a client lists more than one supported representation: an
+# explicit Turtle request first, then JSON-LD, RDF/XML and HTML, then */* or no
+# Accept, which also get Turtle.
 def negotiated_kind(header: str) -> str | None:
     for kind, pattern in (
+        ("turtle", _EXPLICIT_TURTLE_ACCEPT_RE),
         ("jsonld", _JSON_LD_ACCEPT_RE),
         ("rdfxml", _RDF_XML_ACCEPT_RE),
         ("html", _HTML_ACCEPT_RE),
@@ -1343,6 +1363,11 @@ accept_contract = {
     "*/*;q=0": None,
     "application/json": None,
     "text/html, application/ld+json": "jsonld",
+    "text/turtle, application/ld+json;q=0.5": "turtle",
+    "application/ld+json, text/turtle;q=0.1": "turtle",
+    "text/turtle;q=0, application/ld+json": "jsonld",
+    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8": "html",
+    "application/rdf+xml, application/xml;q=0.5, */*;q=0.2": "rdfxml",
 }
 for accept_header, expected_kind in accept_contract.items():
     if negotiated_kind(accept_header) != expected_kind:

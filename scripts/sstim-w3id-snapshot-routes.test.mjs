@@ -84,13 +84,31 @@ test('the simulation catches a generator that drops the legacy rule', () => {
 
 test('the simulation catches a version route that stops negotiating', () => {
   // GB-09. Deleting one condition turns its rule unconditional, so every client
-  // of the version IRI gets that format, Turtle readers included.
+  // it reaches gets that format. An explicit Turtle request is answered before
+  // it, so the clients that break are the ones asking for */*.
   const region = generatedRegion()
   const cut = region.split('\n')
   cut.splice(cut.findIndex((line) => line.includes('application/ld\\+json')), 1)
   const { failures } = simulate(snapshotInventory(), cut.join('\n'))
   expect(failures.length).toBeGreaterThan(0)
-  expect(failures.join('\n')).toContain('[text/turtle]')
+  expect(failures.join('\n')).toContain('[*/*]')
+  expect(failures.join('\n')).not.toContain('[text/turtle]')
+})
+
+test('the simulation catches a lost explicit-Turtle condition', () => {
+  // Without it the Turtle rule answers everyone, and JSON-LD clients get Turtle.
+  const region = generatedRegion()
+  const cut = region.split('\n')
+  cut.splice(cut.findIndex((line) => line.includes('(?:text/turtle|application/x-turtle)')), 1)
+  const { failures } = simulate(snapshotInventory(), cut.join('\n'))
+  expect(failures.join('\n')).toContain('[application/ld+json]')
+})
+
+test('a client listing Turtle among other types gets Turtle', () => {
+  const rules = parseRules(generatedRegion())
+  const accept = 'text/turtle,application/n-triples;q=0.9,application/ld+json;q=0.8'
+  expect(resolvePath('0.18.0', rules, accept)).toMatch(/\/0\.18\.0\/sstim-namespace\.ttl$/)
+  expect(resolvePath('0.18.0', rules, 'application/ld+json, text/turtle;q=0')).toMatch(/\.jsonld$/)
 })
 
 test('the simulation catches a file pattern that excludes hyphens', () => {

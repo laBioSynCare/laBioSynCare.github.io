@@ -1023,9 +1023,12 @@ indexed, examiner-searchable records.
       in [`static/ontology/README.md`](static/ontology/README.md); these are the
       steps particular to this release.*
 
-      1. When #6827 merges, measure `framework/bsc/vocab` and
-         `framework/bsc/shapes` live (Turtle `200`, a browser to `?ns=bsc-v`,
-         `406` otherwise) and set their route-contract rows to Live.
+      1. When #6827 merges, measure it live and set its route-contract rows to
+         Live. It carries four changes since 2026-10-07: the BSC vocabulary and
+         shapes (Turtle `200`, a browser to `?ns=bsc-v`, `406` otherwise), the
+         version-IRI negotiation, the `context.jsonld` route, and named Turtle
+         first on every route that offers JSON-LD or RDF/XML. Then drop the
+         ontology README's "use the site copy" note.
       2. Add the approved 0.19.0 Kernel history note, dated for the cut. It was
          revised on 2026-10-07 to cover the stricter validation and the release
          review, and is kept outside the repository until then.
@@ -1037,10 +1040,6 @@ indexed, examiner-searchable records.
          line reopens for the next release; the registry publishers move to the
          Community Group (the item above); the Community Group announcement,
          drafted, goes out.
-      5. Not a gate: one upstream w3id PR for the staged version-IRI
-         negotiation and the `context.jsonld` route (mirror since 3ddffd8 and
-         f078ceb). Until it merges, a version IRI answers Turtle as before. Once
-         live, measure it and drop the README's "use the site copy" note.
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module

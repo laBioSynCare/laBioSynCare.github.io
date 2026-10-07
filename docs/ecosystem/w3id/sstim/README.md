@@ -75,7 +75,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
 | `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned modules | Live |
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
-| `/sstim/context.jsonld` | SSTIM's JSON-LD context. The live context, the one decided exception to ADR 0060: terms are deprecated, never deleted, so it grows rather than changes | Staged locally, to be submitted with the version negotiation after [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
+| `/sstim/context.jsonld` | SSTIM's JSON-LD context. The live context, the one decided exception to ADR 0060: terms are deprecated, never deleted, so it grows rather than changes | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827), with the BSC routes and the version negotiation |
 | `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
 | `/sstim/ecosystem/biosyncare` | The BioSynCare Ecosystem programme catalog record. Distinct from `/sstim/ecosystem` (the OWL module, matched exactly) and `/sstim/ecosystem-record/...` (live records) | Staged locally |
@@ -89,18 +89,22 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/specialist/{id}` and `/sstim/organization/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/ecosystem-record/{relationship,activity,role}/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/void` | VoID + DCAT dataset description (Turtle only) | Live |
-| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files. The version IRI also negotiates (GB-09): JSON-LD and RDF/XML of the release's version document, and an HTML page for a browser; any other request gets Turtle | Files live; negotiation staged locally, to be submitted after [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
+| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files. The version IRI also negotiates: JSON-LD and RDF/XML of the release's version document, and an HTML page for a browser; any other request gets Turtle | Files live; negotiation submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
 | `/sstim/{major.minor.patch}/manifest` | The manifest frozen with a modular release | Generated only for snapshots containing `manifest.json`; absent from `0.12.0` and earlier |
 | `/sstim/{major.minor.patch}/manifest.schema.json` | The schema frozen beside a modular release manifest | Generated only for snapshots containing `manifest.schema.json`; absent from `0.12.0` and earlier |
 
-The namespace, Kernel, module, and profile routes negotiate JSON-LD
-(`application/ld+json`), RDF/XML (`application/rdf+xml`), HTML, and Turtle
-(`text/turtle`, `application/x-turtle`, `*/*`, or no `Accept`) in that explicit
-precedence. Matching is case-insensitive, `q=0` ranges are not acceptable, and
+The namespace, Kernel, module, and profile routes negotiate in this explicit
+precedence: Turtle when the client names it (`text/turtle` or
+`application/x-turtle`), then JSON-LD (`application/ld+json`), RDF/XML
+(`application/rdf+xml`), HTML, and finally Turtle again for `*/*` or no
+`Accept`. Matching is case-insensitive, `q=0` ranges are not acceptable, and
 requests with no acceptable supported range receive `406 Not Acceptable`. The
 precedence is deterministic server ordering, not full ranking by positive `q`
-magnitude; clients that require one representation should request that media
-type alone. The manifest and schema are JSON; VoID and frozen Turtle files are
+magnitude, which mod_rewrite cannot do. Turtle leads because it is SSTIM's source
+format: until 2026-10-07 JSON-LD came first, so a client that preferred Turtle
+but also listed JSON-LD, as Apache Jena does, was handed JSON-LD. `*/*` stays
+last because every browser sends it. A client that needs one representation
+should still request that media type alone. The manifest and schema are JSON; VoID and frozen Turtle files are
 not multi-format. A version IRI negotiates too, but never refuses: JSON-LD and
 RDF/XML get the release's version document in those formats, a browser gets the
 release's page, and every other request gets the Turtle it always got, because a

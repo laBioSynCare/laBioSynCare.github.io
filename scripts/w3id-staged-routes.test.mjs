@@ -62,10 +62,11 @@ test('every production target belongs to an explicit reviewed category', () => {
   // the preset and session JSON Schema `$id` values. +6 on 2026-10-06 for the
   // BSC framework vocabulary and shapes (ADR 0061): two HTML, two Turtle, two 406.
   // +6 the same day for negotiating version IRIs (GB-09), all ontology targets,
-  // and +1 for the live JSON-LD context.
+  // and +1 for the live JSON-LD context. +8 on 2026-10-07: an explicit Turtle
+  // rule leads each of the six manifest-owned groups and both version patterns.
   expect(ruleCounts(productionRules)).toEqual({
-    total: 91,
-    ontology: 47,
+    total: 99,
+    ontology: 55,
     graph: 17,
     application: 6,
     external: 2,

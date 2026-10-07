@@ -543,16 +543,18 @@ explicit instruction naming each file.
   version IRI (JSON-LD, RDF/XML, an HTML release page rendered from the
   snapshot's own README, and Turtle for anything else, so no 406 is added), and
   its self-check now executes the conditions under seven Accept values per
-  release. Upstream after perma-id/w3id.org#6827 merges.*
+  release. Submitted on 2026-10-07 in perma-id/w3id.org#6827, at Renato's
+  request, with the BSC routes.*
   *The context's coverage check already existed: the quality audit fails on any
   local OWL term, deprecated or not, without a compact term ("no compact term
   for"), and it fired on a test removal. The review missed it; only the route
   remains.*
   *Step 3 decided 2026-10-06 (Renato): `/sstim/context.jsonld` serves the live
   context, recorded as ADR 0060's one exception, and is staged in the mirror.*
-  - *Next step:* one upstream pull request for steps 2 and 3, after
-    perma-id/w3id.org#6827 merges; then measure it live, and drop the interim
-    "until then use the site copy" note from static/ontology/README.md.
+  - *Next step:* when perma-id/w3id.org#6827 merges (steps 2 and 3 joined it
+    on 2026-10-07, with named Turtle now leading every negotiated route),
+    measure it live and drop the interim "until then use the site copy" note
+    from static/ontology/README.md.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
 - [ ] **GB-10 Presets page neutrality** (after GB-01).
   *The GB-01 migration made the group and the breath guide optional and reads
