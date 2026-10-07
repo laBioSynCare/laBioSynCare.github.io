@@ -483,6 +483,18 @@ explicit instruction naming each file.
     stricter rules).
   - *Done when* a signed-out reader can obtain neither the ID nor the email
     local part.
+  - *Progress 2026-10-07:* the app and the first rules are done. A note's full
+    record is its author's, at `users/{uid}/annotations/{id}`. A public note
+    also has a copy at `publicAnnotations/{id}` holding its text, target, dates
+    and, only if the author signs, the account's name. The copy holds no
+    account ID but an author key (SHA-256 of a prefix, the ID and the note's
+    id) that the rules recompute, so only the author can write or withdraw it
+    and no reader can link two anonymous notes. The RDF pseudonym therefore
+    needs no secret: no public record holds the ID it is computed from. Each
+    owner's legacy documents move on their next visit. `make
+    firestore-rules-test` runs the rules under the emulator. Rules accepting
+    both shapes are live (ruleset `c201ac61`); the stricter ones, which close
+    the legacy collection, follow once the app is.
 - [x] **GB-04 Default-graph SPARQL in the Workbench.** *Closed 2026-10-07.
   `src/rdf/query.js` hands Comunica a source whose default graph is the RDF
   merge of the store's own default graph and the authoritative named graphs,

@@ -2,6 +2,67 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Annotations (GB-03). A note's full record belongs to its author and sits
+    // under their account. A public note also has a public copy, under the same
+    // id, holding only what a reader sees: the text, target, dates and, if the
+    // author chose to sign, the name on their account. The copy never holds the
+    // account ID, so a signed-out reader cannot obtain it. It holds an author
+    // key, SHA-256 of a prefix, the account ID and the note's id, which these
+    // rules recompute from the signed-in account: only the author can write or
+    // withdraw the copy, and no reader can link two of an author's notes.
+    match /users/{userId}/annotations/{annotationId} {
+      allow read, delete: if signedIn() && userId == request.auth.uid;
+      allow create, update: if signedIn()
+        && userId == request.auth.uid
+        && validOwnAnnotation();
+    }
+
+    match /publicAnnotations/{annotationId} {
+      allow read: if true;
+      allow create, update: if signedIn()
+        && validPublicCopy(annotationId);
+      // Deleting a copy that does not exist is allowed, and does nothing: the
+      // app withdraws a copy whenever it saves or deletes a private note.
+      allow delete: if signedIn()
+        && (resource == null || resource.data.get('authorKey', '') == authorKey(annotationId));
+    }
+
+    function authorKey(annotationId) {
+      return hashing.sha256('sstim-annotation-author:' + request.auth.uid + ':' + annotationId)
+        .toHexString().lower();
+    }
+
+    function validPublicCopy(annotationId) {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid)/annotations/$(annotationId);
+      let data = request.resource.data;
+      let name = data.get('authorName', '');
+      return data.keys().hasOnly([
+          'targetIri', 'annotationType', 'annotationText', 'authorName', 'authorKey', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasAll(['targetIri', 'annotationType', 'annotationText', 'authorName', 'authorKey'])
+        && data.authorKey == authorKey(annotationId)
+        // An existing copy is changed only by the author who wrote it.
+        && (resource == null || resource.data.get('authorKey', '') == authorKey(annotationId))
+        && existsAfter(path)
+        && getAfter(path).data.visibility == 'public'
+        && data.targetIri == getAfter(path).data.targetIri
+        && data.annotationType == getAfter(path).data.annotationType
+        && data.annotationText == getAfter(path).data.annotationText
+        && name is string
+        // Unsigned, or signed by its author's choice with the name the account
+        // carries, which may not be the email address's local part.
+        && (name == ''
+          || (getAfter(path).data.showName == true
+            && name == request.auth.token.get('name', '')
+            && name.lower() != request.auth.token.get('email', '').split('@')[0].lower()));
+    }
+
+    // Legacy annotations, from before GB-03, which hold the account ID and a
+    // display name. TRANSITIONAL: while clients from before the change may still
+    // be open, a public one stays readable and the legacy shape stays writable.
+    // Once the current app is live the next deployment makes this collection
+    // owner-only and closed to new documents. The app moves each owner's
+    // documents out of it on their next visit.
     match /rdfAnnotations/{annotationId} {
       allow read: if resource.data.get('visibility', '') == 'public'
         || (signedIn() && resource.data.userId == request.auth.uid);
@@ -67,6 +128,23 @@ service cloud.firestore {
     && request.resource.data.get('affiliation', '').size() <= 200
     && request.resource.data.get('email', '') is string
     && request.resource.data.get('email', '').size() <= 200;
+  }
+
+  function validOwnAnnotation() {
+    let data = request.resource.data;
+    return data.keys().hasOnly([
+        'targetIri', 'annotationType', 'annotationText', 'visibility', 'showName', 'createdAt', 'updatedAt'
+      ])
+      && data.keys().hasAll(['targetIri', 'annotationType', 'annotationText', 'visibility', 'showName'])
+      && data.targetIri is string
+      && data.targetIri.size() <= 2000
+      && data.annotationType is string
+      && data.annotationType.size() <= 40
+      && data.annotationText is string
+      && data.annotationText.size() > 0
+      && data.annotationText.size() <= 4000
+      && data.visibility in ['public', 'private']
+      && data.showName is bool;
   }
 
   function validAnnotationCreate() {

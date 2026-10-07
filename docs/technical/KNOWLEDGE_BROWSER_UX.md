@@ -62,7 +62,10 @@ are the choices a future change could quietly undo:
   visibility value is treated as private. Public notes serialize to a shared
   named graph, private ones to a per-user graph. RDF uses `oa:bodyValue`,
   whitelisted OA motivations, and pseudonymous agent IRIs — the Firebase auth ID
-  never appears in exported RDF (audit KR-12).
+  never appears in exported RDF (audit KR-12). Nor does it appear in what a
+  reader is served: a public note's stored copy holds its text, target and
+  dates, and a name only if its author chose to sign, never the email
+  address's local part (GB-03).
 - **CURIEs display, IRIs persist.** The IRI row shows `sstim:X`, but `href`,
   tooltip, and Copy all use the full canonical IRI, so the citable form never
   disappears. `toCurie()` lives beside the prefix table in

@@ -42,6 +42,12 @@ export function safeMotivation(value) {
 // for attribution across exports, but not an authentication identifier.
 // Linking a pseudonym to a public identity requires explicit consent and is
 // deliberately not implemented here.
+//
+// It needs no secret (GB-03, decided 2026-10-07). Recomputing it requires the
+// account ID, and since GB-03 no world-readable record carries one: a public
+// note's copy holds only its text, target, dates and an optional chosen name.
+// Others' public notes reach this code without an account ID at all, so they
+// are attributed to the one 'anonymous' agent.
 const pseudonymCache = new Map()
 
 export async function pseudonymFor(userId) {
@@ -108,21 +114,88 @@ export async function serializeAnnotations(annotations) {
   })
 }
 
-/** Shape validation shared by every implementation's `add`. */
+const MAX_NAME_LENGTH = 200
+
+/**
+ * The name a public note may be signed with, or '' when there is none (GB-03).
+ *
+ * Only a name the person set. When an identity provider has no name it falls
+ * back to the part of the email address before the @, which is fine for the
+ * person's own screens and wrong for anything public: it is the address minus
+ * its domain. Accounts created before 2026-10-07 may even have stored that
+ * fallback as their profile name, so a name equal to the email's local part is
+ * treated as no name. The Firestore rules refuse it too.
+ */
+export function publicNameFor({ displayName, email } = {}) {
+  const name = typeof displayName === 'string' ? displayName.trim() : ''
+  if (!name) return ''
+  const local = typeof email === 'string' ? email.split('@')[0].trim().toLowerCase() : ''
+  if (local && name.toLowerCase() === local) return ''
+  return name.slice(0, MAX_NAME_LENGTH)
+}
+
+/** Shape validation shared by every implementation's `add` and `update`. */
 export function normalizeAnnotationInput({
   annotatesNode,
   annotationText,
   annotationType = 'commenting',
   visibility = 'private',
-  userDisplayName = '',
+  showName = false,
+  authorName = '',
 }) {
   const text = annotationText?.trim()
   if (!text) throw new Error('Annotation text cannot be empty.')
+  const name = typeof authorName === 'string' ? authorName.trim().slice(0, MAX_NAME_LENGTH) : ''
+  const signed = showName === true && name !== ''
   return {
     targetIri: normalizeTargetIri(annotatesNode),
     annotationText: text,
-    annotationType,
+    annotationType: safeMotivation(annotationType),
     visibility: safeVisibility(visibility),
-    userDisplayName: typeof userDisplayName === 'string' ? userDisplayName.slice(0, 200) : '',
+    showName: signed,
+    // A note is signed only when its author chose to sign it and has a name.
+    authorName: signed ? name : '',
+  }
+}
+
+/**
+ * What proves who wrote a public copy without saying who (GB-03): SHA-256 of a
+ * fixed prefix, the account ID and the note's id, as lowercase hex. The rules
+ * recompute it from the signed-in account, so only the author can change or
+ * withdraw the copy. Recomputing it needs the account ID, which no public record
+ * holds, and it differs for every note, so a reader cannot tell that two
+ * anonymous notes share an author.
+ */
+export async function authorKeyFor(userId, annotationId) {
+  if (!userId || !annotationId) throw new Error('An author key needs an account and a note.')
+  const bytes = new TextEncoder().encode(`sstim-annotation-author:${userId}:${annotationId}`)
+  const digest = await crypto.subtle.digest('SHA-256', bytes)
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/** The author's own record: everything about the note, readable only by them. */
+export function ownRecordFields(normalized) {
+  return {
+    targetIri: normalized.targetIri,
+    annotationType: normalized.annotationType,
+    annotationText: normalized.annotationText,
+    visibility: normalized.visibility,
+    showName: normalized.showName,
+  }
+}
+
+/**
+ * What a reader sees of a public note, and all a public copy may hold: never
+ * the account ID, and a name only when the author chose to sign.
+ */
+export function publicCopyFields(normalized) {
+  if (normalized.visibility !== 'public') {
+    throw new Error('Only a public note has a public copy.')
+  }
+  return {
+    targetIri: normalized.targetIri,
+    annotationType: normalized.annotationType,
+    annotationText: normalized.annotationText,
+    authorName: normalized.showName ? normalized.authorName : '',
   }
 }

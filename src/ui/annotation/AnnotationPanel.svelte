@@ -4,13 +4,7 @@
   import { pendingState } from '../../identity/IdentityProvider.js'
   import { createAnnotationStore } from '../../rdf/annotations/AnnotationStore.js'
   import { LOCAL_USER_ID } from '../../rdf/annotations/localAnnotationStore.js'
-
-  function deriveDisplayName(user) {
-    if (!user) return ''
-    const name = user.displayName?.trim()
-    if (name) return name
-    return defaultDisplayNameFromEmail(user.email)
-  }
+  import { publicNameFor } from '../../rdf/annotations/annotationRdf.js'
 
   const { target, between } = $props()
 
@@ -18,17 +12,32 @@
   let annotations = $state([])
   let annotationText = $state('')
   let annotationVisibility = $state('private')
+  let annotationShowName = $state(false)
   let error = $state(null)
   let saving = $state(false)
 
   let editingId = $state(null)
   let editText = $state('')
   let editVisibility = $state('private')
+  let editShowName = $state(false)
   let editError = $state(null)
 
   const unsubscribeAuth = identityState.subscribe((value) => {
     auth = value
   })
+
+  // The name a public note may be signed with: one the person set, never the
+  // email's local part (GB-03). Empty means public notes go out as anonymous.
+  const publicName = $derived(publicNameFor(auth.identity))
+  // Only an account makes a note readable by others; on this device alone
+  // "public" only decides which graph an export puts it in.
+  const sharesNotes = $derived(identityCapabilities().canSignIn)
+
+  function publicNotice(showName) {
+    const signedAs = showName && publicName ? `signed ${publicName}` : 'signed “anonymous”'
+    const hint = publicName ? '' : ' Set a display name in your profile to sign with it.'
+    return `Anyone can read a public note, ${signedAs}. Your account and email address are never shown.${hint}`
+  }
 
   $effect(() => {
     target?.iri
@@ -88,7 +97,8 @@
         annotationType: 'commenting',
         annotationText: text,
         visibility: annotationVisibility,
-        userDisplayName: auth.identity.displayName,
+        showName: annotationShowName,
+        authorName: publicName,
       })
       annotationText = ''
     } catch (e) {
@@ -102,6 +112,7 @@
     editingId = annotation.id
     editText = annotation.annotationText
     editVisibility = annotation.visibility
+    editShowName = annotation.showName === true
     editError = null
   }
 
@@ -122,6 +133,8 @@
       await store.update(editingId, {
         annotationText: text,
         visibility: editVisibility,
+        showName: editShowName,
+        authorName: publicName,
       })
       editingId = null
     } catch (e) {
@@ -164,8 +177,14 @@
 
   function authorLabel(annotation) {
     if (isOwnAnnotation(annotation)) return 'You'
-    const name = annotation.userDisplayName?.trim()
+    const name = annotation.authorName?.trim()
     return name || 'Anonymous'
+  }
+
+  // How one of your own public notes appears to everyone else.
+  function signedAs(annotation) {
+    if (!sharesNotes || annotation.visibility !== 'public') return ''
+    return annotation.showName && publicName ? `as ${publicName}` : 'as anonymous'
   }
 </script>
 
@@ -209,6 +228,15 @@
             Save note
           </button>
         </div>
+        {#if sharesNotes && annotationVisibility === 'public'}
+          <div class="public-choice">
+            <label class="sign-choice">
+              <input type="checkbox" bind:checked={annotationShowName} disabled={saving || !publicName} />
+              {publicName ? `Show my name (${publicName})` : 'Show my name'}
+            </label>
+            <p class="public-notice"><small>{publicNotice(annotationShowName)}</small></p>
+          </div>
+        {/if}
       </form>
     {:else if auth.identity.authenticated}
       <p class="status"><small>No annotatable IRI selected.</small></p>
@@ -263,6 +291,15 @@
                   <button type="submit" aria-busy={saving} disabled={saving || !editText.trim()}>Save</button>
                 </div>
               </div>
+              {#if sharesNotes && editVisibility === 'public'}
+                <div class="public-choice">
+                  <label class="sign-choice">
+                    <input type="checkbox" bind:checked={editShowName} disabled={saving || !publicName} />
+                    {publicName ? `Show my name (${publicName})` : 'Show my name'}
+                  </label>
+                  <p class="public-notice"><small>{publicNotice(editShowName)}</small></p>
+                </div>
+              {/if}
               {#if editError}
                 <p class="annotation-error"><small>{editError}</small></p>
               {/if}
@@ -274,6 +311,9 @@
                 <span class="author">{authorLabel(annotation)}</span>
                 <span class="dot" aria-hidden="true">·</span>
                 <span class="visibility-chip {annotation.visibility}">{annotation.visibility}</span>
+                {#if isMine && signedAs(annotation)}
+                  <span class="signed-as">{signedAs(annotation)}</span>
+                {/if}
                 <span class="dot" aria-hidden="true">·</span>
                 <span>{shortDate(annotation.updatedAt || annotation.createdAt)}</span>
               </span>
@@ -322,6 +362,29 @@
     gap: 0.5rem;
   }
 
+  .public-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .sign-choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    font-size: 0.75rem;
+  }
+  .sign-choice input {
+    margin: 0;
+  }
+  .public-notice {
+    margin: 0;
+    color: var(--pico-muted-color);
+    line-height: 1.3;
+  }
+  .signed-as {
+    color: var(--pico-muted-color);
+  }
   .visibility-toggle {
     display: inline-flex;
     border: 1px solid var(--app-border);

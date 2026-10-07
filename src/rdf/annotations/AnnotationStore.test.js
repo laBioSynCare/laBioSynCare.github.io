@@ -89,3 +89,48 @@ describe('AnnotationStore RDF projection (KR-12)', () => {
     expect(ttl).toContain('dateTime')
   })
 })
+
+describe('what a public note may show (GB-03)', async () => {
+  const {
+    normalizeAnnotationInput, publicCopyFields, ownRecordFields, publicNameFor,
+  } = await import('./annotationRdf.js')
+  const { ownAnnotationFromData, publicAnnotationFromData } = await import('./AnnotationStore.js')
+
+  it('never offers the email address’s local part as a public name', () => {
+    expect(publicNameFor({ displayName: 'Alice Liddell', email: 'alice@example.org' })).toBe('Alice Liddell')
+    expect(publicNameFor({ displayName: 'alice', email: 'alice@example.org' })).toBe('')
+    expect(publicNameFor({ displayName: 'ALICE', email: 'alice@example.org' })).toBe('')
+    expect(publicNameFor({ displayName: '  ', email: 'alice@example.org' })).toBe('')
+    expect(publicNameFor({ displayName: 'Alice', email: null })).toBe('Alice')
+    expect(publicNameFor({})).toBe('')
+  })
+
+  it('signs a note only when its author chose to and has a name', () => {
+    const base = { annotatesNode: 'https://w3id.org/sstim#Preset', annotationText: 'Hi.', visibility: 'public' }
+    expect(normalizeAnnotationInput({ ...base, showName: true, authorName: 'Alice' })).toMatchObject({ showName: true, authorName: 'Alice' })
+    expect(normalizeAnnotationInput({ ...base, showName: false, authorName: 'Alice' })).toMatchObject({ showName: false, authorName: '' })
+    expect(normalizeAnnotationInput({ ...base, showName: true, authorName: '' })).toMatchObject({ showName: false, authorName: '' })
+  })
+
+  it('keeps the account ID and the author’s choice out of the public copy', () => {
+    const normalized = normalizeAnnotationInput({
+      annotatesNode: 'https://w3id.org/sstim#Preset', annotationText: 'Hi.', visibility: 'public', showName: true, authorName: 'Alice',
+    })
+    expect(Object.keys(publicCopyFields(normalized)).sort()).toEqual(['annotationText', 'annotationType', 'authorName', 'targetIri'])
+    expect(Object.keys(ownRecordFields(normalized)).sort()).toEqual(['annotationText', 'annotationType', 'showName', 'targetIri', 'visibility'])
+    expect(() => publicCopyFields({ ...normalized, visibility: 'private' })).toThrow()
+  })
+
+  it('reads a public copy without an author, and an own record as its author’s', () => {
+    const stored = { targetIri: 'https://w3id.org/sstim#Preset', annotationType: 'commenting', annotationText: 'Hi.', authorName: '' }
+    expect(publicAnnotationFromData('n1', stored)).toMatchObject({ userId: null, visibility: 'public', authorName: '' })
+    expect(ownAnnotationFromData('n1', { ...stored, visibility: 'public', showName: true }, RAW_UID))
+      .toMatchObject({ userId: RAW_UID, showName: true })
+  })
+
+  it('attributes others’ public notes to the one anonymous agent in RDF', async () => {
+    const quads = await store.toQuads([annotation({ userId: null })])
+    const agent = quads.find((q) => q.predicate.value === 'http://www.w3.org/ns/prov#wasAttributedTo').object.value
+    expect(agent).toMatch(/\/user\/anonymous$/)
+  })
+})

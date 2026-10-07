@@ -20,7 +20,6 @@ import {
   annotationsToQuads,
   normalizeAnnotationInput,
   normalizeTargetIri,
-  safeVisibility,
   serializeAnnotations,
 } from './annotationRdf.js'
 
@@ -82,11 +81,12 @@ export class LocalAnnotationStore {
     records.push({
       id,
       userId: LOCAL_USER_ID,
-      userDisplayName: normalized.userDisplayName,
       targetIri: normalized.targetIri,
       annotationType: normalized.annotationType,
       annotationText: normalized.annotationText,
       visibility: normalized.visibility,
+      showName: normalized.showName,
+      authorName: normalized.authorName,
       createdAt: now,
       updatedAt: now,
     })
@@ -120,16 +120,26 @@ export class LocalAnnotationStore {
     }
   }
 
-  async update(id, { annotationText, visibility }) {
-    const text = annotationText?.trim()
-    if (!text) throw new Error('Annotation text cannot be empty.')
+  async update(id, { annotationText, visibility, showName = false, authorName = '' }) {
     const records = readAll(this.storage)
     const index = records.findIndex((r) => r.id === id)
     if (index === -1) throw new Error('That annotation no longer exists.')
+    const normalized = normalizeAnnotationInput({
+      annotatesNode: records[index].targetIri,
+      annotationText,
+      annotationType: records[index].annotationType,
+      visibility,
+      showName,
+      authorName,
+    })
+    // A record from before 2026-10-07 may still hold a display name; it goes.
+    const { userDisplayName: _legacyName, ...previous } = records[index]
     records[index] = {
-      ...records[index],
-      annotationText: text,
-      visibility: safeVisibility(visibility),
+      ...previous,
+      annotationText: normalized.annotationText,
+      visibility: normalized.visibility,
+      showName: normalized.showName,
+      authorName: normalized.authorName,
       updatedAt: new Date().toISOString(),
     }
     writeAll(this.storage, records)

@@ -70,7 +70,11 @@ export async function createEmailAccount(email, password, displayName = '') {
   const { auth } = await requireFirebaseClient()
   const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth')
   const credential = await createUserWithEmailAndPassword(auth, email, password)
-  const finalName = (displayName?.trim()) || defaultDisplayNameFromEmail(email)
+  // Only a name the person gave. Storing the email's local part as the profile
+  // name made it indistinguishable from a real one, and a profile name is what a
+  // signed public note shows (GB-03). Screens the person sees alone still fall
+  // back to it, in the identity provider.
+  const finalName = displayName?.trim() ?? ''
   if (finalName) {
     await updateProfile(credential.user, { displayName: finalName })
     syncAuthDisplayName(finalName)

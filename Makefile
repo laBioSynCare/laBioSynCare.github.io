@@ -12,7 +12,8 @@ WIDOCO_CONF := docs/ontology/widoco.properties
 PYLODE     ?= pylode
 VOCAB_DOCS_DIR ?= dist/ontology/docs/vocab
 WAT2WASM   ?= wat2wasm
-FIREBASE   ?= npx firebase-tools
+# The dev shell carries firebase-tools (flake.nix); outside it, npx fetches one.
+FIREBASE   ?= $(if $(shell command -v firebase 2>/dev/null),firebase,npx firebase-tools)
 FIREBASE_PROJECT ?= biosyncare-lab
 WORKLET_DIR := static/worklets
 WASM_WAT   := $(WORKLET_DIR)/bsc-osc.wat
@@ -98,7 +99,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules firestore-rules-test dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -214,6 +215,16 @@ dev:
 ## Deploy Firestore security rules to the configured Firebase project
 deploy-firestore-rules:
 	$(FIREBASE) deploy --project $(FIREBASE_PROJECT) --only firestore:rules
+
+## Run the annotation rules under the Firestore emulator (GB-03): that a
+## signed-out reader gets no account ID, that only a note's author can publish,
+## change or withdraw its public copy, and that the app's own writes pass.
+## firebase-tools needs Java 21, which the dev shell does not carry, so the
+## flake's own nixpkgs supplies it here. Run it before deploy-firestore-rules.
+firestore-rules-test:
+	@jdk="$$(nix build --no-link --print-out-paths --inputs-from . nixpkgs#jdk21)" && \
+	PATH="$$jdk/bin:$$PATH" $(FIREBASE) emulators:exec --only firestore --project demo-sstim \
+		"npx vitest run src/rdf/annotations/annotationRules.emulator.test.js"
 
 ## Preview the production build on a stable local host/port
 preview: build
@@ -1076,6 +1087,7 @@ help:
 	@echo "  make session-conformance Package a session on instance A, verify it on instance B"
 	@echo "  make check            Run SvelteKit sync and static checks"
 	@echo "  make deploy-firestore-rules Deploy firestore.rules to $(FIREBASE_PROJECT)"
+	@echo "  make firestore-rules-test Run the annotation rules under the Firestore emulator"
 	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
