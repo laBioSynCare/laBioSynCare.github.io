@@ -1762,7 +1762,10 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
 - [ ] Role confirmation with Eva Castilho (Æterni Anima member; Head of
       Communication and Marketing, BioSynCare) `P0`
       *Notified 2026-07-18 with a request to review the knowledge graph
-      entry before it is marked approved.*
+      entry before it is marked approved. The BioSynCare role was
+      re-proposed 2026-10-08 as a contributor relationship to the
+      application; the July record targeted an organization record
+      retired on 2026-07-20.*
 
 ### Phase 1 community tasks
 - [ ] Personal message to each named partner (not mass email) with

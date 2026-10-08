@@ -76,6 +76,7 @@ W3ID_STAGING_FILE = (
     ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
 )
 ECOSYSTEM_PUBLIC_DUMP = "https://biosyncare-lab.web.app/current.ttl"
+ECOSYSTEM_BROWSER = "https://w3c-cg.github.io/sstim/graph/"
 _Q_ZERO_GUARD = r"(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$))"
 HTML_ACCEPT = (
     r"RewriteCond %{HTTP_ACCEPT} "
@@ -929,16 +930,19 @@ def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
     # The two HTML rules deep-link to the record's own graph node. They were
     # restored upstream on 2026-08-08 (perma-id/w3id.org#6517) after a file
     # rewrite reverted them; this expectation was not updated with them, which
-    # made every subsequent ledger publish fail closed. Keep the local name as
-    # $2 so the rule set stays fixed while the record set varies.
+    # made every subsequent ledger publish fail closed. The same happened again
+    # when the 2026-08-27 production cutover (perma-id/w3id.org#6609) moved the
+    # browser target to the W3C-CG project site and this host stayed behind.
+    # Keep the local name as $2 so the rule set stays fixed while the record
+    # set varies.
     expected_directives = (
         HTML_ACCEPT,
         r"RewriteRule ^(specialist|organization)/((?!synthetic-)[A-Za-z0-9._~-]+)/?$ "
-        "https://labiosyncare.github.io/graph/#sstim-$1:$2 [R=303,L,NE]",
+        f"{ECOSYSTEM_BROWSER}#sstim-$1:$2 [R=303,L,NE]",
         HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
         r"((?!synthetic-)[A-Za-z0-9._~-]+)/?$ "
-        r"https://labiosyncare.github.io/graph/#sstim-ecosystem-record:$1/$2 [R=303,L,NE]",
+        f"{ECOSYSTEM_BROWSER}#sstim-ecosystem-record:$1/$2 [R=303,L,NE]",
         EMPTY_ACCEPT,
         TURTLE_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
