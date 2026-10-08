@@ -52,12 +52,13 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-07-12"^^xsd:date ;
     dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:modified "2026-10-08"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0024-stakeholder-ecosystem-modeling.md>,
         <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0031-qualified-ecosystem-records.md>,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0032-visible-pending-status-ecosystem-records.md> ;
-    skos:historyNote "0.7.0 — ADR 0031 replaces the initial flat agent-level relationship and consent surface with qualified relationship, membership, implementation-responsibility, and engagement records; the approved public graph is current-state while complete operational history is private and append-only. The original ADR 0024 properties remain deprecated for migration only. 2026-07-19 — ADR 0032 adds sstim-eco:publicationStatus as a second, backward-compatible admission basis: a relationship may be admitted to the public graph at any truthful non-approved status (e.g. notified) so the person it describes can review it in context before consenting; the person-consent gate on a claimed publicationStatus of outcomePublicationApproved is unchanged."@en .
+        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0032-visible-pending-status-ecosystem-records.md>,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0062-sensory-stimulation-ecosystem-contributor.md> ;
+    skos:historyNote "0.7.0 — ADR 0031 replaces the initial flat agent-level relationship and consent surface with qualified relationship, membership, implementation-responsibility, and engagement records; the approved public graph is current-state while complete operational history is private and append-only. The original ADR 0024 properties remain deprecated for migration only. 2026-07-19 — ADR 0032 adds sstim-eco:publicationStatus as a second, backward-compatible admission basis: a relationship may be admitted to the public graph at any truthful non-approved status (e.g. notified) so the person it describes can review it in context before consenting; the person-consent gate on a claimed publicationStatus of outcomePublicationApproved is unchanged. 2026-10-08: ADR 0062 adds sstim-eco:ecosystemContributor, the broadest relationship type, for any agent that contributes, has contributed, or has publicly declared that it will contribute to the field."@en .
 
 
 ###########################################################################
@@ -426,7 +427,8 @@ sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Ecosystem Relationship Vocabulary"@en ;
     dct:description "Controlled types assigned to qualified ecosystem relationship records. A term such as contributor, stakeholder, organization member, or implementation developer describes one sourced agent-target relationship, not the agent globally."@en ;
-    skos:hasTopConcept sstim-eco:contributor, sstim-eco:stakeholder,
+    skos:hasTopConcept sstim-eco:ecosystemContributor,
+        sstim-eco:contributor, sstim-eco:stakeholder,
         sstim-eco:researchCollaborator, sstim-eco:scientificAdvisor,
         sstim-eco:citedAuthor, sstim-eco:toolVendor, sstim-eco:standardsBody,
         sstim-eco:funder, sstim-eco:institutionalHost, sstim-eco:peerProject,
@@ -434,6 +436,18 @@ sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
         sstim-eco:implementationDeveloper, sstim-eco:implementationPublisher,
         sstim-eco:implementationMaintainer, sstim-eco:implementationProvider,
         sstim-eco:implementationOperator .
+
+sstim-eco:ecosystemContributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Sensory stimulation ecosystem contributor"@en,
+                   "Contributore all'ecosistema della stimolazione sensoriale"@it,
+                   "Contribuidor do ecossistema de estimulação sensorial"@pt,
+                   "Contribuidor del ecosistema de estimulación sensorial"@es ;
+    skos:notation "ecosystem-contributor" ;
+    skos:definition "An agent of any kind (a person, a research group or laboratory, an institution, a company, a community, or a standards or funding body) that contributes, has contributed, or has publicly declared that it will contribute to the sensory-stimulation ecosystem in any capacity, such as research, clinical or self-directed practice, device and software development, education, art, standards work, funding, or community building."@en ;
+    skos:scopeNote "The broadest relationship type in this scheme, meant for the first record that places an agent in the ecosystem. Its target is sstim:SensoryStimulation, or a narrower technique or field resource when the source names one. Time is qualified on the record: a past contribution carries sstim-eco:validUntil, and a declared future one carries sstim-eco:validFrom at the declared start and cites the agent's own public declaration as its source; a curator's guess about what an agent could do is not a declaration (ADR 0031). Specific roles (tool vendor, research collaborator, contributor to a named artifact, and the other types here) are separate records beside it. The type records relevance to the field, never endorsement of, affiliation with, or conformance to SSTIM."@en ;
+    skos:historyNote "Added on the 0.19.0-dev line by ADR 0062."@en .
 
 sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
@@ -443,7 +457,8 @@ sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Co
                    "Contribuidor"@pt,
                    "Contribuidor"@es ;
     skos:notation "contributor" ;
-    skos:definition "An agent that has contributed to the sensory-stimulation field — in knowledge, research, practice, or business."@en .
+    skos:definition "An agent that has contributed to the sensory-stimulation field — in knowledge, research, practice, or business."@en ;
+    skos:scopeNote "Records a contribution to the resource the relationship names as its target, such as SSTIM, a framework, an implementation or a programme. For an agent's place in the field as a whole, including past and declared future contribution, use sstim-eco:ecosystemContributor (ADR 0062)."@en .
 
 sstim-eco:stakeholder a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;

@@ -85,6 +85,7 @@ annotations lives here.
 | [0059](0059-community-group-publishes-sstim.md) | The W3C Community Group publishes SSTIM | Accepted |
 | [0060](0060-every-unversioned-iri-resolves-to-a-release.md) | Every unversioned SSTIM IRI resolves to a release | Accepted |
 | [0061](0061-universal-namespaces-carry-no-framework-structure.md) | SSTIM's universal namespaces carry no framework's or implementation's structure | Accepted |
+| [0062](0062-sensory-stimulation-ecosystem-contributor.md) | One relationship type for anyone in the field, and a public directory of it | Accepted |
 
 ## ADR lifecycle and revision policy
 

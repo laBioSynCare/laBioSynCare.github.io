@@ -321,6 +321,7 @@ and picking the wrong one produces a confident, wrong absence:
 | Public reference data | `static/ontology/instances/**` | yes |
 | Released artifacts | `static/ontology/<version>/` | yes, and they are immutable |
 | **Real ecosystem agents and relationships** | **the external live-only store** | **no — ADR 0031 keeps them out of git on purpose; only synthetic fixtures are committed** |
+| Stakeholder directory (a listing of the field, not records) | `src/ui/ecosystem/stakeholderDirectory.js` | yes — but an entry there says nothing about the live store; ADR 0062 |
 | Version DOIs | `void.ttl`, `CITATION.cff`, `src/ui/entrance/releaseMetadata.js`, `CURRENT_STATE.md` | yes, and `make truth-audit` compares them |
 
 For any SSTIM identifier, the executable answer is:

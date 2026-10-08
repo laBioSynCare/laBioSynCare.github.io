@@ -17,7 +17,7 @@ describe('routeRendersStimulation', () => {
     // The entrance is the one that matters: it is what w3id.org/sstim answers
     // with, so it is the project's first impression on anyone arriving cold.
     expect(routeRendersStimulation('/')).toBe(false)
-    for (const route of ['/graph/', '/sparql/', '/presets/', '/about/', '/ecosystem/', '/logbook/']) {
+    for (const route of ['/graph/', '/sparql/', '/presets/', '/about/', '/ecosystem/', '/ecosystem/directory/', '/logbook/']) {
       expect(routeRendersStimulation(route)).toBe(false)
     }
   })

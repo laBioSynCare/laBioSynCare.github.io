@@ -10,12 +10,22 @@
 ## Consent & framing rules (read before contacting anyone)
 
 - **Admission and removal** ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md),
-  [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)): public
-  organization facts use notify-and-honor. A named person must
-  self-publish or give authenticated consent for the exact relationship and
-  purpose; notification alone is insufficient. A prose confirmation in
-  `PARTNERS.md` / `ADVISORY_BOARD.md` counts only when it explicitly covers that
-  scope. Objections and removals are honored promptly.
+  [ADR 0031](../decisions/0031-qualified-ecosystem-records.md),
+  [ADR 0032](../decisions/0032-visible-pending-status-ecosystem-records.md),
+  [ADR 0062](../decisions/0062-sensory-stimulation-ecosystem-contributor.md)):
+  public organization facts use notify-and-honor, so an organization's sourced
+  record may go live on the curator's decision and the notification follows. A
+  named person's record goes live only after a real notification, and then only
+  at the visible *Notification sent* status, so the person can review it in
+  context; it is marked approved only once the person self-publishes or gives
+  authenticated consent for the exact relationship and purpose. A prose
+  confirmation in `PARTNERS.md` / `ADVISORY_BOARD.md` counts as consent only when
+  it explicitly covers that scope. Objections and removals are honored promptly.
+- **Listing is not recording.** The public
+  [stakeholder directory](https://w3c-cg.github.io/sstim/ecosystem/directory/)
+  lists organizations and people from public sources without contacting anyone.
+  A directory entry carries no record, status or claim of engagement; a target
+  graduates from it to a live record by the rule above.
 - **The ask is "encode / reproduce a protocol," never "endorse BSC"** and never
   "validate our health benefits." Endorsement of a policy charter is an *ethical*
   commitment, not scientific or product validation.

@@ -340,7 +340,7 @@ The main gaps are design and coverage gaps, not current parser failures:
   `Q141325360` was created on Wikidata on 2026-09-06 and **all 58 mapped Wikidata
   items now carry a `P2888` statement naming an SSTIM term**, measured by
   `make wikidata-inbound`. The three exceptions are the `relatedMatch` rows held
-  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 555 concepts carry
+  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 556 concepts carry
   English, Italian, Portuguese and Spanish, across all 68 concept schemes, and
   have since 2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be
@@ -353,7 +353,7 @@ The main gaps are design and coverage gaps, not current parser failures:
   current classes carry the other three languages, none of the 266 current
   properties does; GB-13). `skos:definition` remains English-only for all 555
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
-  than absent: 52 alternate labels on 38 of the 555 concepts, all English, 47 of
+  than absent: 52 alternate labels on 38 of the 556 concepts, all English, 47 of
   them in the vocabulary module, which includes the oscillation aliases
   [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
   added (measured 2026-10-06). `make language-coverage` reports it but does not

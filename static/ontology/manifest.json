@@ -496,7 +496,7 @@
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "321accefb8b51305a5be9e9a53777dd0fdc4b757c456f88bc4428aeb6c94a252"
+        "sha256": "fd6190cd290d44f92ab1d878af43e12b2faf50a30a6317fd8da99c66f4013b59"
       },
       "runtime": {
         "url": "sstim-ecosystem.ttl",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "8fbe06b62cc702d92033f8ffa38bbeb33f010e46cca7b6a23df435ca0b3ce892"
+      "sha256": "784380993b8707d67063900ae338b55dfe9a7b150ab4322e05a4d64d8c15287d"
     }
   ]
 }

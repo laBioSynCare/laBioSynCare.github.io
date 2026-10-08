@@ -1492,7 +1492,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
       ANS), the plain names the preferred labels bury, and the `systemAutonomic`
       label divergence the alignment work exposed. Proposal and the rejected
       candidates: `~/sstim-drafts/altlabel-proposal.md`. Still partial by design:
-      most of the 555 concepts have no alias worth writing, and non-English
+      most of the 556 concepts have no alias worth writing, and non-English
       aliases wait for the same native reviewer as the labels.*
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,
@@ -1766,6 +1766,15 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       re-proposed 2026-10-08 as a contributor relationship to the
       application; the July record targeted an organization record
       retired on 2026-07-20.*
+
+- [ ] Notify the first ecosystem batch (five companies, three laboratories,
+      live 2026-10-08 as sensory stimulation ecosystem contributors, ADR 0062)
+      and invite each to review its record `P1`
+      *A notification to an approved organization is a private ledger event
+      (the public record keeps its approval), written by hand for now;
+      `scripts/sstim-ecosystem-stage.py` stages new records only. Enrich one at
+      a time with technique targets and specific roles. Next candidates come
+      from the [stakeholder directory](https://w3c-cg.github.io/sstim/ecosystem/directory/).*
 
 ### Phase 1 community tasks
 - [ ] Personal message to each named partner (not mass email) with

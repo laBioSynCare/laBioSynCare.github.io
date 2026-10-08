@@ -54,6 +54,7 @@
     <nav class="hero-actions" aria-label="Ecosystem page sections">
       <a href="#architecture">See the architecture</a>
       <a href="#directory">Browse applications and initiatives</a>
+      <a href={applicationRoute('/ecosystem/directory/')}>Stakeholder directory</a>
       <a href={applicationRoute('/about/')}>About the Workbench</a>
     </nav>
   </header>
@@ -273,6 +274,7 @@
         </p>
       </div>
       <p>
+        <a href={applicationRoute('/ecosystem/directory/')}>Browse the stakeholder directory</a>
         <a href={`${GITHUB_URL}/issues/new`} rel="external">Open a directory issue</a>
         <a href={ghBlob('docs/concept/SENSORY_STIMULATION.md')} rel="external">Read the domain definition</a>
       </p>

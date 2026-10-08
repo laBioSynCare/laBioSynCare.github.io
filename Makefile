@@ -646,6 +646,7 @@ ecosystem-contract:
 		chmod +x "$$wrapper_dir/pyshacl"; \
 		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py --pyshacl-cli $(SHACL_WORKERS_ARG) $(PUBLIC_ECOSYSTEM_ARG) $(PRIVATE_LEDGER_ARG); \
 	fi
+	$(PYTHON) scripts/sstim-ecosystem-stage.test.py
 	npx vitest run src/rdf/ecosystem-contract.test.mjs
 
 ## Validate and activate an external live ecosystem aggregate, private ledger first

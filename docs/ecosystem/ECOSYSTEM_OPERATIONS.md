@@ -108,15 +108,30 @@ responded, the record stays at `outcomeNotificationSent`, not further along.
    announce a persistent identifier until the corresponding w3id redirect is
    merged and verified.
 
-The executable form is:
+The executable form, run inside `nix develop` (its Python has CA roots; the
+macOS framework Python may not), is:
 
 ```sh
-python3 scripts/sstim-ecosystem-publish.py \
-  --public-candidate ~/.sstim/public-aggregate.ttl \
-  --private-ledger ~/.sstim/private-ledger.ttl
+python3 scripts/sstim-ecosystem-stage.py fetch          # stage the active ledger
+python3 scripts/sstim-ecosystem-stage.py add batch.json # write both candidates
+make ecosystem-publish DRY_RUN=1 \
+  PUBLIC_ECOSYSTEM=~/.sstim/public-aggregate.ttl \
+  PRIVATE_LEDGER=~/.sstim/private-ledger-candidate.ttl
+make ecosystem-publish \
+  PUBLIC_ECOSYSTEM=~/.sstim/public-aggregate.ttl \
+  PRIVATE_LEDGER=~/.sstim/private-ledger-candidate.ttl
+python3 scripts/sstim-ecosystem-stage.py clean          # after verification
 ```
 
-Use `--dry-run` to run admission without changing cloud state. The publisher
+`fetch` finds the active audit document itself, as the one whose
+`publicSha256` is the hash of the live `current.ttl`, and checks the ledger
+bytes against their recorded hash. `add` takes a JSON batch (its docstring
+shows the shape; keep the batch in `~/.sstim/` too) and refuses, writing
+nothing, a person approved by the curator alone, a relationship IRI the ledger
+already holds, an agent once removed from the live graph, and a claim without a
+public source. Corrections, consent and removals are still written by hand.
+
+Use `DRY_RUN=1` to run admission without changing cloud state. The publisher
 never prints private ledger contents and fails before public activation when
 validation or the private-boundary check fails.
 

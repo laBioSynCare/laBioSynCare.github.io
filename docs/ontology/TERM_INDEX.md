@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-164 classes · 305 properties · 555 concepts · 18 modules · 76 of them deprecated
+164 classes · 305 properties · 556 concepts · 18 modules · 76 of them deprecated
 
 A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061 moved out of SSTIM point at the BSC framework vocabulary (`bsc-v:`, in `static/ontology/frameworks/bsc/`), which is not part of SSTIM and is not indexed here.
 
@@ -495,6 +495,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 |---|---|---|---|---|
 | `sstim-eco:citedAuthor` | sstim-eco:RelationshipType | ecosystem | cited-author |  |
 | `sstim-eco:contributor` | sstim-eco:RelationshipType | ecosystem | contributor |  |
+| `sstim-eco:ecosystemContributor` | sstim-eco:RelationshipType | ecosystem | ecosystem-contributor |  |
 | `sstim-eco:funder` | sstim-eco:ImplementationResponsibilityType, sstim-eco:RelationshipType | ecosystem | funder |  |
 | `sstim-eco:implementationDeveloper` | sstim-eco:ImplementationResponsibilityType, sstim-eco:RelationshipType | ecosystem | implementation-developer |  |
 | `sstim-eco:implementationMaintainer` | sstim-eco:ImplementationResponsibilityType, sstim-eco:RelationshipType | ecosystem | implementation-maintainer |  |

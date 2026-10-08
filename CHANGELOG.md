@@ -95,6 +95,14 @@ shows what to change:
 
 ### Added
 
+- `sstim-eco:ecosystemContributor`, "Sensory stimulation ecosystem contributor"
+  ([ADR 0062](docs/decisions/0062-sensory-stimulation-ecosystem-contributor.md)):
+  the broadest relationship type, for a person, laboratory, institution,
+  company, community or standards or funding body that contributes, has
+  contributed, or has publicly declared that it will contribute to the field.
+  Past and declared future contribution are qualified with `validUntil` and
+  `validFrom`. `sstim-eco:contributor` gains a scope note: it records a
+  contribution to its named target.
 - `sstim:breathGuideTrack`: one pointer from a preset to the track that paces
   breathing.
 - `sstim-ex:notCurrentlyDeliverable`, `sstim-ex:notCurrentlyUsed`,
