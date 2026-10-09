@@ -49,7 +49,7 @@ node scripts/truth-audit.mjs      # prints citable release, version DOI, module 
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
-| Publisher | `https://www.w3.org/community/sstim/`, the W3C Sensory Stimulation Vocabulary Community Group, from 0.19.0 ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)). Releases up to 0.18.0 declare `https://github.com/laBioSynCare`, so update a registry's publisher only once it carries 0.19.0 |
+| Publisher | `https://www.w3.org/community/sstim/`, the W3C Sensory Stimulation Vocabulary Community Group, from 0.19.0 ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)). Releases through 0.18.0 declare `https://github.com/laBioSynCare`, so update a registry's publisher only once it carries 0.19.0 |
 | First released | 2026-04-12 |
 | Source repository | `https://github.com/w3c-cg/sstim` |
 | Issue tracker | `https://github.com/w3c-cg/sstim/issues` |
@@ -959,7 +959,7 @@ assigns its own node URI on save.
 | Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
 | Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
 | Languages | en, it, pt, es |
-| Size | `164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.18.0, 2026-09)` |
+| Size | `164 classes, 305 properties, 556 concepts, 68 concept schemes (SSTIM 0.19.0, 2026-10)` |
 
 *Structure:*
 

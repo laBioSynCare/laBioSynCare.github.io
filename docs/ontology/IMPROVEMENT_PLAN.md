@@ -12,7 +12,7 @@ and phase numbering below is dependency order, not a version.
 findings GB-01 to GB-11, sequenced in [§1.6](#16-close-what-a-green-gate-does-not-see).
 
 For the implemented baseline and the ordered work that remains after the
-`0.18.0` release, start with the maintained
+`0.19.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
 logic and acceptance gates; it is not a claim that every bullet is still open.
 
@@ -434,7 +434,7 @@ explicit instruction naming each file.
   BSC's structure moves to a BSC framework vocabulary outside the manifest, and
   implementation status becomes neutral and scoped. [Directions](SSTIM_DIRECTIONS.md)
   §3 names the set. The migration is a 0.19.0 release gate, tracked in
-  `TODO.md`. Migrated 2026-10-06 on the 0.19.0-dev line, with every moved term
+  `TODO.md`. Migrated 2026-10-06 for 0.19.0, with every moved term
   deprecated in place; Directions §3 records what moved and what stayed. The
   upstream route for the BSC vocabulary,
   [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827), is
@@ -450,7 +450,7 @@ explicit instruction naming each file.
     release.
 - [x] **GB-02 SHACL coverage** (*protected*: `sstim-shapes.ttl`,
   `sstim-evidence.ttl`). 83 of 273 live properties and 6 instantiated classes
-  have no constraint. *Closed 2026-10-06 on the 0.19.0-dev line. Measured again
+  have no constraint. *Closed 2026-10-06 for 0.19.0. Measured again
   by `make shacl-coverage`, it was 84 properties and 13 classes: the review
   matched IRIs as substrings, so `sstim:hasSignal` passed as a prefix of
   `sstim:hasSignalShape`, and it counted a class as constrained when a shape
@@ -521,8 +521,8 @@ explicit instruction naming each file.
     on `participantEngagementMode` at the technique layer. Add entailment
     fixtures in both directions. Probably an ADR amendment.
   - *Done when* HermiT rejects a process typed on both sides of the split.
-- [x] **GB-06 Deprecation hygiene** (*protected*). *Closed 2026-10-06 on the
-  0.19.0-dev line: of the 25 deprecated terms without `dct:isReplacedBy`, 12 now
+- [x] **GB-06 Deprecation hygiene** (*protected*). *Closed 2026-10-06 for
+  0.19.0: of the 25 deprecated terms without `dct:isReplacedBy`, 12 now
   name a successor and 13 say they have none and why (`hapticPattern` already
   did), the public data no longer asserts `supportsRelation`, and the
   quality audit fails on any of the three regressing. The alias had stayed in the
@@ -547,9 +547,9 @@ explicit instruction naming each file.
     the Kernel's declaration counts and history-note order; settle the
     `dct:modified` question.
   - *Done when* the truth audit also checks the CURRENT_STATE instance totals.
-- [x] **GB-08 Source links** (*protected*; 20 files). *Closed 2026-10-06 on the
-  0.19.0-dev line. 152 links in 23 live files now name `w3c-cg/sstim`: 147
-  pinned to `v0.18.0`, one to a published commit (ADR 0061, which no release
+- [x] **GB-08 Source links** (*protected*; 20 files). *Closed 2026-10-06 for
+  0.19.0. 152 links in 23 live files then named `w3c-cg/sstim`: 147
+  were pinned to `v0.18.0`, the previous release's tag, one to a published commit (ADR 0061, which no release
   holds yet), the repository root, and three `void.ttl` landing pages that stay
   on `main` because their datasets change between releases. All 39 distinct
   URLs answered 200. `make source-links` fails on a branch or the legacy

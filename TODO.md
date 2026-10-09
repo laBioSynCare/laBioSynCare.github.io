@@ -232,11 +232,12 @@ indexed, examiner-searchable records.
       repeat the numbered post-deploy procedure in `REGISTRY_SUBMISSIONS.md` for
       each genuine release while preserving `dct:created` in SSTIM's metadata.*
 
-      *0.18.0 went out 2026-09-23 with ledger bytes 1344615 (sha256
-      `27ec42ea…2392ef4`). The next nightly pull should create its submission:
-      capture that ID, confirm it survives a second unchanged pull, then PATCH
-      it to Released 2026-09-23 and check the Version IRI reads
-      `https://w3id.org/sstim/0.18.0` (the item below).*
+      *The previous release, 0.18.0, went out 2026-09-23 with ledger bytes 1344615
+      (sha256 `27ec42ea…2392ef4`). 0.19.0 went out 2026-10-10 with ledger bytes
+      1379859 (sha256 `e6006592…532f605`). The next nightly pull should create
+      its submission: capture that ID, confirm it survives a second unchanged
+      pull, then PATCH it to Released 2026-10-10 and check the Version IRI reads
+      `https://w3id.org/sstim/0.19.0` (the item below).*
 
 - [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
@@ -373,8 +374,8 @@ indexed, examiner-searchable records.
       record that never appeared, and it is consistent with what was already
       recorded: the submission was never provable from outside.*
 
-      *The gap on our side is closed, 2026-09-20 in source and served since the
-      0.18.0 release of 2026-09-23. The namespace resolves to the newest release
+      *The gap on our side is closed, 2026-09-20 in source and served since it
+      was released in 0.18.0 on 2026-09-23. The namespace resolves to the newest release
       by design (ADR 0055), so until then it negotiated to a document that was
       still 0.17.0 and held no `foaf:name`, measured 2026-09-23. The served namespace carried
       every LOV-recommended field except an agent name: `dct:creator` was a bare
@@ -419,7 +420,7 @@ indexed, examiner-searchable records.
 - [ ] **After 0.19.0 ships, move registry publishers to the Community Group** `P2`
       *[ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md). Every
       header and `void.ttl` name `https://www.w3.org/community/sstim/` from
-      0.19.0; releases up to 0.18.0 name `https://github.com/laBioSynCare`.
+      0.19.0; releases through 0.18.0 name `https://github.com/laBioSynCare`.
       Update a registry only once it carries 0.19.0, so its publisher matches
       the files it holds: BARTOC's publisher field, FAIRsharing's organisation
       link, and offer LOV the 0.19.0 file. Values in
@@ -914,15 +915,15 @@ indexed, examiner-searchable records.
             left, and must not go up until the deploy carrying `/namespace/` and
             `latest/` is live: the rules point at both.***
             *Merged as [perma-id/w3id.org#6614](https://github.com/perma-id/w3id.org/pull/6614)
-            on 2026-08-31. Measured 2026-10-05: `/sstim` answers 0.18.0, with its
+            on 2026-08-31. Measured 2026-10-05: `/sstim` answered 0.18.0, then current, as it was meant to, with its
             `owl:versionIRI`, in Turtle, JSON-LD and RDF/XML. The other
             unversioned routes did not, which is the next item.*
 - [~] **Every unversioned SSTIM IRI resolves to a release** `P1`
       *[ADR 0060](docs/decisions/0060-every-unversioned-iri-resolves-to-a-release.md),
       accepted 2026-10-05. ADR 0055 fixed `/sstim` alone. Measured 2026-10-05,
       `/sstim/vocab`, `/exposure`, `/shapes`, `/ecosystem`, the other module
-      routes, the profiles and the manifest all answered `0.19.0-dev` with no
-      `owl:versionIRI`: four of the five term namespaces dereferenced to an
+      routes, the profiles and the manifest all answered the development line
+      (it was `0.19.0-dev`) with no `owl:versionIRI`: four of the five term namespaces dereferenced to an
       unreleased graph, through 71 targets at the top of `/ontology/`.*
 
       - [x] 1. Retarget the mirror's unversioned RDF and JSON rules at
@@ -1059,8 +1060,8 @@ indexed, examiner-searchable records.
       `https://w3id.org/sstim/technique`, and another module's description,
       the stimulus module's. The file LOV stored has a single header and holds
       neither value, so the likely source is what `https://w3id.org/sstim`
-      serves: the latest release's `sstim-namespace.ttl`, which on 0.18.0
-      carries sixteen `owl:Ontology` headers, the root and fifteen modules,
+      serves: the latest release's `sstim-namespace.ttl`, which was 0.18.0's then
+      and carried sixteen `owl:Ontology` headers, the root and fifteen modules,
       each with its own title and description. A harvester that wants one IRI
       and one description for the vocabulary has to pick among them, and the
       LOV curator confirmed on 2026-09-29 that its loader offered her many and
