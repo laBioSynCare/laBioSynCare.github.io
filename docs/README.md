@@ -37,6 +37,7 @@ the two disagree, the code and the as-built docs win.
   evidence system.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
   primary validated use case.
+- [`EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md`](concept/EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md) — **candidate, not adopted** mission and architecture direction: domain-bounded reference ambition, format-independent semantic evolution, disagreement and provenance, reuse-first external alignment, and domain applicability.
 - [`SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md) — how
   symbolic SSTIM and LLMs complement each other, and the recommended public
   wording for saying so without overclaiming.
@@ -126,6 +127,7 @@ of `static/favicon.svg` and `static/icons/`.
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
+- [`AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md`](ecosystem/AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md) — **candidate, not adopted** AI-oriented interoperability demonstration, independently graded with/without-SSTIM evaluation, optional read-only agent tools, and independent-adoption gates. Complements the standing ontology directions and adoption plan without altering either.
 - [`ADOPTION.md`](ecosystem/ADOPTION.md): the **supply side** of that tracker,
   what has to exist before an outside party can adopt SSTIM, what counts as
   having adopted it (citation, tooling and data are three different things), the
