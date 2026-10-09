@@ -12,6 +12,11 @@
 > verified observation, a dependency, or a factual claim by SSTIM. The same
 > interoperability needs arise with increasingly capable present-day AI agents.
 
+**Broader conceptual direction.** This is an implementation-oriented companion
+to the [evolving SSTIM reference proposal](../concept/EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md).
+That document frames SSTIM as a durable, format-independent, federated
+knowledge reference rather than only an AI interoperability contract.
+
 ## 1. Recommendation and positioning
 
 **Keep SSTIM's public mission universal and vendor-neutral:** shared semantic
@@ -302,3 +307,157 @@ implementation, decide:
 Record adopted choices in the repository's established roadmap/task/ADR
 processes. Public-facing text should emphasize sensory interoperability,
 not the unverified existence of SAGI.
+
+## 10. Prioritize a platform-neutral contribution path
+
+**Proposed user story:** while a person or an AI assistant is discussing a
+sensory-stimulation concept in ChatGPT, Claude, a research notebook or a local
+agent, it notices an ambiguity or error. With a deliberate user action it can
+submit a *reviewable candidate*, linked to the exact SSTIM term or version,
+without requiring the user to navigate the Workbench graph. The contribution
+can then be discussed and reviewed using existing SSTIM provenance and
+publication governance.
+
+Do **not** design this as an automatic ingestion of users' entire
+conversations, private chats, or third-party scientific documents. A
+model-generated suggestion is not proof of its correctness or authorization
+to disclose underlying conversation content. Contribution must be
+user-approved and scoped to an explicit excerpt or self-contained proposal,
+with identity, consent, and privacy rules honored.
+
+### Proposed service boundary
+
+One reusable service, multiple client adapters:
+
+| Layer | Responsibility |
+|---|---|
+| Canonical SSTIM | Released term definitions, vocabularies, scopes, shapes, versioned identifiers and approved knowledge |
+| Knowledge read service | Term discovery, definition lookup, versions, scoped evidence, source links and validation |
+| **Proposal inbox (noncanonical)** | Comments, objections, corrected definitions, missing concepts, proposed external mappings, alternative models |
+| Review and attribution | Explicit identity/pseudonym policy, sources, statuses, deduplication, discussion, moderation and accepted/rejected rationale |
+| Promoted changes | Reviewed diffs, CI/validation, human-governed merge/release, backward-compatibility and migration rules |
+| Client surfaces | Workbench simple feedback form, HTTP/JSON, remote MCP, AI-app/plugin wrappers, and optional GitHub issue/PR integration |
+
+Existing Web Annotation named-graph storage, governance and
+[agent boundary](../technical/AGENT_AUTOMATION_BOUNDARY.md) are the starting
+point, not automatically a suitable production-wide public API.
+First assess authentication, consent, spam resistance, permission isolation,
+pseudonym leakage, rate limits, persistent storage, moderation workload,
+retention and deletion policy. Publishing a stable API without operational
+capacity to review submissions would create a backlog rather than a useful
+shared reference.
+
+A minimal possible *interface contract*, **not an implemented API**:
+
+- `find_concepts(query, scope?, release?)`: return cited candidates with IRIs.
+- `get_concept(iri, release?)`: definition, relations, domains, mappings, sources.
+- `get_discussion(iri, status?)`: attributed objections and proposals,
+  separate from asserted canonical truth.
+- `submit_proposal(target_iri?, kind, text, evidence_refs?, source_ref?,
+  client_id?, user_confirmation)`: create an attributable, noncanonical,
+  retrievable proposal record with status `pending_review`.
+- `get_proposal(id)`: report receipt, status, provenance, replies and
+  final disposition, subject to access controls.
+- `validate_artifact(input, profile, release)`: deterministic checking
+  with explicitly declared support and limits.
+
+**One proposal ID, regardless of client.** Read and write operations need
+separately scoped authorization. No public agent tool receives direct write
+access to the released ontology, production instance graphs, protected files,
+or real physiological stimulation. An AI's claimed origin or confidence is
+not a substitute for evidence and accountable review.
+
+### Distribution
+
+Start with a tiny public read service and a protected proposal inbox.
+Deploy one standards-based **remote MCP server** that wraps those operations,
+where compatible, with a plain HTTP/JSON API underneath. This can be used
+by ChatGPT apps/plugins, Claude custom connectors, developer agents and
+other clients without coupling SSTIM to any vendor.
+
+Creating a ChatGPT custom app/plugin or a Claude connector is a **distribution
+step** after the service has a useful contract, authentication and a successful
+end-to-end contribution. It does not make SSTIM part of model training,
+automatic global model knowledge, or every chat. Invocations remain subject to
+each host's consent, permissions, availability, and tool-selection behavior.
+Where a particular host cannot write, use read-only tools and offer the
+user a copyable or independently authenticated proposal link.
+
+### Fast first demonstration
+
+Use a non-sensitive, public SSTIM term with a real ambiguity. A user types
+"this definition conflates mechanical stimulation with the resulting
+perception" into an AI chat. With explicit confirmation the assistant submits
+a structured `propose_correction` candidate citing the term IRI and release.
+The service returns a stable receipt and review page. A maintainer can discuss,
+reject with a reason, or promote it through the existing reviewed
+ontology-change workflow. The user can later inspect the outcome from any
+compatible client. No graph navigation is required.
+
+This demonstrates collaboration and knowledge curation, not just
+interoperability.
+
+## 11. Competing knowledge claims without prematurely replacing RDF
+
+**Problem:** a single flattened RDF union can make mutually incompatible
+statements look like one authoritative model, and OWL entailment over
+contradictory axioms can be unsafe for downstream conclusions. **RDF is not
+incapable of disagreement.** Use existing standards to represent *attributed,
+scoped* claims as claims, rather than promoting them into the canonical
+default graph.
+
+Candidate pattern:
+- Each claim/proposal has a stable identifier, source, author or accountable
+  agent, dates, target concepts and qualified content.
+- An assertion or alternative model is stored in its own explicitly
+  identified graph or equivalent scoped record, with no automatic union
+  into canonical axioms.
+- PROV-O records derivation and responsibility; W3C Web Annotation records
+  target, body and motivation. Consider nanopublication conventions if
+  genuinely useful to cited, versioned claim exchange.
+- Support `supports`, `disputes`, `revises` and `supersedes` as reviewed
+  relationship *types*, not automatic truth values. These are conceptual
+  examples: do not create novel SSTIM predicates if existing external
+  standards cover the use case.
+- Keep assertions, hypotheses, proposed definitions, empirical findings and
+  governance approval in separate logical and data-access layers.
+- Query views may surface disagreements side by side; validation of an
+  assertion graph says nothing about its truth.
+
+Evaluate ordinary RDF named graphs and compatible claim/provenance models first.
+A new language, triple dialect or database is warranted only if a
+representative benchmark demonstrates a specific limitation that existing
+representations cannot address economically.
+
+## 12. Reuse-first research and knowledge services
+
+A "Protocol Passport" should not attempt to replace existing scientific
+protocol and event representations. It should **reuse or map to established
+formats by default**, add SSTIM-specific semantics only where the existing
+format cannot express the needed stimulation information, and disclose every
+lossy or partial mapping. Useful starting points include HED event semantics,
+optional BIDS Behavioral context, SOSA/SSN for sensors and observations,
+PROV-O for provenance, W3C Web Annotation for commentary, established
+quantity/unit identifiers, and relevant organism-specific vocabularies.
+
+Candidate public products:
+
+1. **Concept Reference** with natural-language search, sources,
+   version history, mappings, and disagreement-aware explanations.
+2. **Protocol Passport** from structured inputs or paper excerpts
+   (with user review, no invented measurements), validated export and
+   declared external standard alignments.
+3. **Cross-system comparison** explaining exactly which intended physical
+   parameters two specifications share or cannot compare.
+4. **Proposal inbox** accessible from AI chats and simple standalone links.
+
+Measure user utility and scientific fidelity separately from RDF conformance,
+API traffic or downloaded ontology files. Generic ontology lookup alone has
+weak differentiation; prioritize stimulus-domain interpretation, evidence,
+protocol reproducibility, and genuinely low-friction knowledge contribution.
+
+**Priority proposal:** ship the Concept Reference read contract and the
+noncanonical proposal-submission path first. Test a single end-to-end
+ChatGPT/Claude submission after host-specific authorization is verified.
+Then decide whether Protocol Passport, cross-engine adapters, or broader
+agent platform distribution delivers the most external value.
