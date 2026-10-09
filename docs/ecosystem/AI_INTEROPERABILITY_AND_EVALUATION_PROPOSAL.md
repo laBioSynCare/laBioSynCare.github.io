@@ -77,7 +77,7 @@ states the conceptual relationship; the
 governs any contemplated agent workflow. Deterministic jobs remain in
 deterministic tooling, and canonical changes require human review.
 
-## 3. First deliverable: a reproducible AI-to-SSTIM demonstrator
+## 3. First evaluation demonstration: reproducible AI-to-SSTIM exchange
 
 **Question:** Can an independent AI client convert a natural-language
 sensory design request into an interpretable SSTIM artifact that another
@@ -194,7 +194,9 @@ benchmark usage separately from standards adoption.
 ## 5. Optional read-only AI interface
 
 Expose a small, tool-neutral read-only surface before choosing or investing
-in a particular agent framework:
+in a particular agent framework. This is the **public read/validation layer**;
+a later, separately authorized proposal-submission endpoint (section 10) is
+not an exception to the no-canonical-write boundary:
 
 | Candidate operation | Input/output intention | Existing foundation |
 |---|---|---|
@@ -268,27 +270,36 @@ scope review, an ADR where needed, and the normal validation gates.
 
 ## 8. Candidate sequence and decision gates
 
-**Illustrative targets, conditional on maintainer review and available effort,
-not committed dates or delivery promises:**
+**One prioritization, not two competing roadmaps.** Begin with a narrow
+concept lookup plus a user-approved correction loop. Use the existing
+published terms, examples, Python/JavaScript clients, and annotation/review
+machinery first; the AI-to-SSTIM demonstration and controlled evaluation
+are parallel research tracks, not prerequisites for accepting a correction.
+Recruit potential independent adopters from day one.
+
+**Illustrative targets only**, conditional on maintainer review, actual
+external demand, and available effort; neither dates nor deliverables below
+are commitments:
 
 | Horizon | Candidate deliverable | Gate for proceeding |
 |---|---|---|
-| Weeks 1-2 | Version-pinned AI-to-SSTIM walkthrough with public inputs, outputs, failure modes, and reproducible validation | Unaffiliated developer can run it without unstated local knowledge |
-| First month | Small four-condition, multi-model evaluation with independent grading and published results | Results isolate semantic usefulness from mere conformance |
-| Months 1-3 | Optional thin read-only adapter, prioritized by actual client demand; external protocol-encoding invitation already running | At least one real outsider can independently consume a conformant artifact |
-| Months 3-6 | Measured two-implementation exchange and/or bounded research-data demonstrator | Explicit physical/semantic loss report and external reproduction |
-| Months 6-18 | Reviewed modality/device integrations and any justified feedback-loop work | Independent adoption and concrete measured need justify complexity |
+| Days 1-14 | Read a version-pinned concept and submit one approved, noncanonical correction with a stable public/private receipt; use an existing GitHub issue or review channel before building a new backend | An outsider can complete the full loop without navigating the ontology graph; reviewer can dispose of the proposal |
+| Days 15-30 | Make the concept read and proposal flow reusable via a small HTTP/JSON contract; demonstrate one reproducible AI-generated SSTIM artifact, and design/run an initial four-condition benchmark if capacity allows | Provenance, permission boundaries, semantic fidelity and basic usability are measured, not merely assumed |
+| Months 2-3 | Add remote MCP/host-specific adapters only after authorization and end-to-end contribution are verified; assist one external owner in producing an independently reviewable SSTIM protocol or session | A real adopter can retrieve, use and maintain an artifact in their own namespace, or concrete blockers are reported |
+| Months 3-6 | Implement a requested narrow research-tool adapter or measured two-implementation exchange | Explicit semantic/physical loss accounting and independent reproduction |
+| Months 6-18 | Consider expanded modality/sensing integrations and more elaborate automated research tools | Evidence of demand and separate governance/architecture decisions justify complexity |
 
-Track independent maintained artifacts, reproducible external uses, semantic
-fidelity, portability failures, benchmark results, and actual outside demand.
-Do not conflate registry presence, downloads, citation, one-off tool access,
-and independent data adoption.
+**Minimum success signal:** one independently submitted and reviewable
+correction, one independently useful versioned artifact, and evidence that
+a user or agent can perform the task more reliably or economically than with
+existing alternatives. Citation, registry presence, installs, and downloads
+are useful leading signals but not substitutes for sustained independent use.
 
-**Stop or redirect** if controlled evaluation provides no incremental value,
-if external parties cannot identify a use worth adopting, or if implementation
-cost outruns the value of using existing packages and conventions. A successful
-first month can end with a negative result and a well-founded decision to
-improve documentation instead of writing more code.
+Publish null/negative benchmark results. Stop or redirect new construction
+if no practical need emerges, if review capacity becomes a bottleneck, or if
+adopters gain no measurable benefit from SSTIM relative to existing
+conventions. Preserve citable releases and the accumulated reference even
+if active feature development is paused.
 
 ## 9. Decision record before implementation
 
@@ -301,7 +312,9 @@ implementation, decide:
 3. Is the first deliverable documentation plus existing CLI/scripts, or does
    it demonstrably require an agent protocol adapter?
 4. Who owns the benchmark/reference cases and external scientific review?
-5. What authorizations, privacy constraints, and device checks apply if
+5. How will an authenticated, explicitly approved proposal be distinguished
+   from automatically harvested chat content, and who can review it?
+6. What authorizations, privacy constraints, and device checks apply if
    physical execution is added later?
 
 Record adopted choices in the repository's established roadmap/task/ADR
@@ -354,8 +367,10 @@ A minimal possible *interface contract*, **not an implemented API**:
 - `get_discussion(iri, status?)`: attributed objections and proposals,
   separate from asserted canonical truth.
 - `submit_proposal(target_iri?, kind, text, evidence_refs?, source_ref?,
-  client_id?, user_confirmation)`: create an attributable, noncanonical,
-  retrievable proposal record with status `pending_review`.
+  client_id?)`: accept a separately **authenticated and explicitly approved**
+  contribution, returning a noncanonical receipt with status `pending_review`.
+  An AI-supplied `user_confirmation: true` flag is **not** proof of approval:
+  a user-visible approval step and server-enforced permissions are needed.
 - `get_proposal(id)`: report receipt, status, provenance, replies and
   final disposition, subject to access controls.
 - `validate_artifact(input, profile, release)`: deterministic checking
@@ -370,8 +385,12 @@ not a substitute for evidence and accountable review.
 ### Distribution
 
 Start with a tiny public read service and a protected proposal inbox.
-Deploy one standards-based **remote MCP server** that wraps those operations,
-where compatible, with a plain HTTP/JSON API underneath. This can be used
+For the first pilot, use a structured GitHub issue or comparable existing
+review channel as the inbox **if its permissions and visibility are suitable**.
+A public static site cannot itself securely persist untrusted public writes;
+add a narrowly scoped authenticated service only when required by the
+pilot. Expose a standards-based **remote MCP server** when a real supported
+client needs one, with a plain HTTP/JSON API underneath. This can be used
 by ChatGPT apps/plugins, Claude custom connectors, developer agents and
 other clients without coupling SSTIM to any vendor.
 
@@ -456,8 +475,7 @@ API traffic or downloaded ontology files. Generic ontology lookup alone has
 weak differentiation; prioritize stimulus-domain interpretation, evidence,
 protocol reproducibility, and genuinely low-friction knowledge contribution.
 
-**Priority proposal:** ship the Concept Reference read contract and the
-noncanonical proposal-submission path first. Test a single end-to-end
-ChatGPT/Claude submission after host-specific authorization is verified.
-Then decide whether Protocol Passport, cross-engine adapters, or broader
-agent platform distribution delivers the most external value.
+**Execution order is defined once in section 8.** The first externally
+useful loop is concept lookup -> explicitly approved proposed correction ->
+traceable review outcome. Protocol Passport and the controlled AI benchmark
+remain complementary pilots, and platform adapters follow demonstrated need.
