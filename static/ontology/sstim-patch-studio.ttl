@@ -2,7 +2,7 @@
 #
 #  SSTIM Track Parameter Module
 #
-#  Version:    0.19.0
+#  Version:    0.20.0-dev
 #  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -45,7 +45,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.19.0" ;
+    owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Track Parameter Module"@en ;
     dct:description "Audio, visual, haptic, control and authoring-tempo parameters for the tracks of an engine configuration, over the generic configuration and session model. Its former BSC catalog terms are deprecated in favour of the BSC framework vocabulary (ADR 0061)."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

@@ -984,6 +984,12 @@ indexed, examiner-searchable records.
             `sstim:SessionSpecification`: imported, it would type every Martigli
             voice a session specification. Import the 0.19.0 version IRI once
             that release exists.
+            *Done otherwise on 2026-10-10: `dct:requires` now names
+            `https://w3id.org/sstim/0.19.0`, the release the terms were built
+            against. An `owl:imports` would make `validate-profile` and
+            `entailment-check`, which reason over this file with the live
+            modules, fetch the release over the network and mix it with the
+            development line; importing needs a local catalog first.*
             The quality audit, `validate-profile`, `entailment-check`,
             `shacl-instances` and `preset-contract` load it; `void.ttl`
             describes it as a subset of the instance dataset; the term index
@@ -1026,8 +1032,20 @@ indexed, examiner-searchable records.
             terms new in 0.19.0 (`sstim:breathGuideTrack` and four exposure
             values); unversioned IRIs serve the latest release, so they appear
             with 0.19.0 itself, together with the deprecations that name them.*
-- [ ] **Cut 0.19.0** `P1`
-      *Waits on perma-id/w3id.org#6827 (step 6 above). The generic procedure is
+- [x] **Cut 0.19.0** `P1`
+      *Cut 2026-10-10: tag `v0.19.0` on both remotes, the
+      [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0) on
+      `w3c-cg/sstim`, and version DOI
+      [10.5281/zenodo.23271908](https://doi.org/10.5281/zenodo.23271908), deposited
+      over the API into the concept series; the concept DOI now resolves to it.
+      Two gates caught defects on the way: the BioPortal bundle refused a
+      history note that called the release "the 0.19.0-dev line" (fixed
+      before the snapshot was committed), and the truth audit found prose
+      still treating 0.18.0 as current. The line reopened as 0.20.0-dev the
+      same day. Step 4's import became a pinned `dct:requires`, for the
+      reason given in the BSC vocabulary's header; the registries and the
+      announcement remain.*
+      *Waited on perma-id/w3id.org#6827 (step 6 above). The generic procedure is
       in [`static/ontology/README.md`](static/ontology/README.md); these are the
       steps particular to this release.*
 

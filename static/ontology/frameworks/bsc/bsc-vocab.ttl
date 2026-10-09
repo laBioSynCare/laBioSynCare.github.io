@@ -49,7 +49,11 @@
     dct:title "BSC Framework Vocabulary"@en ;
     dct:description "The BSC framework's own terms: the catalog's voice model, its five preset groups, the Martigli oscillation's parameterisation, and the integer coding of Symmetry's permutation functions. Moved out of SSTIM's universal namespaces by SSTIM ADR 0061; it uses SSTIM 0.19.0 terms and is part of no SSTIM profile or snapshot."@en ;
     dct:isPartOf <https://w3id.org/sstim/framework/bsc> ;
-    dct:requires <https://w3id.org/sstim> ;
+    # The SSTIM release these terms were built against. Not owl:imports: the
+    # validation gates reason over this file together with SSTIM's live
+    # modules, and an import would make them fetch the release over the
+    # network and mix it with the development line.
+    dct:requires <https://w3id.org/sstim/0.19.0> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     # Published by the framework's maintainer. Not by the W3C Community Group,
@@ -57,9 +61,9 @@
     dct:publisher <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-06"^^xsd:date ;
     dct:issued "2026-10-06"^^xsd:date ;
-    dct:modified "2026-10-07"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/6421fe84843f8b506201ef5df65ead31a4e803a8/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
 
 # SSTIM's modules declare every other annotation property used here; this one
 # only this header uses, and OWL 2 DL requires the declaration.
