@@ -447,7 +447,7 @@ sstim-eco:ecosystemContributor a owl:NamedIndividual, sstim-eco:RelationshipType
     skos:notation "ecosystem-contributor" ;
     skos:definition "An agent of any kind (a person, a research group or laboratory, an institution, a company, a community, or a standards or funding body) that contributes, has contributed, or has publicly declared that it will contribute to the sensory-stimulation ecosystem in any capacity, such as research, clinical or self-directed practice, device and software development, education, art, standards work, funding, or community building."@en ;
     skos:scopeNote "The broadest relationship type in this scheme, meant for the first record that places an agent in the ecosystem. Its target is sstim:SensoryStimulation, or a narrower technique or field resource when the source names one. Time is qualified on the record: a past contribution carries sstim-eco:validUntil, and a declared future one carries sstim-eco:validFrom at the declared start and cites the agent's own public declaration as its source; a curator's guess about what an agent could do is not a declaration (ADR 0031). Specific roles (tool vendor, research collaborator, contributor to a named artifact, and the other types here) are separate records beside it. The type records relevance to the field, never endorsement of, affiliation with, or conformance to SSTIM."@en ;
-    skos:historyNote "Added on the 0.19.0-dev line by ADR 0062."@en .
+    skos:historyNote "Added in 0.19.0 by ADR 0062."@en .
 
 sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
