@@ -126,6 +126,7 @@ of `static/favicon.svg` and `static/icons/`.
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
+- [`AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md`](ecosystem/AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md) — **candidate, not adopted** AI-oriented interoperability demonstration, independently graded with/without-SSTIM evaluation, optional read-only agent tools, and independent-adoption gates. Complements the standing ontology directions and adoption plan without altering either.
 - [`ADOPTION.md`](ecosystem/ADOPTION.md): the **supply side** of that tracker,
   what has to exist before an outside party can adopt SSTIM, what counts as
   having adopted it (citation, tooling and data are three different things), the
