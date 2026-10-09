@@ -959,7 +959,7 @@ indexed, examiner-searchable records.
             hands to crawlers, moved with them. The quality audit's subset check
             now expects `latest/`, and it rejects any download naming a
             top-level development file.*
-- [ ] **Move BSC's structure out of the universal namespaces** `P1`
+- [x] **Move BSC's structure out of the universal namespaces** `P1`
       *[ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md),
       accepted 2026-10-05; the term set is in
       [Directions](docs/ontology/SSTIM_DIRECTIONS.md) §3. A 0.19.0 release gate:
@@ -1008,7 +1008,7 @@ indexed, examiner-searchable records.
             *17 delivery statuses became scoped assertions. GB-10 is not
             closed by this: the presets page still requires a version and a
             band.*
-      - [ ] 6. Route the BSC vocabulary namespace upstream, after ADR 0060's
+      - [x] 6. Route the BSC vocabulary namespace upstream, after ADR 0060's
             pull request. *Staged in the mirror on 2026-10-06 (6952ddf) and
             submitted as
             [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827)
@@ -1018,6 +1018,13 @@ indexed, examiner-searchable records.
             set the route contract's registry state to Live. ADR 0061's ordering:
             0.19.0 is not cut until every `dct:isReplacedBy` target
             dereferences.*
+            *Merged 2026-10-09 (davidlehn). Measured 2026-10-10: twenty
+            requests over every route #6827 added answered as the mirror's rules
+            say, and every target served. All 32 replacement targets in the BSC
+            vocabulary dereference and are described there. Five targets are
+            terms new in 0.19.0 (`sstim:breathGuideTrack` and four exposure
+            values); unversioned IRIs serve the latest release, so they appear
+            with 0.19.0 itself, together with the deprecations that name them.*
 - [ ] **Cut 0.19.0** `P1`
       *Waits on perma-id/w3id.org#6827 (step 6 above). The generic procedure is
       in [`static/ontology/README.md`](static/ontology/README.md); these are the

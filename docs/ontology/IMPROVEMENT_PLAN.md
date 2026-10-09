@@ -438,7 +438,7 @@ explicit instruction naming each file.
   deprecated in place; Directions §3 records what moved and what stayed. The
   upstream route for the BSC vocabulary,
   [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827), is
-  the one step left before 0.19.0. The release review on 2026-10-07 found five
+  the one step left before 0.19.0; it merged on 2026-10-09. The release review on 2026-10-07 found five
   more definitions and the notes of 14 terms that still depended on BSC or
   recorded its status, now neutral too (ADR 0061's implementation note).*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
@@ -558,7 +558,11 @@ explicit instruction naming each file.
   - *Next step:* on the development line, point at `w3c-cg/sstim`, pinned to a
     tag or a persistent route rather than `main`.
   - *Done when* no live module links to a moving branch.
-- [ ] **GB-09 Frozen serializations.**
+- [x] **GB-09 Frozen serializations.** *Closed 2026-10-10, when
+  perma-id/w3id.org#6827 (merged 2026-10-09) was measured live: `/sstim/0.18.0`
+  serves Turtle, JSON-LD, RDF/XML or an HTML release page as asked, named Turtle
+  leads, anything else gets Turtle, and `/sstim/context.jsonld` serves the live
+  context. The interim note is gone from static/ontology/README.md.*
   *Step 1 done 2026-10-06, narrowed: each frozen release's version document
   (its namespace catalogue, or the Kernel file before 0.13.0) gets JSON-LD and
   RDF/XML at deploy, verified isomorphic, with every frozen Turtle file proved

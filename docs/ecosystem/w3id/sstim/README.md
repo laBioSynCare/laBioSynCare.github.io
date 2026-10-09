@@ -75,13 +75,13 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
 | `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned modules | Live |
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
-| `/sstim/context.jsonld` | SSTIM's JSON-LD context. The live context, the one decided exception to ADR 0060: terms are deprecated, never deleted, so it grows rather than changes | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827), with the BSC routes and the version negotiation |
+| `/sstim/context.jsonld` | SSTIM's JSON-LD context. The live context, the one decided exception to ADR 0060: terms are deprecated, never deleted, so it grows rather than changes | Live since [#6827](https://github.com/perma-id/w3id.org/pull/6827) merged on 2026-10-09 |
 | `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
 | `/sstim/ecosystem/biosyncare` | The BioSynCare Ecosystem programme catalog record. Distinct from `/sstim/ecosystem` (the OWL module, matched exactly) and `/sstim/ecosystem-record/...` (live records) | Staged locally |
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
-| `/sstim/framework/bsc/vocab` | The BSC framework's own vocabulary, which no SSTIM release carries (ADR 0061). RDF: Turtle only. HTML: the knowledge browser with `?ns=bsc-v`, so a term fragment selects the `bsc-v:` term, not the SSTIM term of the same local name it replaced | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
-| `/sstim/framework/bsc/shapes` | The BSC framework's catalog shapes, Turtle for every client | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
+| `/sstim/framework/bsc/vocab` | The BSC framework's own vocabulary, which no SSTIM release carries (ADR 0061). RDF: Turtle only. HTML: the knowledge browser with `?ns=bsc-v`, so a term fragment selects the `bsc-v:` term, not the SSTIM term of the same local name it replaced | Live since [#6827](https://github.com/perma-id/w3id.org/pull/6827) merged on 2026-10-09 |
+| `/sstim/framework/bsc/shapes` | The BSC framework's catalog shapes, Turtle for every client | Live since [#6827](https://github.com/perma-id/w3id.org/pull/6827) merged on 2026-10-09 |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
 | `/sstim/implementation/bsclab/preset/{heal-theta-breathing-seed,perform-alpha-10-seed}` | Exact public BSC Lab preset records; HTML deep-links to the requested graph node and RDF returns its owning preset Turtle file | Staged locally |
@@ -89,7 +89,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/specialist/{id}` and `/sstim/organization/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/ecosystem-record/{relationship,activity,role}/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/void` | VoID + DCAT dataset description (Turtle only) | Live |
-| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files. The version IRI also negotiates: JSON-LD and RDF/XML of the release's version document, and an HTML page for a browser; any other request gets Turtle | Files live; negotiation submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
+| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files. The version IRI also negotiates: JSON-LD and RDF/XML of the release's version document, and an HTML page for a browser; any other request gets Turtle | Files live; negotiation live since [#6827](https://github.com/perma-id/w3id.org/pull/6827) merged on 2026-10-09 |
 | `/sstim/{major.minor.patch}/manifest` | The manifest frozen with a modular release | Generated only for snapshots containing `manifest.json`; absent from `0.12.0` and earlier |
 | `/sstim/{major.minor.patch}/manifest.schema.json` | The schema frozen beside a modular release manifest | Generated only for snapshots containing `manifest.schema.json`; absent from `0.12.0` and earlier |
 
