@@ -114,6 +114,7 @@ export const LLMS_SECTIONS = [
   {
     title: 'Vocabulary and ontology',
     links: [
+      ['Concept Reference API', { site: '/api/v1/index.json' }, 'versioned read-only JSON index for canonical released SSTIM terms, definitions, relations and provenance'],
       ['Term index', { repo: 'docs/ontology/TERM_INDEX.md' }, 'every class, property and SKOS concept with its module and definition, generated and CI-checked; the fastest answer to "does SSTIM have a term for X"'],
       ['Module manifest', { site: '/ontology/manifest.json' }, 'machine-readable inventory of the modules and the four profile entry points; authoritative'],
       ['JSON-LD context', { site: '/ontology/context.jsonld' }, 'for JSON-LD serialisations of SSTIM data'],

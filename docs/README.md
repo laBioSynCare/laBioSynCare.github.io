@@ -42,6 +42,8 @@ the two disagree, the code and the as-built docs win.
   symbolic SSTIM and LLMs complement each other, and the recommended public
   wording for saying so without overclaiming.
 
+- [`technical/CONCEPT_REFERENCE_API.md`](technical/CONCEPT_REFERENCE_API.md): release-versioned read-only JSON concept reference, generated from frozen ontology modules.
+
 ## `technical/` — specifications
 
 **As-built.** [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) (the live authoring
