@@ -56,6 +56,18 @@ scientific, regulatory, and governance decisions.
 
 ---
 
+## Proposed AI interoperability and evaluation work
+
+For a **candidate, not yet adopted** workstream that tests the incremental
+value of SSTIM to independent AI systems, including an AI-to-SSTIM demonstration,
+comparative model evaluation, optional read-only tool interfaces, and external
+adoption gates, see the
+[AI Interoperability and Evaluation Proposal](../ecosystem/AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md).
+This does not change the canonical-data boundary or authorize autonomous
+ontology edits or stimulation execution.
+
+---
+
 ## How to say this externally
 
 Describe SSTIM as **symbolic** AI infrastructure — ontology, knowledge graph,
