@@ -2,8 +2,8 @@
 #
 #  SSTIM Evidence and Research Governance Module
 #
-#  Version:    0.19.0-dev
-#  Date:       2026-09-23
+#  Version:    0.19.0
+#  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/evidence> a owl:Ontology ;
-    owl:versionInfo "0.19.0-dev" ;
+    owl:versionInfo "0.19.0" ;
     dct:title "SSTIM Evidence and Research Governance Module"@en ;
     dct:description "Evidence assessments, atomic propositions, qualified bases, scope, references, searches, reviews, provenance, and public-claim governance."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:issued "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -69,7 +69,7 @@ sstim:EvidenceModalityTag a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Evidence Modality Tag (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: the tag conflated sensory modality (AUD, AV, VIS, TACTILE, MULTISENSORY), intervention (BREATH), study model (PRECLINICAL), and synthesis type (REVIEW). Authoritative data uses the orthogonal basis axes; the class survives only for the generated non-authoritative 0.7 compatibility view and is removed no earlier than 1.0."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:PublicClaimLevel a owl:Class ;
@@ -79,7 +79,7 @@ sstim:PublicClaimLevel a owl:Class ;
                "Nível de Alegação Pública"@pt,
                "Nivel de Afirmación Pública"@es ;
     skos:definition "A named ceiling on what a sensory-stimulation product may assert about itself on a public-facing surface, ordered from descriptive fact to quantified/superiority claims. Each level carries the minimum evidence-tier rank required to assert at that level publicly, so over-claiming is machine-checkable. A risk-reduction classification, not legal advice."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:EvidenceClaim a owl:Class ;
@@ -87,7 +87,7 @@ sstim:EvidenceClaim a owl:Class ;
     rdfs:label "Evidence Claim"@en ;
     skos:definition "Compatibility superclass of evidence assessments. Direct instantiation is rejected by SHACL: every instance must carry a concrete evidence subtype (sstim:EvidenceAssessmentClaim). Hypotheses, research questions, boundary applicability, requirements, design objectives, planned outcomes, knowledge-status assertions, and session observations are never EvidenceClaims."@en ;
     skos:historyNote "Narrowed 2026-07-13 (ADR 0027) from a single overloaded claim class to the compatibility superclass of EvidenceAssessmentClaim."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:ClaimDirection a owl:Class ;
@@ -129,7 +129,7 @@ sstim:hasModalityTag a owl:ObjectProperty ;
     rdfs:range  sstim:EvidenceModalityTag ;
     rdfs:label  "has modality tag (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: the tag mixed sensory modality with study model and synthesis type. Authoritative data uses the orthogonal basis axes (basisSensoryModality, basisModalityApplicability, basisStudyModel, basisSynthesisType, basisIntervention). Appears only in the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:supportsRelation a owl:ObjectProperty ;
@@ -141,8 +141,8 @@ sstim:supportsRelation a owl:ObjectProperty ;
     skos:definition "Deprecated ADR 0027: the property name encodes a supporting direction the claim may not have. Use sstim:evaluatesSubject; direction lives exclusively in hasClaimDirection. Removed no earlier than 1.0."@en ;
     skos:historyNote "Deprecated 2026-07-13 in favour of sstim:evaluatesSubject (ADR 0027); original range decision from ADR 0013 is preserved on the replacement."@en ,
         "SSTIM's public data asserted it beside sstim:evaluatesSubject as a compatibility alias until 0.19.0, which stopped. Its range never admitted the neural oscillation types ADR 0049 made assessable, so the alias was wrong for those claims."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0013-evidence-support-relation-range.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0013-evidence-support-relation-range.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:citesReference a owl:ObjectProperty ;
@@ -173,7 +173,7 @@ sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:range  sstim:ReviewStatus ;
     rdfs:label  "has review status (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: review state is derived from immutable EvidenceReviewDecision records, not stored as a mutable status. A non-authoritative 0.7 compatibility view may derive it; it is excluded from validation and authorization."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:evidenceOutcome a owl:DatatypeProperty ;
@@ -221,7 +221,7 @@ sstim:hasPublicClaimLevel a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:range  sstim:PublicClaimLevel ;
     rdfs:label  "has public claim level"@en ;
     skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that supporting evidence meets the level's required tier."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:tierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -244,7 +244,7 @@ sstim:requiresEvidenceTierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label  "requires evidence tier rank"@en ;
     skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition)."@en ;
     skos:editorialNote "Provisional policy mapping: to be reconciled with the claim-level enumerations of the implementations that publish claims, and with a qualified EU MDR adviser, before any product launch."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:referenceKey a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -264,14 +264,14 @@ sstim:EvidenceAssessmentClaim a owl:Class ;
     rdfs:subClassOf sstim:EvidenceClaim ;
     rdfs:label "Evidence Assessment Claim"@en ;
     skos:definition "A versioned, immutable assessment of an identified evidence basis about one atomic bounded proposition. The sole concrete evidence-bearing class: exactly one evidence tier and one claim direction, at least one qualified evidence basis, and exactly one assessed proposition. A correction mints a new revision IRI linked with prov:wasRevisionOf; it never edits a published revision in place."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:BibliographicReference a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Bibliographic Reference"@en ;
     skos:definition "A bibliographic record of a published source. Being recorded implies neither endorsement nor permission to quote, reproduce, or display the source."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:GovernedResearchOutput a owl:Class ;
@@ -410,15 +410,15 @@ sstim:EvidenceReviewDecision a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Evidence Review Decision"@en ;
     skos:definition "An immutable review decision about one assessment revision: reviewer relationship, independence determination, and decision are independent axes. A later decision supersedes or invalidates the earlier one; no mutable effective-review pointer exists."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:evaluatesSubject a owl:ObjectProperty ;
     rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
     rdfs:label "evaluates subject"@en ;
     skos:definition "Links an evidence assessment to the preset or technique it evaluates. Neutral: the assessment's direction lives exclusively in hasClaimDirection. Replaces the directionally misleading supportsRelation."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0013-evidence-support-relation-range.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0013-evidence-support-relation-range.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:assessesProposition a owl:ObjectProperty, owl:FunctionalProperty ;

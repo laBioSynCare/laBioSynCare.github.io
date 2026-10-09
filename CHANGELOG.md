@@ -17,6 +17,10 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Nothing yet on the 0.20.0-dev line.
+
+## [0.19.0] - 2026-10-10
+
 **Upgrading from 0.18.0.** Nothing is removed. 40 terms are deprecated, and
 each still resolves and names its successor with `dct:isReplacedBy`, or says in
 a `skos:historyNote` why it has none.
@@ -1601,7 +1605,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/w3c-cg/sstim/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.19.0
 [0.18.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.18.0
 [0.17.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.17.0
 [0.16.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.16.0

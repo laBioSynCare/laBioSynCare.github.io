@@ -2,8 +2,8 @@
 #
 #  SSTIM Technique, Framework, and Protocol Module
 #
-#  Version:    0.19.0-dev
-#  Date:       2026-09-23
+#  Version:    0.19.0
+#  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/technique> a owl:Ontology ;
-    owl:versionInfo "0.19.0-dev" ;
+    owl:versionInfo "0.19.0" ;
     dct:title "SSTIM Technique, Framework, and Protocol Module"@en ;
     dct:description "Reusable technique, framework, protocol, and implementation semantics, independent of neuromodulation and evidence claims."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:issued "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -61,7 +61,7 @@ sstim:StimulationTechnique a owl:Class ;
     rdfs:label "Stimulation Technique"@en ;
     skos:definition "A reusable information-content category for a parameterizable stimulation method. Classification records the method's declared design intent and characteristic delivery, not that any response occurred."@en ;
     skos:scopeNote "The neutral technique layer over sensory stimulation and interventional neuromodulation techniques. Electrical, magnetic, acoustic, optical, thermal, and chemical stimulation are property-based views over this class, not primitive subclasses (ADR 0034 §4)."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:SensoryStimulationTechnique a owl:Class ;
@@ -92,7 +92,7 @@ sstim:SensoryStimulationFramework a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Sensory Stimulation Framework"@en ;
     skos:definition "A broad information artifact defining a family of sensory stimulation principles, techniques, protocols, evidence rules, grouping logic, and design constraints. A framework can guide multiple protocols, implementations, presets, and sessions."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0007-framework-protocol-implementation.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:StimulationProtocol a owl:Class ;
@@ -100,7 +100,7 @@ sstim:StimulationProtocol a owl:Class ;
     rdfs:subClassOf obi:0000272 ;
     rdfs:label "Stimulation Protocol"@en ;
     skos:definition "A structured method specification for using one or more stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. The neutral protocol layer over sensory stimulation and neuromodulation protocols."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:SensoryStimulationProtocol a owl:Class ;
@@ -109,15 +109,15 @@ sstim:SensoryStimulationProtocol a owl:Class ;
     rdfs:subClassOf sstim:StimulationProtocol ;
     rdfs:label "Sensory Stimulation Protocol"@en ;
     skos:definition "A structured method specification for using one or more sensory stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. A protocol is narrower than a framework and can constrain many presets."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0007-framework-protocol-implementation.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0014-preset-is-not-a-protocol.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0014-preset-is-not-a-protocol.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:SensoryStimulationImplementation a owl:Class ;
     rdfs:subClassOf prov:Entity ;
     rdfs:label "Sensory Stimulation Implementation"@en ;
     skos:definition "A concrete realization of a sensory stimulation framework or protocol, represented in SSTIM by the implementation identity and metadata. An implementation can be software, hardware, mechanical, manual, or hybrid."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0007-framework-protocol-implementation.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:ParticipantEngagementMode a owl:Class ;
@@ -125,7 +125,7 @@ sstim:ParticipantEngagementMode a owl:Class ;
     rdfs:label "Participant Engagement Mode"@en ;
     skos:definition "A controlled information category for the degree and kind of active participation a stimulation or neuromodulation method requires of the individual — from passive reception, through following an external pacing cue, to active self-regulation of one's own state. It records what the method demands of the participant, never whether that participation is effective."@en ;
     skos:scopeNote "Orthogonal to the ADR 0034 route, approach, target-site, system, and phenomenon axes: a method's engagement mode is neither implied by nor implies any of them. It is the axis that distinguishes self-regulatory practices (meditation, volitional breathwork, neurofeedback, biofeedback) and cue-following practices (paced-breathing guidance) from purely receptive exposure (binaural beats to a resting listener, tDCS). By itself it never reclassifies a method as neuromodulation; the relationship between active self-regulation and the sstim:Neuromodulation definition is discussed in ADR 0035."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:proposedMechanism a owl:ObjectProperty ;
@@ -133,7 +133,7 @@ sstim:proposedMechanism a owl:ObjectProperty ;
     rdfs:range  sstim:StimulationMechanism ;
     rdfs:label  "proposed mechanism"@en ;
     skos:definition "Links a stimulation technique to a controlled mechanism category proposed to explain a response. The relation records a hypothesis or evidence interpretation, not proof of causation."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:hasStimulusTemporalStructure a owl:ObjectProperty ;
@@ -141,14 +141,14 @@ sstim:hasStimulusTemporalStructure a owl:ObjectProperty ;
     rdfs:range  sstim:StimulusTemporalStructure ;
     rdfs:label  "has stimulus temporal structure"@en ;
     skos:definition "Links a stimulation technique to one or more controlled descriptions of its temporal organization, such as periodic, quasi-periodic, aperiodic, adaptive, continuous, pulsed, or scheduled administration."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:participantEngagementMode a owl:ObjectProperty ;
     rdfs:range sstim:ParticipantEngagementMode ;
     rdfs:label "participant engagement mode"@en ;
     skos:definition "Links a stimulation or neuromodulation process, technique, or protocol to the degree and kind of active participation it requires of the individual. Not functional: a method with distinct phases may declare more than one mode. Records what the method demands of the participant, never whether the participation is effective."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:definesTechnique a owl:ObjectProperty ;
@@ -163,7 +163,7 @@ sstim:incorporatesTechnique a owl:ObjectProperty ;
     rdfs:range  sstim:SensoryStimulationTechnique ;
     rdfs:label  "incorporates technique"@en ;
     skos:definition "Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from sstim:definesTechnique, which is reserved for techniques the framework itself defines or governs; a framework that merely applies binaural beats or photic driving incorporates them rather than defining them."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:usesTechnique a owl:ObjectProperty ;
@@ -178,7 +178,7 @@ sstim:definedByFramework a owl:ObjectProperty ;
     rdfs:range  sstim:SensoryStimulationFramework ;
     rdfs:label  "defined by framework"@en ;
     skos:definition "Links a protocol to the broader framework that defines or constrains it. The domain is the general OBI protocol class, not a stimulation protocol: a capability-boundary or baseline protocol can be authored and constrained by a framework without thereby becoming stimulation (ADR 0034 §7)."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:implementsFramework a owl:ObjectProperty ;
@@ -201,7 +201,7 @@ sstim:techniqueModality a owl:ObjectProperty ;
     rdfs:label  "technique modality"@en ;
     skos:definition "Coarse legacy/convenience relation linking a sensory stimulation technique to broad sensory modality tags. Use the SSTIM exposure module when physical delivery medium, perceived modality, device capability, body placement, experiment context, or knowledge status must be represented separately."@en ;
     skos:scopeNote "Kept unchanged for compatibility with SSTIM 0.3.0 consumers. New detailed modeling should use sstim-exposure.ttl terms such as sstim-ex:deliveryMedium, sstim-ex:perceivedModality, and sstim-ex:requiresDeviceCapability."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0010-exposure-delivery-modality.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:EntrainmentBasedTechnique owl:disjointWith sstim:NonEntrainmentTechnique .

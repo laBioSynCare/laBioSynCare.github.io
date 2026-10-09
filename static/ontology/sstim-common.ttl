@@ -2,8 +2,8 @@
 #
 #  SSTIM Common Extension Module
 #
-#  Version:    0.19.0-dev
-#  Date:       2026-09-23
+#  Version:    0.19.0
+#  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/common> a owl:Ontology ;
-    owl:versionInfo "0.19.0-dev" ;
+    owl:versionInfo "0.19.0" ;
     dct:title "SSTIM Common Extension Module"@en ;
     dct:description "Optional shared descriptors used across SSTIM concerns: bands, modalities, mechanisms, temporal structure, delivery approach, cautions, and calibrated channel quantities."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:issued "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -74,7 +74,7 @@ sstim:NeuralOscillationType a owl:Class ;
                "Tipo de Oscilación Neural"@es ;
     skos:definition "A controlled information category for a named rhythmic fluctuation of neural activity, such as the alpha or theta rhythm. Members are identified by a conventional frequency ambit together with characteristic recording topography and observation state; the ambit alone does not identify one."@en ;
     skos:scopeNote "A category, not the rhythm. Following ADR 0021, this classifies a real neurophysiological phenomenon without being that phenomenon: SSTIM records no measured neural activity, so there is no class of measured oscillation events and no instance of one. Distinct from sstim:FrequencyBand, which is a Hz interval and nothing more, and from sstim:NeuralPhenomenon, which categorises kinds of phenomena such as oscillatory dynamics rather than the named rhythms themselves."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0049-neural-oscillations-and-frequency-ambits.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0049-neural-oscillations-and-frequency-ambits.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:hasTypicalFrequencyBand a owl:ObjectProperty ;
@@ -129,7 +129,7 @@ sstim:SensoryModality a owl:Class ;
                "Modalidade Sensorial"@pt,
                "Modalidad Sensorial"@es ;
     skos:definition "A controlled information category identifying a channel of sensory perception through which stimulation is delivered or perceived. Values include auditory, visual, somatosensory, interoceptive, vestibular, and olfactory."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0021-controlled-value-semantics.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:StimulationMechanism a owl:Class ;
@@ -139,21 +139,21 @@ sstim:StimulationMechanism a owl:Class ;
                "Mecanismo de Estimulação"@pt,
                "Mecanismo de Estimulación"@es ;
     skos:definition "A controlled information category identifying a proposed neurobiological or psychophysiological pathway through which a stimulus may produce a measured response or intended effect. Mechanism assignments require separate evidence assessment."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0021-controlled-value-semantics.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:IntendedEffect a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Intended Effect"@en ;
     skos:definition "A controlled information category identifying a target change in physiological, psychological, or cognitive state that a sensory stimulation intervention is designed to facilitate. It records design intent, not a guaranteed outcome."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0021-controlled-value-semantics.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:StimulusTemporalStructure a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Stimulus Temporal Structure"@en ;
     skos:definition "The temporal organization of an applied stimulus or agent. Values cover carrier periodicity (periodic, quasi-periodic, aperiodic), closed-loop adaptation, discrete event and pulse-train patterns, and administration schedules. Values are non-disjoint and may be combined, because carrier periodicity, pulse pattern, and administration schedule are different temporal features. Detailed executed timing remains in the exposure profile."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:StimulationDeliveryApproach a owl:Class ;
@@ -161,14 +161,14 @@ sstim:StimulationDeliveryApproach a owl:Class ;
     rdfs:label "Stimulation Delivery Approach"@en ;
     skos:definition "A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external, transcutaneous, transcranial, implanted, or systemic. Detailed device, body placement, administration, and dose remain in the exposure profile."@en ;
     skos:scopeNote "Values are deliberately non-exclusive: a method may be external, transcutaneous, and transcranial at once. No approach tag is inferred from any other facet."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:stimulationDeliveryApproach a owl:ObjectProperty ;
     rdfs:range sstim:StimulationDeliveryApproach ;
     rdfs:label "stimulation delivery approach"@en ;
     skos:definition "Links a stimulation process, technique, protocol, or intervention to a coarse operational description of how the input is introduced or the interface positioned. Values are non-exclusive and may be combined."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:CautionTag a owl:Class ;
@@ -309,7 +309,7 @@ sstim:flashRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "flash rate (Hz)"@en ;
     skos:definition "Rate of luminance alternation presented to the subject, in hertz. Safety-bearing: rates in the photosensitive range are constrained at runtime rather than merely recorded."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 

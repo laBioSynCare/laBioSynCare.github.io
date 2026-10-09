@@ -2,8 +2,8 @@
 #
 #  SSTIM Engine Configuration Module
 #
-#  Version:    0.19.0-dev
-#  Date:       2026-09-23
+#  Version:    0.19.0
+#  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/configuration> a owl:Ontology ;
-    owl:versionInfo "0.19.0-dev" ;
+    owl:versionInfo "0.19.0" ;
     dct:title "SSTIM Engine Configuration Module"@en ;
     dct:description "Generic engine configurations, tracks, defaults, revision links, and configuration-to-stimulus, technique, framework, and caution relations."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:issued "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -64,9 +64,9 @@ sstim:Preset a owl:Class ;
     skos:definition "A reusable, versioned parameter configuration that makes a particular engine, instrument or design produce an intended sensory stimulation. A preset follows a protocol or framework but is not itself the protocol, and it is not the stimulation: it is the set of settings from which one engine reproduces it."@en ;
     skos:scopeNote "Engine-dependent by nature. Two engines that produce identical stimulation may have entirely unrelated presets, and two research groups will have unrelated schemas, so the field list is a property of a schema rather than of this class. The BSC catalog format and Patch Studio's patch-studio-model-1 are two such schemas; they are conformance profiles of this class, not distinct classes. \"Patch\" is a synonym, from modular-synthesis usage. The engine-independent description of what actually reaches the subject is sstim:StimulusSpecification, which is a different layer (ADR 0041)."@en ;
     skos:historyNote "Until 0.11.x the definition named \"audio architecture\" as a constituent. That described the BSC catalog format, not presets: a sensory stimulation preset may carry visual, haptic, respiratory, olfactory, gustatory or electromagnetic layers, as sstim-ex:StimulusChannel already recognises. Corrected by ADR 0041."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0007-framework-protocol-implementation.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0014-preset-is-not-a-protocol.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0014-preset-is-not-a-protocol.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:targetsFrequencyBand a owl:ObjectProperty ;
@@ -164,7 +164,7 @@ sstim:Track a owl:Class ;
     skos:definition "A single layer within an engine configuration, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
     skos:scopeNote "The generic superclass for audio, visual, haptic, and control layers. A configuration schema may define its own Track subclasses; the BSC framework's catalog voice, for example, specialises sstim:AudioTrack."@en ;
     skos:historyNote "Until 0.19.0 this note said the optional Patch Studio profile specialised sstim:Voice under sstim:AudioTrack, a subsumption ADR 0041 added after renaming the former Patch Studio control voices to LFO and Permutation. ADR 0061 moved the catalog voice to the BSC framework's vocabulary as bsc-v:Voice."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:AudioTrack a owl:Class ;
@@ -177,7 +177,7 @@ sstim:VisualTrack a owl:Class ;
     rdfs:subClassOf sstim:Track ;
     rdfs:label "Visual Track"@en ;
     skos:definition "A track whose output is visible. Rate-bearing visual tracks are subject to the runtime flash-rate safety limits recorded in the exposure module."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:HapticTrack a owl:Class ;
@@ -192,8 +192,8 @@ sstim:ControlTrack a owl:Class ;
     skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks, such as a breathing-guidance oscillation."@en ;
     skos:historyNote "Until 0.19.0 the definition named the BSC catalog's Martigli breathing guidance and its symmetry-derived signals as the current kinds of control track; ADR 0061 removed the dependence."@en ;
     skos:editorialNote "The modulation this definition describes is prose the graph cannot state: no property links a control track to the track and parameter it modulates. Two consequences follow. A configuration cannot be read to discover what drives what, and the control signal is not separable from the preset that contains it, so no shared signal object exists for two channels or two studies to be compared by. This is the abstract-signal half of SSTIM_DIRECTIONS.md §5: a time-varying function with a period or envelope and no modality, which a rendering then binds to a renderable parameter of some sensory channel. Carrier and modulator describe one audio rendering of such a signal, not the general structure — a carrier is needed because 10 Hz falls below the audible range, while a 10 Hz light flicker or vibration is presented directly."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0012-martigli-voice-parameters.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/ontology/SSTIM_DIRECTIONS.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0012-martigli-voice-parameters.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/ontology/SSTIM_DIRECTIONS.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:composedOfTrack a owl:ObjectProperty ;

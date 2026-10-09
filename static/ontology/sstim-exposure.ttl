@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.19.0-dev
-#  Date:       2026-09-23
+#  Version:    0.19.0
+#  Date:       2026-10-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -42,7 +42,7 @@
     # ADR 0044, so profiles import the exact module retrieval endpoint
     # https://w3id.org/sstim/module/exposure. An OWL 2 import names an
     # ontology *document*, not an ontology IRI, so no version IRI is needed.
-    owl:versionInfo "0.19.0-dev" ;
+    owl:versionInfo "0.19.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -50,11 +50,11 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-06-18"^^xsd:date ;
-    dct:issued "2026-09-23"^^xsd:date ;
-    dct:modified "2026-09-23"^^xsd:date ;
+    dct:issued "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0010-exposure-delivery-modality.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     skos:historyNote "Initial exposure module for post-0.3.0 ontology work. The module does not assert physiological or health effects directly; those statements must be modeled as qualified claims with evidence or knowledge status."@en ;
     skos:historyNote "0.4.0 — added left/right laterality body placements, quantitative stimulus datatype properties (frequency, flicker rate, beat frequency, duty cycle, gain, phase), the ExposureLimit class with quantified optical/flicker/hearing safety boundaries citing external standards, and the affordsDeliveryMedium capability-to-medium relation. Grounds the Sensory Field interface (ADR 0011)."@en ;
     skos:historyNote "0.4.1 — added the sstim-ex: to sstim-v: perceived-modality/sensory-channel closeMatch bridge and the somatosensory/haptic/tactile/vibrotactile convention scope notes (ADR 0019, P5.5). Released as part of SSTIM 0.5.0. Additive; no terms removed or renamed."@en ;
@@ -80,7 +80,7 @@ sstim-ex:ExposureProfile a owl:Class ;
     rdfs:label "Exposure Profile"@en ;
     skos:definition "Information artifact describing how one exploratory or operational stimulation exposure is delivered, perceived, placed, bounded, and interpreted."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0010-exposure-delivery-modality.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> .
 
 sstim-ex:PhysicalDeliveryMedium a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
@@ -123,8 +123,8 @@ sstim-ex:ExposureEffectClaim a owl:Class ;
     skos:definition "Deprecated ADR 0027: this class mixed hypotheses, questions, boundary applicability, requirements, design objectives, planned outcomes, and status assertions under evidence semantics. Its instances migrate to the role-specific statement classes; removed no earlier than 1.0."@en ;
     skos:historyNote "Deprecated 2026-07-13 by ADR 0027; the 27 live instances migrate per the ADR 0027 migration ledger."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0010-exposure-delivery-modality.md> ,
-        <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> ,
+        <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> .
 
 sstim-ex:ExperimentContext a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
@@ -144,7 +144,7 @@ sstim-ex:ExploratoryProtocol a owl:Class ;
     rdfs:label "Exploratory Protocol"@en ;
     skos:definition "Non-clinical protocol used to explore an exposure idea, capability boundary, or perceptual hypothesis without asserting treatment, diagnosis, cure, or guaranteed effect."@en ;
     skos:scopeNote "Deliberately not a subclass of any stimulation protocol: a baseline defined by the absence of stimulation, or a mere-exposure hypothesis, must not become stimulation by inheritance. An exploratory protocol that is genuinely stimulation declares that type explicitly (ADR 0034 §7)."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:PerceptualGain a owl:Class ;
@@ -194,7 +194,7 @@ sstim-ex:ExposureLimit a owl:Class ;
     rdfs:label "Exposure Limit"@en ;
     skos:definition "A quantified safety limit for an exposure, such as a maximum flash frequency, a sound-level dose, or an optical-radiation exposure boundary. An exposure limit carries a value and/or maximum frequency, an optional averaging time and body placement, and should cite the external standard it is derived from. It does not itself assert that any specific delivery is safe; it records the threshold against which a delivery is checked."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0011-sensory-field-and-flash-safety.md> .
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> .
 
 
 ###########################################################################
@@ -206,7 +206,7 @@ sstim-ex:hasExposureProfile a owl:ObjectProperty ;
     rdfs:range sstim-ex:ExposureProfile ;
     rdfs:label "has exposure profile"@en ;
     skos:definition "Links a protocol, technique, represented stimulation process or intervention, preset, or experiment instance to a structured exposure profile."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:usesStimulusChannel a owl:ObjectProperty ;
@@ -227,7 +227,7 @@ sstim-ex:StimulusChannelRole a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Stimulus Channel Role"@en ;
     skos:definition "A controlled category for the part a stimulus channel plays in an exposure: an intended causal intervention path, an associated concomitant exposure, a control or sham path, or a feedback path."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:channelRole a owl:ObjectProperty ;
@@ -235,7 +235,7 @@ sstim-ex:channelRole a owl:ObjectProperty ;
     rdfs:range sstim-ex:StimulusChannelRole ;
     rdfs:label "channel role"@en ;
     skos:definition "Links a stimulus channel to the role it plays in the exposure. Deliberate co-stimulation is not concomitant: two or more causal channels may each be intended."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 # ADR 0034 §4. Coarse technique-level characteristic for catalog navigation and
@@ -248,7 +248,7 @@ sstim-ex:characteristicDeliveryMedium a owl:ObjectProperty ;
     rdfs:range sstim-ex:PhysicalDeliveryMedium ;
     rdfs:label "characteristic delivery medium"@en ;
     skos:definition "Links a stimulation technique to a physical energy, material, or chemical agent characteristic of the method. It does not describe an executed dose or imply perception or effect; use an exposure profile for channel-level delivery."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:deliveryMedium a owl:ObjectProperty ;
@@ -312,7 +312,7 @@ sstim-ex:hasEffectClaim a owl:ObjectProperty ;
     rdfs:range sstim-ex:ExposureEffectClaim ;
     rdfs:label "has effect claim (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: the single link mixed hypotheses, questions, boundary applicability, requirements, design objectives, and planned outcomes. Use the role-specific hasHypothesis, hasResearchQuestion, hasBoundaryApplicability, hasProtocolRequirement, hasDesignObjective, hasPlannedOutcome, or hasKnowledgeStatusAssertion; removed no earlier than 1.0."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExperimentContext a owl:ObjectProperty ;
@@ -387,7 +387,7 @@ sstim-ex:hasFrequencyHz a owl:DatatypeProperty ;
     rdfs:label "frequency (Hz)"@en ;
     skos:definition "A frequency this stimulus channel presents, in hertz, without saying what role it plays. The generic parent of the frequency family; assert a subproperty where the role is known, and this one only where it genuinely is not."@en ;
     skos:historyNote "Until 0.15 this was defined as \"carrier or tone frequency\" and was functional. Both were wrong for a generic: the two senses are different things, and a channel may present several frequencies at once. ADR 0052 made it the parent of hasCarrierFrequencyHz, hasToneFrequencyHz and hasModulationFrequencyHz, and dropped functionality, which is a weakening — every existing assertion remains valid and now also entails nothing it did not before."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasCarrierFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -397,7 +397,7 @@ sstim-ex:hasCarrierFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "carrier frequency (Hz)"@en ;
     skos:definition "The frequency of a carrier this channel presents: a frequency whose job is to bear a signal the sense cannot receive directly. The 200 and 210 Hz tones of a 10 Hz binaural beat are carriers, as is the audible tone an isochronic rate modulates."@en ;
     skos:scopeNote "A carrier exists because of a limitation of the sense addressed, not because of anything about the signal: 10 Hz falls below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all. Beside sstim:renderingCarrierHz, which states the same quantity one layer up, on the rendering that chose it. This one describes emission and joins the sstim-ex:hasFrequencyHz family so a consumer can ask what a channel presents without knowing how it was specified; that one describes a binding. Where both are asserted they must agree, which SHACL enforces."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasToneFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -406,7 +406,7 @@ sstim-ex:hasToneFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range xsd:decimal ;
     rdfs:label "tone frequency (Hz)"@en ;
     skos:definition "The frequency of a tone or periodic stimulus that is itself what reaches the subject, carrying nothing — a 440 Hz reference tone, or a 10 Hz vibration delivered as itself."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasModulationFrequencyHz a owl:DatatypeProperty ;
@@ -416,7 +416,7 @@ sstim-ex:hasModulationFrequencyHz a owl:DatatypeProperty ;
     rdfs:label "modulation frequency (Hz)"@en ;
     skos:definition "The rate at which something about this channel varies, as distinct from a carrier that bears it. The general case of a flicker rate and of a beat frequency, both of which specialise it."@en ;
     skos:scopeNote "Not functional, because a channel may be modulated in more than one respect at once — amplitude at one rate and spatial position at another. Where the modulation is a flicker or a beat, assert the specific subproperty."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasFlickerRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -465,7 +465,7 @@ sstim-ex:referencePitchNote a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range xsd:string ;
     rdfs:label "reference pitch note"@en ;
     skos:definition "Named reference note whose pitch a tuning sets, commonly \"A4\"."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0017-reference-pitch-retuning.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0017-reference-pitch-retuning.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:referencePitchHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -473,7 +473,7 @@ sstim-ex:referencePitchHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range xsd:decimal ;
     rdfs:label "reference pitch (Hz)"@en ;
     skos:definition "Frequency in hertz assigned to the reference note (e.g. 432 or 440 for A4). This is a carrier/absolute-pitch attribute, not a modulation or beat frequency."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0017-reference-pitch-retuning.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0017-reference-pitch-retuning.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:retunedFromReferenceHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -2701,7 +2701,7 @@ sstim-ex:ExposureHypothesis a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Exposure Hypothesis"@en ;
     skos:definition "A testable proposition asserting an expected relation, difference, or direction for an exposure. Not evidence: it carries no tier, direction, basis, or review metadata and can never satisfy an evidence-assessment shape."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:ResearchQuestion a owl:Class ;
@@ -2744,7 +2744,7 @@ sstim-ex:KnowledgeStatusAssertion a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Knowledge Status Assertion"@en ;
     skos:definition "An immutable, scoped, dated assertion assigning an existing controlled KnowledgeStatus value to an identified subject: exactly one subject link, one status value, one as-of date, and a named corpus scope or scope note. It states what a named corpus records as of a date — never a universal claim — and carries no evidence tier, direction, basis, or review metadata."@en ;
-    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:KnowledgeStatusActivity a owl:Class ;
