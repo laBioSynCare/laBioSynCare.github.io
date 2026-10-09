@@ -5,6 +5,7 @@
   import { createAnnotationStore } from '../../rdf/annotations/AnnotationStore.js'
   import { LOCAL_USER_ID } from '../../rdf/annotations/localAnnotationStore.js'
   import { publicNameFor } from '../../rdf/annotations/annotationRdf.js'
+  import { contributionRoute, normalizeSstimIri } from '../contribute/issueDraft.js'
 
   const { target, between } = $props()
 
@@ -189,6 +190,13 @@
 </script>
 
 <div class="annotations">
+  {#if target?.iri && normalizeSstimIri(target.iri)}
+    <p class="feedback-link">
+      <a href={contributionRoute(target.iri, target.recordLabel ?? target.label)}>
+        Suggest an improvement to this entry
+      </a>
+    </p>
+  {/if}
   {#if !auth.ready}
     <p class="status"><small>Loading…</small></p>
   {:else}
@@ -337,6 +345,8 @@
     flex-direction: column;
     gap: 0.85rem;
   }
+
+  .feedback-link { margin: 0; font-size: 0.83rem; }
 
   .annotation-form,
   .edit-form {

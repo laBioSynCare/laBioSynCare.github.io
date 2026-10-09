@@ -1,91 +1,43 @@
 ---
-name: Term proposal
-about: Propose a new sensory stimulation vocabulary term
-title: "Term proposal: "
+name: Term feedback or proposal
+about: Correct, question, extend, or propose SSTIM terminology; no RDF knowledge required
+title: "SSTIM feedback: "
 labels: vocabulary, term-proposal
 assignees: ""
 ---
 
-## Proposed term
+## What kind of feedback is this?
 
-Preferred label:
+- [ ] Correction or clarification
+- [ ] Question or ambiguity
+- [ ] Alternative interpretation
+- [ ] Missing concept
+- [ ] External vocabulary mapping
 
-```text
+## Existing SSTIM concept or entry (if known)
 
-```
+Paste its URL or identifier. You can leave this blank for new concepts.
 
-Proposed URI local name:
+## What should be corrected, questioned, or added?
 
-```text
+Describe the problem or missing distinction in ordinary language.
 
-```
+## Suggested wording or alternative (optional)
 
-Example:
+What should the definition or relationship say instead?
 
-```text
-AuditoryStimulus
-```
+## Evidence, examples, or external references (optional)
 
-## Definition
+Include sources or a concrete example when possible. Different scientific
+interpretations can be recorded without assuming one is already canonical.
 
-Provide a short, precise definition.
+## Version / release (if known)
 
-## Why this term is needed
+A pinned release is useful, but you can leave this blank.
 
-Describe the use case or interoperability need.
+---
 
-## Category
-
-Select one or more:
-
-- [ ] Session
-- [ ] Stimulus
-- [ ] Modality
-- [ ] Auditory
-- [ ] Visual
-- [ ] Haptic
-- [ ] Respiratory guidance
-- [ ] Multimodal
-- [ ] Device/context
-- [ ] Safety/caution
-- [ ] Evidence
-- [ ] Dataset/provenance
-- [ ] Protocol
-- [ ] Hardware/software interoperability
-- [ ] Institutional communication
-- [ ] Other
-
-## Suggested modeling
-
-Select one:
-
-- [ ] OWL class
-- [ ] RDF property
-- [ ] SKOS concept
-- [ ] SHACL constraint
-- [ ] JSON-LD context term
-- [ ] Unsure
-
-## Example usage
-
-```ttl
-
-```
-
-or
-
-```json
-
-```
-
-## Existing related terms
-
-List related terms from existing vocabularies, if known.
-
-## Non-goals / caveats
-
-Clarify what the term should not imply.
-
-## Evidence or references
-
-Optional. Add links or citations if relevant.
+A GitHub issue is a public review proposal, **not an automatic change to SSTIM**.
+Do not paste private conversations or personal information without permission.
+For formal substantive contributions, see [CONTRIBUTING.md](https://github.com/w3c-cg/sstim/blob/main/CONTRIBUTING.md)
+and the W3C Community Group contribution requirements.

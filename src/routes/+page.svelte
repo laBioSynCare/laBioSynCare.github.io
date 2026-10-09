@@ -95,13 +95,14 @@
         { label: 'Join the W3C group', href: W3C_GROUP_URL, external: true },
         { label: 'Contribute a protocol', action: 'contribute' },
       ],
-      // Back to one secondary link. The ecosystem architecture was tried here
+      // Keep the public feedback link outside the graph. The ecosystem architecture was tried here
       // and moved to the hero: a reader who cannot yet place SSTIM Workbench
       // against BioSynCare will not scroll to the fourth card to find it. The
       // internal integration tracker was tried here too and is the
       // wrong artifact for a visitor — 500 lines of open workstreams and
       // outreach notes; it stays linked from About.
       secondary: [
+        { label: 'Suggest an improvement', href: applicationRoute('/contribute/') },
         { label: 'Partner / consortium', href: ghBlob('docs/ecosystem/CONSORTIUM_INVITATION.md'), external: true },
       ],
     },

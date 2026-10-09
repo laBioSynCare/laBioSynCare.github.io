@@ -24,6 +24,22 @@ feature, you can remove yourself with the above syntax.
 
 ---
 
+## Suggest a concept improvement without learning RDF
+
+Use the public [SSTIM feedback form](https://w3c-cg.github.io/sstim/contribute/)
+to report an ambiguous definition, an alternative interpretation, a missing
+concept, or a possible link to another vocabulary. A selected graph entry can
+prefill its exact identifier. The form prepares a GitHub issue draft that you
+review and publish yourself; it never sends a report automatically.
+
+GitHub issues are public. Do not include private chat excerpts or personal data
+without permission. Proposals remain distinct from approved SSTIM definitions,
+and maintainers can discuss and close them with a recorded rationale. Formal
+substantive contributions are subject to the W3C Community Group CLA noted
+above.
+
+---
+
 ## Technical contribution requirements from the imported baseline
 
 The repository imported an established open-source sensory-stimulation
