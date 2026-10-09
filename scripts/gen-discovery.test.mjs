@@ -88,6 +88,12 @@ test('every link llms.txt publishes has a file behind it', () => {
   // sources — prerendered routes and static assets — because `make test` runs
   // before `make build` in CI and there is no dist to look at.
   const siteSource = (path) => {
+    // API v1 is generated from checksum-verified release snapshots during the
+    // build (after this test runs), not tracked under static/. The generator
+    // has its own output tests and the subsequent build checks real artifacts.
+    if (path === '/api/v1/index.json') {
+      return [resolve(ROOT, 'scripts/gen-concept-reference.mjs')]
+    }
     if (path.startsWith('/ontology/') || path.startsWith('/schemas/')) {
       return [resolve(ROOT, `static${path.replace(/\/$/, '')}`)]
     }
