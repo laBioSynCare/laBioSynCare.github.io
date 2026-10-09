@@ -1,0 +1,937 @@
+{
+  "$schema": "https://w3id.org/sstim/0.19.0/manifest.schema.json",
+  "schemaVersion": "1.2.0",
+  "manifestIri": "https://w3id.org/sstim/manifest",
+  "suite": {
+    "id": "sstim",
+    "ontologyIri": "https://w3id.org/sstim",
+    "version": "0.19.0",
+    "status": "released",
+    "versionPolicy": "synchronized",
+    "defaultProfile": "full"
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "profileDigestFormat": "module-id\\0module-sha256\\n"
+  },
+  "inventory": {
+    "directory": "static/ontology",
+    "filePattern": "^sstim-.*\\.ttl$",
+    "excluded": [
+      {
+        "path": "static/ontology/sstim-ecosystem-private-shapes.ttl",
+        "reason": "Access-controlled audit shapes are intentionally outside the public SSTIM release and profile inventory."
+      }
+    ]
+  },
+  "namespaceDocuments": [
+    {
+      "id": "sstim",
+      "namespaceIri": "https://w3id.org/sstim#",
+      "modules": [
+        "core",
+        "stimulus",
+        "common",
+        "technique",
+        "configuration",
+        "session",
+        "evidence",
+        "neuromodulation",
+        "patch-studio",
+        "vocab",
+        "exposure",
+        "ecosystem",
+        "neuromodulation-evidence",
+        "evidence-exposure",
+        "technique-exposure",
+        "alignments"
+      ],
+      "runtime": {
+        "turtleUrl": "sstim-namespace.ttl",
+        "jsonLdUrl": "sstim-namespace.jsonld",
+        "rdfXmlUrl": "sstim-namespace.rdf"
+      },
+      "publication": {
+        "persistentUrl": "https://w3id.org/sstim"
+      }
+    },
+    {
+      "id": "exposure",
+      "namespaceIri": "https://w3id.org/sstim/exposure#",
+      "modules": [
+        "stimulus",
+        "exposure"
+      ],
+      "runtime": {
+        "turtleUrl": "sstim-exposure-namespace.ttl",
+        "jsonLdUrl": "sstim-exposure-namespace.jsonld",
+        "rdfXmlUrl": "sstim-exposure-namespace.rdf"
+      },
+      "publication": {
+        "persistentUrl": "https://w3id.org/sstim/exposure"
+      }
+    }
+  ],
+  "modules": [
+    {
+      "id": "core",
+      "title": "Sensory Stimulation Ontology (SSTIM)",
+      "roles": [
+        "semantic",
+        "core"
+      ],
+      "ontologyIri": "https://w3id.org/sstim",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-core.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "3702153526be460d9ebd2d03efd5b0a602346342b284e8fad69fcbe28cd79863"
+      },
+      "runtime": {
+        "url": "sstim-core.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/core"
+      },
+      "requires": [],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/kernel",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-core.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "stimulus",
+      "title": "SSTIM Core Stimulus Description Module",
+      "roles": [
+        "semantic",
+        "core"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/stimulus",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-stimulus.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "31bffd5d8514d3a066c811ac67a0f028367f91b08c0fa6e35e9ca3038e5c233f"
+      },
+      "runtime": {
+        "url": "sstim-stimulus.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/stimulus"
+      },
+      "requires": [
+        "core"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/stimulus",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-stimulus.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-stimulus.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "core-shapes",
+      "title": "SSTIM Core Profile SHACL Shapes",
+      "roles": [
+        "validation",
+        "support"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/core-shapes",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-core-shapes.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "71fd5d4a50d55c1cb01ea98bf6e09c5ecf161abd010d48c1b7b9beaca5410843"
+      },
+      "runtime": {
+        "url": "sstim-core-shapes.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/core-shapes"
+      },
+      "requires": [
+        "core",
+        "stimulus"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/core-shapes",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-shapes.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-core-shapes.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": false
+      }
+    },
+    {
+      "id": "common",
+      "title": "SSTIM Common Extension Module",
+      "roles": [
+        "semantic",
+        "support"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/common",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-common.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "490abbadf2fdaad120f24b8e879d0307ba00de903309f1854ae6f21c80306bed"
+      },
+      "runtime": {
+        "url": "sstim-common.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/common"
+      },
+      "requires": [
+        "stimulus"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/common",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-common.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-common.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "technique",
+      "title": "SSTIM Technique, Framework, and Protocol Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/technique",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-technique.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "5b2776c62930d36367444c27dc5d5a0dfb3efd47fcfa0816dd8d86aab5245acb"
+      },
+      "runtime": {
+        "url": "sstim-technique.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/technique"
+      },
+      "requires": [
+        "common"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/technique",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-technique.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "configuration",
+      "title": "SSTIM Engine Configuration Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/configuration",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-configuration.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "ea32df1b458ab9bb188a773211b87bfda86bb2bc73b96c476b7274e6a89e4a86"
+      },
+      "runtime": {
+        "url": "sstim-configuration.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/configuration"
+      },
+      "requires": [
+        "stimulus",
+        "common",
+        "technique"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/configuration",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-configuration.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-configuration.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "session",
+      "title": "SSTIM Intervention and Session Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/session",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-session.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "39dfcea24a7ce79be0bb6ba13f0ab5f1ea276e63b98c0ad1fb0862d8e3f956ea"
+      },
+      "runtime": {
+        "url": "sstim-session.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/session"
+      },
+      "requires": [
+        "core",
+        "stimulus",
+        "common",
+        "configuration"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/session",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-session.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-session.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "evidence",
+      "title": "SSTIM Evidence and Research Governance Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/evidence",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-evidence.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "5aa1944a997241e9a2f248229d8c7b4c00a6574dceb4cb9904fefe3256ce50f2"
+      },
+      "runtime": {
+        "url": "sstim-evidence.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/evidence"
+      },
+      "requires": [
+        "common",
+        "technique",
+        "configuration"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/evidence",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-evidence.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "neuromodulation",
+      "title": "SSTIM Neuromodulation Extension Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/neuromodulation",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-neuromodulation.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "c5bfc93f86a22b0e9a9738b4b3bd82f5fcdaf99b92eba3710ea2348741b00562"
+      },
+      "runtime": {
+        "url": "sstim-neuromodulation.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/neuromodulation"
+      },
+      "requires": [
+        "core",
+        "common",
+        "technique",
+        "session"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/neuromodulation",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-neuromodulation.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "patch-studio",
+      "title": "SSTIM Track Parameter Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/patch-studio",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-patch-studio.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "1b5564fdf005e5069e8817fe163e48dfbeda938274874fc144b8c19be585d399"
+      },
+      "runtime": {
+        "url": "sstim-patch-studio.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/patch-studio"
+      },
+      "requires": [
+        "configuration",
+        "session"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/patch-studio",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-patch-studio.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-patch-studio.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "vocab",
+      "title": "SSTIM Controlled Vocabulary",
+      "roles": [
+        "semantic",
+        "controlled-vocabulary",
+        "support"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/vocab",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-vocab.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "385781ecbb7550603621c3c1356d0bbaec3c715b05e778b08585d3d74666fe3e"
+      },
+      "runtime": {
+        "url": "sstim-vocab.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/vocab"
+      },
+      "requires": [
+        "common",
+        "evidence",
+        "neuromodulation",
+        "patch-studio",
+        "session",
+        "stimulus",
+        "technique"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/vocab",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-vocab.ttl",
+        "documentationUrl": "https://w3c-cg.github.io/sstim/ontology/docs/vocab/",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-vocab.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "exposure",
+      "title": "SSTIM Exposure and Experiment Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/exposure",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-exposure.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "333db86713a432cb2074deabf5a50f859f2c5c7049385f14b8e2f5f55305107a"
+      },
+      "runtime": {
+        "url": "sstim-exposure.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/exposure"
+      },
+      "requires": [
+        "core",
+        "configuration",
+        "evidence",
+        "stimulus",
+        "technique",
+        "vocab"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/module/exposure",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-exposure.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "ecosystem",
+      "title": "SSTIM Ecosystem Module",
+      "roles": [
+        "semantic"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/ecosystem",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-ecosystem.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "5fd838e6c95f9c5a7826c6d7dc1155bd90f172ee1ae400bbc481c870a8bf9e45"
+      },
+      "runtime": {
+        "url": "sstim-ecosystem.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/ecosystem"
+      },
+      "requires": [
+        "technique"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/ecosystem",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-ecosystem.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-ecosystem.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "neuromodulation-evidence",
+      "title": "SSTIM Neuromodulation–Evidence Bridge Module",
+      "roles": [
+        "semantic",
+        "bridge"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/neuromodulation-evidence",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-neuromodulation-evidence.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "d1d209f2b55b3b793605f79e8a342b56340eb02e7d53ffa3328de19a4082b8ad"
+      },
+      "runtime": {
+        "url": "sstim-neuromodulation-evidence.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/neuromodulation-evidence"
+      },
+      "requires": [
+        "neuromodulation",
+        "evidence"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/neuromodulation-evidence",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation-evidence.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-neuromodulation-evidence.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "evidence-exposure",
+      "title": "SSTIM Evidence–Exposure Bridge Module",
+      "roles": [
+        "semantic",
+        "bridge"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/evidence-exposure",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-evidence-exposure.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "44ee2f26b1e3e80e2e9417a4864a4630c240b5e8b4ed16d4a889862b5febfaa1"
+      },
+      "runtime": {
+        "url": "sstim-evidence-exposure.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/evidence-exposure"
+      },
+      "requires": [
+        "evidence",
+        "exposure",
+        "configuration",
+        "technique",
+        "session"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/evidence-exposure",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-evidence-exposure.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "technique-exposure",
+      "title": "SSTIM Technique–Exposure Bridge Module",
+      "roles": [
+        "semantic",
+        "bridge"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/technique-exposure",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-technique-exposure.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "1e7022df770972447966df4dc93fc3acaed09ea3e3b86c2be13facac52e615f7"
+      },
+      "runtime": {
+        "url": "sstim-technique-exposure.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/technique-exposure"
+      },
+      "requires": [
+        "exposure",
+        "vocab"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/technique-exposure",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-technique-exposure.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "alignments",
+      "title": "SSTIM External Alignments",
+      "roles": [
+        "semantic",
+        "alignments",
+        "support"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/alignments",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-alignments.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "bbcec7acb15e6f580684a78079f9d298bdf46d2dc3a1d94319e7af7687e01d26"
+      },
+      "runtime": {
+        "url": "sstim-alignments.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/alignments"
+      },
+      "requires": [
+        "core",
+        "evidence",
+        "vocab",
+        "exposure"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/alignments",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-alignments.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-alignments.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    },
+    {
+      "id": "shapes",
+      "title": "SSTIM SHACL Validation Shapes",
+      "roles": [
+        "validation",
+        "support"
+      ],
+      "ontologyIri": "https://w3id.org/sstim/shapes",
+      "version": "0.19.0",
+      "source": {
+        "path": "static/ontology/sstim-shapes.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "9cef340b7a48ca92b46a06a84d270934838f6b45d2d7b65d3c8c4516a334a79a"
+      },
+      "runtime": {
+        "url": "sstim-shapes.ttl",
+        "graphIri": "https://w3id.org/sstim/graph/shapes"
+      },
+      "requires": [
+        "core",
+        "common",
+        "configuration",
+        "ecosystem",
+        "evidence",
+        "exposure",
+        "neuromodulation",
+        "neuromodulation-evidence",
+        "patch-studio",
+        "session",
+        "stimulus",
+        "technique",
+        "vocab"
+      ],
+      "requiresProfiles": [],
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/shapes",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-shapes.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-shapes.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true,
+        "fullProfile": true
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "id": "kernel",
+      "title": "SSTIM Kernel Profile",
+      "iri": "https://w3id.org/sstim/profile/kernel",
+      "version": "0.19.0",
+      "status": "released",
+      "inferenceMode": "none",
+      "source": {
+        "path": "static/ontology/sstim-kernel-profile.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "cde87d5f084f2e5ae24272d67425786a0be3189763368e12d910cc4622d7abbe"
+      },
+      "runtime": {
+        "url": "sstim-kernel-profile.ttl"
+      },
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/profile/kernel",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-kernel-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-kernel-profile.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true
+      },
+      "modules": [
+        "core"
+      ],
+      "shapeModules": [],
+      "fixtures": {
+        "positive": [
+          "test/fixtures/rdf/kernel-profile/positive-sensory-stimulation.ttl"
+        ],
+        "outOfScope": [],
+        "adversarial": []
+      },
+      "competencyQueries": [
+        "test/competency/kernel.rq"
+      ],
+      "sha256": "992347a67bc42c4038f6b67d98327ef477175e0962f40f2096ea062c415b47d1"
+    },
+    {
+      "id": "core",
+      "title": "SSTIM Core Profile",
+      "iri": "https://w3id.org/sstim/profile/core",
+      "version": "0.19.0",
+      "status": "released",
+      "inferenceMode": "none",
+      "source": {
+        "path": "static/ontology/sstim-core-profile.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "643a4ef595bae1f144b9fc4547462ae4b3948b1eba564c203fea115359495a3d"
+      },
+      "runtime": {
+        "url": "sstim-core-profile.ttl"
+      },
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/profile/core",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-core-profile.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true
+      },
+      "modules": [
+        "core",
+        "stimulus"
+      ],
+      "shapeModules": [
+        "core-shapes"
+      ],
+      "fixtures": {
+        "positive": [
+          "test/fixtures/rdf/core-profile/positive-minimal-stimulus.ttl"
+        ],
+        "outOfScope": [
+          "test/fixtures/rdf/core-profile/out-of-scope-full-concerns.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/core-profile/adversarial-untyped-channel.ttl",
+          "test/fixtures/rdf/core-profile/adversarial-literal-target.ttl",
+          "test/fixtures/rdf/core-profile/adversarial-nonpositive-duration.ttl"
+        ]
+      },
+      "competencyQueries": [
+        "test/competency/core.rq"
+      ],
+      "sha256": "00fc7a62813d89c2544c4fcc9a1a67b1734aa292e0f3b83c39b415a883f756b2"
+    },
+    {
+      "id": "core-plus",
+      "title": "SSTIM Core Plus Profile",
+      "iri": "https://w3id.org/sstim/profile/core-plus",
+      "version": "0.19.0",
+      "status": "released",
+      "inferenceMode": "none",
+      "source": {
+        "path": "static/ontology/sstim-core-plus-profile.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "b8a23341a627c7395b347e6662af1ea1097a1ee5e95d7eff847817049b22b053"
+      },
+      "runtime": {
+        "url": "sstim-core-plus-profile.ttl"
+      },
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/profile/core-plus",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-plus-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-core-plus-profile.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true
+      },
+      "modules": [
+        "core",
+        "stimulus",
+        "common"
+      ],
+      "shapeModules": [
+        "core-shapes"
+      ],
+      "fixtures": {
+        "positive": [
+          "test/fixtures/rdf/core-plus-profile/positive-calibrated-channel.ttl"
+        ],
+        "outOfScope": [
+          "test/fixtures/rdf/core-plus-profile/out-of-scope-configuration-and-evidence.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/core-plus-profile/adversarial-uncalibrated-channel.ttl"
+        ]
+      },
+      "competencyQueries": [
+        "test/competency/core-plus.rq"
+      ],
+      "sha256": "973336fb07bdf3c8edd973a09fb6370bd1113dee1b12b430e4d5dd42d0106aef"
+    },
+    {
+      "id": "full",
+      "title": "SSTIM Full Profile",
+      "iri": "https://w3id.org/sstim/profile/full",
+      "version": "0.19.0",
+      "status": "released",
+      "inferenceMode": "none",
+      "source": {
+        "path": "static/ontology/sstim-full-profile.ttl",
+        "mediaType": "text/turtle",
+        "sha256": "d69a806843118cbebdb23948d218bba99c33af3cba774eb4d66b165fbcd6ef59"
+      },
+      "runtime": {
+        "url": "sstim-full-profile.ttl"
+      },
+      "publication": {
+        "public": true,
+        "persistentUrl": "https://w3id.org/sstim/profile/full",
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-full-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.19.0/sstim-full-profile.ttl"
+      },
+      "release": {
+        "snapshot": true,
+        "export": true
+      },
+      "modules": [
+        "core",
+        "stimulus",
+        "common",
+        "technique",
+        "configuration",
+        "session",
+        "evidence",
+        "neuromodulation",
+        "patch-studio",
+        "vocab",
+        "exposure",
+        "ecosystem",
+        "neuromodulation-evidence",
+        "evidence-exposure",
+        "technique-exposure",
+        "alignments"
+      ],
+      "shapeModules": [
+        "shapes"
+      ],
+      "fixtures": {
+        "positive": [
+          "test/fixtures/rdf/full-profile/positive-delivered-exposure.ttl",
+          "test/fixtures/rdf/full-profile/positive-recorded-session.ttl"
+        ],
+        "outOfScope": [
+          "test/fixtures/rdf/full-profile/out-of-scope-foreign-vocabulary.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/full-profile/adversarial-undelivered-channel.ttl"
+        ]
+      },
+      "competencyQueries": [
+        "test/competency/full.rq",
+        "test/competency/full-session-timeline.rq"
+      ],
+      "sha256": "0e2ebf41b2df6bd73fa603245aab49d2f723e4b31589f236310a40c4153962f2"
+    }
+  ],
+  "immutableRelease": {
+    "baseUrl": "https://w3id.org/sstim/0.19.0/",
+    "manifestUrl": "https://w3id.org/sstim/0.19.0/manifest",
+    "schemaUrl": "https://w3id.org/sstim/0.19.0/manifest.schema.json"
+  }
+}
