@@ -27,7 +27,7 @@ export const RELEASE_TITLE = 'SSTIM Workbench: Open Sensory Stimulation Platform
 
 export const RELEASE_VERSION = '0.19.0'
 export const RELEASE_DATE = '2026-10-10'
-export const VERSION_DOI = '10.5281/zenodo.22921183'
+export const VERSION_DOI = '10.5281/zenodo.23271908'
 export const CONCEPT_DOI = '10.5281/zenodo.21286974'
 
 // Facts about the ontology itself rather than the deposit, added for the

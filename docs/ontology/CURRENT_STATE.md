@@ -15,7 +15,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.19.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.19.0`, released 2026-10-10 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.22921183` | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.23271908` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | Neutrality: the BSC catalog's structure moves to the BSC framework's own vocabulary (ADR 0061), 40 terms are deprecated and name their successors, every property is held to its declared range, and the W3C Community Group publishes (ADR 0059); no term is removed | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
