@@ -428,7 +428,8 @@
       <h1>Settings</h1>
       <p class="hero-lede">
         Choose how SSTIM Workbench looks and runs here, review visual-output controls,
-        and manage the portable data held by this browser.
+        and manage the portable data held by this browser. These local preferences
+        and personal records are distinct from SSTIM's citable ontology.
       </p>
     </div>
     <div
