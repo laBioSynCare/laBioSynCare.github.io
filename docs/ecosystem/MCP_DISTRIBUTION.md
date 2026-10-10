@@ -1,173 +1,167 @@
-# SSTIM MCP public distribution
+# SSTIM MCP distribution and directory submissions
 
-**Status:** package and listing metadata prepared in the SSTIM repository.
-The npm package @sstim/mcp@0.2.0 is publicly published. Official MCP Registry
-registration and directory submissions are separate actions requiring
-appropriate canonical-publisher authorization.
-Do not describe them as complete until they have been verified independently.
+**Verified publication state (10 October 2026):** SSTIM MCP
+`@sstim/mcp@0.2.0` is published on npm, its executable successfully
+responded to an MCP discovery request from an `npx` installation outside the
+package source tree, and `io.github.w3c-cg/sstim` was successfully
+published to the **official MCP Registry**. The successful registry
+publication is recorded in [GitHub Actions run #38037758861](https://github.com/w3c-cg/sstim/actions/runs/38037758861).
 
-## Canonical identity and credit
+**Not yet verified/submitted:** Glama, Awesome MCP Servers, MCP.so and other
+community directories. Public registry publication does not itself prove a
+separate directory entry exists. Do not mark them complete without a live
+listing or accepted pull request.
 
-- **Project / author / primary steward:** [SSTIM W3C Community Group](https://www.w3.org/community/sstim/).
-- **Authoritative source:** [w3c-cg/sstim](https://github.com/w3c-cg/sstim).
-- **Thanks / acknowledgement:** [BioSynCare](https://biosyncare.com),
-  for contributions and support of the SSTIM ecosystem.
-- **npm package candidate:** `@sstim/mcp`, initial package version `0.2.0`.
-  This is an MCP adapter version, not the SSTIM ontology version.
-- **Official MCP Registry identity candidate:** `io.github.w3c-cg/sstim`.
+## Project ownership and attribution
 
-W3C Community Groups are distinct from W3C Recommendations or normative W3C
-endorsement. Package authorship conveys project stewardship and does not
-replace the repository's contributor history or imply W3C endorsement.
+- **Author and primary responsible project:** [SSTIM W3C Community Group](https://www.w3.org/community/sstim/).
+- **Canonical repository:** [w3c-cg/sstim](https://github.com/w3c-cg/sstim).
+- **Acknowledgement:** [BioSynCare](https://biosyncare.com), for contributions
+  to and support of SSTIM's ecosystem.
+- **Published npm package:** [@sstim/mcp@0.2.0](https://www.npmjs.com/package/@sstim/mcp).
+- **Official registry identity:** `io.github.w3c-cg/sstim`.
+- **Transport:** local stdio, not a hosted HTTP connector.
+- **Licensing:** Apache-2.0 for the MCP implementation. The underlying
+  ontology term content has its separately documented attribution and license.
 
-The `@sstim` npm scope is already used by `@sstim/core`. Publishing
-`@sstim/mcp` still requires an npm user with appropriate rights in that
-scope. Publishing registry identity `io.github.w3c-cg/sstim` may additionally
-require a **w3c-cg organization owner** to authorize the official registry;
-repository administrator rights alone may be insufficient.
+SSTIM is developed through a W3C Community Group; it is **not** a W3C
+Recommendation or a technology formally endorsed by W3C. Do not describe
+BioSynCare as the owner of the standard or the registry namespace.
 
-## Gate 1: validate the tarball, then publish on npm
+## Installation for public listings
 
-From a synchronized SSTIM checkout:
-
-```bash
-npm ci
-npm test -- --run packages/sstim-mcp/package.test.mjs packages/sstim-mcp/mcp.test.mjs
-cd packages/sstim-mcp
-npm pack --dry-run --json
-npm whoami
-npm publish --access public
-```
-
-The package declares `bin: { "sstim-mcp": "./server.mjs" }` and carries its
-own `LICENSE`, `README.md`, `server.json`, and source files. It
-needs no root-SSTIM checkout or runtime dependencies once installed.
-The dry-run and clean-install tests verify the actual npm tarball and CLI
-bin symlink. Do not publish until tests pass, and do not publish again under
-the same version: npm tarball releases are immutable.
-
-`npm publish` is an **authorized user action**, not a result of pushing Git.
-It may require an npm organizational permission grant, interactive 2FA, or
-an approved trusted-publishing workflow. Do not commit publish tokens or
-put them in editor MCP configurations.
-
-**Post-publish smoke check:**
+**For users:** Node.js 20+ and any local stdio MCP client. From outside the
+package's own source directory:
 
 ```bash
-npm view @sstim/mcp@0.2.0 name version bin
 npx --yes @sstim/mcp@0.2.0
 ```
 
-The second command starts an MCP stdio process and waits for an MCP client,
-so apparent inactivity is expected. In a configured agent, run
-`sstim_list_releases` and verify that the latest released ontology version
-is returned.
+The command is a stdio service and waits for client requests. To configure
+VS Code/Copilot, set `.vscode/mcp.json`:
 
-## Gate 2: official MCP Registry
-
-The published `@sstim/mcp@0.2.0` package is installable via npm (verified
-using `npx` outside the package source directory). The authoritative
-[`server.json`](../../packages/sstim-mcp/server.json) identifies the
-SSTIM W3C Community Group and credits
-[BioSynCare](https://biosyncare.com). The registry publishes metadata only;
-the npm package is already published and **must not be republished** merely
-to fix registry authorization or shorten the `server.json` description.
-
-The canonical registry name is `io.github.w3c-cg/sstim`. **Personal GitHub
-login as `ttm` cannot publish that namespace**: interactive login permits
-`io.github.ttm/*`. The official registry now requires GitHub **organization
-Owner** status for interactive publication under `w3c-cg`. A repository
-admin or public ordinary member cannot acquire this permission by making
-their org membership public.
-
-### Preferred: publish via canonical GitHub Actions OIDC (no stored secret)
-
-After synchronizing both SSTIM remotes using `make push`:
-
-1. Open [w3c-cg/sstim Actions](https://github.com/w3c-cg/sstim/actions).
-2. Select **Publish SSTIM MCP to Official Registry**.
-3. Use **Run workflow**, select branch **main**, then start it.
-4. Inspect the run: it validates `server.json`, requests an ephemeral
-   GitHub Actions OIDC token from `w3c-cg/sstim`, and submits the registry
-   record with `mcp-publisher publish`.
-
-The workflow file
-[`publish-mcp-registry.yml`](../../.github/workflows/publish-mcp-registry.yml)
-is manually triggered, guarded to run only on the canonical `w3c-cg/sstim`
-repository's `main`, and requests only `contents: read` and
-`id-token: write`. It needs **no npm token, personal access token or
-other repository secret**. GitHub OIDC derives the namespace from the
-repository owner, not from the person who clicks Run workflow. A future
-automated publication policy should be reviewed with the Community Group
-before broadening triggers or privileges.
-
-References: [official GitHub Actions/OIDC publishing
-guide](https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/github-actions.mdx)
-and [authentication rules](https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/authentication.mdx).
-
-### Alternative: an authorized organization Owner publishes interactively
-
-An actual `w3c-cg` GitHub organization Owner can instead use:
-
-```bash
-mcp-publisher validate packages/sstim-mcp/server.json
-mcp-publisher login github
-mcp-publisher publish packages/sstim-mcp/server.json
+```json
+{
+  "servers": {
+    "sstim": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
+    }
+  }
+}
 ```
 
-If registry publication fails because the npm `mcpName` verification
-field is missing, investigate the published tarball and metadata first.
-A new npm version would require a separately validated release. Do not
-switch to `io.github.ttm/sstim` just to bypass namespace authorization.
+See [per-client configurations](../../packages/sstim-mcp/README.md) for
+Codex, Claude Code, Gemini CLI, Cursor, and Neovim.
 
-Verify the live registry record **after** successful publication:
+## Standard directory description
 
-```bash
-curl -fsSL 'https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.w3c-cg/sstim'
-```
+**Name:** SSTIM MCP: Sensory Stimulation Reference
 
-Check that the registry returns the canonical name, `@sstim/mcp@0.2.0`,
-stdio transport and canonical project links. Registry listing does not
-imply W3C Recommendation or formal W3C endorsement.
+**Short description:** Read-only MCP access to SSTIM's versioned
+sensory-stimulation vocabulary, definitions, identifiers, mappings and
+provenance.
 
-## Gate 3: searchable directories
+**Full description (copy/paste):**
 
-1. **Glama:** visit [Glama servers](https://glama.ai/mcp/servers),
-   choose Add MCP Server, and submit `https://github.com/w3c-cg/sstim`.
-   The repository-root [`glama.json`](../../glama.json) names the GitHub
-   account authorized to claim the listing. It does not change the project's
-   primary group authorship. For a monorepo, point its inspector to
-   `packages/sstim-mcp` or the released npm entry as the UI permits.
-2. **Awesome MCP Servers:** once the Glama entry and its quality badge are
-   available, submit a concise listing to
-   [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers)
-   according to its current contribution requirements.
-3. **MCP.so:** submit the repository/package through
-   [its submission page](https://mcp.so/submit?type=server).
-4. **Other MCP directories:** use their current submission instructions
-   and avoid claiming a remote-hosted connector exists. SSTIM MCP currently
-   runs locally through stdio, not a public Streamable HTTP endpoint.
-
-**Directory summary (copy as appropriate):**
-
-> SSTIM MCP is a free, open-source, read-only reference server for the
-> sensory-stimulation ontology developed through the SSTIM W3C Community
-> Group. Retrieve released concepts, canonical IRIs, multilingual definitions,
-> relationships, external mappings and provenance in AI assistants. Prepare
-> user-reviewed feedback links. Supports current and legacy MCP over local
-> stdio. With thanks to BioSynCare (https://biosyncare.com).
+> SSTIM MCP is an open-source, read-only reference server for SSTIM's
+> published sensory-stimulation ontology. Give coding and research assistants
+> version-qualified definitions, canonical IRIs/CURIEs, relationships,
+> external vocabulary mappings, source provenance and a human-reviewed
+> feedback path. Supports local stdio MCP with modern and legacy protocols.
+> Authored and stewarded by the SSTIM W3C Community Group. With thanks to
+> BioSynCare (https://biosyncare.com). Install with
+> `npx --yes @sstim/mcp@0.2.0`.
 > Source: https://github.com/w3c-cg/sstim.
 
-## Acceptance criteria
+**Suggested keywords:** sensory stimulation, neuroscience, auditory,
+audiovisual, ontology, knowledge graphs, research, RDF, OWL, SKOS,
+interoperability, reproducibility, MCP, AI coding assistant.
 
-Publication is complete **only** when:
+**Four tools:** `sstim_list_releases`, `sstim_search_concepts`,
+`sstim_get_concept`, `sstim_prepare_feedback`. Feedback tool only
+generates a link; the user submits nothing automatically.
 
-- The npm package `@sstim/mcp@0.2.0` can be installed from a clean machine
-  and started in an MCP client without cloning SSTIM.
-- `io.github.w3c-cg/sstim` resolves in the official Registry and names that
-  published package.
-- At least one community directory has an inspectable working SSTIM entry.
-- Author, repository, W3C CG status, and BioSynCare acknowledgement are
-  accurately represented everywhere.
-- Both SSTIM GitHub remotes point to the exact same commit; use `make push`
-  and read both heads back before claiming the source release is distributed.
+**Example prompt:**
+
+> Search SSTIM for binaural beats and related auditory stimulation terms.
+> Return their canonical IRIs, definitions, mappings and provenance, and
+> distinguish source assertions from your own inferred recommendations.
+
+## Community directory publishing
+
+### Glama (first)
+
+1. Open [Glama: Add MCP Server](https://glama.ai/mcp/servers/add) and sign
+   in through the site's GitHub login if requested.
+2. Supply `https://github.com/w3c-cg/sstim` as the source repository.
+   For a monorepo, identify `packages/sstim-mcp/` and npm
+   `@sstim/mcp@0.2.0` if the submission UI provides these fields.
+3. Use the title and description above. The root
+   [`glama.json`](../../glama.json) authorizes GitHub user `ttm` to
+   **claim/manage the listing**, not to replace the Community Group as
+   author.
+4. Verify a real server listing and a passed inspection/quality score.
+   Record its **actual** Glama URL before constructing score-badge links.
+
+Glama's [submission FAQ](https://glama.ai/mcp/faq) describes an interactive
+GitHub-based Add Server form, with scanning after submission. Repository
+metadata cannot submit the form by itself. Do not fabricate a listing URL or
+claim it is live because `glama.json` exists.
+
+### Awesome MCP Servers (after Glama quality score)
+
+The [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers)
+curated list accepts entries as GitHub pull requests from contributor forks.
+Its current automated moderation expects a **working Glama listing with a
+score badge**, correct language/scope icons, and a category-appropriate,
+alphabetically placed entry.
+
+Once Glama issues the real URL, fork that repo, modify the appropriate
+category of `README.md`, and open a PR. A candidate listing line (replace
+`REAL_GLAMA_PATH` only with the confirmed actual path) is:
+
+```markdown
+- [w3c-cg/sstim](https://github.com/w3c-cg/sstim) 📇 ☁️ 🍎 🪟 🐧 - Read-only SSTIM ontology reference MCP server for released sensory-stimulation terms, mappings and provenance; install with `npx -y @sstim/mcp@0.2.0`. [![SSTIM MCP score](https://glama.ai/mcp/servers/REAL_GLAMA_PATH/badges/score.svg)](https://glama.ai/mcp/servers/REAL_GLAMA_PATH)
+```
+
+`☁️` is appropriate because the local client reads an online concept
+reference API, although the executable itself runs on the user's computer.
+Use the icons/category accepted by the upstream list at submission time.
+
+### MCP.so
+
+Open [MCP.so Submit Server](https://mcp.so/submit?type=server). Use the
+canonical source, npm command, description, and credit shown above.
+This is an interactive external website submission and may require
+authentication. Its paid fast-track is **not** required for our first try.
+
+### Other directories
+
+Check each service's current rules before submitting. Maintain **one**
+canonical npm package/version and **one** W3C CG GitHub source, rather than
+creating separately hosted forks. Do not describe the stdio server as a
+hosted public connector or assert a clinical outcome.
+
+## Maintenance and verifiable acceptance
+
+The package's npm tarball for version `0.2.0` is **immutable**. Updating
+the repository README or example files does not retroactively change the
+published npm tarball; package metadata/docs will catch up at a future
+intentional package release. No package version bump is required to update
+the GitHub install instructions or submit directory listings.
+
+To republish the **official registry metadata** in a future version, use
+the repository's protected, manually triggered
+[Publish SSTIM MCP to Official Registry workflow](../../.github/workflows/publish-mcp-registry.yml)
+on `w3c-cg/sstim` main. It authenticates using GitHub Actions OIDC,
+without npm tokens or personal owner credentials. First synchronize
+the exact same commit to both SSTIM remotes using `make push`.
+The 0.2.0 registry registration has already succeeded; do **not**
+rerun publishing merely to list the same artifact elsewhere.
+
+Mark public distribution complete only after the independent directories
+actually show the entry or an upstream PR is accepted. Track Glama URL
+and score, Awesome PR URL/merge, and MCP.so listing URL. The official
+registry identity remains `io.github.w3c-cg/sstim`.

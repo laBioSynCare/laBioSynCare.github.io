@@ -157,19 +157,46 @@ dual-typed OWL individuals and SKOS concepts. See the
 [ontology source guide](static/ontology/README.md), and
 [ADR index](docs/decisions/README.md).
 
-## Concept Reference API and MCP
+## SSTIM MCP: installable reference for AI agents
 
-The released SSTIM ontology is exposed through a
-[version-pinned read-only JSON reference](docs/technical/CONCEPT_REFERENCE_API.md).
-For AI hosts with local MCP support, the
-[SSTIM MCP adapter](packages/sstim-mcp/README.md) exposes tools for released
-concept discovery, exact lookup, and user-reviewed feedback links. It reads
-frozen releases (currently **0.19.0**) and never writes to the ontology.
+**Published:** [`@sstim/mcp@0.2.0`](https://www.npmjs.com/package/@sstim/mcp),
+official MCP Registry identity `io.github.w3c-cg/sstim`
+([successful canonical OIDC registration](https://github.com/w3c-cg/sstim/actions/runs/38037758861)).
+The local **stdio** MCP adapter exposes four read-only tools: list released
+versions, search concepts, retrieve exact terms with definitions/mappings/
+provenance, and prepare a human-reviewed feedback link. It consults the
+[release-pinned Concept Reference API](docs/technical/CONCEPT_REFERENCE_API.md);
+it never mutates the ontology. No source checkout, login or API key is required
+to run the published package with Node.js 20+.
 
-The MCP adapter is packaged for distribution as `@sstim/mcp` (npm publication
-pending), with the [SSTIM W3C Community Group](https://www.w3.org/community/sstim/)
-as primary author/steward and [BioSynCare](https://biosyncare.com) acknowledged
-for its support. See [distribution and directory registration](docs/ecosystem/MCP_DISTRIBUTION.md).
+**Quick installation, VS Code + Copilot Agent** (`.vscode/mcp.json`):
+
+```json
+{
+  "servers": {
+    "sstim": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
+    }
+  }
+}
+```
+
+For Codex use `[mcp_servers.sstim]` with `command = "npx"` and
+`args = ["--yes", "@sstim/mcp@0.2.0"]`.
+[Installation instructions for Codex, Claude Code, Gemini CLI, Cursor and
+Neovim](packages/sstim-mcp/README.md) include the appropriate client-specific
+configuration.
+
+**Try asking your agent:** “Use SSTIM to find the canonical terminology for
+binaural beats, retrieve each relevant term's source and provenance, and
+propose a mapping for my session JSON without inventing any ontology IRIs.”
+
+**Stewardship:** [SSTIM W3C Community Group](https://www.w3.org/community/sstim/)
+(primary author/project); with thanks to [BioSynCare](https://biosyncare.com)
+for support and contributions. Community Group publication is not a W3C
+Recommendation or formal endorsement. [Distribution and public directories](docs/ecosystem/MCP_DISTRIBUTION.md).
 
 ## SSTIM Workbench
 

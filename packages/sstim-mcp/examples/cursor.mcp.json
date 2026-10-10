@@ -1,9 +1,10 @@
 {
   "mcpServers": {
     "sstim": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"
+        "--yes",
+        "@sstim/mcp@0.2.0"
       ]
     }
   }

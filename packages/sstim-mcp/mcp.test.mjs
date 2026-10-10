@@ -97,7 +97,7 @@ describe('SSTIM MCP Concept Reference client', () => {
 describe('editor MCP configuration examples', () => {
   const sample = name => readFileSync(new URL('./examples/' + name, import.meta.url), 'utf8')
 
-  it('gives a runnable local-stdio shape to VS Code, Cursor and Gemini', () => {
+  it('provides npm-backed stdio configurations for VS Code, Cursor, and Gemini', () => {
     const vscode = JSON.parse(sample('vscode.mcp.json'))
     const cursor = JSON.parse(sample('cursor.mcp.json'))
     const gemini = JSON.parse(sample('gemini.settings.json'))
@@ -105,20 +105,20 @@ describe('editor MCP configuration examples', () => {
     expect(vscode.servers.sstim.type).toBe('stdio')
     for (const config of [vscode.servers.sstim, cursor.mcpServers.sstim,
       gemini.mcpServers.sstim]) {
-      expect(config.command).toBe('node')
-      expect(config.args).toHaveLength(1)
-      expect(config.args[0]).toMatch(/^\/absolute\/path\/to\/sstim\/packages\/sstim-mcp\/server\.mjs$/)
+      expect(config.command).toBe('npx')
+      expect(config.args).toEqual(['--yes', '@sstim/mcp@0.2.0'])
     }
   })
 
-  it('documents distinct Codex TOML and Neovim Lua settings', () => {
+  it('provides correct npm command fields to Codex TOML and Neovim Lua', () => {
     const codex = sample('codex.config.toml')
     const neovim = sample('neovim-codecompanion.lua')
     expect(codex).toContain('[mcp_servers.sstim]')
-    expect(codex).toContain('command = "node"')
+    expect(codex).toContain('command = "npx"')
+    expect(codex).toContain('args = ["--yes", "@sstim/mcp@0.2.0"]')
     expect(neovim).toContain('require("codecompanion").setup')
     expect(neovim).toContain('default_servers = { "sstim" }')
-    expect(neovim).toContain('cmd = { "node"')
+    expect(neovim).toContain('cmd = { "npx", "--yes", "@sstim/mcp@0.2.0" }')
   })
 })
 

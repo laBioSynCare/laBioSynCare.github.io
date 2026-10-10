@@ -21,48 +21,36 @@ the authority behind the open SSTIM vocabulary.
 
 Community Group work is not a W3C Recommendation or a W3C-endorsed product.
 
-### Install from npm (once released)
+### Install from npm (published)
 
-The package is prepared for publication as **`@sstim/mcp@0.2.0`**, under
-the same established `@sstim` scope as `@sstim/core`.
-After an authorized npm publisher publishes the package, use:
+**`@sstim/mcp@0.2.0` is published and has been successfully executed from
+npm.** It is listed as `io.github.w3c-cg/sstim` in the official
+[MCP Registry](https://registry.modelcontextprotocol.io/), registered by
+[the canonical W3C Community Group repository via OIDC](https://github.com/w3c-cg/sstim/actions/runs/38037758861).
+
+With Node.js 20+ and a compatible stdio MCP client, set **command** `npx`
+and **arguments** `["--yes", "@sstim/mcp@0.2.0"]`. The server needs no
+checkout or API token. For a smoke test, run it outside
+`packages/sstim-mcp/`: npm may resolve the local package there instead of
+the published executable.
 
 ```bash
+cd /tmp
 npx --yes @sstim/mcp@0.2.0
 ```
 
-For MCP clients, set command `npx` and args
-`["--yes", "@sstim/mcp@0.2.0"]`. For example, VS Code:
+The command waits for protocol messages; silence is expected until the
+MCP client sends them. Pin the exact npm version for reproducibility.
+Run `node packages/sstim-mcp/server.mjs` from a checkout only for development.
 
-```json
-{
-  "servers": {
-    "sstim": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
-    }
-  }
-}
-```
-
-This is the **post-publication configuration**, not yet a claim that npm hosts
-the package. Unlike the local-checkout examples below, it requires no SSTIM
-source checkout. Pin an explicit package version for reproducible installations.
-A local checkout remains supported for development.
-
-Publication metadata is in [`server.json`](server.json) and
-[`package.json`](package.json). The canonical official MCP Registry
-identity is `io.github.w3c-cg/sstim`. Personal login as a repository admin
-cannot publish that organization namespace. The recommended path is the
-[manually triggered GitHub Actions OIDC workflow](../../.github/workflows/publish-mcp-registry.yml)
-on the canonical `w3c-cg/sstim` repository after both remotes are synchronized.
-See [distribution instructions](../../docs/ecosystem/MCP_DISTRIBUTION.md).
+[Distribution and directory-listing status](../../docs/ecosystem/MCP_DISTRIBUTION.md).
+The npm `0.2.0` tarball is immutable; subsequent repository documentation
+edits are reflected in npm's package README only with a future release.
 
 ## Prerequisites
 
 - Node.js 20+ on the machine where the AI client runs.
-- An SSTIM checkout for **local development**, for example `git clone https://github.com/w3c-cg/sstim` (not needed once installed from npm).
+- SSTIM checkout **only if developing the server**. It is not needed for the published npm package.
 - Network access to the read-only reference API (default below).
 - An AI client with support for local stdio MCP servers.
 
@@ -105,8 +93,8 @@ Create or update `.vscode/mcp.json` in **your project** using the
   "servers": {
     "sstim": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
     }
   }
 }
@@ -129,8 +117,8 @@ project-scoped `.codex/config.toml`). Append the contents of
 
 ```toml
 [mcp_servers.sstim]
-command = "node"
-args = ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+command = "npx"
+args = ["--yes", "@sstim/mcp@0.2.0"]
 ```
 
 Or configure the server via the Codex IDE extension:
@@ -145,13 +133,13 @@ Reference: [Codex MCP configuration](https://developers.openai.com/codex/mcp).
 Run in a terminal (using the same Claude Code installation as your extension):
 
 ```bash
-claude mcp add --transport stdio --scope user sstim -- node /absolute/path/to/sstim/packages/sstim-mcp/server.mjs
+claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.2.0
 claude mcp get sstim
 ```
 
 Then open Claude Code (CLI or VS Code extension) and check the **/mcp** menu
 to confirm the server is connected and tools are visible. The `--` separator
-is important: arguments after it belong to `node`, not to Claude's CLI.
+is important: arguments after it belong to `npx`, not to Claude's CLI.
 For a shared project installation instead of a personal user installation,
 consult the project's `.mcp.json` and approval rules.
 
@@ -166,8 +154,8 @@ Add to your user `~/.gemini/settings.json` or project
 {
   "mcpServers": {
     "sstim": {
-      "command": "node",
-      "args": ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
     }
   }
 }
@@ -177,7 +165,7 @@ See [`examples/gemini.settings.json`](examples/gemini.settings.json).
 Alternatively use:
 
 ```bash
-gemini mcp add -s user sstim node /absolute/path/to/sstim/packages/sstim-mcp/server.mjs
+gemini mcp add -s user sstim npx --yes @sstim/mcp@0.2.0
 ```
 
 Open Gemini CLI and use **/mcp** to inspect connectivity and exposed tools.
@@ -196,8 +184,8 @@ with the contents of [`examples/cursor.mcp.json`](examples/cursor.mcp.json):
 {
   "mcpServers": {
     "sstim": {
-      "command": "node",
-      "args": ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
     }
   }
 }
@@ -219,7 +207,7 @@ require("codecompanion").setup({
   mcp = {
     servers = {
       sstim = {
-        cmd = { "node", "/absolute/path/to/sstim/packages/sstim-mcp/server.mjs" },
+        cmd = { "npx", "--yes", "@sstim/mcp@0.2.0" },
       },
     },
     opts = {
