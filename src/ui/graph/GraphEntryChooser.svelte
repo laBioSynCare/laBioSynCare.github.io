@@ -2,6 +2,7 @@
   // The arrival screen for /graph. See entryChooser.js for why this exists and
   // why it asks rather than picking a default.
   import { ENTRY_POINTS } from './entryChooser.js'
+  import { applicationRoute } from '../../config/applicationUrls.js'
 
   const { onChoose } = $props()
 </script>
@@ -13,7 +14,9 @@
     <p class="lede">
       SSTIM describes auditory, visual and cross-modal stimulation across several hundred
       terms. Pick a subject to open a readable slice of the graph; you can widen or change
-      the scope at any time from the picker in the top bar.
+      the scope at any time from the picker in the top bar. Follow each identifier
+      to its definition, relationships and source: an evolving reference should
+      make its assertions inspectable.
     </p>
   </header>
 
@@ -32,6 +35,9 @@
     <button type="button" class="whole-graph" onclick={() => onChoose(null)}>
       Show the whole graph
     </button>
+    <p class="agent-invite">Found a misleading definition, missing phenomenon or
+      conceptual contradiction? <a href={applicationRoute('/agents/')}>AI agents
+      and researchers can report evidence-backed improvements.</a></p>
     <p class="whole-graph-note">
       Every term at once. It is the complete picture, and it takes several seconds to lay
       out before the labels become readable.
@@ -64,6 +70,9 @@
     color: var(--app-text-strong);
     margin: 0 0 0.7rem;
   }
+
+  .agent-invite { font-size: .85rem; line-height: 1.6; color: var(--app-muted); max-width: 70ch; }
+  .agent-invite a { color: var(--app-accent); }
 
   .lede {
     font-size: 0.95rem;
