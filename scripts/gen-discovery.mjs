@@ -105,6 +105,9 @@ export const LLMS_SECTIONS = [
     title: 'Start here',
     links: [
       ['SSTIM overview and status', { repo: 'README.md' }, 'what SSTIM is, what exists now, and where every version fact is derived from'],
+      ['Living reference vision', { repo: 'docs/concept/REFERENCE_VISION.md' }, 'how SSTIM evolves while preserving published meaning and provenance'],
+      ['AI agents: contribution invitation', { site: '/agents/' }, 'report real needs, flaws, missing concepts, evidence conflicts or reproducibility failures for human review'],
+      ['Reviewable contribution form', { site: '/contribute/' }, 'prepare a GitHub issue draft; nothing is submitted automatically'],
       ['SSTIM manual and tutorials', { site: '/manual/' }, 'six practical guides: Workbench, ontology, Python, JavaScript, AI/MCP and repository workflows'],
       ['MCP use cases and installation', { site: '/manual/mcp/' }, 'real agent tasks, setup, release comparison, code mapping and feedback'],
       ['Scope', { repo: 'docs/concept/SCOPE.md' }, 'what SSTIM claims'],
@@ -188,6 +191,7 @@ export const LLMS_SECTIONS = [
 /** The documents llms-full.txt inlines, in reading order. */
 export const LLMS_FULL_DOCUMENTS = [
   'README.md',
+  'docs/concept/REFERENCE_VISION.md',
   'docs/concept/SCOPE.md',
   'docs/concept/NON_SCOPE.md',
   'docs/ontology/CURRENT_STATE.md',
@@ -210,7 +214,7 @@ export function buildLlmsIndex({ siteRoot, repository, facts }) {
   }).join('\n')
 
   return (
-    `# SSTIM: Sensory Stimulation Vocabulary\n` +
+    `# SSTIM: A Living Reference for Sensory Stimulation\n` +
     `\n` +
     `> An open ontology, SKOS vocabulary and SHACL validation suite for describing ` +
     `sensory-stimulation protocols, stimuli, modalities, parameters, exposure boundaries, ` +
