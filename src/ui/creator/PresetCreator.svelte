@@ -2,6 +2,7 @@
   import { onDestroy, onMount, tick } from 'svelte'
   import { afterNavigate, replaceState } from '$app/navigation'
   import { applicationRoute } from '../../config/applicationUrls.js'
+  import BrandHomeLink from '../navigation/BrandHomeLink.svelte'
   import Knob from './Knob.svelte'
   import SpatialTrackInspector from './SpatialTrackInspector.svelte'
   import StudioVisualStage from './StudioVisualStage.svelte'
@@ -1708,6 +1709,7 @@
   <!-- ── HEADER ── -->
   <header class="hdr">
     <div class="hdr-name">
+      <BrandHomeLink compact size={30} />
       <input class="patch-name" aria-label="Patch name" bind:value={draft.patchName} placeholder="Patch name" />
       <span
         class="pill"
@@ -1933,6 +1935,9 @@
       <details class="nav-menu">
         <summary title="Navigate">+</summary>
         <div class="nav-panel">
+          <a href={applicationRoute('/')}>Home</a>
+          <a href={applicationRoute('/agents/')}>AI agents: contribute</a>
+          <a href={applicationRoute('/contribute/')}>Report a flaw or need</a>
           <a href={applicationRoute('/creator/')}>Patch Studio</a>
           <a href={applicationRoute('/settings/')}>Settings</a>
           <a href={applicationRoute('/presets/')}>Presets</a>
@@ -1954,6 +1959,7 @@
           <h3>Patch Studio</h3>
           <button type="button" class="studio-help-close" aria-label="Close help" onclick={closeHelp}>✕</button>
         </header>
+        <p class="studio-reference-note">This is non-normative reference software. A patch describes intended settings; it does not establish measured physical delivery, perception or an effect. Find a missing parameter or an interoperability problem? <a href={applicationRoute('/agents/')}>Humans and AI agents can report it for review.</a></p>
         <dl>
           {#each STUDIO_HELP as item}
             <div>
@@ -2840,6 +2846,8 @@
     min-height: 0;
   }
 
+  .studio-reference-note { font-size: .8rem; line-height: 1.5; margin: 0 0 1rem; color: var(--mut); }
+  .studio-reference-note a { color: var(--acc); }
   .hdr-name {
     display: flex;
     align-items: center;
@@ -3338,7 +3346,7 @@
     right: 0;
     top: calc(100% + 4px);
     z-index: 60;
-    min-width: 120px;
+    min-width: 190px;
     background: var(--sur2);
     border: 1px solid var(--bdr);
     border-radius: 4px;
