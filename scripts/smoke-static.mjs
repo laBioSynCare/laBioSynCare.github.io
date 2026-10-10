@@ -13,6 +13,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { normalizeDeploymentBase } from '../deployment.config.js'
+import { MANUAL_CHAPTERS } from '../src/ui/manual/chapters.js'
 import { serveDist } from './static-host.mjs'
 
 const DIST = resolve(process.argv[2] ?? 'dist')
@@ -65,6 +66,10 @@ async function main() {
       ['/namespace/', 'Linked-data namespace'],
       ['/about/', 'About'],
       ['/settings/', 'Settings'],
+      // All published manual pages must be real prerendered HTML at both
+      // GitHub Pages mounts and on self-hosted Nix/OCI deployments.
+      ['/manual/', 'SSTIM Manual'],
+      ...MANUAL_CHAPTERS.map(chapter => [`/manual/${chapter.id}/`, chapter.title]),
     ]
     for (const [route, marker] of routes) {
       const r = await fetch(base + route)

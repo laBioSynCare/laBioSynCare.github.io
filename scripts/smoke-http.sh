@@ -43,7 +43,7 @@ else
 fi
 
 # 2. Every prerendered route returns its own page, not a fallback.
-for route in graph creator sparql presets logbook settings about; do
+for route in graph creator sparql presets logbook settings about manual manual/mcp; do
   if fetch "/$route/"; then ok "GET /$route/"; else bad "GET /$route/" "not served"; fi
 done
 

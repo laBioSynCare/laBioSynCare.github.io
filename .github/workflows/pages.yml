@@ -108,6 +108,13 @@ jobs:
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-${{ runner.os }}-
 
+      # Nix downloads exact fixed-output dependencies (including ROBOT's
+      # checksum-pinned jar). A temporary upstream/mirror outage can fail the
+      # shell before npm starts. Retry only recognized transport failures;
+      # semantic or hash mismatches fail immediately and never get masked.
+      - name: Prepare pinned Nix environment with bounded network retries
+        run: bash scripts/ci-warm-nix.sh
+
       - name: Install dependencies
         run: nix develop --command npm ci
 

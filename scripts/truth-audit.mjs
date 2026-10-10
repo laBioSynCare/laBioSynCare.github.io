@@ -20,6 +20,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { Parser } from 'n3'
+import { isSstimNpmVersion } from './truth-audit-version.js'
 
 const VERBOSE = process.argv.includes('--verbose')
 const problems = []
@@ -154,6 +155,9 @@ const PROSE = ['README.md', 'SECURITY.md', 'docs/technical/PORTABLE_DEPLOYMENT.m
 // Any SSTIM x.y.z that is not the current one, outside a changelog/history line.
 const olderVersion = /\bv?(\d+\.\d+\.\d+)\b/g
 
+// A pinned npm version is not an ontology release. A bare 0.x.y in prose
+// remains subject to the release check; only an exact @sstim package/version
+// token is exempt. Keep this per-match, not per-line: prose may mention both.
 // Text that legitimately names an old version: history, changelogs, ranges
 // ("v0.2.0 through v0.12.0"), and struck-through gap rows recording what a gap
 // *used to say*. Without this the audit flags its own evidence of progress.
@@ -202,6 +206,7 @@ for (const file of PROSE) {
     if (!/sstim|ontology|release/i.test(line)) return
     for (const m of line.matchAll(olderVersion)) {
       const found = m[1]
+      if (isSstimNpmVersion(line, m.index)) continue
       if (found === VERSION.split('-', 1)[0] || found === RELEASE_VERSION || found === APP_VERSION) continue
       // Only complain about things shaped like an SSTIM release.
       if (!/^0\.\d+\.\d+$/.test(found)) continue
