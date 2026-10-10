@@ -185,7 +185,8 @@
       <p class="subhead">
         Browse reproducible configuration records, see exactly what each one contains,
         and inspect the evidence and provenance attached to it. These are non-clinical
-        reference seeds—not promises of a health or performance outcome.
+        reference seeds, not promises of a health or performance outcome.
+        <a href={applicationRoute('/agents/')}>Report an inaccurate or incomplete record.</a>
       </p>
       <div class="hero-actions" aria-label="Catalog actions">
         <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio <span aria-hidden="true">→</span></a>
