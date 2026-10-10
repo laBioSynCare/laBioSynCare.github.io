@@ -48,6 +48,8 @@ the two disagree, the code and the as-built docs win.
 
 - [`../packages/sstim-mcp/`](../packages/sstim-mcp/): locally runnable read-only MCP server for AI systems, using the generated Concept Reference API and preserving published-release provenance.
 
+- [`technical/AI_CONTRIBUTION_IN_RDF_PLAN.md`](technical/AI_CONTRIBUTION_IN_RDF_PLAN.md): explicitly deferred, separately authorized work to make feedback invitations visible inside RDF headers and annotation metadata; no protected RDF or immutable releases are changed by the website call.
+
 ## `technical/` — specifications
 
 **As-built.** [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) (the live authoring
