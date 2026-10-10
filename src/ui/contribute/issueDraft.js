@@ -8,6 +8,9 @@ export const FEEDBACK_KINDS = Object.freeze([
   { value: 'alternative', label: 'Alternative interpretation' },
   { value: 'missing', label: 'Missing concept' },
   { value: 'mapping', label: 'External vocabulary mapping' },
+  { value: 'flaw', label: 'Validation, implementation, or reproducibility flaw' },
+  { value: 'need', label: 'Unmet research or technology need' },
+  { value: 'evidence', label: 'Evidence gap or conflicting scientific claim' },
 ])
 
 const root = PREFIXES.sstim.replace(/#$/, '')
