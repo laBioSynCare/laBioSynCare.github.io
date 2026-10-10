@@ -129,6 +129,9 @@ of `static/favicon.svg` and `static/icons/`.
 
 ## `ecosystem/` — IP, governance, outreach
 
+- [`MCP_DISTRIBUTION.md`](ecosystem/MCP_DISTRIBUTION.md): npm packaging, official MCP Registry, Glama and community-directory publishing gates; attribution and verification.
+
+
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
 - [`AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md`](ecosystem/AI_INTEROPERABILITY_AND_EVALUATION_PROPOSAL.md) — **candidate, not adopted** AI-oriented interoperability demonstration, independently graded with/without-SSTIM evaluation, optional read-only agent tools, and independent-adoption gates. Complements the standing ontology directions and adoption plan without altering either.

@@ -2,6 +2,8 @@
 // Read-only SSTIM MCP adapter for both 2026-07-28 stateless requests
 // and 2025-era initialize-based sessions over stdio.
 // One JSON-RPC message per line; no HTTP server, credentials or writes.
+import { realpathSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { createInterface } from 'node:readline'
 import { createConceptClient, DEFAULT_API_BASE } from './client.mjs'
 
@@ -231,6 +233,6 @@ export function serveStdio({ input = process.stdin, output = process.stdout } = 
   return lines
 }
 
-if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).href) {
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   serveStdio()
 }

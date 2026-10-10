@@ -1,0 +1,64 @@
+{
+  "name": "@sstim/mcp",
+  "version": "0.2.0",
+  "mcpName": "io.github.w3c-cg/sstim",
+  "description": "Read-only, release-pinned SSTIM sensory-stimulation ontology reference for MCP AI clients. By the SSTIM W3C Community Group.",
+  "keywords": [
+    "sstim",
+    "mcp",
+    "model-context-protocol",
+    "sensory-stimulation",
+    "neuroscience",
+    "ontology",
+    "semantic-web",
+    "rdf",
+    "skos",
+    "owl",
+    "auditory-stimulation",
+    "audiovisual",
+    "research",
+    "interoperability",
+    "open-science"
+  ],
+  "homepage": "https://w3id.org/sstim",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w3c-cg/sstim.git",
+    "directory": "packages/sstim-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/w3c-cg/sstim/issues"
+  },
+  "author": {
+    "name": "SSTIM W3C Community Group",
+    "url": "https://www.w3.org/community/sstim/"
+  },
+  "contributors": [
+    {
+      "name": "BioSynCare",
+      "url": "https://biosyncare.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "sstim-mcp": "./server.mjs"
+  },
+  "exports": {
+    "./client": "./client.mjs"
+  },
+  "files": [
+    "server.mjs",
+    "client.mjs",
+    "README.md",
+    "LICENSE",
+    "server.json",
+    "examples"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

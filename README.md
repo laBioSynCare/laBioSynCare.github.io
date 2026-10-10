@@ -166,6 +166,11 @@ For AI hosts with local MCP support, the
 concept discovery, exact lookup, and user-reviewed feedback links. It reads
 frozen releases (currently **0.19.0**) and never writes to the ontology.
 
+The MCP adapter is packaged for distribution as `@sstim/mcp` (npm publication
+pending), with the [SSTIM W3C Community Group](https://www.w3.org/community/sstim/)
+as primary author/steward and [BioSynCare](https://biosyncare.com) acknowledged
+for its support. See [distribution and directory registration](docs/ecosystem/MCP_DISTRIBUTION.md).
+
 ## SSTIM Workbench
 
 The first screen is the working application, not a marketing site. Its main

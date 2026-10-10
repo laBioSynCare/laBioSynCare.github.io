@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.w3c-cg/sstim",
+  "title": "SSTIM MCP: Sensory Stimulation Reference",
+  "description": "A read-only MCP server for SSTIM's released sensory-stimulation ontology. Search canonical terms, inspect provenance and relationships, compare releases and prepare human-reviewed feedback. Developed through the SSTIM W3C Community Group, with thanks to BioSynCare.",
+  "websiteUrl": "https://w3c-cg.github.io/sstim/",
+  "repository": {
+    "url": "https://github.com/w3c-cg/sstim",
+    "source": "github",
+    "subfolder": "packages/sstim-mcp"
+  },
+  "version": "0.2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@sstim/mcp",
+      "version": "0.2.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "author": {
+        "name": "SSTIM W3C Community Group",
+        "url": "https://www.w3.org/community/sstim/"
+      },
+      "acknowledgement": {
+        "name": "BioSynCare",
+        "url": "https://biosyncare.com"
+      }
+    }
+  }
+}

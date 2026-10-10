@@ -9,14 +9,62 @@ The adapter retrieves frozen SSTIM release data from the
 not an ontology server, a write API, a hosted remote MCP endpoint, or a GitHub
 connector. Its four tools require no API key or additional runtime npm packages.
 
+## Distribution and authorship
+
+**Primary author and responsible project:** the
+[SSTIM W3C Community Group](https://www.w3.org/community/sstim/).
+The canonical source is [w3c-cg/sstim](https://github.com/w3c-cg/sstim).
+
+**Acknowledgement:** [BioSynCare](https://biosyncare.com), for its
+contributions to and support of SSTIM's wider ecosystem. BioSynCare is not
+the authority behind the open SSTIM vocabulary.
+
+Community Group work is not a W3C Recommendation or a W3C-endorsed product.
+
+### Install from npm (once released)
+
+The package is prepared for publication as **`@sstim/mcp@0.2.0`**, under
+the same established `@sstim` scope as `@sstim/core`.
+After an authorized npm publisher publishes the package, use:
+
+```bash
+npx --yes @sstim/mcp@0.2.0
+```
+
+For MCP clients, set command `npx` and args
+`["--yes", "@sstim/mcp@0.2.0"]`. For example, VS Code:
+
+```json
+{
+  "servers": {
+    "sstim": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["--yes", "@sstim/mcp@0.2.0"]
+    }
+  }
+}
+```
+
+This is the **post-publication configuration**, not yet a claim that npm hosts
+the package. Unlike the local-checkout examples below, it requires no SSTIM
+source checkout. Pin an explicit package version for reproducible installations.
+A local checkout remains supported for development.
+
+Publication metadata is in [`server.json`](server.json) and
+[`package.json`](package.json). The official MCP Registry identity is
+`io.github.w3c-cg/sstim`, requiring an authorized publisher for the GitHub
+organization namespace. See
+[distribution steps](../../docs/ecosystem/MCP_DISTRIBUTION.md).
+
 ## Prerequisites
 
 - Node.js 20+ on the machine where the AI client runs.
-- An SSTIM checkout, for example `git clone https://github.com/w3c-cg/sstim`.
+- An SSTIM checkout for **local development**, for example `git clone https://github.com/w3c-cg/sstim` (not needed once installed from npm).
 - Network access to the read-only reference API (default below).
 - An AI client with support for local stdio MCP servers.
 
-For every example below, **replace**
+For each **local-checkout** example below, **replace**
 `/absolute/path/to/sstim/packages/sstim-mcp/server.mjs` with the actual **absolute
 path** to this file. On Windows, use a path like
 `C:/Users/you/sstim/packages/sstim-mcp/server.mjs` and ensure `node` is in
