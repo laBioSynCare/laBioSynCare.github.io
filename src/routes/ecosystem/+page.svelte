@@ -46,6 +46,12 @@
     <p class="eyebrow">Architecture and directory</p>
     <h1>The SSTIM ecosystem</h1>
     <p class="lede">{SSTIM_ECOSYSTEM_DEFINITION}</p>
+    <p class="hero-vision">
+      <strong>Our direction:</strong> a living reference that people and intelligent
+      systems can examine, question and improve without losing published meaning
+      or source provenance.
+      <a href={ghBlob('docs/concept/REFERENCE_VISION.md')} rel="external">Read the vision</a>.
+    </p>
     <p class="hero-note">
       The ecosystem is intentionally broader than the SSTIM standard. Inclusion describes a
       relationship to the field; it does not imply ownership, affiliation, endorsement, or
@@ -291,6 +297,14 @@
 </main>
 
 <style>
+  .hero-vision {
+    max-width: 74ch;
+    border-left: 3px solid var(--app-accent);
+    padding: .4rem 0 .4rem 1rem;
+    line-height: 1.65;
+    color: var(--app-text);
+  }
+
   .ecosystem-page {
     max-width: 1120px;
     margin: 0 auto;

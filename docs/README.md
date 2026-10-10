@@ -38,7 +38,8 @@ the two disagree, the code and the as-built docs win.
   evidence system.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
   primary validated use case.
-- [`EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md`](concept/EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md) — **candidate, not adopted** mission and architecture direction: domain-bounded reference ambition, format-independent semantic evolution, disagreement and provenance, reuse-first external alignment, and domain applicability.
+- [`REFERENCE_VISION.md`](concept/REFERENCE_VISION.md) — **adopted project-level public vision**: an open, evolving reference useful to humans, AI systems, research and technology, with provenance, disagreement, referential continuity and meaningful external utility. This is not a ratified Community Group charter or new semantic contract.
+- [`EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md`](concept/EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md) — originating **proposal**; its specific architecture, domain-applicability and implementation decisions remain candidates for normal review, not automatically adopted by the public vision.
 - [`SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md) — how
   symbolic SSTIM and LLMs complement each other, and the recommended public
   wording for saying so without overclaiming.

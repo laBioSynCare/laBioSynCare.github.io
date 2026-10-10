@@ -58,10 +58,12 @@ scientific, regulatory, and governance decisions.
 
 ## Proposed AI interoperability and evaluation work
 
-For the **candidate foundational principle** that SSTIM's identity and conceptual
-references should outlive current RDF/OWL/SKOS technology, and that AI can
-propose contested, reviewable revisions, see the
-[evolving reference direction](EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md).
+The **adopted project-level public vision** is the
+[living SSTIM reference](REFERENCE_VISION.md): useful human/AI access,
+reviewable revision, and referential continuity beyond the lifetime of any
+one representation technology. The original
+[evolving-reference proposal](EVOLVING_REFERENCE_DIRECTION_PROPOSAL.md)
+still contains **candidate** architectural mechanisms that require review.
 
 For a **candidate, not yet adopted** workstream that tests the incremental
 value of SSTIM to independent AI systems, including an AI-to-SSTIM demonstration,

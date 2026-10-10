@@ -2,11 +2,22 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
 
-**SSTIM** is the open formalized knowledge standard for describing
+**SSTIM** is an open, evolving reference for stimuli and sensory stimulation,
+designed to connect human knowledge, AI systems, scientific research, and
+technology through precise concepts, evidence-aware descriptions, and
+persistent, citable references. Its purpose is to make this knowledge easier to
+understand, compare, challenge, validate, exchange, and improve.
+
+Its **current formal implementation** is a modular knowledge standard covering
 sensory-stimulation techniques, modalities, stimulus parameters, exposure
-boundaries, evidence claims, protocols, presets, and sessions. It comprises the
-specification, RDF vocabulary, semantic infrastructure, documentation,
-interoperability work, and shared identifiers.
+boundaries, evidence claims, protocols, presets, and sessions. It comprises RDF
+vocabularies, ontology modules, semantic infrastructure, validation profiles,
+interoperability work, documentation, and shared identifiers. The long-term
+vision is broader than any one representation technology.
+
+The [living-reference vision](docs/concept/REFERENCE_VISION.md) describes that
+direction and its boundaries. It is a project-level vision, not a ratified
+Community Group charter or a claim to exclusive scientific authority.
 
 The **SSTIM ecosystem** is broader than the standard itself. It includes SSTIM,
 its reference tooling and community, and the wider field of sensory-stimulation

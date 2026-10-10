@@ -3,19 +3,23 @@
 // About-page explanation cannot drift into different architectures.
 
 export const SSTIM_ECOSYSTEM_DEFINITION =
-  'The SSTIM ecosystem centers on SSTIM, the open formalized knowledge standard. ' +
-  'It also includes its reference tooling and community, and sensory-stimulation ' +
-  'applications and initiatives whether or not they currently adopt or support SSTIM.'
+  'SSTIM is an open, evolving reference for stimuli and sensory stimulation, ' +
+  'connecting scientific knowledge, technology and AI through shared meanings, ' +
+  'evidence-aware descriptions and persistent identifiers. Its current formal ' +
+  'foundation is a modular ontology and vocabulary. The wider SSTIM ecosystem ' +
+  'also includes reference tools, its independent Community Group and related ' +
+  'applications and initiatives, whether or not they adopt SSTIM.'
 
 export const ARCHITECTURE_ENTITIES = [
   {
     id: 'sstim',
     name: 'SSTIM',
-    tag: 'Open formalized knowledge standard',
+    tag: 'Open, evolving knowledge reference',
     color: 'var(--app-visual)',
     body:
-      'The specification, RDF vocabulary, semantic infrastructure, documentation, ' +
-      'interoperability work, and shared identifiers at the center of the SSTIM ecosystem.',
+      'A living scientific and technical reference: its present implementation ' +
+      'includes a modular RDF vocabulary, shared identifiers, provenance-aware ' +
+      'descriptions, validation profiles and citable releases.',
   },
   {
     id: 'workbench',
