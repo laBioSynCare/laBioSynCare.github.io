@@ -6,7 +6,7 @@
   const items = [
     { href: appRoot, label: 'Home' },
     { href: applicationRoute('/graph/'), label: 'Graph' },
-    { href: applicationRoute('/creator/'), label: 'Patch Studio' },
+    { href: applicationRoute('/creator/'), label: 'Patch Studio', shortLabel: 'Studio' },
     { href: applicationRoute('/presets/'), label: 'Presets' },
     { href: applicationRoute('/sparql/'), label: 'SPARQL' },
     { href: applicationRoute('/logbook/'), label: 'Logbook' },
@@ -24,8 +24,10 @@
 
 <nav class="app-bottom-dock" aria-label="SSTIM Workbench screens">
   {#each items as item}
-    <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-      <span>{item.label}</span>
+    <a href={item.href} aria-label={item.label} title={item.label}
+      aria-current={isActive(item.href) ? 'page' : undefined}>
+      <span class="dock-full">{item.label}</span>
+      <span class="dock-short">{item.shortLabel ?? item.label}</span>
     </a>
   {/each}
 </nav>
@@ -80,7 +82,10 @@
     white-space: nowrap;
   }
 
+  .dock-short { display: none; }
   @media (max-width: 620px) {
+    .dock-full { display: none; }
+    .dock-short { display: block; }
     .app-bottom-dock a {
       font-size: 0.66rem;
       padding: 0 0.25rem;
