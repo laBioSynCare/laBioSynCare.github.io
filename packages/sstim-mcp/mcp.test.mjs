@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { createInterface } from 'node:readline'
@@ -90,6 +91,34 @@ describe('SSTIM MCP Concept Reference client', () => {
     await expect(c.searchConcepts({ query: 'alpha', release: '0.20.0-dev' })).rejects.toThrow(/Unsupported/)
     expect((await c.searchConcepts({ query: 'old' })).results).toHaveLength(0)
     expect((await c.searchConcepts({ query: 'old', includeDeprecated: true })).results).toHaveLength(1)
+  })
+})
+
+describe('editor MCP configuration examples', () => {
+  const sample = name => readFileSync(new URL('./examples/' + name, import.meta.url), 'utf8')
+
+  it('gives a runnable local-stdio shape to VS Code, Cursor and Gemini', () => {
+    const vscode = JSON.parse(sample('vscode.mcp.json'))
+    const cursor = JSON.parse(sample('cursor.mcp.json'))
+    const gemini = JSON.parse(sample('gemini.settings.json'))
+    expect(Object.keys(vscode.servers)).toEqual(['sstim'])
+    expect(vscode.servers.sstim.type).toBe('stdio')
+    for (const config of [vscode.servers.sstim, cursor.mcpServers.sstim,
+      gemini.mcpServers.sstim]) {
+      expect(config.command).toBe('node')
+      expect(config.args).toHaveLength(1)
+      expect(config.args[0]).toMatch(/^\/absolute\/path\/to\/sstim\/packages\/sstim-mcp\/server\.mjs$/)
+    }
+  })
+
+  it('documents distinct Codex TOML and Neovim Lua settings', () => {
+    const codex = sample('codex.config.toml')
+    const neovim = sample('neovim-codecompanion.lua')
+    expect(codex).toContain('[mcp_servers.sstim]')
+    expect(codex).toContain('command = "node"')
+    expect(neovim).toContain('require("codecompanion").setup')
+    expect(neovim).toContain('default_servers = { "sstim" }')
+    expect(neovim).toContain('cmd = { "node"')
   })
 })
 

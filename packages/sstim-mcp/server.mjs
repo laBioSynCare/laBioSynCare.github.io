@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-// Read-only SSTIM MCP adapter over stdio, compatible with MCP 2025-11-25.
-// One JSON-RPC message per line; no server, authentication or persistence.
-// Newer 2026-07-28 hosts must enable their SDK's legacy MCP fallback.
+// Read-only SSTIM MCP adapter for both 2026-07-28 stateless requests
+// and 2025-era initialize-based sessions over stdio.
+// One JSON-RPC message per line; no HTTP server, credentials or writes.
 import { createInterface } from 'node:readline'
 import { createConceptClient, DEFAULT_API_BASE } from './client.mjs'
 
-const info = { name: 'sstim-reference', version: '0.1.0' }
-const supported = new Set(['2025-11-25', '2025-06-18', '2024-11-05'])
+const info = { name: 'sstim-reference', version: '0.2.0' }
+const MODERN = '2026-07-28'
+const legacyVersions = new Set(['2025-11-25', '2025-06-18', '2024-11-05'])
+const VERSION_META = 'io.modelcontextprotocol/protocolVersion'
+const CAPABILITIES_META = 'io.modelcontextprotocol/clientCapabilities'
+const SERVER_META = 'io.modelcontextprotocol/serverInfo'
 const client = createConceptClient({
   apiBase: process.env.SSTIM_MCP_API_BASE || DEFAULT_API_BASE,
 })
@@ -82,7 +86,12 @@ function validArguments(tool, args) {
   return true
 }
 
-/** Request dispatcher can be unit-tested without a spawned process or network. */
+/** Testable JSON-RPC dispatcher for modern stateless and legacy session clients.
+ *
+ * Modern requests carry protocolVersion and clientCapabilities in params._meta;
+ * legacy requests establish a process-scoped session with initialize.
+ * No server-side conversation state is used by the four read-only tools.
+ */
 export function makeDispatcher(referenceClient = client) {
   let ready = false
   let initialized = false
@@ -99,30 +108,82 @@ export function makeDispatcher(referenceClient = client) {
       if (input.method === 'notifications/initialized' && ready) initialized = true
       return null
     }
-    const reply = result => ({ jsonrpc: '2.0', id: input.id, result })
-    const fail = (code, message) => ({ jsonrpc: '2.0', id: input.id,
-      error: { code, message } })
+    const params = input.params
+    const meta = params && typeof params === 'object' && !Array.isArray(params) &&
+      params._meta && typeof params._meta === 'object' && !Array.isArray(params._meta)
+        ? params._meta : {}
+    const requestedVersion = meta[VERSION_META]
+    const modern = requestedVersion !== undefined
+    const reply = (result, useModern = modern) => ({
+      jsonrpc: '2.0', id: input.id,
+      result: useModern ? {
+        ...result, resultType: 'complete', _meta: {
+          ...(result._meta ?? {}), [SERVER_META]: info,
+        },
+      } : result,
+    })
+    const fail = (code, message, data) => ({
+      jsonrpc: '2.0', id: input.id,
+      error: { code, message, ...(data ? { data } : {}) },
+    })
+
     if (input.method === 'initialize') {
-      const offered = input.params?.protocolVersion
+      if (modern) return fail(-32601, 'initialize is not used by modern MCP clients')
+      const offered = params?.protocolVersion
       if (typeof offered !== 'string') return fail(-32602, 'protocolVersion is required')
       ready = true
       initialized = false
       return reply({
-        protocolVersion: supported.has(offered) ? offered : '2025-11-25',
+        protocolVersion: legacyVersions.has(offered) ? offered : '2025-11-25',
         capabilities: { tools: { listChanged: false } },
         serverInfo: info,
+      }, false)
+    }
+
+    if (modern) {
+      if (requestedVersion !== MODERN) {
+        return fail(-32022, 'Unsupported protocol version', {
+          supported: [MODERN, ...legacyVersions], requested: requestedVersion,
+        })
+      }
+      const capabilities = meta[CAPABILITIES_META]
+      if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+        return fail(-32602, 'Modern MCP requires clientCapabilities in params._meta')
+      }
+      if (meta['io.modelcontextprotocol/clientInfo'] !== undefined) {
+        const clientInfo = meta['io.modelcontextprotocol/clientInfo']
+        if (!clientInfo || typeof clientInfo.name !== 'string' ||
+          typeof clientInfo.version !== 'string') {
+          return fail(-32602, 'Invalid clientInfo in params._meta')
+        }
+      }
+    }
+
+    if (input.method === 'server/discover') {
+      if (!modern) return fail(-32601, 'Method not found')
+      return reply({
+        supportedVersions: [MODERN],
+        capabilities: { tools: { listChanged: false } },
+        instructions: 'Use search to find exact SSTIM IRIs, then get a release-pinned term with source provenance. Suggestions only create links; no writes.',
+        ttlMs: 0,
+        cacheScope: 'public',
       })
     }
-    if (input.method === 'ping') return reply({})
-    if (!ready || !initialized) return fail(-32000, 'Initialize the MCP session first')
+    if (input.method === 'ping') {
+      if (!modern && (!ready || !initialized)) return fail(-32000, 'Initialize the MCP session first')
+      return reply({})
+    }
+    if (!modern && (!ready || !initialized)) {
+      return fail(-32000, 'Initialize the MCP session first')
+    }
     if (input.method === 'tools/list') {
       return reply({ tools })
     }
     if (input.method === 'tools/call') {
-      const name = input.params?.name
+      const name = params?.name
       const tool = tools.find(t => t.name === name)
       if (!tool) return fail(-32602, 'Unknown MCP tool')
-      const args = input.params?.arguments ?? {}
+      const args = params?.arguments ?? {}
       if (!validArguments(tool, args)) return fail(-32602, 'Invalid MCP tool arguments')
       try {
         const data = await commands[name](args, referenceClient)
@@ -132,8 +193,10 @@ export function makeDispatcher(referenceClient = client) {
           isError: false,
         })
       } catch (error) {
-        return reply({ content: [{ type: 'text', text: String(error?.message ?? 'Tool failed') }],
-          isError: true })
+        return reply({
+          content: [{ type: 'text', text: String(error?.message ?? 'Tool failed') }],
+          isError: true,
+        })
       }
     }
     return fail(-32601, 'Method not found')

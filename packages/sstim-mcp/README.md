@@ -1,28 +1,116 @@
-# SSTIM MCP reference adapter (local stdio)
+# SSTIM MCP reference adapter
 
-**Status:** implemented read-only MCP adapter, driven by SSTIM's frozen
-Concept Reference JSON API. Run from a local checkout with **Node.js 20+**.
-No new npm dependencies, credentials, database or hosted service.
+**Status:** local, read-only MCP server over stdio. Supports the **current MCP
+`2026-07-28` stateless protocol** and legacy initialization-based clients
+(`2025-11-25`, `2025-06-18`, `2024-11-05`).
 
-This adapter currently implements **legacy MCP protocol 2025-11-25**, with
-compatibility for clients negotiating `2025-06-18` or `2024-11-05`.
-Some clients implementing the July 2026 stateless MCP revision can fall back
-to legacy stdio; a host locked to 2026-only protocol cannot use this adapter.
-It does **not** expose a remote HTTPS MCP endpoint.
+The adapter retrieves frozen SSTIM release data from the
+[Concept Reference API](../../docs/technical/CONCEPT_REFERENCE_API.md). It is
+not an ontology server, a write API, a hosted remote MCP endpoint, or a GitHub
+connector. Its four tools require no API key or additional runtime npm packages.
 
-## Start the MCP server
+## Prerequisites
 
-From the SSTIM checkout:
+- Node.js 20+ on the machine where the AI client runs.
+- An SSTIM checkout, for example `git clone https://github.com/w3c-cg/sstim`.
+- Network access to the read-only reference API (default below).
+- An AI client with support for local stdio MCP servers.
 
-```bash
-node packages/sstim-mcp/server.mjs
+For every example below, **replace**
+`/absolute/path/to/sstim/packages/sstim-mcp/server.mjs` with the actual **absolute
+path** to this file. On Windows, use a path like
+`C:/Users/you/sstim/packages/sstim-mcp/server.mjs` and ensure `node` is in
+the launching application's `PATH`.
+
+The server is launched by the AI client. Running it manually will appear idle
+because it waits for JSON-RPC messages on stdin. It must not emit human-readable
+logs to stdout.
+
+## Four available tools
+
+| Tool | Result |
+|---|---|
+| `sstim_list_releases` | Supported frozen releases and latest available version |
+| `sstim_search_concepts` | Search terms by IRI/CURIE, labels, alternatives or definition |
+| `sstim_get_concept` | Retrieve exact term, definitions, declared relationships, source provenance |
+| `sstim_prepare_feedback` | User-facing Contribution Bridge link; nothing is submitted |
+
+All four tools are **read-only**. The feedback tool generates only a link with
+the selected public concept ID and label, without copying conversation text.
+The user reviews any issue and decides whether to publish it. No writes to
+SSTIM occur through these tools.
+
+## Configure your software
+
+Choose **one** configuration appropriate to the AI client in use. They are
+not interchangeable. Sample files are in [`examples/`](examples/).
+
+### 1. VS Code: GitHub Copilot Chat (Agent mode)
+
+Create or update `.vscode/mcp.json` in **your project** using the
+[`examples/vscode.mcp.json`](examples/vscode.mcp.json) contents:
+
+```json
+{
+  "servers": {
+    "sstim": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+    }
+  }
+}
 ```
 
-The process reads newline-delimited JSON-RPC from stdin and returns MCP
-responses on stdout. Nothing is logged to stdout except protocol messages.
-A compatible MCP host starts and manages this subprocess.
+In VS Code run **MCP: List Servers** (or use MCP commands in the Command
+Palette), start `sstim`, then open **GitHub Copilot Chat → Agent mode** and
+enable the SSTIM tools in the tool picker.
 
-Example local configuration (replace path with your absolute checkout path):
+This is VS Code's `servers` format, **not** the `mcpServers` format used by
+Cursor and Gemini. VS Code can also use a portable project-root `.mcp.json`,
+which has different keys; see its
+[official MCP setup](https://code.visualstudio.com/docs/agent-customization/mcp-servers).
+
+### 2. VS Code: OpenAI Codex extension / Codex CLI
+
+Codex's IDE extension and CLI share `~/.codex/config.toml` (or supported
+project-scoped `.codex/config.toml`). Append the contents of
+[`examples/codex.config.toml`](examples/codex.config.toml):
+
+```toml
+[mcp_servers.sstim]
+command = "node"
+args = ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+```
+
+Or configure the server via the Codex IDE extension:
+**Settings → MCP servers → Add server → STDIO**. Restart the extension if
+prompted. In the CLI, `codex mcp list` can show the configured servers.
+This configuration is separate from `.vscode/mcp.json` for Copilot Chat.
+
+Reference: [Codex MCP configuration](https://developers.openai.com/codex/mcp).
+
+### 3. VS Code: Claude Code extension / Claude Code CLI
+
+Run in a terminal (using the same Claude Code installation as your extension):
+
+```bash
+claude mcp add --transport stdio --scope user sstim -- node /absolute/path/to/sstim/packages/sstim-mcp/server.mjs
+claude mcp get sstim
+```
+
+Then open Claude Code (CLI or VS Code extension) and check the **/mcp** menu
+to confirm the server is connected and tools are visible. The `--` separator
+is important: arguments after it belong to `node`, not to Claude's CLI.
+For a shared project installation instead of a personal user installation,
+consult the project's `.mcp.json` and approval rules.
+
+Reference: [Claude Code MCP setup](https://code.claude.com/docs/en/mcp).
+
+### 4. Gemini CLI (including inside VS Code's terminal)
+
+Add to your user `~/.gemini/settings.json` or project
+`.gemini/settings.json`:
 
 ```json
 {
@@ -35,57 +123,85 @@ Example local configuration (replace path with your absolute checkout path):
 }
 ```
 
-This configuration shape is used by hosts supporting `mcpServers`, such as
-Claude Desktop. Consult your particular host's configuration guidance; placing
-the file in a repository does **not** auto-install the tool in ChatGPT or other
-products. ChatGPT connectors requiring remote MCP HTTPS cannot connect to a
-local stdio process without a separately deployed, authenticated adapter.
+See [`examples/gemini.settings.json`](examples/gemini.settings.json).
+Alternatively use:
 
-## Exposed tools
-
-| Name | Behavior |
-|---|---|
-| `sstim_list_releases` | Lists frozen releases exported by JSON API v1, with the latest |
-| `sstim_search_concepts` | Searches labels, IRIs, CURIEs and definitions; returns at most 20 results |
-| `sstim_get_concept` | Returns one released concept/class/property with source hashes, mappings and notes |
-| `sstim_prepare_feedback` | Generates a link to the public Contribution Bridge (no submission) |
-
-All tools are read-only. No tool modifies files, publishes proposals, updates
-SSTIM, stores user data or silently copies private conversations. A feedback
-link contains only the selected public term identifier and label; the user
-must explicitly review and submit any issue using the Workbench/GitHub UI.
-
-**Release semantics.** When `release` is omitted, discovery selects the
-latest published snapshot, currently **0.19.0**. The development line,
-currently `0.20.0-dev`, is never treated as a release. Clients should pass
-a fixed release for reproducible research or archived records.
-
-**Data provenance.** The MCP tools return published ontology assertions from
-[Concept Reference API v1](../../docs/technical/CONCEPT_REFERENCE_API.md).
-External mappings are not verified scientific equivalence or clinical evidence.
-Their predicates and source provenance are retained so the consumer can judge
-the scope and strength of each assertion.
-
-## Configuration and constraints
-
-The default JSON endpoint is:
-
-```text
-https://w3c-cg.github.io/sstim/api/v1/
+```bash
+gemini mcp add -s user sstim node /absolute/path/to/sstim/packages/sstim-mcp/server.mjs
 ```
 
-An operator serving a copy of SSTIM may set `SSTIM_MCP_API_BASE` to its own
-API endpoint (the URL must end in `/api/v1/`). HTTPS is required except for
-explicit loopback development endpoints. Retrieval is bounded in duration
-and response size; term detail paths are verified against the SHA-256 of the
-canonical IRI. Only the configured API origin is fetched. The process has a
-per-instance cache and can be restarted to refresh the reference.
+Open Gemini CLI and use **/mcp** to inspect connectivity and exposed tools.
 
-**Runtime prerequisites:** Network connectivity to the configured endpoint,
-a compatible MCP host, and a Node.js executable accessible to that host.
-The server provides no credentials or secrets by default.
+**Gemini CLI is not the same product as the Gemini Code Assist VS Code
+extension.** This configuration applies to the CLI; support for an extension
+must be verified against that extension's own settings.
+Reference: [Gemini CLI MCP](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md).
 
-## Verify
+### 5. Cursor
+
+Create a project `.cursor/mcp.json`, or `~/.cursor/mcp.json` globally,
+with the contents of [`examples/cursor.mcp.json`](examples/cursor.mcp.json):
+
+```json
+{
+  "mcpServers": {
+    "sstim": {
+      "command": "node",
+      "args": ["/absolute/path/to/sstim/packages/sstim-mcp/server.mjs"]
+    }
+  }
+}
+```
+
+Open **Cursor Settings → Tools & MCP** and verify the server is connected.
+Ask Cursor Agent to use `sstim_search_concepts`.
+
+Reference: [Cursor MCP documentation](https://prod.cursor.com/docs/mcp).
+
+### 6. Neovim with CodeCompanion.nvim
+
+Neovim does not supply an AI/MCP client merely by being installed. If you use
+[CodeCompanion.nvim](https://codecompanion.olimorris.dev/configuration/mcp),
+add this to its setup (or integrate the `mcp` table into existing config):
+
+```lua
+require("codecompanion").setup({
+  mcp = {
+    servers = {
+      sstim = {
+        cmd = { "node", "/absolute/path/to/sstim/packages/sstim-mcp/server.mjs" },
+      },
+    },
+    opts = {
+      default_servers = { "sstim" },
+    },
+  },
+})
+```
+
+See [`examples/neovim-codecompanion.lua`](examples/neovim-codecompanion.lua).
+Open a CodeCompanion chat and access MCP tools using the `@mcp:` tool group
+or the `/mcp` picker, depending on your CodeCompanion version. The plugin's
+MCP client currently supports the older `2025-11-25` handshake, which this
+server continues to accept.
+
+For **classic Vim**, no built-in MCP client is assumed. You can use the Claude
+Code, Codex, or Gemini CLI configuration above in a terminal inside or outside
+Vim; do not paste Neovim Lua into a traditional `.vimrc`.
+
+## Verify the installation
+
+After configuring your chosen client, ask:
+
+> Use the SSTIM MCP tools to list the current released version, search for
+> “binaural”, and explain one matched concept using its canonical IRI and
+> source provenance. Compare the results for v0.18.0 and v0.19.0 if applicable.
+
+The search tools may be automatically chosen by the agent, but whether a tool
+is called depends on client settings and model behavior. You can also inspect
+the tool inventory in your host's MCP panel.
+
+For tests inside this repository:
 
 ```bash
 npm test -- --run packages/sstim-mcp/mcp.test.mjs
@@ -93,13 +209,46 @@ npm run check
 npm run build
 ```
 
-Tests use an in-memory reference fixture and a spawned stdio process. They do
-not contact GitHub Pages. The main build continues to generate the JSON API
-from frozen modules; this MCP package is not bundled into the website.
+The tests exercise mocked API data, legacy and modern MCP handshakes, stdio
+framing, and editor-config example syntax. They do not certify interoperability
+with every named editor release.
 
-## Next extension
+## Protocol versions and constraints
 
-A hosted remote MCP endpoint, if demanded by real users, should reuse this
-read-only concept client but use the current official SDK and its transport/auth
-requirements. Do not silently turn `sstim_prepare_feedback` into a write tool.
-Proposals remain distinct from reviewed, released ontology content.
+`2026-07-28` is the current MCP protocol revision. Unlike
+`2025-11-25`, which negotiates a process-scoped session via
+`initialize` / `notifications/initialized`, the new revision uses
+**per-request** metadata. This server implements both paths:
+
+- **Modern clients:** `server/discover` advertises `2026-07-28`, tools are
+  usable without `initialize`, and every request carries
+  `params._meta["io.modelcontextprotocol/protocolVersion"]` and
+  `params._meta["io.modelcontextprotocol/clientCapabilities"]`.
+  Results declare `resultType: "complete"` and server identity metadata.
+- **Older clients:** continue using the legacy `initialize` handshake and
+  legacy response structure. Supporting this version remains important for
+  real installed clients, including some Neovim plugins.
+
+The modern revision does **not** mean the server must be remote: stdio remains
+a defined transport. There is currently **no Streamable HTTP endpoint** for
+SSTIM MCP; remote ChatGPT connectors would require a separate deployment.
+
+Protocol references:
+[MCP 2026-07-28 versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning),
+[stdio transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio),
+[discovery](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/server/discover.mdx).
+
+The latest frozen release comes from API discovery, not from a hard-coded
+runtime constant. At the time of this update it is **v0.19.0**; the separately
+maintained development line is **v0.20.0-dev**. For repeatable research use an
+explicit frozen release in tool arguments.
+
+**Operational limits:** read-only catalog; up to 20 search results;
+no hosted `?q=` search; no API key; no write tools; no live ontology inference,
+adjudication of scientific disputes, or guaranteed clinical meaning.
+The default reference URL is
+`https://w3c-cg.github.io/sstim/api/v1/`.
+An operator can override it with `SSTIM_MCP_API_BASE`, using HTTPS or
+loopback HTTP for testing. A per-process cache keeps repeated requests local
+until restart. Outputs retain term IRIs, release identity and source links.
+
