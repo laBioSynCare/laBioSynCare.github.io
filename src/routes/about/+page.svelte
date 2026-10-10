@@ -172,6 +172,13 @@
         brings <strong>Patch Studio</strong> and <strong>Graph Navigator</strong> together with <strong>SSTIM</strong>, the open
         formalized knowledge standard for techniques, parameters, exposure, safety metadata, and evidence.
       </p>
+      <p class="vision-line">
+        <strong>Beyond the Workbench:</strong> SSTIM's long-term direction is a living
+        reference for human inquiry, AI systems, research, and technology. Its published
+        meanings remain citable as knowledge develops, while new claims and changes are
+        subject to evidence, attribution, and review.
+        <a href={ghBlob('docs/concept/REFERENCE_VISION.md')} rel="external">Read the vision</a>.
+      </p>
       <div class="hero-actions" aria-label="Start using SSTIM Workbench">
         <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio</a>
         <a class="secondary-action" href={applicationRoute('/graph/')}>Explore SSTIM</a>
@@ -379,6 +386,17 @@
 </main>
 
 <style>
+  .vision-line {
+    max-width: 69ch;
+    margin: 1.15rem 0 1.45rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--app-accent);
+    color: var(--app-muted);
+    line-height: 1.65;
+    font-size: .94rem;
+  }
+  .vision-line strong { color: var(--app-text-strong); }
+
   .about-page {
     max-width: 1120px;
     margin: 0 auto;
