@@ -65,6 +65,19 @@ describe('reviewable GitHub drafts', () => {
   it('supports target-free missing-concept proposals without defining RDF classes', () => {
     const url = feedbackIssueUrl({ kind: 'missing', description: 'A stimulus phenomenon not yet described.' })
     expect(new URL(url).searchParams.get('body')).toContain('Missing concept')
-    expect(FEEDBACK_KINDS).toHaveLength(5)
+    // A maintained taxonomy can grow: guard semantic coverage and uniqueness,
+    // not a hard-coded count that would reject legitimate new report types.
+    const values = FEEDBACK_KINDS.map(item => item.value)
+    expect(new Set(values).size).toBe(values.length)
+    expect(values).toEqual(expect.arrayContaining([
+      'correction', 'question', 'alternative', 'missing', 'mapping',
+      'flaw', 'need', 'evidence',
+    ]))
+    for (const kind of ['flaw', 'need', 'evidence']) {
+      const body = new URL(feedbackIssueUrl({ kind, description: 'Evidence-backed test case.' }))
+        .searchParams.get('body')
+      expect(body).toContain(FEEDBACK_KINDS.find(item => item.value === kind).label)
+      expect(body).toContain('Not submitted automatically')
+    }
   })
 })
