@@ -4,8 +4,9 @@
 
   const appRoot = applicationRoute('/')
   const items = [
+    { href: appRoot, label: 'Home' },
     { href: applicationRoute('/graph/'), label: 'Graph' },
-    { href: applicationRoute('/creator/'), label: 'Patch Studio' },
+    { href: applicationRoute('/creator/'), label: 'Patch Studio', shortLabel: 'Studio' },
     { href: applicationRoute('/presets/'), label: 'Presets' },
     { href: applicationRoute('/sparql/'), label: 'SPARQL' },
     { href: applicationRoute('/logbook/'), label: 'Logbook' },
@@ -23,8 +24,10 @@
 
 <nav class="app-bottom-dock" aria-label="SSTIM Workbench screens">
   {#each items as item}
-    <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-      <span>{item.label}</span>
+    <a href={item.href} aria-label={item.label} title={item.label}
+      aria-current={isActive(item.href) ? 'page' : undefined}>
+      <span class="dock-full">{item.label}</span>
+      <span class="dock-short">{item.shortLabel ?? item.label}</span>
     </a>
   {/each}
 </nav>
@@ -38,7 +41,7 @@
     z-index: 120;
     height: var(--app-bottom-dock-height, 48px);
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     align-items: stretch;
     background: color-mix(in srgb, var(--app-surface) 94%, #000 6%);
     border-top: var(--app-border-width) solid var(--app-border);
@@ -79,7 +82,10 @@
     white-space: nowrap;
   }
 
+  .app-bottom-dock .dock-short { display: none; }
   @media (max-width: 620px) {
+    .app-bottom-dock .dock-full { display: none; }
+    .app-bottom-dock .dock-short { display: block; }
     .app-bottom-dock a {
       font-size: 0.66rem;
       padding: 0 0.25rem;

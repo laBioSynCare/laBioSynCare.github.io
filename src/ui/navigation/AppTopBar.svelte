@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { applicationRoute } from '../../config/applicationUrls.js'
   import ProfileControl from './ProfileControl.svelte'
+  import BrandHomeLink from './BrandHomeLink.svelte'
   import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
   import { ONTOLOGY_DOCS_URL, VOCAB_DOCS_URL } from '../externalLinks.js'
@@ -100,6 +101,7 @@
 </script>
 
 <header class="app-topbar">
+  <BrandHomeLink compact size={32} />
   <div class="topbar-main">
     {#if $graphNavigation.available}
       <div class="scope-group" bind:this={scopeGroup}>
@@ -271,7 +273,7 @@
         </button>
       </div>
     {:else}
-      <a class="brand" href={applicationRoute('/')}>SSTIM Workbench</a>
+      <a class="brand" href={applicationRoute('/')}>SSTIM Workbench <small>· living knowledge reference</small></a>
     {/if}
   </div>
 
@@ -288,6 +290,8 @@
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
       <a href={applicationRoute('/')}>Home</a>
+      <a href={applicationRoute('/agents/')}>AI agents: contribute</a>
+      <a href={applicationRoute('/contribute/')}>Report a gap or correction</a>
       <a href={applicationRoute('/graph/')}>Graph</a>
       <a href={applicationRoute('/creator/')}>Patch Studio</a>
       <a href={applicationRoute('/presets/')}>Presets</a>
@@ -331,22 +335,27 @@
              canvas is RDF and that its nodes are persistent identifiers. -->
         <section class="help-about">
           <p>
-            One RDF knowledge graph, not a diagram: the SSTIM ontology and its
-            SKOS vocabulary, together with the catalog and ecosystem records.
+            A navigable view over RDF knowledge: SSTIM ontology terms and SKOS
+            vocabulary, together with catalog records and separately sourced
+            ecosystem data. The graph is an interface to assertions, not
+            independent scientific verification of those assertions.
           </p>
           <p>
-            Every node is a persistent identifier under
-            <code>{PREFIXES.sstim}</code>. They dereference. Open one and you get
-            this view with the term selected, or Turtle and JSON-LD if you ask
-            for those instead.
+            Published SSTIM vocabulary terms have persistent identifiers in
+            <code>{PREFIXES.sstim}</code>, which support versioned reference and
+            content negotiation. Catalog and ecosystem nodes may have distinct
+            provenance and identity rules. Inspect a node's source and IRI
+            before treating it as canonical SSTIM knowledge.
           </p>
           <p class="help-links">
             <a href={applicationRoute('/namespace/')}>What resolves where</a>
             <a href={ONTOLOGY_DOCS_URL} rel="external">Reference docs</a>
             <a href={VOCAB_DOCS_URL} rel="external">Vocabulary</a>
             <a href={applicationRoute('/sparql/')}>SPARQL</a>
+            <a href={applicationRoute('/agents/')}>AI contributions</a>
           </p>
         </section>
+        <p class="help-agent-call">Found a misleading definition, missing concept, broken mapping or real research need? <a href={applicationRoute('/agents/')}>People and AI agents can suggest improvements for review.</a></p>
         <h4 class="help-subhead">Keyboard shortcuts</h4>
         <dl class="help-list">
           {#each SHORTCUTS as shortcut}
@@ -363,7 +372,7 @@
         </dl>
       {:else}
         <p class="help-fallback">
-          Click the tabs below or the buttons on the page to get around — explore at will.
+          Use the bottom navigation or the + menu to explore. SSTIM is a living reference with sources and reviewed contributions. <a href={applicationRoute('/agents/')}>Report a gap or contribute as an AI agent.</a>
         </p>
       {/if}
     </div>
@@ -455,6 +464,9 @@
     align-items: center;
     gap: 0.5rem;
   }
+
+  .help-agent-call { margin: .75rem 0 1.1rem; line-height: 1.6; color: var(--app-muted); }
+  .brand small { font-weight: 500; color: var(--app-muted); }
 
   .brand {
     align-self: center;

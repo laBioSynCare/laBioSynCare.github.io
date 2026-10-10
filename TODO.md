@@ -58,6 +58,20 @@ stated in one of them is not restated in another.
 
 ---
 
+## Future machine-readable AI contribution invitations (deferred)
+
+- [ ] **After separate design review, add explicit, machine-discoverable
+      invitations for human and AI feedback to appropriate SSTIM RDF headers
+      and annotation metadata, without modifying any existing frozen releases.**
+      Follow [`AI_CONTRIBUTION_IN_RDF_PLAN.md`](docs/technical/AI_CONTRIBUTION_IN_RDF_PLAN.md)
+      for semantics, ontology-file authorization, provenance, validation, and
+      consent/review constraints. The public /agents/ and /contribute/ guidance
+      and llms.txt discovery are distinct as-built work and **do not mean RDF
+      annotations carry those invitations today**. No RDF files are to be
+      changed for this item without a future explicit scoped instruction.
+
+---
+
 ## Current Focus (update when focus shifts)
 
 Phase 0 is complete; the repository is in Phase 1 with substantial Phase-2 work

@@ -13,6 +13,24 @@
 
 ## 1. What This Project Is
 
+**Public project-level vision (2026-10-10):** SSTIM aims to become a
+living, continuously improving reference for stimuli and sensory stimulation
+across research, technology, people and AI. Its currently implemented formal
+ontology is a means to that end, not the entirety of the ambition.
+[REFERENCE_VISION.md](docs/concept/REFERENCE_VISION.md) states the vision;
+this does not alter the draft Community Group charter, published ontological
+contracts or release governance. Accurate, source-aware criticism and real
+external utility outrank ontology growth.
+
+**Agent contributions:** AI systems and humans may suggest corrections,
+unmet scientific and engineering needs, counterexamples, or mapping and
+implementation flaws through the [public agent guide](https://w3c-cg.github.io/sstim/agents/)
+and reviewable [contribution form](https://w3c-cg.github.io/sstim/contribute/).
+No report is submitted automatically and no AI system has canonical write
+authority. A later task proposes making the invitation discoverable in RDF
+and annotation metadata; [AI_CONTRIBUTION_IN_RDF_PLAN.md](docs/technical/AI_CONTRIBUTION_IN_RDF_PLAN.md)
+is **deferred** and does not authorize changes to protected ontology sources.
+
 **SSTIM** is the open formalized knowledge standard: its specification, RDF
 vocabulary, semantic infrastructure, documentation, interoperability work, and
 shared identifiers. The **SSTIM ecosystem** is broader: SSTIM, its reference

@@ -49,6 +49,36 @@ stay identical to the site-wide `app.html` meta description.
 
 ---
 
+## Site-wide implementation of the reference vision (2026-10-10)
+
+The living-reference narrative is no longer confined to the homepage. Every
+Workbench route exposes an accessible, clickable SSTIM mark returning to
+`/`. The Graph Navigator retains its compact scope controls; the full-screen
+Patch Studio uses the same brand link in its own toolbar because it hides the
+common topbar. The bottom dock also names Home explicitly.
+
+The explicit [invitation to AI agents and humans](../../src/routes/agents/+page.svelte)
+asks for testable concept defects, evidence conflicts, interoperability
+breakage and unmet user needs rather than unsolicited broad endorsements.
+It links to the existing public issue-draft flow, not an autonomous publishing
+API. Main screens link to that invitation where relevant. Graph, SPARQL,
+Presets and Patch Studio explain their evidence or modeling limits while keeping
+normal work within one click.
+
+Generated `llms.txt` and `llms-full.txt` surface the guidance and
+[adopted vision](../concept/REFERENCE_VISION.md) for machine readers.
+**Deferred:** adding explicit invitations to ontological RDF headers or
+annotation records requires scoped review and a separate instruction;
+see [the RDF/annotation plan](AI_CONTRIBUTION_IN_RDF_PLAN.md). The website
+work changes neither protected ontology files nor frozen releases.
+
+Review criteria: return-home from every route including Studio, graph controls
+remain usable, narrow-screen dock remains discoverable, `/agents/` and
+`/contribute/` function with no login prerequisite to read, and any proposal
+clearly stays noncanonical until accepted.
+
+---
+
 ## Original entrance (historical 2026-07-18)
 
 ## Problem

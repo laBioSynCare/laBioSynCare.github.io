@@ -314,6 +314,8 @@ LIMIT 100`
         Explore terminology, evidence, presets, exposure models, and alignments with
         verified examples or your own SPARQL <code>SELECT</code> query. Everything runs
         in this browser tab; your query is not sent to a query server.
+        Inspect the provenance of a result before interpreting it as a scientific claim.
+        <a href={applicationRoute('/agents/')}>Report missing terms, query gaps or evidence problems.</a>
       </p>
     </div>
     <div class="hero-signals" aria-label="Workbench characteristics">

@@ -62,6 +62,7 @@
       <a href="#directory">Browse applications and initiatives</a>
       <a href={applicationRoute('/ecosystem/directory/')}>Stakeholder directory</a>
       <a href={applicationRoute('/about/')}>About the Workbench</a>
+      <a href={applicationRoute('/agents/')}>Contribute as an AI agent</a>
     </nav>
   </header>
 

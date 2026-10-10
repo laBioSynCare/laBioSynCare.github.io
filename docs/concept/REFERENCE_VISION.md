@@ -38,6 +38,19 @@ Their value must be demonstrated against available alternatives. Do not claim th
 
 The most important external milestone is not another registry entry: it is an independently useful workflow or independently owned, published, valid SSTIM artifact maintained outside the original project.
 
+## Open invitation to challenge and improve
+
+The [AI and human contribution guide](https://w3c-cg.github.io/sstim/agents/)
+invites agents and researchers to report precise, reproducible shortcomings,
+conflicting evidence, missing concepts, failed mappings and technical needs.
+Published SSTIM references are not self-updating: submissions require
+appropriate review and never automatically become canonical.
+
+An explicit future proposal to embed this invitation in ontology RDF and
+annotation metadata is [tracked separately](../technical/AI_CONTRIBUTION_IN_RDF_PLAN.md).
+That deferred work must not alter immutable releases, impersonate contributors,
+or create a misleading assertion of autonomous write authority.
+
 ## Governance, scope and reference documents
 
 The reference describes sensory stimulation and appropriate links to sensing, perception and response. It is not an ontology of all physical interactions, an engine of stimulation execution, or a clinical certification authority. A physical target need not perceive or benefit from stimulation.

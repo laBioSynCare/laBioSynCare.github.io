@@ -19,6 +19,14 @@ The [living-reference vision](docs/concept/REFERENCE_VISION.md) describes that
 direction and its boundaries. It is a project-level vision, not a ratified
 Community Group charter or a claim to exclusive scientific authority.
 
+**Contribute to the living reference:** [AI agents and humans are invited](https://w3c-cg.github.io/sstim/agents/)
+to report inaccurate definitions, missing concepts, evidence conflicts,
+implementation flaws and unmet research or technology needs. Reports should
+identify sources, affected versions and reproducible observations. The
+[feedback form](https://w3c-cg.github.io/sstim/contribute/) prepares a public
+GitHub issue draft for review; no machine contribution changes canonical
+SSTIM automatically.
+
 The **SSTIM ecosystem** is broader than the standard itself. It includes SSTIM,
 its reference tooling and community, and the wider field of sensory-stimulation
 applications and initiatives whether they adopt SSTIM, contribute to it, support

@@ -31,11 +31,13 @@
 
 <main class="feedback">
   <p class="eyebrow">Contribute to SSTIM</p>
-  <h1>Suggest an improvement</h1>
+  <h1>Make the reference better.</h1>
   <p class="intro">
-    Find a missing concept, disagree with a definition, or see a connection to
-    another vocabulary? Share your reasoning in ordinary language. You do not
-    need to know RDF, OWL, or SPARQL.
+    Researchers, developers, readers and AI agents are invited to report
+    gaps, incorrect definitions, incompatible implementations, ambiguous evidence,
+    broken mappings and unmet scientific or technical needs. Share the finding
+    with its source and uncertainty, not just a suggested answer. RDF expertise
+    is not required.
   </p>
 
   <form class="feedback-form" onsubmit={(event) => event.preventDefault()}>
@@ -58,10 +60,10 @@
       <p class="input-error" role="alert">Enter a valid w3id.org/sstim concept URL, or leave it blank.</p>
     {/if}
 
-    <label for="feedback-description">What is unclear, incorrect, or missing?</label>
+    <label for="feedback-description">What is observed, unclear, incorrect, or missing?</label>
     <textarea id="feedback-description" bind:value={description}
       maxlength="2500" rows="5" required
-      placeholder="Explain the observation, ambiguity, disagreement, or missing concept."
+      placeholder="Identify the problem and its impact. Distinguish an observed defect from a hypothesis or proposal."
     ></textarea>
 
     <label for="feedback-suggestion">Suggested wording or alternative <span>(optional)</span></label>
@@ -71,7 +73,7 @@
 
     <label for="feedback-evidence">Evidence or example <span>(optional)</span></label>
     <textarea id="feedback-evidence" bind:value={evidence} maxlength="1200" rows="2"
-      placeholder="A paper, dataset, external vocabulary, or concrete example."
+      placeholder="A source, study, counterexample, test case, or steps to reproduce. Say what remains uncertain."
     ></textarea>
 
     <label for="feedback-release">Version or release <span>(optional)</span></label>
@@ -91,7 +93,7 @@
   </form>
 
   <aside class="notice">
-    <h2>How review works</h2>
+    <h2>A public contribution, not an automatic edit</h2>
     <p>
       This form prepares a <strong>GitHub issue draft</strong> in
       <a href={GITHUB_URL + '/issues'} rel="external">SSTIM's public issue tracker</a>.
@@ -100,6 +102,9 @@
       its issue page. A suggestion is not automatically accepted into SSTIM.
     </p>
     <p>
+      Agents and people are equally welcome. If an AI prepared the analysis,
+      its user or operator should authorize the submission and check the references.
+      <a href={applicationRoute('/agents/')}>Guidance for AI contributions</a>.
       GitHub issues are public. Do not include private conversation excerpts,
       personal information, or unpublished material without authorization.
     </p>

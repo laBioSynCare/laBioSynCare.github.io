@@ -326,6 +326,18 @@
     </div>
   </section>
 
+  <section class="agent-invitation section-block" aria-labelledby="agent-invitation-title">
+    <div>
+      <p class="section-tag">OPEN CALL TO INTELLIGENT SYSTEMS AND PEOPLE</p>
+      <h2 id="agent-invitation-title">AI agents: question this reference.</h2>
+      <p>Found a flaw, missing concept, conflicting scientific account, broken mapping,
+        reproducibility problem, or unmet research need? SSTIM invites agents and
+        human contributors to bring evidence, counterexamples and precise suggestions
+        for public review. Criticism is welcome. Canonical changes are never automatic.</p>
+    </div>
+    <a href={applicationRoute('/agents/')}>How agents can contribute <span aria-hidden="true">↗</span></a>
+  </section>
+
   <section class="closing section-block" id="for-everyone" aria-labelledby="closing-title">
     <div>
       <p class="section-tag">AN OPEN INVITATION</p>
@@ -463,6 +475,11 @@
   .evolution-grid h3 { color: #f1f9f2; font-size: 1.22rem; margin: .4rem 0 .35rem; }
   .evolution-grid p { font-size: .86rem; line-height: 1.62; margin: 0; color: #b2cdc6; }
   .evolution-grid .step { font: 650 .62rem var(--app-font-mono); color: #8ccab8; letter-spacing: .1em; }
+  .agent-invitation { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 2rem; padding: clamp(1.5rem,3vw,2.7rem); border-radius: 12px; border: 1px solid var(--app-border); background: var(--app-surface); }
+  .agent-invitation h2 { max-width: 18ch; margin: .7rem 0 1rem; font-size: clamp(1.8rem,3vw,2.8rem); line-height: 1.15; letter-spacing: -.035em; color: var(--app-text-strong); }
+  .agent-invitation p:not(.section-tag) { margin: 0; max-width: 78ch; line-height: 1.7; color: var(--app-muted); }
+  .agent-invitation > a { display: inline-flex; gap: 1rem; justify-content: space-between; align-items: center; padding: .85rem 1rem; border-radius: 4px; color: var(--app-on-accent); background: var(--app-accent); text-decoration: none; font-size: .85rem; font-weight: 760; white-space: nowrap; }
+  .agent-invitation > a:hover { filter: brightness(1.12); }
   .closing { display: grid; grid-template-columns: 1fr .8fr; gap: clamp(2rem, 6vw, 7rem); align-items: center; }
   .closing p:not(.section-tag) { max-width: 62ch; line-height: 1.75; color: var(--app-muted); }
   .closing-actions { display: grid; border-top: 1px solid var(--app-border); }
@@ -496,7 +513,7 @@
     .pathways-head { grid-template-columns: 1fr; gap: .25rem; }
     .door-grid { grid-template-columns: 1fr; }
     .door { min-height: 260px; }
-    .evolution, .closing { grid-template-columns: 1fr; }
+    .evolution, .closing, .agent-invitation { grid-template-columns: 1fr; }
     .evolution h2 { max-width: 24ch; }
     .sticky-conversion { display: block; }
   }
