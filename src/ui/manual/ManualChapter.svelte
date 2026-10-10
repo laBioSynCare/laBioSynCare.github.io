@@ -84,7 +84,7 @@
           {#if recipe.links?.length}
             <div class="recipe-links">
               {#each recipe.links as link}
-                <a href={here(link.href)} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label} <span aria-hidden="true">↗</span></a>
+                <a href={here(link.href)} rel={link.href.startsWith('/ontology/docs/') ? 'external' : link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label} <span aria-hidden="true">↗</span></a>
               {/each}
             </div>
           {/if}
@@ -95,7 +95,7 @@
         <h2>Further reference</h2>
         <div class="reference-links">
           {#each chapter.more as link}
-            <a href={here(link.href)} rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label} <span aria-hidden="true">↗</span></a>
+            <a href={here(link.href)} rel={link.href.startsWith('/ontology/docs/') ? 'external' : link.href.startsWith('http') ? 'noopener noreferrer' : undefined}>{link.label} <span aria-hidden="true">↗</span></a>
           {/each}
         </div>
       </section>
