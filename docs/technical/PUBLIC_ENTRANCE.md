@@ -1,11 +1,55 @@
 # Public Entrance — audience-first landing IA & copy
 
-> **Status: shipped 2026-07-18** (`src/routes/+page.svelte`). Implements
-> Workstream 4 of
-> [`../ecosystem/ECOSYSTEM_INTEGRATION.md`](../ecosystem/ECOSYSTEM_INTEGRATION.md).
-> This file is the design + copy source of record — update it in the same
-> change as any future entrance edit. Pairs with
+> **Status: revised 2026-10-10** (`src/routes/+page.svelte`). This is the
+> public entrance design and copy source of record. The 2026-07-18 decisions
+> below are preserved as historical rationale; the current design is documented
+> immediately below. Pairs with
 > [`KNOWLEDGE_BROWSER_UX.md`](KNOWLEDGE_BROWSER_UX.md).
+
+## Current direction (2026-10-10)
+
+**Hero:** *A living reference for sensory stimulation.*
+
+**Subhead:** *An open, evolving knowledge foundation for sensory stimulation,
+connecting research, technology, and AI through citable references, precise
+descriptions, and transparent evidence.*
+
+This is a project-level vision, recorded in
+[`REFERENCE_VISION.md`](../concept/REFERENCE_VISION.md), not a claim of
+international scientific authority or W3C ratification. The public identity
+describes the destination; each link and action describes a capability actually
+available today.
+
+**Purpose of the revised entrance:** lead with scientific value instead of
+ontology implementation details. Demonstrate why an ambiguous "40 Hz
+stimulation" description conceals physically distinct modalities (binaural
+difference, isochronic amplitude modulation and visual flicker), explicitly
+labeling schematic artwork as illustrative. Distinguish what was specified,
+delivered, observed and supported by evidence.
+
+**Four working paths:** Explore (Graph, manual, SPARQL); For AI & developers
+(read-only published MCP reference, published clients); Experiment (ready-made
+patch, Patch Studio, presets); Contribute (Community Group, correction channel,
+protocol contribution). Do not represent AI-proposed ontology changes,
+autonomous execution, turnkey HED/BIDS export or conformance certification as
+existing features.
+
+**Evolution narrative:** versioned persistent identifiers, contextual and
+contested evidence, reviewed changes. The new page links the project vision and
+current citable releases. SSTIM remains independent of BioSynCare, and SSTIM
+Workbench remains non-normative. The About and Ecosystem pages use the same
+direction without changing their factual architecture.
+
+**Design:** responsive editorial grid; high-contrast typographic hierarchy,
+purpose-built static semantic network illustration, source-labeled signal
+diagrams, four accessible action cards, and no extra dependencies or externally
+hosted assets. Existing `?example=` and graph deep links survive. A reduced
+motion preference is respected. The hero description and share metadata must
+stay identical to the site-wide `app.html` meta description.
+
+---
+
+## Original entrance (historical 2026-07-18)
 
 ## Problem
 
