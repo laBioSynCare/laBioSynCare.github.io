@@ -27,6 +27,8 @@ describe('SSTIM MCP standalone npm distribution', () => {
       expect.objectContaining({ name: 'BioSynCare', url: 'https://biosyncare.com' }),
     ]))
     expect(registry.name).toBe(meta.mcpName)
+    expect(registry.description.length).toBeLessThanOrEqual(100)
+    expect(registry.description).toMatch(/SSTIM/)
     expect(registry.version).toBe(meta.version)
     expect(registry.packages[0].identifier).toBe(meta.name)
     expect(registry.packages[0].transport.type).toBe('stdio')
