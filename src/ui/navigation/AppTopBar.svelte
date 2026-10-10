@@ -335,14 +335,17 @@
              canvas is RDF and that its nodes are persistent identifiers. -->
         <section class="help-about">
           <p>
-            One RDF knowledge graph, not a diagram: the SSTIM ontology and its
-            SKOS vocabulary, together with the catalog and ecosystem records.
+            A navigable view over RDF knowledge: SSTIM ontology terms and SKOS
+            vocabulary, together with catalog records and separately sourced
+            ecosystem data. The graph is an interface to assertions, not
+            independent scientific verification of those assertions.
           </p>
           <p>
-            Every node is a persistent identifier under
-            <code>{PREFIXES.sstim}</code>. They dereference. Open one and you get
-            this view with the term selected, or Turtle and JSON-LD if you ask
-            for those instead.
+            Published SSTIM vocabulary terms have persistent identifiers in
+            <code>{PREFIXES.sstim}</code>, which support versioned reference and
+            content negotiation. Catalog and ecosystem nodes may have distinct
+            provenance and identity rules. Inspect a node's source and IRI
+            before treating it as canonical SSTIM knowledge.
           </p>
           <p class="help-links">
             <a href={applicationRoute('/namespace/')}>What resolves where</a>
