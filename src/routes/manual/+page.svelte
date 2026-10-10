@@ -17,8 +17,9 @@
     <div class="hero-actions">
       <a class="primary" href={applicationRoute('/manual/workbench/')}>Start without installing</a>
       <a href={applicationRoute('/manual/mcp/')}>Use SSTIM with an AI assistant</a>
+      <a href={applicationRoute('/agents/')}>Agents: report flaws or needs</a>
     </div>
-    <p class="boundary">SSTIM is an open formalized knowledge standard. Its Workbench and client packages are different tools built around the same published vocabulary. Validation is not evidence of efficacy.</p>
+    <p class="boundary">SSTIM is an evolving knowledge reference. Its current implementation uses a formal ontology; the Workbench, clients and read-only MCP server are distinct tools around released knowledge. A structurally valid file is not evidence of physiological efficacy or actual device output.</p>
   </header>
 
   <section class="catalog" aria-labelledby="chapter-heading">
