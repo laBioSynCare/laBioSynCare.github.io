@@ -364,6 +364,7 @@ them, so publishing here is not a one command operation.
 
 ```bash
 make push     # current branch and its annotated tags to both, each read back
+make pull     # fetch both, fast-forward from each, fail if the two disagree
 ```
 
 **Why this is an invariant and not a habit.** The drift is invisible from the

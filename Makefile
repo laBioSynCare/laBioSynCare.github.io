@@ -99,7 +99,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules firestore-rules-test dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push pull deploy-firestore-rules firestore-rules-test dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -171,6 +171,54 @@ push:
 		}; \
 	done; \
 	echo "push: $$branch at $$(git rev-parse --short HEAD) reached $(GIT_REMOTES)"
+
+## Fetch every remote in GIT_REMOTES (with tags), fast-forward the current
+## branch to each remote's copy of it, and report where each remote stands.
+##
+## Fast-forward only: a diverged branch stops the command instead of creating
+## a merge commit nobody asked for. It also stops, after the pull, if the two
+## remotes disagree with each other, because that is the mirror drift
+## `make push` exists to prevent (CLAUDE.md 3.7). Needs a clean-enough tree
+## for git to fast-forward; it never stashes or rebases.
+pull:
+	@set -e; \
+	branch="$$(git rev-parse --abbrev-ref HEAD)"; \
+	for remote in $(GIT_REMOTES); do \
+		git remote get-url "$$remote" >/dev/null 2>&1 || { \
+			echo "pull: FAILED, remote '$$remote' is not configured (see CLAUDE.md 3.7)"; \
+			exit 1; \
+		}; \
+	done; \
+	for remote in $(GIT_REMOTES); do \
+		echo "==> $$remote"; \
+		git fetch --tags "$$remote"; \
+	done; \
+	for remote in $(GIT_REMOTES); do \
+		ref="refs/remotes/$$remote/$$branch"; \
+		git rev-parse --verify --quiet "$$ref" >/dev/null || { \
+			echo "pull: $$remote has no branch '$$branch', skipped"; \
+			continue; \
+		}; \
+		if git merge-base --is-ancestor "$$ref" HEAD; then \
+			echo "pull: $$remote/$$branch has nothing HEAD lacks"; \
+		elif git merge-base --is-ancestor HEAD "$$ref"; then \
+			git merge --ff-only "$$ref"; \
+		else \
+			echo "pull: FAILED, $$branch has diverged from $$remote/$$branch; rebase or merge by hand"; \
+			exit 1; \
+		fi; \
+	done; \
+	head="$$(git rev-parse HEAD)"; \
+	behind=""; \
+	for remote in $(GIT_REMOTES); do \
+		theirs="$$(git rev-parse --verify --quiet "refs/remotes/$$remote/$$branch" || true)"; \
+		[ "$$theirs" = "$$head" ] || behind="$$behind $$remote"; \
+	done; \
+	if [ -n "$$behind" ]; then \
+		echo "pull: $$branch at $$(git rev-parse --short HEAD); not at this commit:$$behind (run make push)"; \
+		exit 1; \
+	fi; \
+	echo "pull: $$branch at $$(git rev-parse --short HEAD), identical on $(GIT_REMOTES)"
 
 ## Build the static site as an immutable Nix package (result/share/bsc-lab).
 ## Bit-reproducible: `nix build --rebuild` produces an identical output.
