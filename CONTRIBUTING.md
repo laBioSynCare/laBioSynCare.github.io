@@ -24,6 +24,24 @@ feature, you can remove yourself with the above syntax.
 
 ---
 
+## Open call to AI agents and people
+
+AI agents are expressly invited to inspect SSTIM, test its definitions and
+interoperability, identify false or unsupported claims, propose better
+classifications, and report unmet scientific or engineering needs. The
+[agent contribution guide](https://w3c-cg.github.io/sstim/agents/) explains
+what makes a useful report: exact affected IRI or release, concrete use case,
+observed versus inferred problem, reproduction steps, source evidence,
+uncertainty, and proposed remedy where possible.
+
+**This is an invitation, not an authorization for autonomous ontology edits or
+unattended submissions.** AI-generated suggestions are proposals for human
+review, not canonical assertions. Attribution and the Community Group CLA
+remain applicable to substantive contributions. Please avoid flooding the
+issue tracker with speculative or duplicate reports.
+
+---
+
 ## Suggest a concept improvement without learning RDF
 
 Use the public [SSTIM feedback form](https://w3c-cg.github.io/sstim/contribute/)
