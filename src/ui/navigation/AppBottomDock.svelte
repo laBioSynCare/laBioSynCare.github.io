@@ -4,6 +4,7 @@
 
   const appRoot = applicationRoute('/')
   const items = [
+    { href: appRoot, label: 'Home' },
     { href: applicationRoute('/graph/'), label: 'Graph' },
     { href: applicationRoute('/creator/'), label: 'Patch Studio' },
     { href: applicationRoute('/presets/'), label: 'Presets' },
@@ -38,7 +39,7 @@
     z-index: 120;
     height: var(--app-bottom-dock-height, 48px);
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     align-items: stretch;
     background: color-mix(in srgb, var(--app-surface) 94%, #000 6%);
     border-top: var(--app-border-width) solid var(--app-border);
