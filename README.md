@@ -157,6 +157,15 @@ dual-typed OWL individuals and SKOS concepts. See the
 [ontology source guide](static/ontology/README.md), and
 [ADR index](docs/decisions/README.md).
 
+## Concept Reference API and MCP
+
+The released SSTIM ontology is exposed through a
+[version-pinned read-only JSON reference](docs/technical/CONCEPT_REFERENCE_API.md).
+For AI hosts with local MCP support, the
+[SSTIM MCP adapter](packages/sstim-mcp/README.md) exposes tools for released
+concept discovery, exact lookup, and user-reviewed feedback links. It reads
+frozen releases (currently **0.19.0**) and never writes to the ontology.
+
 ## SSTIM Workbench
 
 The first screen is the working application, not a marketing site. Its main

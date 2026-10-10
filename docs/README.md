@@ -44,6 +44,8 @@ the two disagree, the code and the as-built docs win.
 
 - [`technical/CONCEPT_REFERENCE_API.md`](technical/CONCEPT_REFERENCE_API.md): release-versioned read-only JSON concept reference, generated from frozen ontology modules.
 
+- [`../packages/sstim-mcp/`](../packages/sstim-mcp/): locally runnable read-only MCP server for AI systems, using the generated Concept Reference API and preserving published-release provenance.
+
 ## `technical/` — specifications
 
 **As-built.** [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) (the live authoring

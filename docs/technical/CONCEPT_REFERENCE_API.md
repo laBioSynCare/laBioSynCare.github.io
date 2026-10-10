@@ -1,6 +1,6 @@
 # SSTIM Concept Reference API v1
 
-**Status:** deterministic, read-only JSON derived from frozen *released* SSTIM semantic modules during the static build. It is an accessibility layer over the published ontology, not an independent authority, live dataset, write API, or MCP server.
+**Status:** deterministic, read-only JSON derived from frozen *released* SSTIM semantic modules during the static build. It is an accessibility layer over the published ontology, not an independent authority, live dataset or write API. A separate [read-only local MCP adapter](../../packages/sstim-mcp/README.md) consumes this interface.
 
 ## Endpoints
 
