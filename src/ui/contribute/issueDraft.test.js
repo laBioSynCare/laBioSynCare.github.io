@@ -3,6 +3,7 @@ import {
   FEEDBACK_KINDS, normalizeSstimIri, contributionRoute,
   contributionPrefill, feedbackIssueUrl,
 } from './issueDraft.js'
+import { applicationRoute } from '../../config/applicationUrls.js'
 
 const term = 'https://w3id.org/sstim/vocab#techBinauralBeats'
 
@@ -23,10 +24,11 @@ describe('SSTIM contribution links', () => {
 
   it('creates a stable entry route and round-trips a fragment IRI and label', () => {
     const route = contributionRoute(term, 'Binaural beats')
-    expect(route.startsWith('/contribute/?')).toBe(true)
+    // The route carries the deployment's mount path (/sstim on the W3C CG site).
+    expect(route.startsWith(`${applicationRoute('/contribute/')}?`)).toBe(true)
     const search = route.slice(route.indexOf('?'))
     expect(contributionPrefill(search)).toEqual({ targetIri: term, label: 'Binaural beats' })
-    expect(contributionRoute('https://example.com/no')).toBe('/contribute/')
+    expect(contributionRoute('https://example.com/no')).toBe(applicationRoute('/contribute/'))
     expect(contributionPrefill('?label=Fake&term=https://example.com/no'))
       .toEqual({ targetIri: '', label: '' })
   })
