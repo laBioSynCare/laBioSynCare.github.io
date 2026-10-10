@@ -655,7 +655,7 @@
           </div>
         {/if}
       </div>
-      <p class="tagline">The long-term memory of your sensory stimulation work.</p>
+      <p class="tagline">Your personal observations and ideas, separate from published SSTIM assertions. Private logbook entries do not change the shared reference.</p>
     </div>
     <button class="btn-add" onclick={openForm}>+ Add entry</button>
   </header>
