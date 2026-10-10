@@ -1,0 +1,55 @@
+name: Publish SSTIM MCP to Official Registry
+
+# Registry publication is an explicit maintainer action, not part of routine
+# source pushes or the ontology release process. Run ONLY on w3c-cg/sstim.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    # The same Git commit also lives in a legacy mirror. Only the canonical
+    # Community Group repository may request its organization's OIDC namespace.
+    if: github.repository == 'w3c-cg/sstim' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # GitHub Actions OIDC for io.github.w3c-cg/*
+    steps:
+      - name: Check out canonical repository
+        uses: actions/checkout@v6
+
+      - name: Check identity, immutable npm package and registry descriptor
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict'
+          import { readFileSync } from 'node:fs'
+          const pkg = JSON.parse(readFileSync('packages/sstim-mcp/package.json', 'utf8'))
+          const entry = JSON.parse(readFileSync('packages/sstim-mcp/server.json', 'utf8'))
+          assert.equal(pkg.name, '@sstim/mcp')
+          assert.equal(pkg.mcpName, 'io.github.w3c-cg/sstim')
+          assert.equal(entry.name, pkg.mcpName)
+          assert.equal(entry.version, pkg.version)
+          assert.equal(entry.packages?.[0]?.identifier, pkg.name)
+          assert.equal(entry.packages?.[0]?.version, pkg.version)
+          assert.ok(entry.description.length <= 100)
+          assert.equal(pkg.author?.name, 'SSTIM W3C Community Group')
+          assert.equal(pkg.contributors?.find(x => x.name === 'BioSynCare')?.url, 'https://biosyncare.com')
+          NODE
+
+      - name: Install official MCP publisher
+        run: |
+          curl -fLsS             "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz"             | tar -xz mcp-publisher
+          chmod +x mcp-publisher
+          ./mcp-publisher --help >/dev/null
+
+      - name: Validate MCP Registry entry
+        run: ./mcp-publisher validate packages/sstim-mcp/server.json
+
+      - name: Authenticate as canonical GitHub repository via OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish metadata to official registry
+        run: ./mcp-publisher publish packages/sstim-mcp/server.json

@@ -1,8 +1,9 @@
 # SSTIM MCP public distribution
 
 **Status:** package and listing metadata prepared in the SSTIM repository.
-External npm publication, official MCP Registry registration, and directory
-submissions are separate actions requiring their respective publisher accounts.
+The npm package @sstim/mcp@0.2.0 is publicly published. Official MCP Registry
+registration and directory submissions are separate actions requiring
+appropriate canonical-publisher authorization.
 Do not describe them as complete until they have been verified independently.
 
 ## Canonical identity and credit
@@ -64,34 +65,70 @@ is returned.
 
 ## Gate 2: official MCP Registry
 
-The candidate [`server.json`](../../packages/sstim-mcp/server.json)
-declares the GitHub source, monorepo subfolder, npm artifact, stdio transport,
-and the same `mcpName` published inside npm's `package.json`. The official
-registry hosts **metadata only**: the npm package must already be published
-before registration.
+The published `@sstim/mcp@0.2.0` package is installable via npm (verified
+using `npx` outside the package source directory). The authoritative
+[`server.json`](../../packages/sstim-mcp/server.json) identifies the
+SSTIM W3C Community Group and credits
+[BioSynCare](https://biosyncare.com). The registry publishes metadata only;
+the npm package is already published and **must not be republished** merely
+to fix registry authorization or shorten the `server.json` description.
 
-See the [official publishing guide](https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/quickstart.mdx).
+The canonical registry name is `io.github.w3c-cg/sstim`. **Personal GitHub
+login as `ttm` cannot publish that namespace**: interactive login permits
+`io.github.ttm/*`. The official registry now requires GitHub **organization
+Owner** status for interactive publication under `w3c-cg`. A repository
+admin or public ordinary member cannot acquire this permission by making
+their org membership public.
+
+### Preferred: publish via canonical GitHub Actions OIDC (no stored secret)
+
+After synchronizing both SSTIM remotes using `make push`:
+
+1. Open [w3c-cg/sstim Actions](https://github.com/w3c-cg/sstim/actions).
+2. Select **Publish SSTIM MCP to Official Registry**.
+3. Use **Run workflow**, select branch **main**, then start it.
+4. Inspect the run: it validates `server.json`, requests an ephemeral
+   GitHub Actions OIDC token from `w3c-cg/sstim`, and submits the registry
+   record with `mcp-publisher publish`.
+
+The workflow file
+[`publish-mcp-registry.yml`](../../.github/workflows/publish-mcp-registry.yml)
+is manually triggered, guarded to run only on the canonical `w3c-cg/sstim`
+repository's `main`, and requests only `contents: read` and
+`id-token: write`. It needs **no npm token, personal access token or
+other repository secret**. GitHub OIDC derives the namespace from the
+repository owner, not from the person who clicks Run workflow. A future
+automated publication policy should be reviewed with the Community Group
+before broadening triggers or privileges.
+
+References: [official GitHub Actions/OIDC publishing
+guide](https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/github-actions.mdx)
+and [authentication rules](https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/authentication.mdx).
+
+### Alternative: an authorized organization Owner publishes interactively
+
+An actual `w3c-cg` GitHub organization Owner can instead use:
 
 ```bash
-# After installing the mcp-publisher CLI via its official release/Homebrew:
 mcp-publisher validate packages/sstim-mcp/server.json
 mcp-publisher login github
 mcp-publisher publish packages/sstim-mcp/server.json
 ```
 
-Login must authorize `io.github.w3c-cg/*`. An OAuth login made as an
-outside collaborator may **not** be entitled to publish under the organization.
-If authorization fails, obtain explicit W3C organization-owner approval.
-Do not misrepresent a personal GitHub namespace as the Community Group.
+If registry publication fails because the npm `mcpName` verification
+field is missing, investigate the published tarball and metadata first.
+A new npm version would require a separately validated release. Do not
+switch to `io.github.ttm/sstim` just to bypass namespace authorization.
 
-Verify the live registry record **after** publication:
+Verify the live registry record **after** successful publication:
 
 ```bash
 curl -fsSL 'https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.w3c-cg/sstim'
 ```
 
-Check that the package name, transport, repository, title, and release version
-match the published artifacts. Registry status does not imply W3C endorsement.
+Check that the registry returns the canonical name, `@sstim/mcp@0.2.0`,
+stdio transport and canonical project links. Registry listing does not
+imply W3C Recommendation or formal W3C endorsement.
 
 ## Gate 3: searchable directories
 

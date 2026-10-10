@@ -52,10 +52,12 @@ source checkout. Pin an explicit package version for reproducible installations.
 A local checkout remains supported for development.
 
 Publication metadata is in [`server.json`](server.json) and
-[`package.json`](package.json). The official MCP Registry identity is
-`io.github.w3c-cg/sstim`, requiring an authorized publisher for the GitHub
-organization namespace. See
-[distribution steps](../../docs/ecosystem/MCP_DISTRIBUTION.md).
+[`package.json`](package.json). The canonical official MCP Registry
+identity is `io.github.w3c-cg/sstim`. Personal login as a repository admin
+cannot publish that organization namespace. The recommended path is the
+[manually triggered GitHub Actions OIDC workflow](../../.github/workflows/publish-mcp-registry.yml)
+on the canonical `w3c-cg/sstim` repository after both remotes are synchronized.
+See [distribution instructions](../../docs/ecosystem/MCP_DISTRIBUTION.md).
 
 ## Prerequisites
 
