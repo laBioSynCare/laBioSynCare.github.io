@@ -82,10 +82,10 @@
     white-space: nowrap;
   }
 
-  .dock-short { display: none; }
+  .app-bottom-dock .dock-short { display: none; }
   @media (max-width: 620px) {
-    .dock-full { display: none; }
-    .dock-short { display: block; }
+    .app-bottom-dock .dock-full { display: none; }
+    .app-bottom-dock .dock-short { display: block; }
     .app-bottom-dock a {
       font-size: 0.66rem;
       padding: 0 0.25rem;
