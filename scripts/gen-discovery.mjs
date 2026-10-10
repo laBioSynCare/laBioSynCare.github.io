@@ -105,6 +105,8 @@ export const LLMS_SECTIONS = [
     title: 'Start here',
     links: [
       ['SSTIM overview and status', { repo: 'README.md' }, 'what SSTIM is, what exists now, and where every version fact is derived from'],
+      ['SSTIM manual and tutorials', { site: '/manual/' }, 'six practical guides: Workbench, ontology, Python, JavaScript, AI/MCP and repository workflows'],
+      ['MCP use cases and installation', { site: '/manual/mcp/' }, 'real agent tasks, setup, release comparison, code mapping and feedback'],
       ['Scope', { repo: 'docs/concept/SCOPE.md' }, 'what SSTIM claims'],
       ['Non-scope', { repo: 'docs/concept/NON_SCOPE.md' }, 'what SSTIM explicitly does not claim; read before inferring capability'],
       ['Sensory stimulation, the domain', { repo: 'docs/concept/SENSORY_STIMULATION.md' }, 'the field being modelled: rhythmic sensory stimulation, entrainment paradigms, modalities'],
@@ -190,6 +192,8 @@ export const LLMS_FULL_DOCUMENTS = [
   'docs/concept/NON_SCOPE.md',
   'docs/ontology/CURRENT_STATE.md',
   'docs/ontology/TERM_INDEX.md',
+  'docs/manual/README.md',
+  'docs/manual/MCP_COOKBOOK.md',
   'CHARTER.md',
   'CITATION.cff',
 ]

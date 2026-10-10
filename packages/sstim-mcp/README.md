@@ -64,6 +64,35 @@ The server is launched by the AI client. Running it manually will appear idle
 because it waits for JSON-RPC messages on stdin. It must not emit human-readable
 logs to stdout.
 
+## What can an AI assistant do with SSTIM MCP?
+
+For a hands-on tutorial with **eight concrete AI prompts**, prerequisites,
+tool usage and limits, see the
+[**SSTIM MCP manual chapter**](https://w3c-cg.github.io/sstim/manual/mcp/)
+and the [MCP examples cookbook](../../docs/manual/MCP_COOKBOOK.md).
+
+Here are examples for users of Codex, Claude Code, GitHub Copilot, Cursor,
+Gemini and compatible Neovim plugins. Each task combines an AI assistant's
+ordinary reasoning and project access with *read-only released SSTIM data*:
+
+| Task | What to ask for | What SSTIM MCP contributes |
+|---|---|---|
+| Code/data schema alignment | "Inspect my session JSON and map frequency, technique, channels and session fields to SSTIM" | Canonical term IRIs and module/release provenance; **not** an automatically validated mapping |
+| Research terminology review | "Compare meanings of binaural and isochronous techniques without conflating stimulation with EEG bands" | Definitions and related concept links |
+| Version migration | "Retrieve this exact IRI in 0.18.0 and 0.19.0; report asserted differences" | Version-pinned details, deprecation and mappings |
+| Cross-ontology interoperability | "List external alignments for this term, including the precise SKOS relation" | Mapped external IRIs and relation strengths |
+| Codebase audit | "Find fields in my code matching published SSTIM properties; flag unknown ones" | Stable identifiers; human review of inferred matches |
+| Write scientific documentation | "Explain these terms with source references; distinguish evidence from labels" | Released definitions, source module and hashes |
+| Correct the standard | "Find this term or gap and prepare a link for me to submit a correction" | A user-reviewed Contribution Bridge link, **not a submission** |
+| Repeatable research | "Use only release 0.19.0 for all SSTIM terms cited in this protocol" | Release-qualified records for reproducibility |
+
+These four MCP tools do **not** perform automatic SHACL validation,
+execute a stimulation protocol, diagnose anything, or modify the ontology.
+Use [Python sstim](https://pypi.org/project/sstim/) or
+[JavaScript @sstim/core](https://www.npmjs.com/package/@sstim/core)
+for data validation, and use the Workbench to explore or author reference
+patches.
+
 ## Four available tools
 
 | Tool | Result |

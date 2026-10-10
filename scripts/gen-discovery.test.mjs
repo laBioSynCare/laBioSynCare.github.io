@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { MANUAL_IDS } from '../src/ui/manual/chapters.js'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -93,6 +94,14 @@ test('every link llms.txt publishes has a file behind it', () => {
     // has its own output tests and the subsequent build checks real artifacts.
     if (path === '/api/v1/index.json') {
       return [resolve(ROOT, 'scripts/gen-concept-reference.mjs')]
+    }
+    // The SvelteKit manual is a prerendered dynamic route. Resolve only the
+    // chapters actually declared by the tutorial inventory, never arbitrary slugs.
+    const manualRoute = path.match(/^\/manual\/([^/]+)\/$/)
+    if (manualRoute) {
+      return MANUAL_IDS.includes(manualRoute[1])
+        ? [resolve(ROOT, 'src/routes/manual/[chapter]/+page.svelte')]
+        : []
     }
     if (path.startsWith('/ontology/') || path.startsWith('/schemas/')) {
       return [resolve(ROOT, `static${path.replace(/\/$/, '')}`)]

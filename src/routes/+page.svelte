@@ -46,6 +46,7 @@
       // "+" menu and About. It exists in the deployed artifact only, so it
       // needs rel="external" to stay out of the prerender crawler's way.
       secondary: [
+        { label: 'Learn with tutorials', href: applicationRoute('/manual/') },
         { label: 'Read the reference docs', href: ONTOLOGY_DOCS_URL, external: true },
         { label: 'Cite SSTIM', action: 'cite' },
       ],

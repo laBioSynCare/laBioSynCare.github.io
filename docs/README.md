@@ -10,6 +10,7 @@ the two disagree, the code and the as-built docs win.
 
 ## Start here if you want to use SSTIM
 
+- [**Interactive web manual**](https://w3c-cg.github.io/sstim/manual/): six tutorials, with examples and commands for the Workbench, ontology, Python, JavaScript, MCP and repository. [Manual index](manual/README.md) in this repo.
 - [`ADOPTING_SSTIM.md`](ADOPTING_SSTIM.md): the on-ramp for someone outside
   this project: choose a profile, fetch it pinned to a release, copy a starter
   file, change the namespace, validate. Runnable without a checkout, and it
