@@ -178,12 +178,15 @@ dual-typed OWL individuals and SKOS concepts. See the
 
 ## SSTIM MCP: installable reference for AI agents
 
-**Published:** [`@sstim/mcp@0.2.0`](https://www.npmjs.com/package/@sstim/mcp),
+**Published:** [`@sstim/mcp@0.3.0`](https://www.npmjs.com/package/@sstim/mcp),
 official MCP Registry identity `io.github.w3c-cg/sstim`
-([successful canonical OIDC registration](https://github.com/w3c-cg/sstim/actions/runs/38037758861)).
-The local **stdio** MCP adapter exposes four read-only tools: list released
-versions, search concepts, retrieve exact terms with definitions/mappings/
-provenance, and prepare a human-reviewed feedback link. It consults the
+([canonical OIDC registration](https://github.com/w3c-cg/sstim/actions/workflows/publish-mcp-registry.yml)).
+The local **stdio** MCP adapter exposes four read-only knowledge tools: list
+released versions, search concepts, retrieve exact terms with definitions/
+mappings/provenance, and prepare a human-reviewed feedback link. Since 0.3.0 it
+can also draft contribution proposals and read the public contribution issues;
+it opens a public GitHub issue only when its operator enables submission and
+approves the exact text. It consults the
 [release-pinned Concept Reference API](docs/technical/CONCEPT_REFERENCE_API.md);
 it never mutates the ontology. No source checkout, login or API key is required
 to run the published package with Node.js 20+.
@@ -196,14 +199,14 @@ to run the published package with Node.js 20+.
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.0"]
     }
   }
 }
 ```
 
 For Codex use `[mcp_servers.sstim]` with `command = "npx"` and
-`args = ["--yes", "@sstim/mcp@0.2.0"]`.
+`args = ["--yes", "@sstim/mcp@0.3.0"]`.
 [Installation instructions for Codex, Claude Code, Gemini CLI, Cursor and
 Neovim](packages/sstim-mcp/README.md) include the appropriate client-specific
 configuration.

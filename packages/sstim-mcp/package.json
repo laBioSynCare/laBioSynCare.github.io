@@ -46,7 +46,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "sstim-mcp": "./server.mjs"
+    "sstim-mcp": "server.mjs"
   },
   "exports": {
     "./client": "./client.mjs"

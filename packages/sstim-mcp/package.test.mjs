@@ -48,7 +48,10 @@ describe('SSTIM MCP standalone npm distribution', () => {
     expect(paths.every(x => ['package.json', 'server.mjs', 'client.mjs',
       'README.md', 'LICENSE', 'server.json', 'contribution.mjs'].includes(x) ||
       x.startsWith('examples/'))).toBe(true)
-    expect(meta.bin['sstim-mcp']).toBe('./server.mjs')
+    // npm 11.21 drops a bin written "./server.mjs" at publish ("script name
+    // server.mjs was invalid and removed") although `npm pack` keeps it, so
+    // only `npm publish --dry-run` shows the loss. Caught before 0.3.0.
+    expect(meta.bin['sstim-mcp']).toBe('server.mjs')
     expect(readFileSync(join(dir, 'server.mjs'), 'utf8').startsWith('#!/usr/bin/env node'))
       .toBe(true)
   })

@@ -1,12 +1,9 @@
 # SSTIM MCP: senses, stimuli, perception and research
 
-**Status:** source version 0.3.0 adds an explicitly authorized, GitHub-backed
-contribution workflow to the read-only knowledge tools. **The published npm
-version is still 0.2.0** until the maintainer performs npm publication.
-Use the GitHub checkout to test 0.3.0 contribution features before release.
-The new code continues to support the **current MCP
-`2026-07-28` stateless protocol** and legacy initialization-based clients
-(`2025-11-25`, `2025-06-18`, `2024-11-05`).
+**Status:** version 0.3.0 adds an explicitly authorized, GitHub-backed
+contribution workflow to the read-only knowledge tools. It supports the
+**current MCP `2026-07-28` stateless protocol** and legacy
+initialization-based clients (`2025-11-25`, `2025-06-18`, `2024-11-05`).
 
 The adapter retrieves frozen SSTIM release data from the
 [Concept Reference API](../../docs/technical/CONCEPT_REFERENCE_API.md). It is
@@ -31,20 +28,20 @@ Community Group work is not a W3C Recommendation or a W3C-endorsed product.
 
 ### Install from npm (published)
 
-**`@sstim/mcp@0.2.0` is published and has been successfully executed from
-npm.** It is listed as `io.github.w3c-cg/sstim` in the official
+**`@sstim/mcp@0.3.0` is published on npm.** It is listed as
+`io.github.w3c-cg/sstim` in the official
 [MCP Registry](https://registry.modelcontextprotocol.io/), registered by
-[the canonical W3C Community Group repository via OIDC](https://github.com/w3c-cg/sstim/actions/runs/38037758861).
+[the canonical W3C Community Group repository via OIDC](https://github.com/w3c-cg/sstim/actions/workflows/publish-mcp-registry.yml).
 
 With Node.js 20+ and a compatible stdio MCP client, set **command** `npx`
-and **arguments** `["--yes", "@sstim/mcp@0.2.0"]`. The server needs no
+and **arguments** `["--yes", "@sstim/mcp@0.3.0"]`. The server needs no
 checkout or API token. For a smoke test, run it outside
 `packages/sstim-mcp/`: npm may resolve the local package there instead of
 the published executable.
 
 ```bash
 cd /tmp
-npx --yes @sstim/mcp@0.2.0
+npx --yes @sstim/mcp@0.3.0
 ```
 
 The command waits for protocol messages; silence is expected until the
@@ -52,8 +49,8 @@ MCP client sends them. Pin the exact npm version for reproducibility.
 Run `node packages/sstim-mcp/server.mjs` from a checkout only for development.
 
 [Distribution and directory-listing status](../../docs/ecosystem/MCP_DISTRIBUTION.md).
-The npm `0.2.0` tarball is immutable; subsequent repository documentation
-edits are reflected in npm's package README only with a future release.
+Each npm tarball is immutable; later repository documentation edits reach
+npm's package README only with a future release.
 
 ## Prerequisites
 
@@ -94,14 +91,14 @@ ordinary reasoning and project access with *read-only released SSTIM data*:
 | Correct the standard | "Find this term or gap and prepare a link for me to submit a correction" | A user-reviewed Contribution Bridge link, **not a submission** |
 | Repeatable research | "Use only release 0.19.0 for all SSTIM terms cited in this protocol" | Release-qualified records for reproducibility |
 
-These four MCP tools do **not** perform automatic SHACL validation,
+These MCP tools do **not** perform automatic SHACL validation,
 execute a stimulation protocol, diagnose anything, or modify the ontology.
 Use [Python sstim](https://pypi.org/project/sstim/) or
 [JavaScript @sstim/core](https://www.npmjs.com/package/@sstim/core)
 for data validation, and use the Workbench to explore or author reference
 patches.
 
-## Contribution workflow in source version 0.3.0
+## Contribution workflow (since 0.3.0)
 
 The new `sstim_draft_contribution` tool builds a structured, unreviewed issue
 proposal, with an explicit epistemic status. `sstim_list_contributions` and
@@ -125,11 +122,7 @@ creative work and technological applications. SSTIM is not a comprehensive
 encyclopedia of these areas; gaps are valid reports. Sources are
 contributor-supplied and must be independently assessed.
 
-This version is **not yet on npm**: the installation examples below continue to
-target the verifiably published `@sstim/mcp@0.2.0` and therefore expose only the
-four read-only tools until a future npm release.
-
-## Four tools in the currently published npm version
+## Tools
 
 | Tool | Result |
 |---|---|
@@ -137,11 +130,16 @@ four read-only tools until a future npm release.
 | `sstim_search_concepts` | Search terms by IRI/CURIE, labels, alternatives or definition |
 | `sstim_get_concept` | Retrieve exact term, definitions, declared relationships, source provenance |
 | `sstim_prepare_feedback` | User-facing Contribution Bridge link; nothing is submitted |
+| `sstim_draft_contribution` | Structured, unreviewed proposal text; nothing is submitted |
+| `sstim_list_contributions` | Recent public contribution issues and their GitHub state |
+| `sstim_get_contribution` | One public contribution issue, its unverified text and state |
+| `sstim_submit_contribution` | Public GitHub issue for review; refused unless the operator enabled submissions |
 
-All four tools are **read-only**. The feedback tool generates only a link with
-the selected public concept ID and label, without copying conversation text.
-The user reviews any issue and decides whether to publish it. No writes to
-SSTIM occur through these tools.
+Every tool except `sstim_submit_contribution` is **read-only**, and that one is
+disabled unless the operator opts in as described above. The feedback tool
+generates only a link with the selected public concept ID and label, without
+copying conversation text. The user reviews any issue and decides whether to
+publish it. No tool writes to the SSTIM ontology.
 
 ## Configure your software
 
@@ -159,7 +157,7 @@ Create or update `.vscode/mcp.json` in **your project** using the
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.0"]
     }
   }
 }
@@ -183,7 +181,7 @@ project-scoped `.codex/config.toml`). Append the contents of
 ```toml
 [mcp_servers.sstim]
 command = "npx"
-args = ["--yes", "@sstim/mcp@0.2.0"]
+args = ["--yes", "@sstim/mcp@0.3.0"]
 ```
 
 Or configure the server via the Codex IDE extension:
@@ -198,7 +196,7 @@ Reference: [Codex MCP configuration](https://developers.openai.com/codex/mcp).
 Run in a terminal (using the same Claude Code installation as your extension):
 
 ```bash
-claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.2.0
+claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.3.0
 claude mcp get sstim
 ```
 
@@ -220,7 +218,7 @@ Add to your user `~/.gemini/settings.json` or project
   "mcpServers": {
     "sstim": {
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.0"]
     }
   }
 }
@@ -230,7 +228,7 @@ See [`examples/gemini.settings.json`](examples/gemini.settings.json).
 Alternatively use:
 
 ```bash
-gemini mcp add -s user sstim npx --yes @sstim/mcp@0.2.0
+gemini mcp add -s user sstim npx --yes @sstim/mcp@0.3.0
 ```
 
 Open Gemini CLI and use **/mcp** to inspect connectivity and exposed tools.
@@ -250,7 +248,7 @@ with the contents of [`examples/cursor.mcp.json`](examples/cursor.mcp.json):
   "mcpServers": {
     "sstim": {
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.0"]
     }
   }
 }
@@ -272,7 +270,7 @@ require("codecompanion").setup({
   mcp = {
     servers = {
       sstim = {
-        cmd = { "npx", "--yes", "@sstim/mcp@0.2.0" },
+        cmd = { "npx", "--yes", "@sstim/mcp@0.3.0" },
       },
     },
     opts = {

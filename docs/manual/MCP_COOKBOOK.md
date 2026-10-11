@@ -3,7 +3,7 @@
 The released [SSTIM MCP server](../../packages/sstim-mcp/README.md) gives
 compatible coding assistants *read-only* access to the
 [Concept Reference API](../technical/CONCEPT_REFERENCE_API.md). The server
-is published as [\`@sstim/mcp@0.2.0\`](https://www.npmjs.com/package/@sstim/mcp)
+is published as [\`@sstim/mcp@0.3.0\`](https://www.npmjs.com/package/@sstim/mcp)
 and registered under \`io.github.w3c-cg/sstim\`.
 
 **User-facing tutorial:** [SSTIM Manual: MCP](https://w3c-cg.github.io/sstim/manual/mcp/).
@@ -18,7 +18,7 @@ and registered under \`io.github.w3c-cg/sstim\`.
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.2.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.0"]
     }
   }
 }
@@ -29,13 +29,13 @@ and registered under \`io.github.w3c-cg/sstim\`.
 \`\`\`toml
 [mcp_servers.sstim]
 command = "npx"
-args = ["--yes", "@sstim/mcp@0.2.0"]
+args = ["--yes", "@sstim/mcp@0.3.0"]
 \`\`\`
 
 **Claude Code** CLI or extension:
 
 \`\`\`bash
-claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.2.0
+claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.3.0
 \`\`\`
 
 Use the [client-specific setup](../../packages/sstim-mcp/README.md) for

@@ -38,7 +38,7 @@ describe('public SSTIM manual tutorials', () => {
     const mcp = getManualChapter('mcp')
     expect(mcp.examples.length).toBeGreaterThanOrEqual(8)
     expect(mcp.examples.filter(e => e.prompt).length).toBeGreaterThanOrEqual(6)
-    expect(mcp.examples.some(e => e.code?.includes('@sstim/mcp@0.2.0'))).toBe(true)
+    expect(mcp.examples.some(e => e.code?.includes('@sstim/mcp@0.3.0'))).toBe(true)
     expect(mcp.examples.some(e => /contribution/i.test(e.title))).toBe(true)
     expect(mcp.intro).toContain('read-only')
   })

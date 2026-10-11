@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "--yes",
-        "@sstim/mcp@0.2.0"
+        "@sstim/mcp@0.3.0"
       ]
     }
   }

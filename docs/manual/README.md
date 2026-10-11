@@ -57,7 +57,7 @@ npm install @sstim/core
 npx sstim validate stimulus.ttl --profile core --version 0.19.0
 
 # MCP: the executable is a stdio server for an AI client, not a text CLI
-npx --yes @sstim/mcp@0.2.0
+npx --yes @sstim/mcp@0.3.0
 \`\`\`
 
 For the MCP server command, configure the stdio client as shown in the

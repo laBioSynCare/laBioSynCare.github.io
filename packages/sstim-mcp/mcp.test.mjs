@@ -106,7 +106,7 @@ describe('editor MCP configuration examples', () => {
     for (const config of [vscode.servers.sstim, cursor.mcpServers.sstim,
       gemini.mcpServers.sstim]) {
       expect(config.command).toBe('npx')
-      expect(config.args).toEqual(['--yes', '@sstim/mcp@0.2.0'])
+      expect(config.args).toEqual(['--yes', '@sstim/mcp@0.3.0'])
     }
   })
 
@@ -115,10 +115,10 @@ describe('editor MCP configuration examples', () => {
     const neovim = sample('neovim-codecompanion.lua')
     expect(codex).toContain('[mcp_servers.sstim]')
     expect(codex).toContain('command = "npx"')
-    expect(codex).toContain('args = ["--yes", "@sstim/mcp@0.2.0"]')
+    expect(codex).toContain('args = ["--yes", "@sstim/mcp@0.3.0"]')
     expect(neovim).toContain('require("codecompanion").setup')
     expect(neovim).toContain('default_servers = { "sstim" }')
-    expect(neovim).toContain('cmd = { "npx", "--yes", "@sstim/mcp@0.2.0" }')
+    expect(neovim).toContain('cmd = { "npx", "--yes", "@sstim/mcp@0.3.0" }')
   })
 })
 
