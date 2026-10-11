@@ -26,7 +26,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false
       - name: Ensure npm supports OIDC
-        run: npm install --global npm@latest
+        # Exact version whose `npm publish --dry-run` was read for 0.3.0.
+        # npm@latest became 12 on its own and changed `npm pack --json`.
+        run: npm install --global npm@11.21.0
       - name: Check package identity and pending version
         run: |
           node --input-type=module <<'NODE'

@@ -14,6 +14,11 @@ const runNpm = (args, extra = {}) => execFileSync(npmCommand, args, {
   env: { ...process.env, npm_config_audit: 'false', npm_config_fund: 'false' },
   ...extra,
 })
+// npm 11 prints `pack --json` as an array, npm 12 as an object keyed by name.
+const packResult = output => {
+  const parsed = JSON.parse(output)
+  return Array.isArray(parsed) ? parsed[0] : parsed[meta.name]
+}
 
 describe('SSTIM MCP standalone npm distribution', () => {
   it('aligns authorship, package ownership metadata, and registry identity', () => {
@@ -38,7 +43,7 @@ describe('SSTIM MCP standalone npm distribution', () => {
   })
 
   it('packs a source-independent CLI with its license and registry metadata', () => {
-    const pack = JSON.parse(runNpm(['pack', '--dry-run', '--json', '--ignore-scripts']))[0]
+    const pack = packResult(runNpm(['pack', '--dry-run', '--json', '--ignore-scripts']))
     const paths = pack.files.map(x => x.path)
     for (const expected of ['package.json', 'server.mjs', 'client.mjs',
       'README.md', 'LICENSE', 'server.json', 'contribution.mjs']) {
@@ -59,9 +64,9 @@ describe('SSTIM MCP standalone npm distribution', () => {
   it('runs the actual npm-installed executable, including its bin symlink', () => {
     const tmp = mkdtempSync(join(tmpdir(), 'sstim-mcp-pack-'))
     try {
-      const packed = JSON.parse(runNpm([
+      const packed = packResult(runNpm([
         'pack', '--json', '--ignore-scripts', '--pack-destination', tmp,
-      ]))[0]
+      ]))
       const archive = join(tmp, packed.filename)
       expect(existsSync(archive)).toBe(true)
       const prefix = join(tmp, 'consumer')
