@@ -253,6 +253,15 @@ indexed, examiner-searchable records.
       pull, then PATCH it to Released 2026-10-10 and check the Version IRI reads
       `https://w3id.org/sstim/0.19.0` (the item below).*
 
+      *2026-10-11: three rows still showed 2026-04-12 and are corrected.
+      Submissions 29 (the captured 0.16.0 transition row), 31 (0.17.0) and 32
+      (0.18.0) were PATCHed to their `dct:issued` dates, 2026-08-18, 2026-09-07
+      and 2026-09-23. Each had gone weeks with no newer row, which is the
+      stability step 4 asks for, and read-back shows all three with the count
+      still 32 rows. 0.19.0 had not been pulled by 18:30 UTC although both
+      origins have served its ledger bytes since 2026-10-10, so its row
+      (expected 33) is still to capture, prove stable, and PATCH.*
+
 - [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
@@ -263,7 +272,9 @@ indexed, examiner-searchable records.
       unchanged-pull stability check, inspect the latest/current submission in
       the API and UI. If the field remains stale, correct that current row only,
       verify the displayed/resolved value, and preserve archived submissions as
-      history. Repeat this check for each genuine release.*
+      history. Repeat this check for each genuine release.* *Read back
+      2026-10-11: rows 31 and 32 carry the Version IRIs submitted for 0.17.0
+      and 0.18.0 respectively.*
 
 - [x] **Automate the DBpedia KG Catalog release refresh** `P3`
       *[dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53)

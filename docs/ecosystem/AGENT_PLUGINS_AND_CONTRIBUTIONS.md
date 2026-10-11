@@ -1,8 +1,8 @@
 # SSTIM Agent Plugins and GitHub-backed MCP proposals
 
-Status: packages and source v0.3.0 exist; they have not yet been published to
-public plugin marketplaces or verified against every named client. The npm
-registry still serves @sstim/mcp@0.2.0 until an explicit npm release.
+Status: @sstim/mcp@0.3.0 is published on npm and in the official MCP Registry
+(2026-10-11). The plugins have not yet been published to public plugin
+marketplaces or verified against every named client.
 
 ## Scope and value
 
@@ -28,13 +28,13 @@ does an ontology entry prove a therapeutic outcome.
   This is not yet a remote ChatGPT MCP app; web/mobile access requires a
   separately hosted, accessible HTTPS endpoint.
 
-All configured MCP commands use npx --yes @sstim/mcp@latest. Until
-npm v0.3.0 is published, this resolves the existing read-only v0.2.0
-implementation and does not expose direct proposal submission.
+All configured MCP commands use npx --yes @sstim/mcp@latest, which has
+resolved 0.3.0 with its proposal tools since 2026-10-11. Submission stays
+disabled unless the operator opts in, as described below.
 
 ## Local development
 
-To exercise the new source tools before npm publication, run
+To exercise unreleased source changes, run
 node packages/sstim-mcp/server.mjs as a local stdio MCP server.
 
 Public GitHub proposal submission is disabled by default. The operator must
@@ -73,9 +73,11 @@ the current stdio service as publicly deployable.
 
 1. Verify source mock-backed tests, protocol dispatcher, security cases,
    static build, RDF CI and deployment tests on main.
-2. Configure/verify npm trusted publication with the maintainer, publish
-   @sstim/mcp@0.3.0 from w3c-cg/sstim, then update the official
-   MCP registry descriptor and verify a real npm install.
+2. Done 2026-10-11 except trusted publication. @sstim/mcp@0.3.0 is on npm
+   and is the official registry's latest version, and a real install lists
+   eight tools. The OIDC publish run got E404, so the release went out with
+   the maintainer's token; configure the npm trusted publisher before the
+   next release (MCP_DISTRIBUTION.md).
 3. Test plugins in real Claude Code, VS Code/Copilot and ChatGPT clients,
    then package and submit to applicable marketplaces.
 4. Deploy an authenticated remote MCP service for ChatGPT only after
