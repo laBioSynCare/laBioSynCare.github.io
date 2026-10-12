@@ -91,6 +91,17 @@ what a working task list cannot.
 
 ## 2. IP and Legal
 
+### Registries
+- [x] **Migrate BARTOC node 21154's mutable links and extent** `P2`
+      *Requested in
+      [gbv/bartoc.org#319](https://github.com/gbv/bartoc.org/issues/319#issuecomment-5497720588)
+      on 2026-09-01; the curator applied every change and closed the issue as
+      completed on 2026-09-02. Re-read from the public JSKOS API on 2026-10-12:
+      `modified` 2026-09-02T06:15:49Z, `url` the W3C-CG docs, `subjectOf` the
+      W3C-CG repository, concept DOI and 0.16.0 namespace file, and the 0.16.0
+      extent, with the node URI, W3ID identifier and publisher preserved. The
+      publisher change that 0.19.0 makes possible is its own TODO item.*
+
 ### Ontology namespace
 - [x] Register `https://w3id.org/sstim` persistent namespace for the
       ontology `P1`

@@ -262,6 +262,15 @@ indexed, examiner-searchable records.
       origins have served its ledger bytes since 2026-10-10, so its row
       (expected 33) is still to capture, prove stable, and PATCH.*
 
+      *2026-10-12, 15:10 UTC: still no 0.19.0 row, and the stall is BioPortal's,
+      not ours. Across all 1,267 ontologies the `/submissions?include_status=ANY`
+      listing holds no submission created on 10-09, 10-10 or 10-11, and the one
+      created on 10-12 (HCMO) is a manual one still waiting for its file; the
+      pull URL answers 200 with the ledger bytes. The recovery that worked for
+      0.17.0, a submission created through the API against the same
+      `pullLocation`, is prepared for the maintainer to run rather than run
+      from an agent session. Either way the row then needs its date PATCHed.*
+
 - [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
@@ -289,14 +298,6 @@ indexed, examiner-searchable records.
       is idempotent in production and not only in the pre-merge rehearsal. The
       catalog now tracks stable tags without a submission; see
       [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
-
-- [~] **Migrate BARTOC node 21154's mutable links and extent** `P2`
-      *The live JSKOS record still carries the legacy docs/repository and July
-      counts. The exact W3C-CG replacements and 0.16.0 extent were requested in
-      [gbv/bartoc.org#319](https://github.com/gbv/bartoc.org/issues/319#issuecomment-5497720588)
-      on 2026-09-01. The request preserves the node URI, W3ID identifier,
-      concept DOI, and publisher field. Complete after a curator applies it and
-      the public JSKOS API returns the new values.*
 
 - [~] **SNOMED Affiliate Licence: applied 2026-09-04, awaiting approval** `P2`
       *SNOMED International replied on 2026-09-04 offering a no-fee "public good"
