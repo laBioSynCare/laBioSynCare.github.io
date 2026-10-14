@@ -86,6 +86,8 @@ annotations lives here.
 | [0060](0060-every-unversioned-iri-resolves-to-a-release.md) | Every unversioned SSTIM IRI resolves to a release | Accepted |
 | [0061](0061-universal-namespaces-carry-no-framework-structure.md) | SSTIM's universal namespaces carry no framework's or implementation's structure | Accepted |
 | [0062](0062-sensory-stimulation-ecosystem-contributor.md) | One relationship type for anyone in the field, and a public directory of it | Accepted |
+| [0063](0063-stimulus-magnitudes-at-delivery-stages.md) | A level says where in the delivery chain it holds: stimulus magnitudes with a quantity, unit, stage and basis | Accepted |
+| [0064](0064-published-protocols-schedules-arms-and-control-laws.md) | Published protocols, and the twelve things they needed: a source in place of a framework, schedules, arms, populations, control laws | Accepted |
 
 ## ADR lifecycle and revision policy
 

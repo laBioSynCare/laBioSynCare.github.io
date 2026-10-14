@@ -985,7 +985,10 @@ for claim in assessments:
 
 
 # Bibliographic identifiers must resolve to the same DOI recorded as source.
-references = instances_of(SSTIM.PublicSafeReference)
+# Every bibliographic record, not only the public-safe ones: ADR 0064 added
+# sources that protocols were encoded from, typed BibliographicReference, and a
+# DOI that disagrees with its own source link is wrong whatever the clearance.
+references = instances_of(SSTIM.BibliographicReference)
 reference_keys: dict[str, set[URIRef]] = defaultdict(set)
 for reference in references:
     keys = objects(reference, SSTIM.referenceKey)
@@ -1010,9 +1013,12 @@ for key, members in reference_keys.items():
 
 # Protocol, preset, caution, and session competency contracts.
 protocols = instances_of(SSTIM.SensoryStimulationProtocol)
+bibliographic_records = instances_of(SSTIM.BibliographicReference)
 for protocol in protocols:
-    if not objects(protocol, SSTIM.definedByFramework):
-        fail(f"{protocol}: protocol is not linked to a defining framework")
+    # ADR 0064: a framework, or the cited paper that specifies the protocol.
+    cited = [r for r in objects(protocol, DCTERMS.source) if r in bibliographic_records]
+    if not objects(protocol, SSTIM.definedByFramework) and not cited:
+        fail(f"{protocol}: protocol is linked neither to a defining framework nor to a cited bibliographic record")
     if not objects(protocol, SSTIM.usesTechnique) and not objects(protocol, SKOS.editorialNote):
         fail(f"{protocol}: protocol has neither a technique nor a baseline/boundary explanation")
 

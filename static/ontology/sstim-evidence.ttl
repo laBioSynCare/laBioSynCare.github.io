@@ -41,14 +41,14 @@
 <https://w3id.org/sstim/evidence> a owl:Ontology ;
     owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Evidence and Research Governance Module"@en ;
-    dct:description "Evidence assessments, atomic propositions, qualified bases, scope, references, searches, reviews, provenance, and public-claim governance."@en ;
+    dct:description "Evidence assessments, atomic propositions, qualified bases, scope, references, searches, reviews, provenance, public-claim governance, and the populations and study designs of protocols."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/configuration> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -701,6 +701,48 @@ sstim:permittedUseScope a owl:DatatypeProperty ;
     rdfs:range rdf:langString ;
     rdfs:label "permitted use scope"@en ;
     skos:definition "The permitted use and release scope of a governed research output as evidence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+
+###########################################################################
+# Protocol populations and designs (ADR 0064)
+#
+# A protocol's population and design were sayable only about an evidence
+# source, never about the protocol itself. These link a protocol, or one of its
+# arms, to the same population descriptors and study-design values the
+# evidence layer already uses, so the two sides share one vocabulary instead
+# of growing two. They live here because this module already requires the
+# Technique module that owns protocols and arms.
+###########################################################################
+
+sstim:hasStudyPopulation a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulationProtocol sstim:StudyArm ) ] ;
+    rdfs:range  sstim:PopulationDescriptor ;
+    rdfs:label  "has study population"@en ;
+    skos:definition "Links a protocol, or one of its arms, to the population it is designed for or was carried out in, such as people with mild Alzheimer's dementia or a transgenic mouse line. It describes who the protocol is for, never who benefits from it."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:protocolStudyDesign a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationProtocol ;
+    rdfs:range  sstim:StudyDesign ;
+    rdfs:label  "protocol study design"@en ;
+    skos:definition "The design of the study a protocol belongs to, using the study-design values evidence bases use: a randomized controlled trial, a preclinical experiment, and so on."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:populationTaxon a owl:ObjectProperty ;
+    rdfs:domain sstim:PopulationDescriptor ;
+    rdfs:label  "population taxon"@en ;
+    skos:definition "The organism taxon of a population, identified by an NCBI Taxonomy IRI such as http://purl.obolibrary.org/obo/NCBITaxon_10090 for the house mouse."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:populationCondition a owl:ObjectProperty ;
+    rdfs:domain sstim:PopulationDescriptor ;
+    rdfs:label  "population condition"@en ;
+    skos:definition "A health condition that defines membership of a population, identified by an external IRI such as a MeSH descriptor. Describes who a protocol was carried out in; it asserts nothing about effect on the condition."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 

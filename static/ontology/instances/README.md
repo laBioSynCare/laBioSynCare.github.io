@@ -31,10 +31,10 @@ BioSynCare catalog and real participant records are not present.
 | `programmes/` | The BioSynCare Ecosystem programme identity and its `dct:hasPart` membership ([ADR 0047](../../../docs/decisions/0047-programme-identity-path.md)). Kept out of `ecosystem/`, whose subdirectories are a reserved contract path for agent records |
 | `frameworks/` | BSC framework identity and the three techniques it originated (generic techniques it applies are incorporated from the vocabulary — [ADR 0033](../../../docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md)) |
 | `implementations/` | Public identity records for BSC Lab, the BioSynCare application, and the Patch Studio component |
-| `protocols/` | Two narrow, non-clinical BSC Lab reference protocols |
+| `protocols/` | Two narrow, non-clinical BSC Lab reference protocols, and nine published protocols encoded from their papers, which describe the method and assert no effect (ADR 0064) |
 | `presets/` | Two public reference preset fixtures |
 | `evidence/` | Scoped technique-level evidence assessments |
-| `references/` | Seven DOI-identified public-safe bibliographic records |
+| `references/` | Eleven DOI-identified public-safe bibliographic records, and the eight papers the nine published protocols were encoded from |
 | `experiments/` | Ten exploratory protocols, exposure profiles, channels, and qualified claims |
 | `sessions/` | One explicitly synthetic, non-personal session fixture with pre/post reports |
 | `ecosystem/fixtures/` | Synthetic people, organizations, qualified memberships, implementation responsibility, and admission-state tests |

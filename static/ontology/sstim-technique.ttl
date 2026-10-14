@@ -41,14 +41,14 @@
 <https://w3id.org/sstim/technique> a owl:Ontology ;
     owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Technique, Framework, and Protocol Module"@en ;
-    dct:description "Reusable technique, framework, protocol, and implementation semantics, independent of neuromodulation and evidence claims."@en ;
+    dct:description "Reusable technique, framework, protocol, and implementation semantics, with protocol schedules and study arms, independent of neuromodulation and evidence claims."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim/common> ;
+    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/stimulus> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -205,6 +205,178 @@ sstim:techniqueModality a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 sstim:EntrainmentBasedTechnique owl:disjointWith sstim:NonEntrainmentTechnique .
+
+
+###########################################################################
+# Schedules and study arms (ADR 0064)
+#
+# What a published protocol states first, after its stimulus, is how often
+# and for how long ("1 hour a day for 7 days"), and what it is compared with
+# (darkness, white noise, the same tones at random). Neither had a place: a
+# session plan describes one execution, and comparators and populations
+# existed only on the evidence side, as properties of a source about its
+# findings rather than of a protocol about its design.
+###########################################################################
+
+sstim:StimulationSchedule a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Schedule"@en ;
+    skos:definition "How a protocol, or one of its arms, distributes stimulation over time: how long a session lasts, how many sessions a day, how many sessions in all, how long the course runs, and how a session is divided into blocks, trials and their ordered segments."@en ;
+    skos:scopeNote "A design, stated in advance. What actually happened in one execution is session data (sstim:SessionInstance), and a single planned execution is a sstim:SessionSpecification."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:ScheduleSegment a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Schedule Segment"@en ;
+    skos:definition "One ordered part of a session or of a trial, such as a cue, a stimulation period, a rest or a baseline, with its duration and, where it presents one, the stimulus it presents."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:SegmentRole a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Segment Role"@en ;
+    skos:definition "A controlled information category for the part a schedule segment plays: cue, stimulation, rest or baseline."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:StudyArm a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Arm"@en ;
+    skos:definition "One condition of a protocol: what one group of subjects receives, or what each subject receives in turn. An arm may present the stimulation under study, a different active stimulation, a sham, or no stimulation at all, which is why an arm need not have a stimulus."@en ;
+    skos:scopeNote "An arm describes a protocol's design. A comparator named by an evidence source (sstim:ComparatorDescriptor) describes what that source compared against; the two may be the same condition seen from either side."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:StudyArmRole a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Arm Role"@en ;
+    skos:definition "A controlled information category for the part an arm plays in a protocol: experimental, active comparator, sham, or no stimulation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:ArmAllocation a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Arm Allocation"@en ;
+    skos:definition "A controlled information category for how a protocol's subjects meet its arms: each subject receives every arm in turn, or each receives one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:hasSchedule a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulationProtocol sstim:StudyArm ) ] ;
+    rdfs:range  sstim:StimulationSchedule ;
+    rdfs:label  "has schedule"@en ;
+    skos:definition "Links a protocol, or one of its arms, to the schedule on which it delivers stimulation. An arm's own schedule applies to that arm; otherwise the protocol's applies to every arm."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:sessionDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "session duration (s)"@en ;
+    skos:definition "How long one scheduled session lasts, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:sessionsPerDay a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "sessions per day"@en ;
+    skos:definition "How many sessions the schedule places in one day."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:sessionCount a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "session count"@en ;
+    skos:definition "How many sessions the schedule contains in all."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:courseDurationValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "course duration value"@en ;
+    skos:definition "How long the whole course of sessions runs, in the calendar unit stated by sstim:courseDurationUnit. A value and a unit rather than a count of seconds, because protocols state courses in days, weeks or months, and a month has no fixed length to convert."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:courseDurationUnit a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  sstim:MeasurementUnit ;
+    rdfs:label  "course duration unit"@en ;
+    skos:definition "The calendar unit of the course duration: day, week or month."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:trialsPerBlock a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "trials per block"@en ;
+    skos:definition "How many trials one block of a session contains, each trial being one pass through the schedule's ordered segments."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:blocksPerSession a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "blocks per session"@en ;
+    skos:definition "How many blocks of trials one session contains."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:hasScheduleSegment a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationSchedule ;
+    rdfs:range  sstim:ScheduleSegment ;
+    rdfs:label  "has schedule segment"@en ;
+    skos:definition "Links a schedule to one of the ordered segments a trial, or a session without trials, passes through."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:segmentOrder a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ScheduleSegment ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "segment order"@en ;
+    skos:definition "The position of the segment within its schedule, counting from 1. Positions are unique within a schedule."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:segmentDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ScheduleSegment ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "segment duration (s)"@en ;
+    skos:definition "How long the segment lasts, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:segmentRole a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ScheduleSegment ;
+    rdfs:range  sstim:SegmentRole ;
+    rdfs:label  "segment role"@en ;
+    skos:definition "The part the segment plays: cue, stimulation, rest or baseline."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:segmentStimulus a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ScheduleSegment ;
+    rdfs:range  sstim:StimulusSpecification ;
+    rdfs:label  "segment stimulus"@en ;
+    skos:definition "The stimulus specification a stimulation segment presents for its duration. A cue, rest or baseline segment usually presents none."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:hasStudyArm a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationProtocol ;
+    rdfs:range  sstim:StudyArm ;
+    rdfs:label  "has study arm"@en ;
+    skos:definition "Links a protocol to one of its arms."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:armRole a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StudyArm ;
+    rdfs:range  sstim:StudyArmRole ;
+    rdfs:label  "arm role"@en ;
+    skos:definition "The part the arm plays in its protocol."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:armStimulus a owl:ObjectProperty ;
+    rdfs:domain sstim:StudyArm ;
+    rdfs:range  sstim:StimulusSpecification ;
+    rdfs:label  "arm stimulus"@en ;
+    skos:definition "A stimulus the arm presents. An arm with no stimulation has none, and a SHACL constraint rejects one that does."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
+
+sstim:armAllocation a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationProtocol ;
+    rdfs:range  sstim:ArmAllocation ;
+    rdfs:label  "arm allocation"@en ;
+    skos:definition "How the protocol's subjects meet its arms: each receives every arm in turn, or each receives one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/technique> .
 
 
 ###########################################################################

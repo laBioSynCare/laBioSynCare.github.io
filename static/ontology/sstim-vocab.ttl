@@ -44,7 +44,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en ;
     skos:historyNote "0.7.0 adds orthogonal evidence-basis, proposition, scope, search, source-governance, review, and ecosystem relationship/purpose/outcome controlled values. Legacy overloaded evidence tags remain deprecated for compatibility."@en .
@@ -682,7 +682,7 @@ sstim-v:NeuralOscillationScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural Oscillation Vocabulary"@en ;
     skos:definition "Controlled categories for the named rhythmic fluctuations of neural activity, delimited by conventional frequency ambits together with characteristic topography and observation state."@en ;
-    skos:hasTopConcept sstim-v:deltaOscillation, sstim-v:thetaOscillation, sstim-v:alphaOscillation, sstim-v:smrOscillation, sstim-v:betaOscillation, sstim-v:gammaOscillation .
+    skos:hasTopConcept sstim-v:deltaOscillation, sstim-v:thetaOscillation, sstim-v:alphaOscillation, sstim-v:smrOscillation, sstim-v:betaOscillation, sstim-v:gammaOscillation, sstim-v:slowOscillation, sstim-v:sleepSpindle .
 
 sstim-v:deltaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
     skos:inScheme sstim-v:NeuralOscillationScheme ;
@@ -4338,7 +4338,7 @@ sstim-v:shapeSquare a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Onda quadra"@it,
                    "Onda quadrada"@pt,
                    "Onda cuadrada"@es ;
-    skos:altLabel "square wave"@en ;
+    skos:altLabel "square wave"@en, "rectangular wave"@en, "pulse train"@en ;
     skos:notation "square" ;
     skos:definition "A periodic shape alternating between two levels with a duty cycle. Its harmonic content makes it audibly and visually harsher than a sinusoid at the same rate."@en .
 
@@ -4539,3 +4539,670 @@ sstim-v:paramLuminance skos:topConceptOf sstim-v:RenderableParameterScheme .
 sstim-v:paramSize skos:topConceptOf sstim-v:RenderableParameterScheme .
 sstim-v:paramSpatialPosition skos:topConceptOf sstim-v:RenderableParameterScheme .
 sstim-v:paramVibrationIntensity skos:topConceptOf sstim-v:RenderableParameterScheme .
+
+
+###########################################################################
+# Stimulus magnitudes, schedules, arms and control laws (ADR 0063, ADR 0064)
+#
+# The controlled values the published-protocol encodings needed. Units and
+# quantity kinds are SSTIM's own small vocabularies rather than an import:
+# each quantity names the units it may be stated in, which is what lets SHACL
+# reject sound pressure in lux. Mapping them to QUDT is deferred until the
+# alignment gate can dereference QUDT targets (ADR 0057).
+###########################################################################
+
+sstim-v:QuantityKindScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Quantity Kind Vocabulary"@en ;
+    skos:definition "What a stated stimulus magnitude measures, across modalities and delivery stages."@en ;
+    skos:hasTopConcept sstim-v:quantitySoundPressureLevel, sstim-v:quantityHearingLevel, sstim-v:quantityLoudnessLevel,
+        sstim-v:quantityIlluminance, sstim-v:quantityLuminance, sstim-v:quantityIrradiance, sstim-v:quantityLuminousFlux,
+        sstim-v:quantityMelanopicEdi, sstim-v:quantityPower, sstim-v:quantityVibrationAcceleration,
+        sstim-v:quantityVibrationDisplacement, sstim-v:quantityElectricCurrent, sstim-v:quantityCurrentDensity,
+        sstim-v:quantityElectricFieldStrength, sstim-v:quantityTemperature, sstim-v:quantityRelativeOutputLevel,
+        sstim-v:quantityLevelAboveReference, sstim-v:quantityRatioToReference .
+
+sstim-v:quantitySoundPressureLevel a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Sound pressure level"@en, "Livello di pressione sonora"@it, "Nível de pressão sonora"@pt, "Nivel de presión sonora"@es ;
+    skos:altLabel "SPL"@en, "dB SPL"@en ;
+    skos:notation "sound-pressure-level" ;
+    skos:definition "Sound pressure in decibels relative to 20 micropascals, the reference for airborne sound. Stated at the subject it is what sstim:soundPressureLevelDb records."@en ;
+    sstim:quantityUnit sstim-v:unitDecibel .
+
+sstim-v:quantityHearingLevel a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Hearing level"@en, "Livello di udito"@it, "Nível de audição"@pt, "Nivel de audición"@es ;
+    skos:altLabel "dB HL"@en ;
+    skos:notation "hearing-level" ;
+    skos:definition "Sound level in decibels relative to the standardised normal-hearing threshold at the frequency concerned, as audiometers are calibrated. Relative to a population norm, not to the subject's own threshold, which is a level above reference."@en ;
+    sstim:quantityUnit sstim-v:unitDecibel .
+
+sstim-v:quantityLoudnessLevel a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Loudness level"@en, "Livello di sonorità"@it, "Nível de sonoridade"@pt, "Nivel de sonoridad"@es ;
+    skos:notation "loudness-level" ;
+    skos:definition "Perceived loudness in phon: the sound pressure level of a 1 kHz tone that a listener judges equally loud."@en ;
+    sstim:quantityUnit sstim-v:unitPhon .
+
+sstim-v:quantityIlluminance a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Illuminance"@en, "Illuminamento"@it, "Iluminância"@pt, "Iluminancia"@es ;
+    skos:notation "illuminance" ;
+    skos:definition "Visible light arriving per unit area at a surface, such as the plane of the eyes, weighted by the eye's photopic sensitivity, in lux. What light reaches the subject, as distinct from how bright the source is."@en ;
+    sstim:quantityUnit sstim-v:unitLux .
+
+sstim-v:quantityLuminance a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Luminance"@en, "Luminanza"@it, "Luminância"@pt, "Luminancia"@es ;
+    skos:notation "luminance" ;
+    skos:definition "Luminous intensity per unit projected area of a source or surface in a given direction, in candelas per square metre: a property of the source as seen from where the subject is, which sstim:luminanceCdM2 records."@en ;
+    sstim:quantityUnit sstim-v:unitCandelaPerSquareMetre .
+
+sstim-v:quantityIrradiance a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Irradiance"@en, "Irradianza"@it, "Irradiância"@pt, "Irradiancia"@es ;
+    skos:notation "irradiance" ;
+    skos:definition "Radiant power arriving per unit area, in watts per square metre, not weighted by visual sensitivity, as used for ultraviolet, infrared and other optical exposure."@en ;
+    sstim:quantityUnit sstim-v:unitWattPerSquareMetre .
+
+sstim-v:quantityLuminousFlux a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Luminous flux"@en, "Flusso luminoso"@it, "Fluxo luminoso"@pt, "Flujo luminoso"@es ;
+    skos:notation "luminous-flux" ;
+    skos:definition "The total visible light a source puts out in all directions, weighted by the eye's photopic sensitivity, in lumens, as lamps are rated."@en ;
+    sstim:quantityUnit sstim-v:unitLumen .
+
+sstim-v:quantityMelanopicEdi a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Melanopic equivalent daylight illuminance"@en, "Illuminamento melanopico equivalente alla luce diurna"@it, "Iluminância melanópica equivalente à luz do dia"@pt, "Iluminancia melanópica equivalente a la luz diurna"@es ;
+    skos:altLabel "melanopic EDI"@en ;
+    skos:notation "melanopic-edi" ;
+    skos:definition "Light arriving at the eye weighted by the sensitivity of the melanopsin-containing retinal ganglion cells rather than by visual brightness, expressed as the daylight illuminance with the same melanopic effect (CIE S 026), in lux."@en ;
+    sstim:quantityUnit sstim-v:unitLux .
+
+sstim-v:quantityPower a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Power"@en, "Potenza"@it, "Potência"@pt, "Potencia"@es ;
+    skos:notation "power" ;
+    skos:definition "A power in watts. A source's figure may be its electrical input, a rated equivalent or its radiated output, and often does not say which, so a more specific quantity is preferred whenever the source does."@en ;
+    sstim:quantityUnit sstim-v:unitWatt .
+
+sstim-v:quantityVibrationAcceleration a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Vibration acceleration"@en, "Accelerazione della vibrazione"@it, "Aceleração da vibração"@pt, "Aceleración de la vibración"@es ;
+    skos:notation "vibration-acceleration" ;
+    skos:definition "Acceleration of a vibrating surface or contactor, in metres per second squared."@en ;
+    sstim:quantityUnit sstim-v:unitMetrePerSecondSquared .
+
+sstim-v:quantityVibrationDisplacement a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Vibration displacement"@en, "Spostamento della vibrazione"@it, "Deslocamento da vibração"@pt, "Desplazamiento de la vibración"@es ;
+    skos:notation "vibration-displacement" ;
+    skos:definition "Displacement amplitude of a vibrating surface or contactor against the skin, in micrometres, the quantity vibrotactile thresholds are usually stated in."@en ;
+    sstim:quantityUnit sstim-v:unitMicrometre .
+
+sstim-v:quantityElectricCurrent a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Electric current"@en, "Corrente elettrica"@it, "Corrente elétrica"@pt, "Corriente eléctrica"@es ;
+    skos:notation "electric-current" ;
+    skos:definition "Electric current delivered through electrodes, in milliamperes, as transcranial direct and alternating current stimulation and nerve stimulation are dosed."@en ;
+    sstim:quantityUnit sstim-v:unitMilliampere .
+
+sstim-v:quantityCurrentDensity a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Current density"@en, "Densità di corrente"@it, "Densidade de corrente"@pt, "Densidad de corriente"@es ;
+    skos:notation "current-density" ;
+    skos:definition "Electric current per unit area of electrode or tissue, in milliamperes per square centimetre."@en ;
+    sstim:quantityUnit sstim-v:unitMilliamperePerSquareCentimetre .
+
+sstim-v:quantityElectricFieldStrength a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Electric field strength"@en, "Intensità del campo elettrico"@it, "Intensidade do campo elétrico"@pt, "Intensidad del campo eléctrico"@es ;
+    skos:notation "electric-field-strength" ;
+    skos:definition "Electric field strength, in volts per metre, usually the field induced in tissue by transcranial stimulation and estimated by a model rather than measured."@en ;
+    sstim:quantityUnit sstim-v:unitVoltPerMetre .
+
+sstim-v:quantityTemperature a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Temperature"@en, "Temperatura"@it, "Temperatura"@pt, "Temperatura"@es ;
+    skos:notation "temperature" ;
+    skos:definition "Temperature of a contact surface or medium in thermal stimulation, in degrees Celsius."@en ;
+    sstim:quantityUnit sstim-v:unitDegreeCelsius .
+
+sstim-v:quantityRelativeOutputLevel a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Relative output level"@en, "Livello di uscita relativo"@it, "Nível de saída relativo"@pt, "Nivel de salida relativo"@es ;
+    skos:notation "relative-output-level" ;
+    skos:definition "A setting as a fraction or percentage of the delivering system's own maximum, such as a normalised gain or the percentage of maximum stimulator output. Meaningful only for the system that defines that maximum."@en ;
+    sstim:quantityUnit sstim-v:unitRatio, sstim-v:unitPercent .
+
+sstim-v:quantityLevelAboveReference a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Level above reference"@en, "Livello sopra il riferimento"@it, "Nível acima da referência"@pt, "Nivel sobre la referencia"@es ;
+    skos:altLabel "sensation level"@en, "dB SL"@en ;
+    skos:notation "level-above-reference" ;
+    skos:definition "Level in decibels above a measure of the subject's own, such as their hearing threshold, the quantity audiology calls sensation level. The measure is named by sstim:relativeToParticipantMeasure."@en ;
+    sstim:quantityUnit sstim-v:unitDecibel .
+
+sstim-v:quantityRatioToReference a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Ratio to reference"@en, "Rapporto con il riferimento"@it, "Razão em relação à referência"@pt, "Razón respecto a la referencia"@es ;
+    skos:notation "ratio-to-reference" ;
+    skos:definition "A value as a ratio or percentage of a measure of the subject's own, such as 120% of resting motor threshold or 110% of baseline cadence. The measure is named by sstim:relativeToParticipantMeasure."@en ;
+    sstim:quantityUnit sstim-v:unitRatio, sstim-v:unitPercent .
+
+sstim-v:MeasurementUnitScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Measurement Unit Vocabulary"@en ;
+    skos:definition "The units SSTIM states magnitudes, thresholds and course lengths in."@en ;
+    skos:hasTopConcept sstim-v:unitDecibel, sstim-v:unitPhon, sstim-v:unitLux, sstim-v:unitCandelaPerSquareMetre,
+        sstim-v:unitWattPerSquareMetre, sstim-v:unitLumen, sstim-v:unitWatt, sstim-v:unitMetrePerSecondSquared,
+        sstim-v:unitMicrometre, sstim-v:unitMilliampere, sstim-v:unitMilliamperePerSquareCentimetre,
+        sstim-v:unitVoltPerMetre, sstim-v:unitMicrovolt, sstim-v:unitDegreeCelsius, sstim-v:unitPercent,
+        sstim-v:unitRatio, sstim-v:unitDay, sstim-v:unitWeek, sstim-v:unitMonth .
+
+sstim-v:unitDecibel a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Decibel"@en, "Decibel"@it, "Decibel"@pt, "Decibelio"@es ;
+    skos:altLabel "dB"@en ;
+    skos:notation "dB" ;
+    skos:definition "A logarithmic ratio to a reference value. The reference is part of the quantity, not of the unit: 20 micropascals for sound pressure level, the normal threshold for hearing level, the subject's own threshold for a level above reference."@en .
+
+sstim-v:unitPhon a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Phon"@en, "Phon"@it, "Fon"@pt, "Fonio"@es ;
+    skos:notation "phon" ;
+    skos:definition "The unit of loudness level: a sound at N phon is as loud as a 1 kHz tone at N decibels sound pressure level."@en .
+
+sstim-v:unitLux a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Lux"@en, "Lux"@it, "Lux"@pt, "Lux"@es ;
+    skos:altLabel "lx"@en ;
+    skos:notation "lx" ;
+    skos:definition "One lumen per square metre, the unit of illuminance."@en .
+
+sstim-v:unitCandelaPerSquareMetre a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Candela per square metre"@en, "Candela per metro quadrato"@it, "Candela por metro quadrado"@pt, "Candela por metro cuadrado"@es ;
+    skos:altLabel "cd/m²"@en, "nit"@en ;
+    skos:notation "cd/m2" ;
+    skos:definition "The unit of luminance: one candela per square metre of projected area of the source."@en .
+
+sstim-v:unitWattPerSquareMetre a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Watt per square metre"@en, "Watt per metro quadrato"@it, "Watt por metro quadrado"@pt, "Vatio por metro cuadrado"@es ;
+    skos:altLabel "W/m²"@en ;
+    skos:notation "W/m2" ;
+    skos:definition "The unit of irradiance: radiant power arriving per square metre."@en .
+
+sstim-v:unitLumen a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Lumen"@en, "Lumen"@it, "Lúmen"@pt, "Lumen"@es ;
+    skos:altLabel "lm"@en ;
+    skos:notation "lm" ;
+    skos:definition "The unit of luminous flux, the visible light a source puts out weighted by the eye's sensitivity."@en .
+
+sstim-v:unitWatt a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Watt"@en, "Watt"@it, "Watt"@pt, "Vatio"@es ;
+    skos:altLabel "W"@en ;
+    skos:notation "W" ;
+    skos:definition "The unit of power, one joule per second."@en .
+
+sstim-v:unitMetrePerSecondSquared a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Metre per second squared"@en, "Metro al secondo quadrato"@it, "Metro por segundo ao quadrado"@pt, "Metro por segundo al cuadrado"@es ;
+    skos:altLabel "m/s²"@en ;
+    skos:notation "m/s2" ;
+    skos:definition "The unit of acceleration, in which vibration amplitude is often stated."@en .
+
+sstim-v:unitMicrometre a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Micrometre"@en, "Micrometro"@it, "Micrômetro"@pt, "Micrómetro"@es ;
+    skos:altLabel "µm"@en, "micron"@en ;
+    skos:notation "um" ;
+    skos:definition "One millionth of a metre, the usual unit of vibration displacement at the skin."@en .
+
+sstim-v:unitMilliampere a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Milliampere"@en, "Milliampere"@it, "Miliampere"@pt, "Miliamperio"@es ;
+    skos:altLabel "mA"@en ;
+    skos:notation "mA" ;
+    skos:definition "One thousandth of an ampere, the usual unit of stimulation current."@en .
+
+sstim-v:unitMilliamperePerSquareCentimetre a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Milliampere per square centimetre"@en, "Milliampere per centimetro quadrato"@it, "Miliampere por centímetro quadrado"@pt, "Miliamperio por centímetro cuadrado"@es ;
+    skos:altLabel "mA/cm²"@en ;
+    skos:notation "mA/cm2" ;
+    skos:definition "The usual unit of current density at an electrode."@en .
+
+sstim-v:unitVoltPerMetre a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Volt per metre"@en, "Volt per metro"@it, "Volt por metro"@pt, "Voltio por metro"@es ;
+    skos:altLabel "V/m"@en ;
+    skos:notation "V/m" ;
+    skos:definition "The unit of electric field strength."@en .
+
+sstim-v:unitMicrovolt a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Microvolt"@en, "Microvolt"@it, "Microvolt"@pt, "Microvoltio"@es ;
+    skos:altLabel "µV"@en ;
+    skos:notation "uV" ;
+    skos:definition "One millionth of a volt, the unit EEG amplitudes and closed-loop detection thresholds are stated in."@en .
+
+sstim-v:unitDegreeCelsius a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Degree Celsius"@en, "Grado Celsius"@it, "Grau Celsius"@pt, "Grado Celsius"@es ;
+    skos:altLabel "°C"@en ;
+    skos:notation "degC" ;
+    skos:definition "The unit of temperature on the Celsius scale."@en .
+
+sstim-v:unitPercent a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Percent"@en, "Percentuale"@it, "Porcentagem"@pt, "Porcentaje"@es ;
+    skos:altLabel "%"@en ;
+    skos:notation "percent" ;
+    skos:definition "Hundredths of a reference quantity, which the quantity names."@en .
+
+sstim-v:unitRatio a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Ratio"@en, "Rapporto"@it, "Razão"@pt, "Razón"@es ;
+    skos:altLabel "dimensionless"@en ;
+    skos:notation "ratio" ;
+    skos:definition "A dimensionless fraction of a reference quantity, where 1 is the reference itself."@en .
+
+sstim-v:unitDay a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Day"@en, "Giorno"@it, "Dia"@pt, "Día"@es ;
+    skos:notation "day" ;
+    skos:definition "A calendar day, as a course of sessions is counted."@en .
+
+sstim-v:unitWeek a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Week"@en, "Settimana"@it, "Semana"@pt, "Semana"@es ;
+    skos:notation "week" ;
+    skos:definition "A calendar week of seven days."@en .
+
+sstim-v:unitMonth a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Month"@en, "Mese"@it, "Mês"@pt, "Mes"@es ;
+    skos:notation "month" ;
+    skos:definition "A calendar month. It has no fixed length in days, which is why a course stated in months is not converted."@en .
+
+sstim-v:DeliveryStageScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Delivery Stage Vocabulary"@en ;
+    skos:definition "Where in the chain from a system's settings to the subject's perception a stated magnitude holds."@en ;
+    skos:hasTopConcept sstim-v:stageConfigured, sstim-v:stageEmitted, sstim-v:stageAtSubject, sstim-v:stageAtTarget,
+        sstim-v:stageSubjectRelative, sstim-v:stagePerceived, sstim-v:stageUnstated .
+
+sstim-v:stageConfigured a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "Configured in the system"@en, "Impostato nel sistema"@it, "Configurado no sistema"@pt, "Configurado en el sistema"@es ;
+    skos:notation "configured" ;
+    skos:definition "A setting inside the delivering system before any transducer acts on it: a normalised gain, a drive-current set point, a percentage of maximum output. The stage of sstim:masterVolume, sstim:masterBrightness and sstim-ex:hasGainLevel, and the one that means least on hardware nobody else has."@en .
+
+sstim-v:stageEmitted a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "Emitted at the source"@en, "Emesso alla sorgente"@it, "Emitido na fonte"@pt, "Emitido en la fuente"@es ;
+    skos:notation "emitted" ;
+    skos:definition "What the transducer puts out, at the source: a loudspeaker's output at a stated distance, a lamp's flux or rating, an actuator's acceleration, the current at the electrodes."@en .
+
+sstim-v:stageAtSubject a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "At the subject"@en, "Al soggetto"@it, "No sujeito"@pt, "En el sujeto"@es ;
+    skos:notation "at-subject" ;
+    skos:definition "Where the stimulus meets the subject's receptor surface: sound pressure at the ear, illuminance at the eye, displacement at the skin. The stage ADR 0042 makes a stimulus specification's own, because it is the one an engine nobody has built can reproduce, and the stage of sstim:soundPressureLevelDb."@en .
+
+sstim-v:stageAtTarget a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "At a target in the body"@en, "In un bersaglio nel corpo"@it, "Em um alvo no corpo"@pt, "En un objetivo del cuerpo"@es ;
+    skos:notation "at-target" ;
+    skos:definition "At a target inside the body, for stimulation that does not pass through the senses or whose internal value is what is controlled, such as the electric field induced in cortex. Usually modelled rather than measured."@en .
+
+sstim-v:stageSubjectRelative a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "Relative to the subject's own measure"@en, "Relativo a una misura del soggetto"@it, "Relativo a uma medida do próprio sujeito"@pt, "Relativo a una medida del propio sujeto"@es ;
+    skos:notation "subject-relative" ;
+    skos:definition "Set relative to a measure of the subject's own, such as decibels above their hearing threshold or a percentage of their resting motor threshold. The absolute value differs between subjects by design, and sstim:relativeToParticipantMeasure names the measure."@en .
+
+sstim-v:stagePerceived a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "As perceived"@en, "Come percepito"@it, "Como percebido"@pt, "Como se percibe"@es ;
+    skos:notation "perceived" ;
+    skos:definition "As the subject perceives it, on a psychophysical scale such as loudness level in phon. A designed perceptual level, not a participant's report, which is a session observation."@en .
+
+sstim-v:stageUnstated a owl:NamedIndividual, sstim:DeliveryStage, skos:Concept ;
+    skos:inScheme sstim-v:DeliveryStageScheme ;
+    skos:topConceptOf sstim-v:DeliveryStageScheme ;
+    skos:prefLabel "Stage not stated"@en, "Stadio non indicato"@it, "Estágio não indicado"@pt, "Etapa no indicada"@es ;
+    skos:notation "unstated" ;
+    skos:definition "The source gives the value without saying where in the delivery chain it holds. Recording that is not a defect of the description; assigning a stage the source did not give would be."@en .
+
+sstim-v:ValueBasisScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Value Basis Vocabulary"@en ;
+    skos:definition "How a stated value is known."@en ;
+    skos:hasTopConcept sstim-v:valueSpecified, sstim-v:valueMeasured, sstim-v:valueReported, sstim-v:valueModelled .
+
+sstim-v:valueSpecified a owl:NamedIndividual, sstim:ValueBasis, skos:Concept ;
+    skos:inScheme sstim-v:ValueBasisScheme ;
+    skos:topConceptOf sstim-v:ValueBasisScheme ;
+    skos:prefLabel "Specified design value"@en, "Valore di progetto specificato"@it, "Valor de projeto especificado"@pt, "Valor de diseño especificado"@es ;
+    skos:notation "specified" ;
+    skos:definition "What the protocol or configuration says should be delivered."@en .
+
+sstim-v:valueMeasured a owl:NamedIndividual, sstim:ValueBasis, skos:Concept ;
+    skos:inScheme sstim-v:ValueBasisScheme ;
+    skos:topConceptOf sstim-v:ValueBasisScheme ;
+    skos:prefLabel "Measured"@en, "Misurato"@it, "Medido"@pt, "Medido"@es ;
+    skos:notation "measured" ;
+    skos:definition "Obtained by measuring the delivered stimulus with an instrument."@en .
+
+sstim-v:valueReported a owl:NamedIndividual, sstim:ValueBasis, skos:Concept ;
+    skos:inScheme sstim-v:ValueBasisScheme ;
+    skos:topConceptOf sstim-v:ValueBasisScheme ;
+    skos:prefLabel "Reported by a source"@en, "Riportato da una fonte"@it, "Relatado por uma fonte"@pt, "Informado por una fuente"@es ;
+    skos:notation "reported" ;
+    skos:definition "Stated by a cited source without a method SSTIM can check. The source's own words travel with it in sstim:reportedAs."@en .
+
+sstim-v:valueModelled a owl:NamedIndividual, sstim:ValueBasis, skos:Concept ;
+    skos:inScheme sstim-v:ValueBasisScheme ;
+    skos:topConceptOf sstim-v:ValueBasisScheme ;
+    skos:prefLabel "Modelled"@en, "Modellato"@it, "Modelado"@pt, "Modelado"@es ;
+    skos:notation "modelled" ;
+    skos:definition "Computed by a model or simulation rather than measured, as fields induced inside the head usually are."@en .
+
+sstim-v:ParticipantReferenceScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Participant Reference Vocabulary"@en ;
+    skos:definition "Measures of the subject's own that a stimulus value is set relative to."@en ;
+    skos:hasTopConcept sstim-v:referenceHearingThreshold, sstim-v:referenceDetectionThreshold, sstim-v:referencePainThreshold,
+        sstim-v:referenceRestingMotorThreshold, sstim-v:referenceComfortableLevel, sstim-v:referenceBaselineCadence,
+        sstim-v:referenceIndividualAlphaFrequency .
+
+sstim-v:referenceHearingThreshold a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Hearing threshold"@en, "Soglia uditiva"@it, "Limiar auditivo"@pt, "Umbral auditivo"@es ;
+    skos:notation "hearing-threshold" ;
+    skos:definition "The quietest level of the sound delivered that this subject can detect, measured for them."@en .
+
+sstim-v:referenceDetectionThreshold a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Detection threshold"@en, "Soglia di rilevamento"@it, "Limiar de detecção"@pt, "Umbral de detección"@es ;
+    skos:notation "detection-threshold" ;
+    skos:definition "The weakest stimulus of the kind delivered that this subject can detect, in a modality other than hearing, such as a vibrotactile or an electrical perception threshold."@en .
+
+sstim-v:referencePainThreshold a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Pain threshold"@en, "Soglia del dolore"@it, "Limiar de dor"@pt, "Umbral del dolor"@es ;
+    skos:notation "pain-threshold" ;
+    skos:definition "The level at which this subject first reports the stimulus as painful, as electrical stimulation is often set just below."@en .
+
+sstim-v:referenceRestingMotorThreshold a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Resting motor threshold"@en, "Soglia motoria a riposo"@it, "Limiar motor de repouso"@pt, "Umbral motor en reposo"@es ;
+    skos:notation "resting-motor-threshold" ;
+    skos:definition "The lowest stimulator output that evokes a criterion motor response in this subject at rest, as transcranial magnetic stimulation intensity is set."@en .
+
+sstim-v:referenceComfortableLevel a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Most comfortable level"@en, "Livello di massimo comfort"@it, "Nível de maior conforto"@pt, "Nivel de máximo confort"@es ;
+    skos:notation "most-comfortable-level" ;
+    skos:definition "The level this subject judges most comfortable, as a stimulus level is often set individually."@en .
+
+sstim-v:referenceBaselineCadence a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Baseline cadence"@en, "Cadenza di base"@it, "Cadência basal"@pt, "Cadencia basal"@es ;
+    skos:notation "baseline-cadence" ;
+    skos:definition "This subject's own walking step rate measured before training, as the tempo of a rhythmic cue is set relative to."@en .
+
+sstim-v:referenceIndividualAlphaFrequency a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Individual alpha frequency"@en, "Frequenza alfa individuale"@it, "Frequência alfa individual"@pt, "Frecuencia alfa individual"@es ;
+    skos:altLabel "IAF"@en ;
+    skos:notation "individual-alpha-frequency" ;
+    skos:definition "The peak frequency of this subject's own alpha rhythm, as a stimulation frequency is often set individually."@en .
+
+sstim-v:MeasuredSignalScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Measured Signal Vocabulary"@en ;
+    skos:definition "Kinds of physiological signal a control law reads from the subject."@en ;
+    skos:hasTopConcept sstim-v:measuredEeg, sstim-v:measuredEcg, sstim-v:measuredEmg, sstim-v:measuredRespiration, sstim-v:measuredMovement .
+
+sstim-v:measuredEeg a owl:NamedIndividual, sstim:MeasuredSignalKind, skos:Concept ;
+    skos:inScheme sstim-v:MeasuredSignalScheme ;
+    skos:topConceptOf sstim-v:MeasuredSignalScheme ;
+    skos:prefLabel "Electroencephalogram (EEG)"@en, "Elettroencefalogramma (EEG)"@it, "Eletroencefalograma (EEG)"@pt, "Electroencefalograma (EEG)"@es ;
+    skos:notation "eeg" ;
+    skos:definition "Electrical activity of the brain recorded from the scalp, or from within the skull."@en .
+
+sstim-v:measuredEcg a owl:NamedIndividual, sstim:MeasuredSignalKind, skos:Concept ;
+    skos:inScheme sstim-v:MeasuredSignalScheme ;
+    skos:topConceptOf sstim-v:MeasuredSignalScheme ;
+    skos:prefLabel "Electrocardiogram (ECG)"@en, "Elettrocardiogramma (ECG)"@it, "Eletrocardiograma (ECG)"@pt, "Electrocardiograma (ECG)"@es ;
+    skos:notation "ecg" ;
+    skos:definition "Electrical activity of the heart, or a heart-rate signal derived from it."@en .
+
+sstim-v:measuredEmg a owl:NamedIndividual, sstim:MeasuredSignalKind, skos:Concept ;
+    skos:inScheme sstim-v:MeasuredSignalScheme ;
+    skos:topConceptOf sstim-v:MeasuredSignalScheme ;
+    skos:prefLabel "Electromyogram (EMG)"@en, "Elettromiogramma (EMG)"@it, "Eletromiograma (EMG)"@pt, "Electromiograma (EMG)"@es ;
+    skos:notation "emg" ;
+    skos:definition "Electrical activity of muscle."@en .
+
+sstim-v:measuredRespiration a owl:NamedIndividual, sstim:MeasuredSignalKind, skos:Concept ;
+    skos:inScheme sstim-v:MeasuredSignalScheme ;
+    skos:topConceptOf sstim-v:MeasuredSignalScheme ;
+    skos:prefLabel "Respiration signal"@en, "Segnale respiratorio"@it, "Sinal respiratório"@pt, "Señal respiratoria"@es ;
+    skos:notation "respiration" ;
+    skos:definition "Breathing, measured as airflow or as chest or abdominal movement, or a rate derived from either."@en .
+
+sstim-v:measuredMovement a owl:NamedIndividual, sstim:MeasuredSignalKind, skos:Concept ;
+    skos:inScheme sstim-v:MeasuredSignalScheme ;
+    skos:topConceptOf sstim-v:MeasuredSignalScheme ;
+    skos:prefLabel "Body movement"@en, "Movimento corporeo"@it, "Movimento corporal"@pt, "Movimiento corporal"@es ;
+    skos:notation "movement" ;
+    skos:definition "Movement of the body or a limb, measured by accelerometer, motion capture or force sensors."@en .
+
+sstim-v:OscillationPhaseTargetScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Oscillation Phase Target Vocabulary"@en ;
+    skos:definition "Parts of a tracked rhythm's cycle a control law can aim its stimulation at."@en ;
+    skos:hasTopConcept sstim-v:phaseUpState, sstim-v:phaseDownState, sstim-v:phasePeak, sstim-v:phaseTrough .
+
+sstim-v:phaseUpState a owl:NamedIndividual, sstim:OscillationPhaseTarget, skos:Concept ;
+    skos:inScheme sstim-v:OscillationPhaseTargetScheme ;
+    skos:topConceptOf sstim-v:OscillationPhaseTargetScheme ;
+    skos:prefLabel "Up state"@en, "Stato attivo (up state)"@it, "Estado ativo (up state)"@pt, "Estado activo (up state)"@es ;
+    skos:notation "up-state" ;
+    skos:definition "The depolarised, active half of a slow oscillation's cycle, seen as its positive half-wave in scalp EEG."@en .
+
+sstim-v:phaseDownState a owl:NamedIndividual, sstim:OscillationPhaseTarget, skos:Concept ;
+    skos:inScheme sstim-v:OscillationPhaseTargetScheme ;
+    skos:topConceptOf sstim-v:OscillationPhaseTargetScheme ;
+    skos:prefLabel "Down state"@en, "Stato silente (down state)"@it, "Estado silencioso (down state)"@pt, "Estado silente (down state)"@es ;
+    skos:notation "down-state" ;
+    skos:definition "The hyperpolarised, silent half of a slow oscillation's cycle, seen as its negative half-wave in scalp EEG."@en .
+
+sstim-v:phasePeak a owl:NamedIndividual, sstim:OscillationPhaseTarget, skos:Concept ;
+    skos:inScheme sstim-v:OscillationPhaseTargetScheme ;
+    skos:topConceptOf sstim-v:OscillationPhaseTargetScheme ;
+    skos:prefLabel "Peak"@en, "Picco"@it, "Pico"@pt, "Pico"@es ;
+    skos:notation "peak" ;
+    skos:definition "The maximum of the tracked rhythm's cycle, for rhythms without up and down states."@en .
+
+sstim-v:phaseTrough a owl:NamedIndividual, sstim:OscillationPhaseTarget, skos:Concept ;
+    skos:inScheme sstim-v:OscillationPhaseTargetScheme ;
+    skos:topConceptOf sstim-v:OscillationPhaseTargetScheme ;
+    skos:prefLabel "Trough"@en, "Valle"@it, "Vale"@pt, "Valle"@es ;
+    skos:notation "trough" ;
+    skos:definition "The minimum of the tracked rhythm's cycle, for rhythms without up and down states."@en .
+
+sstim-v:SegmentRoleScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Schedule Segment Role Vocabulary"@en ;
+    skos:definition "The parts a segment of a session or trial can play."@en ;
+    skos:hasTopConcept sstim-v:segmentCue, sstim-v:segmentStimulation, sstim-v:segmentRest, sstim-v:segmentBaseline .
+
+sstim-v:segmentCue a owl:NamedIndividual, sstim:SegmentRole, skos:Concept ;
+    skos:inScheme sstim-v:SegmentRoleScheme ;
+    skos:topConceptOf sstim-v:SegmentRoleScheme ;
+    skos:prefLabel "Cue"@en, "Indicazione"@it, "Indicação"@pt, "Indicación"@es ;
+    skos:notation "cue" ;
+    skos:definition "Shows the subject what to attend to or do next, before stimulation starts."@en .
+
+sstim-v:segmentStimulation a owl:NamedIndividual, sstim:SegmentRole, skos:Concept ;
+    skos:inScheme sstim-v:SegmentRoleScheme ;
+    skos:topConceptOf sstim-v:SegmentRoleScheme ;
+    skos:prefLabel "Stimulation"@en, "Stimolazione"@it, "Estimulação"@pt, "Estimulación"@es ;
+    skos:notation "stimulation" ;
+    skos:definition "Presents the stimulus under study, as distinct from a cue, a rest or a baseline."@en .
+
+sstim-v:segmentRest a owl:NamedIndividual, sstim:SegmentRole, skos:Concept ;
+    skos:inScheme sstim-v:SegmentRoleScheme ;
+    skos:topConceptOf sstim-v:SegmentRoleScheme ;
+    skos:prefLabel "Rest"@en, "Riposo"@it, "Repouso"@pt, "Reposo"@es ;
+    skos:notation "rest" ;
+    skos:definition "Presents nothing, so the subject can rest between trials; a blank screen after a trial is a rest."@en .
+
+sstim-v:segmentBaseline a owl:NamedIndividual, sstim:SegmentRole, skos:Concept ;
+    skos:inScheme sstim-v:SegmentRoleScheme ;
+    skos:topConceptOf sstim-v:SegmentRoleScheme ;
+    skos:prefLabel "Baseline"@en, "Linea di base"@it, "Linha de base"@pt, "Línea de base"@es ;
+    skos:notation "baseline" ;
+    skos:definition "Presents nothing so that activity without the stimulus can be recorded for comparison, as the interleaved silent blocks of an electrophysiology session are."@en .
+
+sstim-v:StudyArmRoleScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Study Arm Role Vocabulary"@en ;
+    skos:definition "The parts an arm can play in a protocol."@en ;
+    skos:hasTopConcept sstim-v:armExperimental, sstim-v:armActiveComparator, sstim-v:armSham, sstim-v:armNoStimulation .
+
+sstim-v:armExperimental a owl:NamedIndividual, sstim:StudyArmRole, skos:Concept ;
+    skos:inScheme sstim-v:StudyArmRoleScheme ;
+    skos:topConceptOf sstim-v:StudyArmRoleScheme ;
+    skos:prefLabel "Experimental arm"@en, "Braccio sperimentale"@it, "Braço experimental"@pt, "Brazo experimental"@es ;
+    skos:notation "experimental" ;
+    skos:definition "Receives the stimulation the protocol is designed to study."@en .
+
+sstim-v:armActiveComparator a owl:NamedIndividual, sstim:StudyArmRole, skos:Concept ;
+    skos:inScheme sstim-v:StudyArmRoleScheme ;
+    skos:topConceptOf sstim-v:StudyArmRoleScheme ;
+    skos:prefLabel "Active comparator arm"@en, "Braccio di confronto attivo"@it, "Braço comparador ativo"@pt, "Brazo comparador activo"@es ;
+    skos:notation "active-comparator" ;
+    skos:definition "Receives a different active stimulation for comparison, such as another frequency, random timing or stimulation at the wrong phase."@en .
+
+sstim-v:armSham a owl:NamedIndividual, sstim:StudyArmRole, skos:Concept ;
+    skos:inScheme sstim-v:StudyArmRoleScheme ;
+    skos:topConceptOf sstim-v:StudyArmRoleScheme ;
+    skos:prefLabel "Sham arm"@en, "Braccio simulato (sham)"@it, "Braço simulado (sham)"@pt, "Brazo simulado (sham)"@es ;
+    skos:notation "sham" ;
+    skos:definition "Receives a stimulus made to resemble the experimental one without the feature under study, so that exposure and expectation are matched, as constant light and white noise stand in for 40 Hz flicker and clicks."@en .
+
+sstim-v:armNoStimulation a owl:NamedIndividual, sstim:StudyArmRole, skos:Concept ;
+    skos:inScheme sstim-v:StudyArmRoleScheme ;
+    skos:topConceptOf sstim-v:StudyArmRoleScheme ;
+    skos:prefLabel "No-stimulation arm"@en, "Braccio senza stimolazione"@it, "Braço sem estimulação"@pt, "Brazo sin estimulación"@es ;
+    skos:notation "no-stimulation" ;
+    skos:definition "Receives no stimulation: darkness and quiet, the same surroundings without the stimulus, or no training at all."@en .
+
+sstim-v:ArmAllocationScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Arm Allocation Vocabulary"@en ;
+    skos:definition "How a protocol's subjects meet its arms."@en ;
+    skos:hasTopConcept sstim-v:allocationWithinSubject, sstim-v:allocationBetweenSubject .
+
+sstim-v:allocationWithinSubject a owl:NamedIndividual, sstim:ArmAllocation, skos:Concept ;
+    skos:inScheme sstim-v:ArmAllocationScheme ;
+    skos:topConceptOf sstim-v:ArmAllocationScheme ;
+    skos:prefLabel "Within-subject"@en, "Intra-soggetto"@it, "Intrassujeito"@pt, "Intrasujeto"@es ;
+    skos:notation "within-subject" ;
+    skos:definition "Each subject receives every arm, in turn."@en .
+
+sstim-v:allocationBetweenSubject a owl:NamedIndividual, sstim:ArmAllocation, skos:Concept ;
+    skos:inScheme sstim-v:ArmAllocationScheme ;
+    skos:topConceptOf sstim-v:ArmAllocationScheme ;
+    skos:prefLabel "Between-subject"@en, "Tra soggetti"@it, "Entre sujeitos"@pt, "Entre sujetos"@es ;
+    skos:notation "between-subject" ;
+    skos:definition "Each subject receives one arm."@en .
+
+sstim-v:slowOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Slow oscillation"@en, "Oscillazione Lenta"@it, "Oscilação Lenta"@pt, "Oscilación Lenta"@es ;
+    skos:altLabel "sleep slow oscillation"@en, "SO"@en ;
+    skos:notation "slow-oscillation" ;
+    skos:definition "The rhythm of non-REM sleep below about 1 Hz in which large cortical populations alternate between a depolarised up state and a hyperpolarised down state, first described by Steriade, Nunez and Amzica in 1993. The rhythm closed-loop auditory stimulation in sleep follows."@en ;
+    skos:scopeNote "Conventionally below 1 Hz and often analysed as 0.5-1 Hz in human sleep EEG, while some scalp-EEG work detects it in 0.5-2 Hz. SSTIM has no ambit below 1 Hz, so its typical band is low delta (0.5-2 Hz), the narrowest that contains it, and its extended range runs from 0.1 Hz, as recorded in vivo, to that band's upper edge. Whether it is distinct from delta activity is debated; SSTIM records them as distinct rhythms."@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:lowDelta ;
+    sstim:extendedHzMin "0.1"^^xsd:decimal ;
+    sstim:extendedHzMax "2.0"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Widespread over the neocortex, largest frontally, often travelling from front to back." ;
+    sstim:hasOscillationStateContext "Characteristically present in non-REM sleep, most of all in slow-wave sleep." .
+
+sstim-v:sleepSpindle a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Sleep spindle"@en, "Fuso del Sonno"@it, "Fuso do Sono"@pt, "Huso del Sueño"@es ;
+    skos:altLabel "sigma activity"@en, "spindles"@en ;
+    skos:notation "sleep-spindle" ;
+    skos:definition "A waxing and waning burst of activity at roughly 11-16 Hz lasting half a second to a few seconds, generated in thalamic and thalamocortical networks, and a defining feature of non-REM stage 2 sleep. Slow spindles near 12 Hz are frontal and fast spindles near 14 Hz centro-parietal."@en ;
+    skos:scopeNote "Shares the sensorimotor rhythm's ambit (12-15 Hz) as its typical band, and is distinguished from it by state and generator rather than by frequency: a spindle occurs in sleep, the sensorimotor rhythm in waking motor quiescence. See De Gennaro and Ferrara (2003), Sleep spindles: an overview."@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:smr ;
+    sstim:extendedHzMin "11.0"^^xsd:decimal ;
+    sstim:extendedHzMax "16.0"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Frontal for slow spindles and centro-parietal for fast spindles." ;
+    sstim:hasOscillationStateContext "Characteristically present in non-REM sleep, most of all stage 2." .

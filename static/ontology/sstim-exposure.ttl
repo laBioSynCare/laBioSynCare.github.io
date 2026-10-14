@@ -44,14 +44,14 @@
     # ontology *document*, not an ontology IRI, so no version IRI is needed.
     owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
-    dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
+    dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status, with channel timing and visual source geometry."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-06-18"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
@@ -2832,6 +2832,137 @@ sstim-ex:knowledgeScopeNote a owl:DatatypeProperty ;
     rdfs:label "knowledge scope note"@en ;
     skos:definition "A language-tagged description of the corpus or scope of a knowledge-status assertion, used when no scope IRI exists."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+
+###########################################################################
+# Initial phase, random onset timing and display geometry (ADR 0064)
+#
+# Three things published protocols state about a channel that had no term: the
+# phase a flicker starts at (joint frequency and phase coding gives each SSVEP
+# target its own), the distribution random pulse onsets are drawn from (the
+# comparison condition of the GENUS studies), and the geometry of a visual
+# source (how far away, how large, how often the display refreshes).
+###########################################################################
+
+sstim-ex:OnsetIntervalDistribution a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Onset Interval Distribution"@en ;
+    skos:definition "Controlled vocabulary class for the probability distribution the intervals between successive pulse onsets are drawn from, for a channel whose timing is random rather than periodic."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasInitialPhase a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "initial phase"@en ;
+    skos:definition "The phase of a channel's modulation at the moment the channel starts, as a fraction of a cycle from 0 up to but excluding 1. Distinct from sstim-ex:hasPhaseOffset, which is relative to other channels: for channels at different rates a relative offset drifts, while the phase each one starts at stays fixed."@en ;
+    skos:scopeNote "Joint frequency and phase coding of SSVEP targets is the defining use: targets 0.2 Hz apart start a quarter of a cycle apart."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasOnsetIntervalDistribution a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range sstim-ex:OnsetIntervalDistribution ;
+    rdfs:label "has onset interval distribution"@en ;
+    skos:definition "The distribution the intervals between successive pulse onsets of a randomly timed channel are drawn from."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:meanOnsetIntervalSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "mean onset interval (s)"@en ;
+    skos:definition "The mean interval between successive pulse onsets of a randomly timed channel, in seconds. Random pulses averaging 40 per second have a mean interval of 0.025 s."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:minOnsetIntervalSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "minimum onset interval (s)"@en ;
+    skos:definition "The shortest interval between successive pulse onsets a randomly timed channel allows, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:maxOnsetIntervalSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "maximum onset interval (s)"@en ;
+    skos:definition "The longest interval between successive pulse onsets a randomly timed channel allows, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:displayRefreshRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "display refresh rate (Hz)"@en ;
+    skos:definition "The refresh rate of the display a visual channel is presented on, in hertz. It bounds which flicker rates the display can render exactly: at 60 Hz a 10 Hz square flicker takes six frames, while 8.2 Hz takes a non-integer number and must be approximated or sampled."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:viewingDistanceMetres a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "viewing distance (m)"@en ;
+    skos:definition "Distance from the subject's eyes to the visual source, in metres."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:sourceWidthMetres a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "source width (m)"@en ;
+    skos:definition "Width of the emitting surface of a visual source, such as a light panel or the stimulus on a screen, in metres."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:sourceHeightMetres a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "source height (m)"@en ;
+    skos:definition "Height of the emitting surface of a visual source, in metres."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:visualAngleDegrees a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "visual angle (degrees)"@en ;
+    skos:definition "Angle the visual stimulus subtends at the subject's eye, in degrees. Stated when a source gives it; deriving it from size and distance is a consumer's calculation, not a reported value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:OnsetIntervalDistributionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "Onset Interval Distribution Scheme"@en ;
+    skos:definition "Distributions the intervals between the pulse onsets of a randomly timed channel are drawn from."@en ;
+    skos:hasTopConcept
+        sstim-ex:intervalUniform,
+        sstim-ex:intervalExponential,
+        sstim-ex:intervalNormal .
+
+sstim-ex:intervalUniform a owl:NamedIndividual, sstim-ex:OnsetIntervalDistribution, skos:Concept ;
+    skos:inScheme sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:topConceptOf sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:prefLabel "Uniform"@en,
+                   "Uniforme"@it,
+                   "Uniforme"@pt,
+                   "Uniforme"@es ;
+    skos:notation "uniform" ;
+    skos:definition "Intervals drawn with equal probability anywhere between a minimum and a maximum."@en .
+
+sstim-ex:intervalExponential a owl:NamedIndividual, sstim-ex:OnsetIntervalDistribution, skos:Concept ;
+    skos:inScheme sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:topConceptOf sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:prefLabel "Exponential (Poisson process)"@en,
+                   "Esponenziale (processo di Poisson)"@it,
+                   "Exponencial (processo de Poisson)"@pt,
+                   "Exponencial (proceso de Poisson)"@es ;
+    skos:altLabel "Poisson process"@en ;
+    skos:notation "exponential" ;
+    skos:definition "Intervals drawn from an exponential distribution, so that onsets form a Poisson process: memoryless, with a stated mean rate and no regularity a subject could entrain to."@en .
+
+sstim-ex:intervalNormal a owl:NamedIndividual, sstim-ex:OnsetIntervalDistribution, skos:Concept ;
+    skos:inScheme sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:topConceptOf sstim-ex:OnsetIntervalDistributionScheme ;
+    skos:prefLabel "Normal"@en,
+                   "Normale"@it,
+                   "Normal"@pt,
+                   "Normal"@es ;
+    skos:altLabel "Gaussian jitter"@en ;
+    skos:notation "normal" ;
+    skos:definition "Intervals drawn from a normal distribution around a mean, as when a periodic train is jittered."@en .
 
 
 ###########################################################################

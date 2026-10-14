@@ -32,14 +32,14 @@
 <https://w3id.org/sstim/stimulus> a owl:Ontology ;
     owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Core Stimulus Description Module"@en ;
-    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, and optional stimulation target."@en ;
+    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, optional stimulation target, signals and their renderings, measurement units, and the control laws of adaptive specifications."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-07-31"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -227,6 +227,108 @@ sstim:renderingCarrierHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label  "rendering carrier (Hz)"@en ;
     skos:definition "The carrier frequency this rendering uses, where it needs one. A carrier exists because of a limitation of the sense being addressed and not because of anything about the signal: 10 Hz is below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all."@en ;
     skos:scopeNote "Beside sstim-ex:hasCarrierFrequencyHz, which states the same quantity one layer down. This one is a fact about a binding — what this rendering uses to carry this signal — and belongs to the specification layer; the exposure one is a fact about emission, what the channel physically puts out, and answers the generic \"what frequencies does this channel present?\" through its place in the sstim-ex:hasFrequencyHz family. A channel may carry several renderings, so the rendering-level value is the finer of the two. Where both are asserted a SHACL constraint requires them to agree."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+###########################################################################
+# Units and closed-loop control laws (ADR 0063, ADR 0064)
+#
+# A unit is named once, here, so every layer above can state a quantity with
+# it: a control law's detection threshold below, a channel magnitude in Common,
+# a course length in Technique. A control law is what ADR 0041 says an adaptive
+# stimulus is described by: not a waveform, which does not exist in advance,
+# but the rule that produces one from a signal measured in the subject.
+###########################################################################
+
+sstim:MeasurementUnit a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Measurement Unit"@en ;
+    skos:definition "A controlled information category naming the unit a stated quantity is expressed in, such as the decibel, the lux, the milliampere or the day. It names the unit and nothing else: what the number measures, and where, is stated by the quantity and the delivery stage beside it."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0063)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:ControlLaw a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Control Law"@en ;
+    skos:definition "The rule an adaptive stimulus specification follows to decide, from a signal measured in the subject, what to deliver and when: which signal it reads, which rhythm it tracks, which part of that rhythm's cycle it aims at, what threshold an event must cross, how long it waits before stimulating, how many stimuli it delivers, how long it then refrains, and which channel it drives."@en ;
+    skos:scopeNote "ADR 0041 holds that an adaptive stimulus has no description in advance, only the law that produces it, and this is that law. Closed-loop auditory stimulation of sleep slow oscillations is the case it was written for; neurofeedback is another. It describes the rule, never a recorded execution of it, which is session data."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064), after encoding a published closed-loop protocol showed that the adaptive regime could be declared but its rule could not be stated."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:MeasuredSignalKind a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Measured Signal Kind"@en ;
+    skos:definition "A controlled information category for the kind of physiological signal a control law reads from the subject, such as the electroencephalogram or respiration. Distinct from sstim:StimulationSignal, which is what is delivered rather than what is measured."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:OscillationPhaseTarget a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Oscillation Phase Target"@en ;
+    skos:definition "A controlled information category naming the part of a tracked rhythm's cycle a control law aims its stimulation at, such as the up state of a sleep slow oscillation."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasControlLaw a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim:ControlLaw ;
+    rdfs:label  "has control law"@en ;
+    skos:definition "Links an adaptive stimulus specification to the rule that decides what it delivers. Only an adaptive specification has one, and a SHACL constraint rejects a control law on a determinate or stochastic specification."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:controlInputSignal a owl:ObjectProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  sstim:MeasuredSignalKind ;
+    rdfs:label  "control input signal"@en ;
+    skos:definition "The kind of signal measured in the subject that the control law reads. A law may read more than one, such as EEG for the rhythm and movement to suspend stimulation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:targetOscillationPhase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  sstim:OscillationPhaseTarget ;
+    rdfs:label  "target oscillation phase"@en ;
+    skos:definition "The part of the tracked rhythm's cycle at which the control law aims to deliver its stimulus."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:detectionThresholdValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "detection threshold value"@en ;
+    skos:definition "The value the measured signal must cross for the control law to register an event, in the unit stated by sstim:detectionThresholdUnit. Signed, so a negative half-wave detected below -80 microvolts is the value -80."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:detectionThresholdUnit a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  sstim:MeasurementUnit ;
+    rdfs:label  "detection threshold unit"@en ;
+    skos:definition "The unit of the control law's detection threshold. A threshold value without its unit cannot be read, so a SHACL constraint requires the two together."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:triggerDelaySeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "trigger delay (s)"@en ;
+    skos:definition "Time from the detected event to the first stimulus, in seconds. A delay is how a law reaches a later phase than the one it detects: detecting a trough and stimulating half a cycle later to meet the following peak."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:stimuliPerTrigger a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "stimuli per trigger"@en ;
+    skos:definition "How many stimuli the control law delivers for each detected event."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:refractoryPeriodSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "refractory period (s)"@en ;
+    skos:definition "Time after a stimulation sequence during which the control law ignores new events, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:controlsChannel a owl:ObjectProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  sstim-ex:StimulusChannel ;
+    rdfs:label  "controls channel"@en ;
+    skos:definition "A stimulus channel whose delivery the control law decides."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
 ###########################################################################

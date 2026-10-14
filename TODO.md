@@ -1355,7 +1355,33 @@ Turtle files are listed in section 1. After they exist:
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
       `static/ontology/instances/references/` `P1`
-      *Seven records are present; expand only with source and venue review.*
+      *Eleven public-safe records are present, plus the eight sources of the
+      published protocols typed `sstim:BibliographicReference` (ADR 0064);
+      expand only with source and venue review.*
+
+- [ ] Complete the four abstract-level published protocols `P1`
+      *Galambos 1981, Ngo 2013, Lane 1998 and Thaut 1996 in
+      `instances/protocols/published-protocols.ttl` were encoded from their
+      PubMed abstracts only: their full texts sit behind publisher bot checks
+      and a PMC reCAPTCHA that were not bypassed. With the PDFs, encode the
+      stimuli, levels and timing their `skos:editorialNote`s list as missing.
+      The terms each needs exist (ADR 0063, ADR 0064), so this is data entry.
+      Wang 2017's display, refresh rate and waveform need the paper too.*
+
+- [ ] Route `implementation/bsclab/protocol/` at w3id.org `P2`
+      *Measured 2026-10-13 with `curl` (HTML and Turtle Accept): the existing
+      `bsclab/protocol/auditory-observation-reference` and
+      `bsclab/experiment/color-field-blink` IRIs answer 404, so the nine
+      published protocols, like the two reference protocols, do not
+      dereference. The `ref/` routes enumerate their keys, so the eight new
+      source records (`ref/IACCARINO_2016` and the rest) answer 404 too. Needs
+      an upstream perma-id/w3id.org PR (read the current PR template first),
+      routing HTML to `/graph/` and RDF to the instance file, then the mirror in
+      `docs/ecosystem/w3id/` updated to match.*
+
+- [ ] Native review of the labels ADR 0063 and ADR 0064 added `P2`
+      *237 labels in Italian, Portuguese and Spanish on the 79 new concepts,
+      written by the maintainers, as with the earlier vocabulary.*
 
 - [~] Grow the public preset catalog beyond its two seeds `P2`
       *Measured 2026-09-10 against the production build: `/presets/` renders
@@ -1544,7 +1570,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
       ANS), the plain names the preferred labels bury, and the `systemAutonomic`
       label divergence the alignment work exposed. Proposal and the rejected
       candidates: `~/sstim-drafts/altlabel-proposal.md`. Still partial by design:
-      most of the 556 concepts have no alias worth writing, and non-English
+      most of the 635 concepts have no alias worth writing, and non-English
       aliases wait for the same native reviewer as the labels.*
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,

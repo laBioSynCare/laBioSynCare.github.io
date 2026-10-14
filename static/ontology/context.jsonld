@@ -1557,6 +1557,231 @@
     "impliesPresence": {
       "@id": "sstim:impliesPresence",
       "@type": "@id"
+    },
+    "MeasurementUnit": "sstim:MeasurementUnit",
+    "ControlLaw": "sstim:ControlLaw",
+    "MeasuredSignalKind": "sstim:MeasuredSignalKind",
+    "OscillationPhaseTarget": "sstim:OscillationPhaseTarget",
+    "StimulusMagnitude": "sstim:StimulusMagnitude",
+    "QuantityKind": "sstim:QuantityKind",
+    "DeliveryStage": "sstim:DeliveryStage",
+    "ValueBasis": "sstim:ValueBasis",
+    "ParticipantReference": "sstim:ParticipantReference",
+    "StimulationSchedule": "sstim:StimulationSchedule",
+    "ScheduleSegment": "sstim:ScheduleSegment",
+    "SegmentRole": "sstim:SegmentRole",
+    "StudyArm": "sstim:StudyArm",
+    "StudyArmRole": "sstim:StudyArmRole",
+    "ArmAllocation": "sstim:ArmAllocation",
+    "OnsetIntervalDistribution": "sstim-ex:OnsetIntervalDistribution",
+    "hasControlLaw": {
+      "@id": "sstim:hasControlLaw",
+      "@type": "@id"
+    },
+    "controlInputSignal": {
+      "@id": "sstim:controlInputSignal",
+      "@type": "@id"
+    },
+    "targetOscillationPhase": {
+      "@id": "sstim:targetOscillationPhase",
+      "@type": "@id"
+    },
+    "detectionThresholdValue": {
+      "@id": "sstim:detectionThresholdValue",
+      "@type": "xsd:decimal"
+    },
+    "detectionThresholdUnit": {
+      "@id": "sstim:detectionThresholdUnit",
+      "@type": "@id"
+    },
+    "triggerDelaySeconds": {
+      "@id": "sstim:triggerDelaySeconds",
+      "@type": "xsd:decimal"
+    },
+    "stimuliPerTrigger": {
+      "@id": "sstim:stimuliPerTrigger",
+      "@type": "xsd:integer"
+    },
+    "refractoryPeriodSeconds": {
+      "@id": "sstim:refractoryPeriodSeconds",
+      "@type": "xsd:decimal"
+    },
+    "controlsChannel": {
+      "@id": "sstim:controlsChannel",
+      "@type": "@id"
+    },
+    "hasMagnitude": {
+      "@id": "sstim:hasMagnitude",
+      "@type": "@id"
+    },
+    "magnitudeQuantity": {
+      "@id": "sstim:magnitudeQuantity",
+      "@type": "@id"
+    },
+    "magnitudeUnit": {
+      "@id": "sstim:magnitudeUnit",
+      "@type": "@id"
+    },
+    "magnitudeValue": {
+      "@id": "sstim:magnitudeValue",
+      "@type": "xsd:decimal"
+    },
+    "magnitudeMinimum": {
+      "@id": "sstim:magnitudeMinimum",
+      "@type": "xsd:decimal"
+    },
+    "magnitudeMaximum": {
+      "@id": "sstim:magnitudeMaximum",
+      "@type": "xsd:decimal"
+    },
+    "deliveryStage": {
+      "@id": "sstim:deliveryStage",
+      "@type": "@id"
+    },
+    "valueBasis": {
+      "@id": "sstim:valueBasis",
+      "@type": "@id"
+    },
+    "relativeToParticipantMeasure": {
+      "@id": "sstim:relativeToParticipantMeasure",
+      "@type": "@id"
+    },
+    "measurementDistanceMetres": {
+      "@id": "sstim:measurementDistanceMetres",
+      "@type": "xsd:decimal"
+    },
+    "reportedAs": "sstim:reportedAs",
+    "quantityUnit": {
+      "@id": "sstim:quantityUnit",
+      "@type": "@id"
+    },
+    "trackedOscillation": {
+      "@id": "sstim:trackedOscillation",
+      "@type": "@id"
+    },
+    "hasSchedule": {
+      "@id": "sstim:hasSchedule",
+      "@type": "@id"
+    },
+    "sessionDurationSeconds": {
+      "@id": "sstim:sessionDurationSeconds",
+      "@type": "xsd:decimal"
+    },
+    "sessionsPerDay": {
+      "@id": "sstim:sessionsPerDay",
+      "@type": "xsd:decimal"
+    },
+    "sessionCount": {
+      "@id": "sstim:sessionCount",
+      "@type": "xsd:integer"
+    },
+    "courseDurationValue": {
+      "@id": "sstim:courseDurationValue",
+      "@type": "xsd:decimal"
+    },
+    "courseDurationUnit": {
+      "@id": "sstim:courseDurationUnit",
+      "@type": "@id"
+    },
+    "trialsPerBlock": {
+      "@id": "sstim:trialsPerBlock",
+      "@type": "xsd:integer"
+    },
+    "blocksPerSession": {
+      "@id": "sstim:blocksPerSession",
+      "@type": "xsd:integer"
+    },
+    "hasScheduleSegment": {
+      "@id": "sstim:hasScheduleSegment",
+      "@type": "@id"
+    },
+    "segmentOrder": {
+      "@id": "sstim:segmentOrder",
+      "@type": "xsd:integer"
+    },
+    "segmentDurationSeconds": {
+      "@id": "sstim:segmentDurationSeconds",
+      "@type": "xsd:decimal"
+    },
+    "segmentRole": {
+      "@id": "sstim:segmentRole",
+      "@type": "@id"
+    },
+    "segmentStimulus": {
+      "@id": "sstim:segmentStimulus",
+      "@type": "@id"
+    },
+    "hasStudyArm": {
+      "@id": "sstim:hasStudyArm",
+      "@type": "@id"
+    },
+    "armRole": {
+      "@id": "sstim:armRole",
+      "@type": "@id"
+    },
+    "armStimulus": {
+      "@id": "sstim:armStimulus",
+      "@type": "@id"
+    },
+    "armAllocation": {
+      "@id": "sstim:armAllocation",
+      "@type": "@id"
+    },
+    "hasStudyPopulation": {
+      "@id": "sstim:hasStudyPopulation",
+      "@type": "@id"
+    },
+    "protocolStudyDesign": {
+      "@id": "sstim:protocolStudyDesign",
+      "@type": "@id"
+    },
+    "populationTaxon": {
+      "@id": "sstim:populationTaxon",
+      "@type": "@id"
+    },
+    "populationCondition": {
+      "@id": "sstim:populationCondition",
+      "@type": "@id"
+    },
+    "hasInitialPhase": {
+      "@id": "sstim-ex:hasInitialPhase",
+      "@type": "xsd:decimal"
+    },
+    "hasOnsetIntervalDistribution": {
+      "@id": "sstim-ex:hasOnsetIntervalDistribution",
+      "@type": "@id"
+    },
+    "meanOnsetIntervalSeconds": {
+      "@id": "sstim-ex:meanOnsetIntervalSeconds",
+      "@type": "xsd:decimal"
+    },
+    "minOnsetIntervalSeconds": {
+      "@id": "sstim-ex:minOnsetIntervalSeconds",
+      "@type": "xsd:decimal"
+    },
+    "maxOnsetIntervalSeconds": {
+      "@id": "sstim-ex:maxOnsetIntervalSeconds",
+      "@type": "xsd:decimal"
+    },
+    "displayRefreshRateHz": {
+      "@id": "sstim-ex:displayRefreshRateHz",
+      "@type": "xsd:decimal"
+    },
+    "viewingDistanceMetres": {
+      "@id": "sstim-ex:viewingDistanceMetres",
+      "@type": "xsd:decimal"
+    },
+    "sourceWidthMetres": {
+      "@id": "sstim-ex:sourceWidthMetres",
+      "@type": "xsd:decimal"
+    },
+    "sourceHeightMetres": {
+      "@id": "sstim-ex:sourceHeightMetres",
+      "@type": "xsd:decimal"
+    },
+    "visualAngleDegrees": {
+      "@id": "sstim-ex:visualAngleDegrees",
+      "@type": "xsd:decimal"
     }
   }
 }

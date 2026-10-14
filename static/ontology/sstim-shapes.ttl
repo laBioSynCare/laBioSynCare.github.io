@@ -50,7 +50,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0031-qualified-ecosystem-records.md> .
 
@@ -863,6 +863,30 @@ sstim-sh:ReferenceShape a sh:NodeShape ;
         sh:message "PublicSafeReference must include a DOI identifier beginning with doi:10."@en ;
     ] .
 
+# A bibliographic record that is not a public-safe one still has to be
+# checkable: ADR 0064's protocol sources are cited by dct:source, and a
+# citation of a record with no title, or with nothing to look it up by, is a
+# citation of nothing. "Identified well enough to be checked" is how
+# sstim:PublicSafeReference already defines it, so a resolvable source IRI or
+# an identifier such as doi:10... is enough. Weaker than ReferenceShape on
+# purpose, since no clearance is implied.
+sstim-sh:BibliographicReferenceShape a sh:NodeShape ;
+    sh:targetClass sstim:BibliographicReference ;
+    sh:name "BibliographicReference"@en ;
+    sh:property [
+        sh:path dct:title ; sh:minCount 1 ;
+        sh:message "A bibliographic reference must have a title."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:source ; sh:nodeKind sh:IRI ;
+        sh:message "A bibliographic reference's dct:source must be an IRI, such as its DOI URL."@en ;
+    ] ;
+    sh:or (
+        [ sh:path dct:source ; sh:minCount 1 ]
+        [ sh:path dct:identifier ; sh:minCount 1 ]
+    ) ;
+    sh:message "A bibliographic reference must be identified well enough to be checked: a resolvable dct:source or a dct:identifier such as a DOI."@en .
+
 ###########################################################################
 # Self-Report Shape
 #
@@ -1248,10 +1272,14 @@ sstim-sh:ProtocolShape a sh:NodeShape ;
         sh:path dct:description ; sh:minCount 1 ;
         sh:message "SensoryStimulationProtocol must have a scoped dct:description."@en ;
     ] ;
+    # ADR 0064: a framework is one of two ways to be accountable for a
+    # protocol; a published one may instead cite the paper that specifies it.
+    # The alternative is sstim-sh:ProtocolProvenanceShape. Any framework that
+    # is named must still be a declared one.
     sh:property [
-        sh:path sstim:definedByFramework ; sh:minCount 1 ;
+        sh:path sstim:definedByFramework ;
         sh:class sstim:SensoryStimulationFramework ;
-        sh:message "SensoryStimulationProtocol must identify its defining framework."@en ;
+        sh:message "Every definedByFramework value of a SensoryStimulationProtocol must be a declared sensory stimulation framework."@en ;
     ] ;
     sh:property [
         sh:path sstim:usesTechnique ;
@@ -4184,6 +4212,547 @@ sstim-sh:ExploratoryProtocolShape a sh:NodeShape ;
     sh:property [
         sh:path dct:description ; sh:minCount 1 ;
         sh:message "ExploratoryProtocol must have a scoped dct:description."@en ;
+    ] .
+
+
+###########################################################################
+# Published protocols: provenance, magnitudes, schedules, arms and control
+# laws (ADR 0063, ADR 0064)
+#
+# Written against nine published protocols encoded in
+# instances/protocols/published-protocols.ttl, and each rule below rejects
+# something one of them could otherwise have said wrongly. `make
+# protocol-layer` drives an adversarial fixture through every one.
+###########################################################################
+
+# A protocol is accountable to whoever specifies it. Until ADR 0064 that could
+# only be a framework, which a published laboratory protocol does not have:
+# there is no framework behind the 40 Hz auditory response of 1981, and
+# declaring one per paper would mint framework records in other people's names.
+# The paper's methods section is the specification, so citing its record is
+# the other way to satisfy this.
+sstim-sh:ProtocolProvenanceShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationProtocol ;
+    sh:name "SensoryStimulationProtocol provenance"@en ;
+    sh:or (
+        [ sh:path sstim:definedByFramework ; sh:minCount 1 ]
+        [
+            sh:path dct:source ;
+            sh:qualifiedValueShape [ sh:class sstim:BibliographicReference ] ;
+            sh:qualifiedMinCount 1 ;
+        ]
+    ) ;
+    sh:message "A sensory stimulation protocol must name the framework that defines it, or cite with dct:source the bibliographic record of the publication that specifies it (ADR 0064)."@en .
+
+# ── magnitudes ────────────────────────────────────────────────────────
+sstim-sh:StimulusMagnitudeShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulusMagnitude ;
+    sh:name "StimulusMagnitude"@en ;
+    sh:property [
+        sh:path sstim:magnitudeQuantity ; sh:minCount 1 ;
+        sh:message "A stimulus magnitude must state what it measures."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:magnitudeUnit ; sh:minCount 1 ;
+        sh:message "A stimulus magnitude must state its unit."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:deliveryStage ; sh:minCount 1 ;
+        sh:message "A stimulus magnitude must state where in the delivery chain it holds; when its source does not say, that stage is sstim-v:stageUnstated."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:valueBasis ; sh:minCount 1 ;
+        sh:message "A stimulus magnitude must state how its value is known."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A stimulus magnitude states either one value or both bounds of a range: never neither, and never a value beside a bound."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                OPTIONAL { $this <https://w3id.org/sstim#magnitudeValue> ?value }
+                OPTIONAL { $this <https://w3id.org/sstim#magnitudeMinimum> ?low }
+                OPTIONAL { $this <https://w3id.org/sstim#magnitudeMaximum> ?high }
+                FILTER( ( !BOUND(?value) && !( BOUND(?low) && BOUND(?high) ) )
+                        || ( BOUND(?value) && ( BOUND(?low) || BOUND(?high) ) ) )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A stated range must not run backwards: its minimum may not exceed its maximum."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#magnitudeMinimum> ?low ;
+                      <https://w3id.org/sstim#magnitudeMaximum> ?high .
+                FILTER( ?low > ?high )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A magnitude's unit must be one its quantity lists with sstim:quantityUnit, so that sound pressure is never stated in lux."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#magnitudeQuantity> ?quantity ;
+                      <https://w3id.org/sstim#magnitudeUnit> ?unit .
+                FILTER NOT EXISTS { ?quantity <https://w3id.org/sstim#quantityUnit> ?unit }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A subject-relative magnitude must name the participant measure it is relative to, and only a subject-relative magnitude may name one."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim#deliveryStage> <https://w3id.org/sstim/vocab#stageSubjectRelative> .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#relativeToParticipantMeasure> ?measure }
+                } UNION {
+                    $this <https://w3id.org/sstim#relativeToParticipantMeasure> ?measure .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#deliveryStage> <https://w3id.org/sstim/vocab#stageSubjectRelative> }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A value reported by a source must keep the source's own words in sstim:reportedAs, so the structured reading can be checked against what was said."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#valueBasis> <https://w3id.org/sstim/vocab#valueReported> .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#reportedAs> ?words }
+            }
+        """ ;
+    ] .
+
+sstim-sh:StimulusMagnitudeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:magnitudeQuantity, sstim:magnitudeUnit, sstim:magnitudeValue,
+        sstim:magnitudeMinimum, sstim:magnitudeMaximum, sstim:deliveryStage, sstim:valueBasis,
+        sstim:relativeToParticipantMeasure, sstim:measurementDistanceMetres, sstim:reportedAs ;
+    sh:name "Stimulus magnitude ranges"@en ;
+    sh:property [
+        sh:path sstim:magnitudeQuantity ; sh:maxCount 1 ; sh:class sstim:QuantityKind ;
+        sh:message "sstim:magnitudeQuantity takes one sstim:QuantityKind value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:magnitudeUnit ; sh:maxCount 1 ; sh:class sstim:MeasurementUnit ;
+        sh:message "sstim:magnitudeUnit takes one sstim:MeasurementUnit value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:magnitudeValue ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:magnitudeValue takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:magnitudeMinimum ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:magnitudeMinimum takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:magnitudeMaximum ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:magnitudeMaximum takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:deliveryStage ; sh:maxCount 1 ; sh:class sstim:DeliveryStage ;
+        sh:message "sstim:deliveryStage takes one sstim:DeliveryStage value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:valueBasis ; sh:maxCount 1 ; sh:class sstim:ValueBasis ;
+        sh:message "sstim:valueBasis takes one sstim:ValueBasis value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:relativeToParticipantMeasure ; sh:maxCount 1 ; sh:class sstim:ParticipantReference ;
+        sh:message "sstim:relativeToParticipantMeasure takes one sstim:ParticipantReference value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:measurementDistanceMetres ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:measurementDistanceMetres takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:reportedAs ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:message "sstim:reportedAs takes one xsd:string, the source's words verbatim."@en ;
+    ] .
+
+sstim-sh:HasMagnitudeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasMagnitude ;
+    sh:property [
+        sh:path sstim:hasMagnitude ; sh:class sstim:StimulusMagnitude ;
+        sh:message "sstim:hasMagnitude takes sstim:StimulusMagnitude values."@en ;
+    ] .
+
+# Every quantity lists its units, or the unit check above would pass vacuously
+# for a quantity that lists none.
+sstim-sh:QuantityKindShape a sh:NodeShape ;
+    sh:targetClass sstim:QuantityKind ;
+    sh:name "QuantityKind"@en ;
+    sh:property [
+        sh:path sstim:quantityUnit ; sh:minCount 1 ; sh:class sstim:MeasurementUnit ;
+        sh:message "A quantity kind must list at least one sstim:MeasurementUnit it may be stated in."@en ;
+    ] .
+
+sstim-sh:QuantityUnitRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:quantityUnit ;
+    sh:property [
+        sh:path sstim:quantityUnit ; sh:class sstim:MeasurementUnit ;
+        sh:message "sstim:quantityUnit takes sstim:MeasurementUnit values."@en ;
+    ] .
+
+# ── control laws ──────────────────────────────────────────────────────
+sstim-sh:ControlLawShape a sh:NodeShape ;
+    sh:targetClass sstim:ControlLaw ;
+    sh:name "ControlLaw"@en ;
+    sh:property [
+        sh:path sstim:controlInputSignal ; sh:minCount 1 ;
+        sh:message "A control law must name at least one signal it reads from the subject."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A detection threshold's value and its unit travel together: neither can be read without the other."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim#detectionThresholdValue> ?value .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#detectionThresholdUnit> ?unit }
+                } UNION {
+                    $this <https://w3id.org/sstim#detectionThresholdUnit> ?unit .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#detectionThresholdValue> ?value }
+                }
+            }
+        """ ;
+    ] .
+
+sstim-sh:ControlLawRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:controlInputSignal, sstim:trackedOscillation, sstim:targetOscillationPhase,
+        sstim:detectionThresholdValue, sstim:detectionThresholdUnit, sstim:triggerDelaySeconds,
+        sstim:stimuliPerTrigger, sstim:refractoryPeriodSeconds, sstim:controlsChannel ;
+    sh:name "Control law ranges"@en ;
+    sh:property [
+        sh:path sstim:controlInputSignal ; sh:class sstim:MeasuredSignalKind ;
+        sh:message "sstim:controlInputSignal takes sstim:MeasuredSignalKind values."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:trackedOscillation ; sh:maxCount 1 ; sh:class sstim:NeuralOscillationType ;
+        sh:message "sstim:trackedOscillation takes one sstim:NeuralOscillationType value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:targetOscillationPhase ; sh:maxCount 1 ; sh:class sstim:OscillationPhaseTarget ;
+        sh:message "sstim:targetOscillationPhase takes one sstim:OscillationPhaseTarget value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:detectionThresholdValue ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:detectionThresholdValue takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:detectionThresholdUnit ; sh:maxCount 1 ; sh:class sstim:MeasurementUnit ;
+        sh:message "sstim:detectionThresholdUnit takes one sstim:MeasurementUnit value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:triggerDelaySeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "sstim:triggerDelaySeconds takes one non-negative xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:stimuliPerTrigger ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "sstim:stimuliPerTrigger takes one xsd:integer of at least 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:refractoryPeriodSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "sstim:refractoryPeriodSeconds takes one non-negative xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:controlsChannel ;
+        sh:or ( [ sh:class sstim-ex:StimulusChannel ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:controlsChannel takes sstim-ex:StimulusChannel values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+# ADR 0041: only an adaptive stimulus is described by a rule. A control law on a
+# determinate specification would contradict the specification's own regime.
+sstim-sh:HasControlLawShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasControlLaw ;
+    sh:property [
+        sh:path sstim:hasControlLaw ; sh:maxCount 1 ; sh:class sstim:ControlLaw ;
+        sh:message "sstim:hasControlLaw takes one sstim:ControlLaw value."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Only an adaptive stimulus specification has a control law; a determinate or stochastic one is not decided by a measured signal."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasControlLaw> ?law .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#stimulusRegime> "adaptive" }
+            }
+        """ ;
+    ] .
+
+# ── schedules ─────────────────────────────────────────────────────────
+sstim-sh:StimulationScheduleShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulationSchedule ;
+    sh:name "StimulationSchedule"@en ;
+    sh:or (
+        [ sh:path sstim:sessionDurationSeconds ; sh:minCount 1 ]
+        [ sh:path sstim:sessionsPerDay ; sh:minCount 1 ]
+        [ sh:path sstim:sessionCount ; sh:minCount 1 ]
+        [ sh:path sstim:courseDurationValue ; sh:minCount 1 ]
+        [ sh:path sstim:trialsPerBlock ; sh:minCount 1 ]
+        [ sh:path sstim:blocksPerSession ; sh:minCount 1 ]
+        [ sh:path sstim:hasScheduleSegment ; sh:minCount 1 ]
+    ) ;
+    sh:message "A stimulation schedule must state at least one of its timings; an empty schedule says nothing."@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A course duration's value and its calendar unit travel together."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim#courseDurationValue> ?value .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#courseDurationUnit> ?unit }
+                } UNION {
+                    $this <https://w3id.org/sstim#courseDurationUnit> ?unit .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#courseDurationValue> ?value }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Segment positions are unique within a schedule: two segments cannot both come in the same place."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasScheduleSegment> ?first, ?second .
+                ?first <https://w3id.org/sstim#segmentOrder> ?position .
+                ?second <https://w3id.org/sstim#segmentOrder> ?position .
+                FILTER( ?first != ?second )
+            }
+        """ ;
+    ] .
+
+sstim-sh:StimulationScheduleRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:sessionDurationSeconds, sstim:sessionsPerDay, sstim:sessionCount,
+        sstim:courseDurationValue, sstim:courseDurationUnit, sstim:trialsPerBlock,
+        sstim:blocksPerSession, sstim:hasScheduleSegment ;
+    sh:name "Stimulation schedule ranges"@en ;
+    sh:property [
+        sh:path sstim:sessionDurationSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:sessionDurationSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:sessionsPerDay ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:sessionsPerDay takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:sessionCount ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "sstim:sessionCount takes one xsd:integer of at least 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:courseDurationValue ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:courseDurationValue takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:courseDurationUnit ; sh:maxCount 1 ;
+        sh:in ( sstim-v:unitDay sstim-v:unitWeek sstim-v:unitMonth ) ;
+        sh:message "sstim:courseDurationUnit takes one calendar unit: day, week or month."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:trialsPerBlock ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "sstim:trialsPerBlock takes one xsd:integer of at least 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:blocksPerSession ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "sstim:blocksPerSession takes one xsd:integer of at least 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasScheduleSegment ; sh:class sstim:ScheduleSegment ;
+        sh:message "sstim:hasScheduleSegment takes sstim:ScheduleSegment values."@en ;
+    ] .
+
+sstim-sh:ScheduleSegmentShape a sh:NodeShape ;
+    sh:targetClass sstim:ScheduleSegment ;
+    sh:name "ScheduleSegment"@en ;
+    sh:property [
+        sh:path sstim:segmentOrder ; sh:minCount 1 ;
+        sh:message "A schedule segment must state its position."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:segmentRole ; sh:minCount 1 ;
+        sh:message "A schedule segment must state the part it plays."@en ;
+    ] .
+
+sstim-sh:ScheduleSegmentRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:segmentOrder, sstim:segmentDurationSeconds, sstim:segmentRole, sstim:segmentStimulus ;
+    sh:name "Schedule segment ranges"@en ;
+    sh:property [
+        sh:path sstim:segmentOrder ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "sstim:segmentOrder takes one xsd:integer of at least 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:segmentDurationSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:segmentDurationSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:segmentRole ; sh:maxCount 1 ; sh:class sstim:SegmentRole ;
+        sh:message "sstim:segmentRole takes one sstim:SegmentRole value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:segmentStimulus ; sh:maxCount 1 ;
+        sh:or ( [ sh:class sstim:StimulusSpecification ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:segmentStimulus takes one sstim:StimulusSpecification value: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasScheduleRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasSchedule ;
+    sh:property [
+        sh:path sstim:hasSchedule ; sh:maxCount 1 ; sh:class sstim:StimulationSchedule ;
+        sh:message "sstim:hasSchedule takes one sstim:StimulationSchedule value."@en ;
+    ] .
+
+# ── study arms, populations and designs ───────────────────────────────
+sstim-sh:StudyArmShape a sh:NodeShape ;
+    sh:targetClass sstim:StudyArm ;
+    sh:name "StudyArm"@en ;
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "A study arm must have a label naming the condition."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:armRole ; sh:minCount 1 ;
+        sh:message "A study arm must state the part it plays in its protocol."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An arm with no stimulation presents no stimulus."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#armRole> <https://w3id.org/sstim/vocab#armNoStimulation> ;
+                      <https://w3id.org/sstim#armStimulus> ?stimulus .
+            }
+        """ ;
+    ] .
+
+sstim-sh:StudyArmRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:armRole, sstim:armStimulus ;
+    sh:name "Study arm ranges"@en ;
+    sh:property [
+        sh:path sstim:armRole ; sh:maxCount 1 ; sh:class sstim:StudyArmRole ;
+        sh:message "sstim:armRole takes one sstim:StudyArmRole value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:armStimulus ;
+        sh:or ( [ sh:class sstim:StimulusSpecification ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:armStimulus takes sstim:StimulusSpecification values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:ProtocolDesignRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasStudyArm, sstim:armAllocation, sstim:hasStudyPopulation, sstim:protocolStudyDesign ;
+    sh:name "Protocol design ranges"@en ;
+    sh:property [
+        sh:path sstim:hasStudyArm ; sh:class sstim:StudyArm ;
+        sh:message "sstim:hasStudyArm takes sstim:StudyArm values."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:armAllocation ; sh:maxCount 1 ; sh:class sstim:ArmAllocation ;
+        sh:message "sstim:armAllocation takes one sstim:ArmAllocation value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasStudyPopulation ;
+        sh:or ( [ sh:class sstim:PopulationDescriptor ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:hasStudyPopulation takes sstim:PopulationDescriptor values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:protocolStudyDesign ; sh:maxCount 1 ; sh:class sstim:StudyDesign ;
+        sh:message "sstim:protocolStudyDesign takes one sstim:StudyDesign value."@en ;
+    ] .
+
+sstim-sh:PopulationIdentityRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:populationTaxon, sstim:populationCondition ;
+    sh:name "Population identity ranges"@en ;
+    sh:property [
+        sh:path sstim:populationTaxon ; sh:nodeKind sh:IRI ;
+        sh:message "sstim:populationTaxon takes taxon IRIs, such as NCBI Taxonomy identifiers."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:populationCondition ; sh:nodeKind sh:IRI ;
+        sh:message "sstim:populationCondition takes condition IRIs, such as MeSH descriptors."@en ;
+    ] .
+
+# ── channel timing and geometry ───────────────────────────────────────
+sstim-sh:ChannelTimingGeometryRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasInitialPhase, sstim-ex:hasOnsetIntervalDistribution,
+        sstim-ex:meanOnsetIntervalSeconds, sstim-ex:minOnsetIntervalSeconds, sstim-ex:maxOnsetIntervalSeconds,
+        sstim-ex:displayRefreshRateHz, sstim-ex:viewingDistanceMetres, sstim-ex:sourceWidthMetres,
+        sstim-ex:sourceHeightMetres, sstim-ex:visualAngleDegrees ;
+    sh:name "Channel timing and geometry ranges"@en ;
+    sh:property [
+        sh:path sstim-ex:hasInitialPhase ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "sstim-ex:hasInitialPhase takes one xsd:decimal fraction of a cycle, from 0 up to but excluding 1."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:hasOnsetIntervalDistribution ; sh:maxCount 1 ; sh:class sstim-ex:OnsetIntervalDistribution ;
+        sh:message "sstim-ex:hasOnsetIntervalDistribution takes one sstim-ex:OnsetIntervalDistribution value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:meanOnsetIntervalSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:meanOnsetIntervalSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:minOnsetIntervalSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "sstim-ex:minOnsetIntervalSeconds takes one non-negative xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:maxOnsetIntervalSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:maxOnsetIntervalSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:displayRefreshRateHz ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:displayRefreshRateHz takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:viewingDistanceMetres ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:viewingDistanceMetres takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:sourceWidthMetres ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:sourceWidthMetres takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:sourceHeightMetres ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim-ex:sourceHeightMetres takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:visualAngleDegrees ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxInclusive 180 ;
+        sh:message "sstim-ex:visualAngleDegrees takes one xsd:decimal above 0 and at most 180."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Interval statistics belong to a randomly timed channel: one that states them must name the distribution they describe."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ?statistic ?seconds .
+                FILTER( ?statistic IN ( <https://w3id.org/sstim/exposure#meanOnsetIntervalSeconds>,
+                                        <https://w3id.org/sstim/exposure#minOnsetIntervalSeconds>,
+                                        <https://w3id.org/sstim/exposure#maxOnsetIntervalSeconds> ) )
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim/exposure#hasOnsetIntervalDistribution> ?distribution }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Onset intervals must be ordered: the minimum may not exceed the mean, nor the mean the maximum."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim/exposure#minOnsetIntervalSeconds> ?low ;
+                          <https://w3id.org/sstim/exposure#meanOnsetIntervalSeconds> ?mean .
+                    FILTER( ?low > ?mean )
+                } UNION {
+                    $this <https://w3id.org/sstim/exposure#meanOnsetIntervalSeconds> ?mean ;
+                          <https://w3id.org/sstim/exposure#maxOnsetIntervalSeconds> ?high .
+                    FILTER( ?mean > ?high )
+                } UNION {
+                    $this <https://w3id.org/sstim/exposure#minOnsetIntervalSeconds> ?low ;
+                          <https://w3id.org/sstim/exposure#maxOnsetIntervalSeconds> ?high .
+                    FILTER( ?low > ?high )
+                }
+            }
+        """ ;
     ] .
 
 

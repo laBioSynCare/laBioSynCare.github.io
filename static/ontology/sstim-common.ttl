@@ -41,14 +41,14 @@
 <https://w3id.org/sstim/common> a owl:Ontology ;
     owl:versionInfo "0.20.0-dev" ;
     dct:title "SSTIM Common Extension Module"@en ;
-    dct:description "Optional shared descriptors used across SSTIM concerns: bands, modalities, mechanisms, temporal structure, delivery approach, cautions, and calibrated channel quantities."@en ;
+    dct:description "Optional shared descriptors used across SSTIM concerns: bands, modalities, mechanisms, temporal structure, delivery approach, cautions, calibrated channel quantities, and stimulus magnitudes stated at a stage of delivery."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim/stimulus> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-08-01"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-10"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -312,6 +312,144 @@ sstim:flashRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
+
+###########################################################################
+# Stimulus magnitudes at stages of delivery (ADR 0063)
+#
+# A level means nothing until it says where in the delivery chain it holds:
+# a gain inside the system, the output of the transducer, what arrives at the
+# ear or eye or skin, what reaches a target inside the body, a value set
+# relative to the subject's own threshold, or what the subject perceives. One
+# qualified node per stated value carries the quantity, the unit, the stage and
+# how the value is known, for any modality. The older single-purpose
+# properties keep their fixed meanings: sstim:soundPressureLevelDb is a sound
+# pressure level at the subject, and sstim:masterVolume, sstim:masterBrightness
+# and sstim-ex:hasGainLevel are configured values.
+###########################################################################
+
+sstim:StimulusMagnitude a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Magnitude"@en ;
+    skos:definition "One stated magnitude of what a stimulus channel delivers: a quantity with its unit, a value or a range, the stage of the delivery chain at which it holds, and how it is known. A channel carries one per stated value, so the same stimulus can state its configured gain, its emitted output and the level arriving at the subject side by side."@en ;
+    skos:scopeNote "Modality-free. The same node states a sound pressure level at the ear, an illuminance at the eye, a vibration displacement at the skin, a current at the electrodes or a percentage of a motor threshold. A value a source reports without saying where it holds is recorded at the unstated stage with the source's own words, rather than given a stage it did not have."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0063), after published protocols reported levels whose measurement point SSTIM could neither state nor leave honestly unstated, and reported light levels in lux, which no SSTIM property expressed."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:QuantityKind a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Quantity Kind"@en ;
+    skos:definition "A controlled information category naming what a stated magnitude measures, such as sound pressure level, illuminance, electric current or a ratio to the subject's own threshold. Each kind lists the units it may be stated in."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:DeliveryStage a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Delivery Stage"@en ;
+    skos:definition "A controlled information category naming where in the chain from a system's settings to the subject's perception a stated magnitude holds: configured, emitted at the source, at the subject, at a target inside the body, relative to the subject's own measure, as perceived, or not stated."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:ValueBasis a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Value Basis"@en ;
+    skos:definition "A controlled information category for how a stated value is known: specified as a design value, measured, reported by a source, or modelled."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:ParticipantReference a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Participant Reference"@en ;
+    skos:definition "A controlled information category for a measure of the subject's own that a value is set relative to, such as their hearing threshold, their resting motor threshold or their baseline walking cadence. A value set this way differs between subjects by design."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hasMagnitude a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  sstim:StimulusMagnitude ;
+    rdfs:label  "has magnitude"@en ;
+    skos:definition "Links a stimulus channel to a stated magnitude of what it delivers. A channel may have several, one per quantity and stage."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:magnitudeQuantity a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:QuantityKind ;
+    rdfs:label  "magnitude quantity"@en ;
+    skos:definition "What the stated magnitude measures."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:magnitudeUnit a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:MeasurementUnit ;
+    rdfs:label  "magnitude unit"@en ;
+    skos:definition "The unit the stated magnitude is expressed in. It must be one of the units its quantity lists, which a SHACL constraint checks."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:magnitudeValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "magnitude value"@en ;
+    skos:definition "The stated value, in the magnitude's unit, when a single value is given."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:magnitudeMinimum a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "magnitude minimum"@en ;
+    skos:definition "The lower bound of a stated range, in the magnitude's unit, when a source gives a range such as 390 to 400 lux."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:magnitudeMaximum a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "magnitude maximum"@en ;
+    skos:definition "The upper bound of a stated range, in the magnitude's unit."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:deliveryStage a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:DeliveryStage ;
+    rdfs:label  "delivery stage"@en ;
+    skos:definition "Where in the delivery chain the stated magnitude holds. Required, and the unstated stage is a value of it, so a record says either where a value holds or that its source did not say."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:valueBasis a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:ValueBasis ;
+    rdfs:label  "value basis"@en ;
+    skos:definition "How the stated value is known: specified, measured, reported by a source, or modelled."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:relativeToParticipantMeasure a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:ParticipantReference ;
+    rdfs:label  "relative to participant measure"@en ;
+    skos:definition "The measure of the subject's own that a subject-relative magnitude is stated against. Present exactly when the stage is subject-relative, which a SHACL constraint checks in both directions."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:measurementDistanceMetres a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "measurement distance (m)"@en ;
+    skos:definition "Distance from the source at which the magnitude is stated, in metres, as a loudspeaker's output is stated at 1 m."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:reportedAs a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reported as"@en ;
+    skos:definition "The source's own words for a reported value, kept verbatim, such as \"60 dB\" or \"390-400 lux at the participant's eyes\". Required for a reported value, so the structured reading can always be checked against what the source actually said."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:quantityUnit a owl:ObjectProperty ;
+    rdfs:domain sstim:QuantityKind ;
+    rdfs:range  sstim:MeasurementUnit ;
+    rdfs:label  "quantity unit"@en ;
+    skos:definition "A unit in which this kind of quantity may be stated. A magnitude stating its quantity in any other unit is rejected, so sound pressure cannot be given in lux."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:trackedOscillation a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  sstim:NeuralOscillationType ;
+    rdfs:label  "tracked oscillation"@en ;
+    skos:definition "The named rhythm whose phase a control law follows, such as the sleep slow oscillation. Declared here rather than beside the control law because named rhythms are a Common concern."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0064)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 ###########################################################################
 # End of common

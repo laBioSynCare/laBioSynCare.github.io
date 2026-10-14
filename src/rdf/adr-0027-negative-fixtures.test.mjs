@@ -51,7 +51,8 @@ function conforms(ttl) {
 // fixtures isolate the ADR 0027 shapes from unrelated Technique constraints.
 // supportsRelation mirrors evaluatesSubject per the ADR 0.7.x "carry both" rule.
 const VALID_ASSESSMENT = `
-ex:ref a sstim:BibliographicReference ; rdfs:label "R" .
+ex:ref a sstim:BibliographicReference ; rdfs:label "R" ;
+    dct:title "R" ; dct:source <https://doi.org/10.0000/r> .
 ex:a a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
     rdfs:label "A" ; dct:description "d" ;
     sstim:evaluatesSubject sstim-v:techBinauralBeats ;

@@ -259,6 +259,8 @@ export const INSTANCE_URLS = {
   ],
   protocols: [
     applicationAsset('/ontology/instances/protocols/bsc-reference-protocols.ttl'),
+    // Nine published protocols encoded from their papers (ADR 0063, ADR 0064).
+    applicationAsset('/ontology/instances/protocols/published-protocols.ttl'),
   ],
   evidence: [
     applicationAsset('/ontology/instances/evidence/technique-evidence.ttl'),

@@ -17,7 +17,60 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.20.0-dev line.
+**Upgrading from 0.19.0.** Nothing is removed or deprecated, and every 0.19.0
+triple survives. One rule is relaxed: a sensory stimulation protocol no longer
+has to name a framework if it cites the paper that specifies it. One is added:
+a `sstim:BibliographicReference` must have a title and be identifiable, by a
+`dct:source` IRI or a `dct:identifier`. Records that only carried a label need
+one of each.
+
+### Added
+
+- **Stimulus magnitudes at a stage of delivery**
+  ([ADR 0063](docs/decisions/0063-stimulus-magnitudes-at-delivery-stages.md)).
+  `sstim:StimulusMagnitude` states a level for any modality: a quantity, a value
+  or a range, a unit, where in the delivery chain it holds (configured, emitted,
+  at the subject, at a target in the body, relative to the subject's own
+  measure, as perceived, or not stated) and how it is known (specified,
+  measured, reported, modelled). A reported value keeps the source's words in
+  `sstim:reportedAs`, and a subject-relative one names the participant measure
+  it is set against. Eighteen quantity kinds, from sound pressure level and
+  illuminance to current density and percent of motor threshold, each list the
+  units they may be stated in, so SHACL rejects sound pressure in lux.
+- **Schedules, study arms, populations and designs on protocols**
+  ([ADR 0064](docs/decisions/0064-published-protocols-schedules-arms-and-control-laws.md)).
+  `sstim:StimulationSchedule` (session length, sessions per day, session count,
+  course length in calendar units, blocks, trials and ordered segments) and
+  `sstim:StudyArm` (experimental, active comparator, sham, no stimulation, with
+  `sstim:armAllocation`). `sstim:hasStudyPopulation` and
+  `sstim:protocolStudyDesign` reuse the evidence layer's population descriptors
+  and study designs; a population may name its taxon and defining condition.
+- **Control laws for adaptive stimuli.** `sstim:ControlLaw` states what an
+  adaptive specification reads, which rhythm and phase it aims at, its detection
+  threshold, delays, stimuli per trigger, refractory period and the channel it
+  drives. `sstim-v:slowOscillation` and `sstim-v:sleepSpindle` join the neural
+  oscillations.
+- **Channel timing and geometry.** `sstim-ex:hasInitialPhase` for a channel's
+  phase at onset; `sstim-ex:hasOnsetIntervalDistribution` with mean, minimum and
+  maximum intervals for randomly timed pulses; display refresh rate, viewing
+  distance, source size and visual angle.
+- **Nine published protocols as public data**, from the 40 Hz auditory response
+  of 1981 to a randomized home-use trial of 2022, each citing its paper and
+  asserting no effect, with `make protocol-layer` holding the layer to 30
+  adversarial fixtures. Their eight source papers join `references.ttl` as
+  `sstim:BibliographicReference` records, which a new shape requires to carry a
+  title and a source IRI or an identifier.
+
+### Changed
+
+- **A protocol may be accountable to its paper**
+  ([ADR 0064](docs/decisions/0064-published-protocols-schedules-arms-and-control-laws.md)).
+  `sstim-sh:ProtocolProvenanceShape` accepts a defining framework or a
+  `dct:source` naming a `sstim:BibliographicReference`; ProtocolShape keeps its
+  check that a named framework is a declared one.
+- `sstim-v:shapeSquare` gains the alternative labels "rectangular wave" and
+  "pulse train": a low duty-cycle pulse train was always a square signal.
+- The Technique module now requires Stimulus directly.
 
 ## [0.19.0] - 2026-10-10
 

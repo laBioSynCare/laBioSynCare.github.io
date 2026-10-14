@@ -117,3 +117,157 @@ sstim-ref:BUZSAKI_2004 a sstim:PublicSafeReference ;
     dct:issued "2004-06-25"^^xsd:date ;
     dct:identifier "doi:10.1126/science.1099745" ;
     dct:source <https://doi.org/10.1126/science.1099745> .
+
+###########################################################################
+# Sources of the published protocols (ADR 0064)
+#
+# The papers instances/protocols/published-protocols.ttl was encoded from,
+# each cited by its protocol with dct:source. Typed sstim:BibliographicReference
+# rather than sstim:PublicSafeReference: they are sources a description was
+# read from, not references cleared for product copy. Every record was built
+# from the Crossref response for its DOI, not recalled.
+###########################################################################
+
+# Verified via Crossref 2026-10-13: Proceedings of the National Academy of Sciences 78(4):2643-2647.
+sstim-ref:GALAMBOS_1981 a sstim:BibliographicReference ;
+    sstim:referenceKey "GALAMBOS_1981" ;
+    dct:title "A 40-Hz auditory potential recorded from the human scalp." ;
+    dct:creator "Galambos, R",
+        "Makeig, S",
+        "Talmachoff, P J" ;
+    dct:issued "1981"^^xsd:gYear ;
+    dct:identifier "doi:10.1073/pnas.78.4.2643" ;
+    dct:source <https://doi.org/10.1073/pnas.78.4.2643> .
+
+# Verified via Crossref 2026-10-13: Nature 540(7632):230-235.
+sstim-ref:IACCARINO_2016 a sstim:BibliographicReference ;
+    sstim:referenceKey "IACCARINO_2016" ;
+    dct:title "Gamma frequency entrainment attenuates amyloid load and modifies microglia" ;
+    dct:creator "Iaccarino, Hunter F.",
+        "Singer, Annabelle C.",
+        "Martorell, Anthony J.",
+        "Rudenko, Andrii",
+        "Gao, Fan",
+        "Gillingham, Tyler Z.",
+        "Mathys, Hansruedi",
+        "Seo, Jinsoo",
+        "Kritskiy, Oleg",
+        "Abdurrob, Fatema",
+        "Adaikkan, Chinnakkaruppan",
+        "Canter, Rebecca G.",
+        "Rueda, Richard",
+        "Brown, Emery N.",
+        "Boyden, Edward S.",
+        "Tsai, Li-Huei" ;
+    dct:issued "2016-12-08"^^xsd:date ;
+    dct:identifier "doi:10.1038/nature20587" ;
+    dct:source <https://doi.org/10.1038/nature20587> .
+
+# Verified via Crossref 2026-10-13: Cell 177(2):256-271.e22.
+sstim-ref:MARTORELL_2019 a sstim:BibliographicReference ;
+    sstim:referenceKey "MARTORELL_2019" ;
+    dct:title "Multi-sensory Gamma Stimulation Ameliorates Alzheimer’s-Associated Pathology and Improves Cognition" ;
+    dct:creator "Martorell, Anthony J.",
+        "Paulson, Abigail L.",
+        "Suk, Ho-Jun",
+        "Abdurrob, Fatema",
+        "Drummond, Gabrielle T.",
+        "Guan, Webster",
+        "Young, Jennie Z.",
+        "Kim, David Nam-Woo",
+        "Kritskiy, Oleg",
+        "Barker, Scarlett J.",
+        "Mangena, Vamsi",
+        "Prince, Stephanie M.",
+        "Brown, Emery N.",
+        "Chung, Kwanghun",
+        "Boyden, Edward S.",
+        "Singer, Annabelle C.",
+        "Tsai, Li-Huei" ;
+    dct:issued "2019"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/j.cell.2019.02.014" ;
+    dct:source <https://doi.org/10.1016/j.cell.2019.02.014> .
+
+# Verified via Crossref 2026-10-13: PLOS ONE 17(12):e0278412.
+sstim-ref:CHAN_2022 a sstim:BibliographicReference ;
+    sstim:referenceKey "CHAN_2022" ;
+    dct:title "Gamma frequency sensory stimulation in mild probable Alzheimer’s dementia patients: Results of feasibility and pilot studies" ;
+    dct:creator "Chan, Diane",
+        "Suk, Ho-Jun",
+        "Jackson, Brennan L.",
+        "Milman, Noah P.",
+        "Stark, Danielle",
+        "Klerman, Elizabeth B.",
+        "Kitchener, Erin",
+        "Fernandez Avalos, Vanesa S.",
+        "de Weck, Gabrielle",
+        "Banerjee, Arit",
+        "Beach, Sara D.",
+        "Blanchard, Joel",
+        "Stearns, Colton",
+        "Boes, Aaron D.",
+        "Uitermarkt, Brandt",
+        "Gander, Phillip",
+        "Howard, Matthew",
+        "Sternberg, Eliezer J.",
+        "Nieto-Castanon, Alfonso",
+        "Anteraper, Sheeba",
+        "Whitfield-Gabrieli, Susan",
+        "Brown, Emery N.",
+        "Boyden, Edward S.",
+        "Dickerson, Bradford C.",
+        "Tsai, Li-Huei" ;
+    dct:issued "2022-12-01"^^xsd:date ;
+    dct:identifier "doi:10.1371/journal.pone.0278412" ;
+    dct:source <https://doi.org/10.1371/journal.pone.0278412> .
+
+# Verified via Crossref 2026-10-13: IEEE Transactions on Neural Systems and Rehabilitation Engineering 25(10):1746-1752.
+sstim-ref:WANG_2017 a sstim:BibliographicReference ;
+    sstim:referenceKey "WANG_2017" ;
+    dct:title "A Benchmark Dataset for SSVEP-Based Brain–Computer Interfaces" ;
+    dct:creator "Wang, Yijun",
+        "Chen, Xiaogang",
+        "Gao, Xiaorong",
+        "Gao, Shangkai" ;
+    dct:issued "2017"^^xsd:gYear ;
+    dct:identifier "doi:10.1109/tnsre.2016.2627556" ;
+    dct:source <https://doi.org/10.1109/tnsre.2016.2627556> .
+
+# Verified via Crossref 2026-10-13: Neuron 78(3):545-553.
+sstim-ref:NGO_2013 a sstim:BibliographicReference ;
+    sstim:referenceKey "NGO_2013" ;
+    dct:title "Auditory Closed-Loop Stimulation of the Sleep Slow Oscillation Enhances Memory" ;
+    dct:creator "Ngo, Hong-Viet V.",
+        "Martinetz, Thomas",
+        "Born, Jan",
+        "Mölle, Matthias" ;
+    dct:issued "2013"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/j.neuron.2013.03.006" ;
+    dct:source <https://doi.org/10.1016/j.neuron.2013.03.006> .
+
+# Verified via Crossref 2026-10-13: Physiology & Behavior 63(2):249-252.
+sstim-ref:LANE_1998 a sstim:BibliographicReference ;
+    sstim:referenceKey "LANE_1998" ;
+    dct:title "Binaural Auditory Beats Affect Vigilance Performance and Mood" ;
+    dct:creator "Lane, James D",
+        "Kasian, Stefan J",
+        "Owens, Justine E",
+        "Marsh, Gail R" ;
+    dct:issued "1998"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/s0031-9384(97)00436-8" ;
+    dct:source <https://doi.org/10.1016/s0031-9384(97)00436-8> .
+
+# Verified via Crossref 2026-10-13: Movement Disorders 11(2):193-200.
+sstim-ref:THAUT_1996 a sstim:BibliographicReference ;
+    sstim:referenceKey "THAUT_1996" ;
+    dct:title "Rhythmic auditory stimulation in gait training for Parkinson's disease patients" ;
+    dct:creator "Thaut, M. H.",
+        "McIntosh, G. C.",
+        "Rice, R. R.",
+        "Miller, R. A.",
+        "Rathbun, J.",
+        "Brault, J. M." ;
+    dct:issued "1996"^^xsd:gYear ;
+    dct:identifier "doi:10.1002/mds.870110213" ;
+    dct:source <https://doi.org/10.1002/mds.870110213> .
+

@@ -91,6 +91,17 @@ advisories, evidence assessments, research hypotheses, neuromodulation,
 Patch Studio parameters, sessions and self-reports, and qualified ecosystem
 relationships.
 
+On the 0.20.0 development line, protocols gained what published research states
+about them: schedules, study arms, populations and designs, closed-loop control
+laws, random onset timing, initial phase and display geometry
+([ADR 0064](../decisions/0064-published-protocols-schedules-arms-and-control-laws.md)),
+and levels for any modality, each stated at a stage of delivery
+([ADR 0063](../decisions/0063-stimulus-magnitudes-at-delivery-stages.md)). A
+published protocol may cite its paper instead of naming a framework. Nine
+published protocols, from the 40 Hz auditory response of 1981 to a 2022
+randomized home-use trial, are public data; five are complete as far as their
+open sources go and four are abstract-level.
+
 Evidence is scoped and revisioned. An `EvidenceAssessmentClaim` evaluates one
 subject, assesses one bounded proposition, has one or more qualified evidence
 bases, and records direction, tier, provenance, and review state. Hypotheses,
@@ -110,8 +121,10 @@ and [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md).
 
 Committed instance RDF is public reference data, not ontology term space and
 not part of the immutable ontology snapshots. It currently includes the BSC
-framework and implementations, two reference protocols, five reference presets,
-eleven DOI-identified references, ten exploratory exposure examples, evidence
+framework and implementations, eleven reference protocols (two of BSC Lab's
+own and nine published protocols encoded from their papers), five reference
+presets, eleven DOI-identified references and the eight papers those published
+protocols cite, ten exploratory exposure examples, evidence
 assessments, and one explicitly synthetic session with phased self-reports.
 
 The committed ecosystem graph is synthetic contract data. Real ecosystem
@@ -340,23 +353,24 @@ The main gaps are design and coverage gaps, not current parser failures:
   `Q141325360` was created on Wikidata on 2026-09-06 and **all 58 mapped Wikidata
   items now carry a `P2888` statement naming an SSTIM term**, measured by
   `make wikidata-inbound`. The three exceptions are the `relatedMatch` rows held
-  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 556 concepts carry
-  English, Italian, Portuguese and Spanish, across all 68 concept schemes, and
-  have since 2026-08-18. `make language-coverage` measures it and now guards against
+  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 635 concepts carry
+  English, Italian, Portuguese and Spanish, across all 79 concept schemes
+  (measured 2026-10-13), and every scheme has carried all four since 2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be
   recorded deliberately. The 276 labels added that day were written by the
   maintainers and have **not yet had native review**, and neither have the twelve
-  added for ADR 0061's neutral status values; see the review request in the
+  added for ADR 0061's neutral status values or the 237 added for ADRs 0063 and
+  0064; see the review request in the
   repository issues. The four languages are the vocabulary's: class and property
   labels are English while translating them waits for native review, and
-  `make language-coverage` reports that layer without gating it (21 of 154
-  current classes carry the other three languages, none of the 266 current
-  properties does; GB-13). `skos:definition` remains English-only for all 555
+  `make language-coverage` reports that layer without gating it (21 of 170
+  current classes carry the other three languages, none of the 319 current
+  properties does, measured 2026-10-13; GB-13). `skos:definition` remains English-only for all 635
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
-  than absent: 52 alternate labels on 38 of the 556 concepts, all English, 47 of
-  them in the vocabulary module, which includes the oscillation aliases
+  than absent: 84 alternate labels on 62 of the 635 concepts, all English, including the
+  oscillation aliases
   [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
-  added (measured 2026-10-06). `make language-coverage` reports it but does not
+  added (measured 2026-10-13). `make language-coverage` reports it but does not
   gate it.
 - VoID subsets are checked against the frozen release manifest but are not
   generated from the live manifest, leaving an avoidable maintenance seam.

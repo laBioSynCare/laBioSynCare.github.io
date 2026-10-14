@@ -297,6 +297,21 @@ EXCLUDED_SHAPE_PROPERTY_ROOTS = (
     (SSTIM_SH.MartigliVoiceShape, SH["or"]),
     (SSTIM_SH.MartigliBinauralVoiceShape, SH["or"]),
     (SSTIM_SH.VoiceShape, SH.xone),
+    # ADR 0064 made a framework one of two ways to be accountable for a sensory
+    # stimulation protocol: a published protocol may instead cite the paper that
+    # specifies it. ProtocolShape's definedByFramework block loses its minCount
+    # and keeps its sh:class check, and the requirement moves to
+    # sstim-sh:ProtocolProvenanceShape as an sh:or of the two. The block is
+    # anonymous, so all four of its triples are replaced and its canonical label
+    # moves.
+    #
+    # Excluding ProtocolShape's whole sh:property closure would also stop this
+    # script noticing a change to its label and description blocks. That is
+    # covered instead by scripts/check-protocol-layer.py, which rejects a
+    # protocol with neither a framework nor a cited source, one naming an
+    # undeclared framework, one citing a source that is not a bibliographic
+    # record, and one without a label or a description.
+    (SSTIM_SH.ProtocolShape, SH.property),
 )
 
 
@@ -668,7 +683,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052/0061 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052/0061/0064 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )

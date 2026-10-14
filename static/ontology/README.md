@@ -379,6 +379,30 @@ The committed session is a synthetic, non-personal fixture. It demonstrates:
 Real participant records are not committed. A follow-up report is a separate
 node with its own phase and timestamp.
 
+## Protocol Description
+
+A protocol says what is done, and published research states more about that
+than which techniques it uses. Since the 0.20.0 development line
+([ADR 0064](../../docs/decisions/0064-published-protocols-schedules-arms-and-control-laws.md)):
+
+| To state | Use |
+|---|---|
+| Who specifies it | `sstim:definedByFramework`, or `dct:source` naming the `sstim:BibliographicReference` of the paper |
+| How often and how long | `sstim:hasSchedule` → `sstim:StimulationSchedule`, with ordered `sstim:ScheduleSegment`s for trials |
+| What it is compared with | `sstim:hasStudyArm` → `sstim:StudyArm` (experimental, active comparator, sham, no stimulation) and `sstim:armAllocation` |
+| Who it is for | `sstim:hasStudyPopulation` → `sstim:PopulationDescriptor`, with `sstim:populationTaxon` and `sstim:populationCondition` |
+| Its design | `sstim:protocolStudyDesign` → a `sstim:StudyDesign` value |
+| A closed-loop rule | `sstim:hasControlLaw` → `sstim:ControlLaw` on an adaptive `StimulusSpecification` |
+| A level, in any modality | `sstim:hasMagnitude` → `sstim:StimulusMagnitude`, stating its stage of delivery ([ADR 0063](../../docs/decisions/0063-stimulus-magnitudes-at-delivery-stages.md)) |
+
+A level states where it holds: configured, emitted, at the subject, at a target
+in the body, relative to the subject's own measure, as perceived, or not stated.
+A value a source reports without a measurement point is recorded as not stated,
+with the source's words in `sstim:reportedAs`, never promoted to "at the ear".
+`instances/protocols/published-protocols.ttl` holds nine published protocols
+encoded this way, and `make protocol-layer` checks that every rule rejects what
+it claims to.
+
 ## Validation
 
 From the repository root, inside the Nix dev shell:

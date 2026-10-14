@@ -458,9 +458,9 @@ and domain sense, not knowledge of this repository.
 
 **[Review the translations](https://github.com/w3c-cg/sstim/issues/new).**
 SSTIM's controlled vocabulary is published in English, Italian, Portuguese and
-Spanish: as of 2026-10-08 all 556 concepts carry all four, but 294 of those
-labels (282 measured on 2026-08-19, and twelve added since for ADR 0061) were
-written by the maintainers and have had no native review. Class and property
+Spanish: as of 2026-10-13 all 635 concepts carry all four, but 531 of those
+labels (282 measured on 2026-08-19, twelve added for ADR 0061 and 237 for ADRs
+0063 and 0064) were written by the maintainers and have had no native review. Class and property
 labels are in English. If you speak one
 of these languages and know the domain, reading a scheme and saying which terms
 a practitioner would not actually use is the most valuable thing you can do
