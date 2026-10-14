@@ -22,6 +22,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Parser, Writer } from 'n3'
 
+import { logicalApplicationPath } from '../src/config/applicationUrls.js'
 import { INSTANCE_URLS } from '../src/rdf/loader.js'
 import { PREFIXES, RDFS, DCT, SKOS } from '../src/rdf/namespaces.js'
 import {
@@ -34,9 +35,14 @@ import {
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
-/** The committed instance sources the application loads, as paths under static/. */
+/**
+ * The committed instance sources the application loads, as paths under static/.
+ * Under a mounted build (the Community Group site is served at /sstim/) the
+ * loader's URLs carry the mount, which is not a directory in static/.
+ */
 export function committedInstanceSources() {
   return Object.values(INSTANCE_URLS).flat()
+    .map(url => logicalApplicationPath(url))
     .filter(url => url.startsWith('/'))
     .map(url => url.slice(1))
 }
