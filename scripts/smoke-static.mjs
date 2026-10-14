@@ -57,6 +57,7 @@ async function main() {
       ['/creator/', 'Patch Studio'],
       ['/sparql/', 'SPARQL'],
       ['/presets/', 'Presets'],
+      ['/protocols/', 'Published protocols'],
       ['/logbook/', 'Logbook'],
       ['/ecosystem/', 'SSTIM ecosystem'],
       ['/ecosystem/directory/', 'Stakeholder directory'],

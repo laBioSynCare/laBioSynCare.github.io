@@ -295,6 +295,7 @@
       <a href={applicationRoute('/graph/')}>Graph</a>
       <a href={applicationRoute('/creator/')}>Patch Studio</a>
       <a href={applicationRoute('/presets/')}>Presets</a>
+      <a href={applicationRoute('/protocols/')}>Published protocols</a>
       <a href={applicationRoute('/sparql/')}>SPARQL</a>
       <a href={applicationRoute('/logbook/')}>Logbook</a>
       <a href={applicationRoute('/settings/')}>Settings</a>

@@ -60,6 +60,10 @@ one of each.
   adversarial fixtures. Their eight source papers join `references.ttl` as
   `sstim:BibliographicReference` records, which a new shape requires to carry a
   title and a source IRI or an identifier.
+- **A Workbench page comparing them**, `/protocols/`: one table of senses, rate,
+  levels with the stage each holds at, schedule, arms and population, a full
+  record per protocol with the paper's own words beside each reported level,
+  and a mark on the four encoded from an abstract only.
 
 ### Changed
 

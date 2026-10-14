@@ -48,6 +48,7 @@ export const BSCLAB = ns('https://w3id.org/sstim/implementation/bsclab/')
 // Public members of bsclab-preset: use the same exact audited route inventory;
 // do not replace it with a namespace wildcard when adding local/private data.
 export const BSCLAB_PRESET = ns('https://w3id.org/sstim/implementation/bsclab/preset/')
+export const BSCLAB_PROTOCOL = ns('https://w3id.org/sstim/implementation/bsclab/protocol/')
 export const BSCLAB_EXPERIMENT = ns('https://w3id.org/sstim/implementation/bsclab/experiment/')
 export const BSCLAB_EVIDENCE = ns('https://w3id.org/sstim/implementation/bsclab/evidence/')
 export const BSCLAB_SESSION = ns('https://w3id.org/sstim/implementation/bsclab/session/')
@@ -81,6 +82,10 @@ export const ECO  = ns('http://purl.obolibrary.org/obo/ECO_')
 export const WD   = ns('http://www.wikidata.org/entity/')
 export const WDT  = ns('http://www.wikidata.org/prop/direct/')
 export const DBR  = ns('http://dbpedia.org/resource/')
+// Identifiers the published protocols use for populations (ADR 0064): the NCBI
+// Taxonomy for species and MeSH descriptors for a defining condition.
+export const NCBITAXON = ns('http://purl.obolibrary.org/obo/NCBITaxon_')
+export const MESH = ns('http://id.nlm.nih.gov/mesh/')
 
 // ── Predecessor namespaces (read-only; used when loading legacy TTL files) ────
 export const NSO_V0 = ns('https://biosyncare.github.io/ont#')
@@ -114,6 +119,7 @@ export const PREFIXES = {
   'biosyncare-annotation': 'https://w3id.org/sstim/implementation/biosyncare/annotation/',
   'bsclab': 'https://w3id.org/sstim/implementation/bsclab/',
   'bsclab-preset': 'https://w3id.org/sstim/implementation/bsclab/preset/',
+  'bsclab-protocol': 'https://w3id.org/sstim/implementation/bsclab/protocol/',
   'bsclab-experiment': 'https://w3id.org/sstim/implementation/bsclab/experiment/',
   'bsclab-evidence': 'https://w3id.org/sstim/implementation/bsclab/evidence/',
   'bsclab-session': 'https://w3id.org/sstim/implementation/bsclab/session/',

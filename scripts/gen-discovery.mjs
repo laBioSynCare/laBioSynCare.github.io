@@ -169,6 +169,7 @@ export const LLMS_SECTIONS = [
       ['SPARQL interface', { site: '/sparql/' }, 'query the ontology in the browser'],
       ['Patch Studio', { site: '/creator/' }, 'author stimulation patches; its authoring model is a Workbench model, not the catalog preset format'],
       ['Reference presets', { site: '/presets/' }, 'public example data'],
+      ['Published protocols', { site: '/protocols/' }, 'protocols from published papers, compared side by side: stimulus, levels and the stage each holds at, schedule, arms and population'],
       ['Ecosystem directory', { site: '/ecosystem/' }, 'applications and initiatives, and how ecosystem membership is defined'],
       ['Stakeholder directory', { site: '/ecosystem/directory/' }, 'companies, laboratories, people, societies, standards and projects of the field, from public sources, and which are in the live graph'],
       ['Patch Studio conformance and neutrality', { repo: 'docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md' }, 'which Workbench behaviour is SSTIM and which is not'],

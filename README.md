@@ -229,6 +229,9 @@ surfaces are:
 - **SPARQL workbench:** Comunica queries over ontology and public instance data.
 - **Presets:** SSTIM Workbench reference presets, their preserved BSC Lab
   implementation identifiers, and their evidence links.
+- **Published protocols:** protocols encoded from published papers, compared
+  side by side (stimulus, levels and the stage each holds at, schedule, arms,
+  population), each with its full record and its source.
 - **Patch Studio:** real-time audio/visual authoring with Web Audio,
   AudioWorklet/WASM options, modulation, photosensitivity safeguards, and
   first-class colour-field and stereoscopic scene tracks. Its built-in Sensory
