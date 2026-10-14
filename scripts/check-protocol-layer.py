@@ -11,8 +11,9 @@ Three checks.
 
 **Adds.** Every class, property and concept the two ADRs promised is declared.
 
-**Uses.** The nine protocols are present and each cites a bibliographic record,
-which is the only way they satisfy the provenance rule: none names a framework.
+**Uses.** The nine protocols are present, one file each named after its
+identifier (ADR 0065), and each cites a bibliographic record, which is the only
+way they satisfy the provenance rule: none names a framework.
 
 **Constraints, adversarially.** Each rule the layer adds is a rule data can
 break, and a rule that never fails is decoration. One positive fixture uses
@@ -39,10 +40,11 @@ ONTOLOGY = ROOT / "static" / "ontology"
 SHAPES = ONTOLOGY / "sstim-shapes.ttl"
 BSC_VOCAB = ONTOLOGY / "frameworks" / "bsc" / "bsc-vocab.ttl"
 BSC_SHAPES = ONTOLOGY / "frameworks" / "bsc" / "bsc-shapes.ttl"
-PROTOCOLS = ONTOLOGY / "instances" / "protocols" / "published-protocols.ttl"
+PROTOCOL_DIR = ONTOLOGY / "instances" / "protocols"
 FIXTURE_ROOT = "https://example.org/protocol-layer-fixture/"
 
 SSTIM = Namespace("https://w3id.org/sstim#")
+BSCLAB_PROTOCOL = Namespace("https://w3id.org/sstim/implementation/bsclab/protocol/")
 SSTIM_V = Namespace("https://w3id.org/sstim/vocab#")
 SSTIM_EX = Namespace("https://w3id.org/sstim/exposure#")
 SH = Namespace("http://www.w3.org/ns/shacl#")
@@ -78,7 +80,24 @@ REQUIRED_CONCEPTS = [
     "quantityIlluminance", "armExperimental", "armActiveComparator", "armSham", "armNoStimulation",
     "slowOscillation", "sleepSpindle", "measuredEeg", "phaseUpState",
 ]
-EXPECTED_PROTOCOLS = 9
+# Named rather than inferred: calling a protocol published because it cites a
+# paper would make the check that each one cites a paper true by construction.
+PUBLISHED_PROTOCOLS = (
+    "galambos-1981-40hz-auditory-steady-state-response",
+    "thaut-1996-rhythmic-auditory-stimulation-gait",
+    "lane-1998-binaural-beats-vigilance",
+    "ngo-2013-closed-loop-auditory-slow-oscillation",
+    "iaccarino-2016-40hz-visual-flicker",
+    "wang-2017-ssvep-40-target-speller",
+    "martorell-2019-40hz-auditory-tone-train",
+    "martorell-2019-40hz-audiovisual",
+    "chan-2022-40hz-audiovisual-daily-home-use",
+)
+# BSC Lab's own, which name the BSC framework and cite no paper.
+REFERENCE_PROTOCOLS = (
+    "auditory-observation-reference",
+    "guided-breathing-observation-reference",
+)
 
 PREAMBLE = """
 @prefix ex:       <https://example.org/protocol-layer-fixture/> .
@@ -375,12 +394,25 @@ def main() -> int:
     data = Graph()
     for path in instance_paths():
         data.parse(path, format="turtle")
-    protocols = Graph().parse(PROTOCOLS, format="turtle")
-    published = sorted(
-        s for s in protocols.subjects(RDF.type, SSTIM.SensoryStimulationProtocol) if isinstance(s, URIRef)
-    )
-    if len(published) != EXPECTED_PROTOCOLS:
-        failures.append(f"expected {EXPECTED_PROTOCOLS} published protocols, found {len(published)}")
+    # Every protocol file is one this gate classifies, so a new one cannot
+    # arrive unchecked as neither published nor BSC Lab's own.
+    on_disk = sorted(path.stem for path in PROTOCOL_DIR.glob("*.ttl"))
+    known = sorted(PUBLISHED_PROTOCOLS + REFERENCE_PROTOCOLS)
+    if on_disk != known:
+        failures.append(f"protocol files {on_disk} are not the classified set {known}")
+    published = []
+    for slug in PUBLISHED_PROTOCOLS:
+        path = PROTOCOL_DIR / f"{slug}.ttl"
+        if not path.exists():
+            failures.append(f"{path.name} is missing")
+            continue
+        declared = sorted(
+            s for s in Graph().parse(path, format="turtle").subjects(RDF.type, SSTIM.SensoryStimulationProtocol)
+            if isinstance(s, URIRef)
+        )
+        if declared != [BSCLAB_PROTOCOL[slug]]:
+            failures.append(f"{path.name} must declare exactly the protocol it is named after, found {declared}")
+        published.append(BSCLAB_PROTOCOL[slug])
     for protocol in published:
         cited = [r for r in data.objects(protocol, DCTERMS.source)
                  if (r, RDF.type, SSTIM.BibliographicReference) in data]

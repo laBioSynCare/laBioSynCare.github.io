@@ -1,0 +1,697 @@
+# 40-target SSVEP speller with joint frequency and phase coding, 8 to 15.8 Hz (Wang et al. 2017 benchmark dataset)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix w2017:           <https://w3id.org/sstim/implementation/bsclab/protocol/wang-2017-ssvep-40-target-speller#> .
+
+
+###########################################################################
+# 6. Wang, Chen, Gao and Gao 2017: SSVEP benchmark, 40-target speller
+#    Dataset readme and Freq_Phase.mat from the authors' download page, and
+#    the PubMed abstract. The 40 target channels are generated from
+#    Freq_Phase.mat and follow this block.
+###########################################################################
+
+bsclab-protocol:wang-2017-ssvep-40-target-speller a sstim:SensoryStimulationProtocol ;
+    rdfs:label "40-target SSVEP speller with joint frequency and phase coding, 8 to 15.8 Hz (Wang et al. 2017 benchmark dataset)"@en ;
+    dct:description "A virtual keyboard of 40 characters flickers on a screen, each character at its own frequency from 8 to 15.8 Hz in 0.2 Hz steps, with an initial phase of 0, 0.5π, π or 1.5π assigned so that characters 0.2 Hz apart differ by 0.5π (joint frequency and phase modulation). Each trial shows a red square on the target for 0.5 s, then 5 s in which all 40 characters flicker together while a red triangle marks the target, then 0.5 s of blank screen. Each of 35 healthy participants completed 6 blocks of 40 trials, one per character in random order, with rests of several minutes between blocks, while 64-channel EEG was recorded. Frequencies and phases are the dataset's own (Freq_Phase.mat). The display, its refresh rate and the stimulus waveform are not recorded here, because the sources read do not state them. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techPhoticDriving ;
+    sstim:participantEngagementMode sstim-v:engagementGuidedFollowing ;
+    sstim:hasStudyPopulation w2017:population ;
+    sstim:hasSchedule w2017:schedule ;
+    sstim-ex:hasExposureProfile w2017:profile ;
+    dct:source sstim-ref:WANG_2017 ;
+    skos:editorialNote "Encoded from the PubMed abstract (PMID 27849543), the dataset Readme.txt and Freq_Phase.mat from bci.med.tsinghua.edu.cn, read 2026-10-13. Without the waveform no StimulationSignal is asserted, so each target's rate and initial phase sit on its channel. Guided following is used for the instruction to shift gaze to the cued target."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+w2017:population a sstim:PopulationDescriptor ;
+    rdfs:label "Healthy adults aged 17 to 34"@en ;
+    dct:description "35 participants, 17 of them women, 8 experienced with SSVEP spellers and 27 naive."@en ;
+    sstim:populationTaxon obo:NCBITaxon_9606 .
+
+# One trial is the three segments in order; a block is 40 trials, one per
+# target, and a session is six blocks.
+w2017:schedule a sstim:StimulationSchedule ;
+    sstim:trialsPerBlock 40 ;
+    sstim:blocksPerSession 6 ;
+    sstim:hasScheduleSegment w2017:segment-cue, w2017:segment-flicker, w2017:segment-blank .
+
+w2017:segment-cue a sstim:ScheduleSegment ;
+    sstim:segmentOrder 1 ;
+    sstim:segmentDurationSeconds "0.5"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentCue .
+
+w2017:segment-flicker a sstim:ScheduleSegment ;
+    sstim:segmentOrder 2 ;
+    sstim:segmentDurationSeconds "5.0"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentStimulation ;
+    sstim:segmentStimulus w2017:stimulus .
+
+w2017:segment-blank a sstim:ScheduleSegment ;
+    sstim:segmentOrder 3 ;
+    sstim:segmentDurationSeconds "0.5"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentRest .
+
+w2017:stimulus a sstim:StimulusSpecification ;
+    rdfs:label "40-target flicker array, one 5 s trial (Wang et al. 2017)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasStimulationTarget w2017:subject .
+
+w2017:subject a bfo:0000040, obo:NCBITaxon_9606 ;
+    rdfs:label "Human participant"@en .
+
+
+###########################################################################
+# 6 (continued). The 40 SSVEP targets of Wang et al. 2017, in the dataset's
+# own target order. Rates and initial phases are the values of
+# Freq_Phase.mat; sstim-ex:hasInitialPhase is the phase at stimulus onset as a
+# fraction of a cycle.
+###########################################################################
+
+# Generated from Freq_Phase.mat (dataset target order). Do not edit by hand.
+w2017:target-01 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 1: 8.0 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "8.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-02 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 2: 9.0 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "9.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-03 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 3: 10.0 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "10.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-04 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 4: 11.0 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "11.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-05 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 5: 12.0 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "12.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-06 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 6: 13.0 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "13.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-07 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 7: 14.0 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "14.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-08 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 8: 15.0 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "15.0"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-09 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 9: 8.2 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "8.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-10 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 10: 9.2 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "9.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-11 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 11: 10.2 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "10.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-12 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 12: 11.2 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "11.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-13 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 13: 12.2 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "12.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-14 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 14: 13.2 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "13.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-15 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 15: 14.2 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "14.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-16 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 16: 15.2 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "15.2"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-17 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 17: 8.4 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "8.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-18 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 18: 9.4 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "9.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-19 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 19: 10.4 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "10.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-20 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 20: 11.4 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "11.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-21 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 21: 12.4 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "12.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-22 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 22: 13.4 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "13.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-23 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 23: 14.4 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "14.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-24 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 24: 15.4 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "15.4"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-25 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 25: 8.6 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "8.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-26 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 26: 9.6 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "9.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-27 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 27: 10.6 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "10.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-28 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 28: 11.6 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "11.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-29 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 29: 12.6 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "12.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-30 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 30: 13.6 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "13.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-31 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 31: 14.6 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "14.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-32 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 32: 15.6 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "15.6"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-33 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 33: 8.8 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "8.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-34 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 34: 9.8 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "9.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-35 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 35: 10.8 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "10.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-36 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 36: 11.8 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "11.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-37 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 37: 12.8 Hz, initial phase 0"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "12.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.0"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-38 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 38: 13.8 Hz, initial phase 0.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "13.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.25"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-39 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 39: 14.8 Hz, initial phase π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "14.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:target-40 a sstim-ex:StimulusChannel ;
+    rdfs:label "Target 40: 15.8 Hz, initial phase 1.5π"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "15.8"^^xsd:decimal ;
+    sstim-ex:hasInitialPhase "0.75"^^xsd:decimal ;
+    sstim:channelDurationSeconds "5.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity .
+
+w2017:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "One 5 s trial: all 40 targets flickering together"@en ;
+    sstim-ex:usesStimulusChannel w2017:target-01,
+        w2017:target-02,
+        w2017:target-03,
+        w2017:target-04,
+        w2017:target-05,
+        w2017:target-06,
+        w2017:target-07,
+        w2017:target-08,
+        w2017:target-09,
+        w2017:target-10,
+        w2017:target-11,
+        w2017:target-12,
+        w2017:target-13,
+        w2017:target-14,
+        w2017:target-15,
+        w2017:target-16,
+        w2017:target-17,
+        w2017:target-18,
+        w2017:target-19,
+        w2017:target-20,
+        w2017:target-21,
+        w2017:target-22,
+        w2017:target-23,
+        w2017:target-24,
+        w2017:target-25,
+        w2017:target-26,
+        w2017:target-27,
+        w2017:target-28,
+        w2017:target-29,
+        w2017:target-30,
+        w2017:target-31,
+        w2017:target-32,
+        w2017:target-33,
+        w2017:target-34,
+        w2017:target-35,
+        w2017:target-36,
+        w2017:target-37,
+        w2017:target-38,
+        w2017:target-39,
+        w2017:target-40 ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+w2017:stimulus sstim:hasStimulusChannel w2017:target-01,
+        w2017:target-02,
+        w2017:target-03,
+        w2017:target-04,
+        w2017:target-05,
+        w2017:target-06,
+        w2017:target-07,
+        w2017:target-08,
+        w2017:target-09,
+        w2017:target-10,
+        w2017:target-11,
+        w2017:target-12,
+        w2017:target-13,
+        w2017:target-14,
+        w2017:target-15,
+        w2017:target-16,
+        w2017:target-17,
+        w2017:target-18,
+        w2017:target-19,
+        w2017:target-20,
+        w2017:target-21,
+        w2017:target-22,
+        w2017:target-23,
+        w2017:target-24,
+        w2017:target-25,
+        w2017:target-26,
+        w2017:target-27,
+        w2017:target-28,
+        w2017:target-29,
+        w2017:target-30,
+        w2017:target-31,
+        w2017:target-32,
+        w2017:target-33,
+        w2017:target-34,
+        w2017:target-35,
+        w2017:target-36,
+        w2017:target-37,
+        w2017:target-38,
+        w2017:target-39,
+        w2017:target-40 .

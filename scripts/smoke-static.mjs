@@ -14,6 +14,7 @@ import { existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { normalizeDeploymentBase } from '../deployment.config.js'
 import { MANUAL_CHAPTERS } from '../src/ui/manual/chapters.js'
+import { buildRecordDocuments } from './gen-record-documents.mjs'
 import { serveDist } from './static-host.mjs'
 
 const DIST = resolve(process.argv[2] ?? 'dist')
@@ -161,6 +162,26 @@ async function main() {
         ? ok(`GET ${url}`, response.headers.get('content-type') ?? '')
         : bad(`GET ${url}`, `status ${response.status}`)
     }
+
+    // Every record document a w3id.org route sends an RDF client to (ADR 0065)
+    // is in the build, served as Turtle, and describes its record. A build
+    // that skipped the generator would otherwise 404 every evidence record and
+    // reference identifier while all of the above passed.
+    const recordDocuments = buildRecordDocuments()
+    let servedRecords = 0
+    for (const { identifier, path } of recordDocuments) {
+      const response = await fetch(`${base}/ontology/${path}`)
+      const body = response.ok ? await response.text() : ''
+      if (!response.ok) bad(`GET /ontology/${path}`, `status ${response.status}`)
+      else if (!(response.headers.get('content-type') ?? '').includes('text/turtle')) {
+        bad(`GET /ontology/${path}`, `content-type ${response.headers.get('content-type')}`)
+      } else if (!body.includes(identifier.split('/').pop())) {
+        bad(`GET /ontology/${path}`, `does not describe ${identifier}`)
+      } else servedRecords += 1
+    }
+    servedRecords === recordDocuments.length && servedRecords > 0
+      ? ok('GET /ontology/records/', `${servedRecords} record documents, each Turtle describing its record`)
+      : bad('GET /ontology/records/', `${servedRecords} of ${recordDocuments.length} served`)
 
     // 4. PWA assets present.
     for (const asset of ['/service-worker.js', '/manifest.webmanifest']) {

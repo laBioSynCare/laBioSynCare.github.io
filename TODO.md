@@ -1361,23 +1361,25 @@ Turtle files are listed in section 1. After they exist:
 
 - [ ] Complete the four abstract-level published protocols `P1`
       *Galambos 1981, Ngo 2013, Lane 1998 and Thaut 1996 in
-      `instances/protocols/published-protocols.ttl` were encoded from their
+      `instances/protocols/` (one file each) were encoded from their
       PubMed abstracts only: their full texts sit behind publisher bot checks
       and a PMC reCAPTCHA that were not bypassed. With the PDFs, encode the
       stimuli, levels and timing their `skos:editorialNote`s list as missing.
       The terms each needs exist (ADR 0063, ADR 0064), so this is data entry.
       Wang 2017's display, refresh rate and waveform need the paper too.*
 
-- [ ] Route `implementation/bsclab/protocol/` at w3id.org `P2`
-      *Measured 2026-10-13 with `curl` (HTML and Turtle Accept): the existing
-      `bsclab/protocol/auditory-observation-reference` and
-      `bsclab/experiment/color-field-blink` IRIs answer 404, so the nine
-      published protocols, like the two reference protocols, do not
-      dereference. The `ref/` routes enumerate their keys, so the eight new
-      source records (`ref/IACCARINO_2016` and the rest) answer 404 too. Needs
-      an upstream perma-id/w3id.org PR (read the current PR template first),
-      routing HTML to `/graph/` and RDF to the instance file, then the mirror in
-      `docs/ecosystem/w3id/` updated to match.*
+- [~] Route committed records at w3id.org `P2`
+      *Measured 2026-10-14: 145 of 161 committed record identifiers answered
+      404 (every protocol, experiment and evidence record, and the eight new
+      references). Repository side done the same day
+      ([ADR 0065](docs/decisions/0065-committed-records-resolve-by-family-pattern.md)):
+      one pattern per family in `docs/ecosystem/w3id/sstim/.htaccess`, record
+      documents generated at build, and the proof in `make w3id-routes`.
+      Remaining: once the Pages deploy serves `ontology/records/` and the
+      per-protocol files, submit the prepared perma-id/w3id.org change (branch
+      `sstim-committed-record-patterns`, upstream checker clean, tested on
+      their Apache harness), and after the merge confirm a sample of each
+      family live: 303 from w3id.org, 200 Turtle at the target.*
 
 - [ ] Native review of the labels ADR 0063 and ADR 0064 added `P2`
       *237 labels in Italian, Portuguese and Spanish on the 79 new concepts,

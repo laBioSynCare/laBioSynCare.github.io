@@ -4220,7 +4220,7 @@ sstim-sh:ExploratoryProtocolShape a sh:NodeShape ;
 # laws (ADR 0063, ADR 0064)
 #
 # Written against nine published protocols encoded in
-# instances/protocols/published-protocols.ttl, and each rule below rejects
+# instances/protocols/, one file each, and each rule below rejects
 # something one of them could otherwise have said wrongly. `make
 # protocol-layer` drives an adversarial fixture through every one.
 ###########################################################################

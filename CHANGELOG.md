@@ -75,6 +75,25 @@ one of each.
 - `sstim-v:shapeSquare` gains the alternative labels "rectangular wave" and
   "pulse train": a low duty-cycle pulse train was always a square signal.
 - The Technique module now requires Stimulus directly.
+- **Committed records resolve by family pattern**
+  ([ADR 0065](docs/decisions/0065-committed-records-resolve-by-family-pattern.md)).
+  176 identifiers in the committed RDF resolved nowhere, among them every
+  protocol, experiment and evidence record. The w3id.org rules now route each
+  family of committed records (presets, protocols, experiments, evidence
+  records, references) by one pattern, so a new record resolves without a
+  registry change. A browser lands on the record's node in the knowledge
+  browser, which now loads protocols, experiments and evidence. An RDF client
+  gets a document describing that record alone: its own file, or a record
+  document the build generates under `ontology/records/` for references and
+  evidence, whose source files are shared. References therefore no longer
+  resolve to `references.ttl` as a whole. `make w3id-routes` executes the rules
+  against every committed record and fails on any SSTIM identifier in the
+  committed RDF that resolves nowhere without a stated reason. Takes effect
+  when the matching perma-id/w3id.org pull request merges.
+- One file per protocol: `published-protocols.ttl` and
+  `bsc-reference-protocols.ttl` are replaced by eleven files in
+  `instances/protocols/`, each named after its protocol's identifier, which is
+  unchanged.
 
 ## [0.19.0] - 2026-10-10
 

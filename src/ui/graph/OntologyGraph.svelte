@@ -64,6 +64,9 @@
     { kind: 'catalogTechnique',      label: 'Catalog technique' },
     { kind: 'catalogPreset',         label: 'Catalog preset' },
     { kind: 'catalogReference',      label: 'Catalog reference' },
+    { kind: 'catalogProtocol',       label: 'Catalog protocol' },
+    { kind: 'catalogExperiment',     label: 'Catalog experiment' },
+    { kind: 'catalogEvidence',       label: 'Catalog evidence record' },
     { kind: 'ecosystemPerson',       label: 'Live person' },
     { kind: 'ecosystemOrganization', label: 'Live organization' },
     { kind: 'ecosystemTarget',       label: 'Live target' },
@@ -89,7 +92,7 @@
     { value: 'terms', label: 'Terms', layers: ['ontology', 'vocabulary'],
       about: 'The released term space: every OWL class and SKOS concept of the SSTIM ontology and vocabulary. This is the default on its own so that published terms — not example data — define the shape of the graph.' },
     { value: 'catalog', label: 'Catalog · versioned', layers: ['catalog'],
-      about: 'Versioned public reference instances — frameworks, implementations and their components, techniques, presets, and evidence records. Citable and frozen per release.' },
+      about: 'Versioned public reference instances: frameworks, implementations and their components, techniques, presets, protocols, experiments, evidence records and references. Citable and frozen per release.' },
     { value: 'ecosystem', label: 'Stakeholders · live', layers: ['ecosystem'],
       about: 'The live stakeholder network: people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
   ]
@@ -267,6 +270,9 @@
     catalogTechnique: 'Technique · versioned catalog',
     catalogPreset: 'Preset · versioned catalog',
     catalogReference: 'Reference · versioned catalog',
+    catalogProtocol: 'Protocol · versioned catalog',
+    catalogExperiment: 'Experiment · versioned catalog',
+    catalogEvidence: 'Evidence record · versioned catalog',
     ecosystemPerson: 'Person · live stakeholder network',
     ecosystemOrganization: 'Organization · live stakeholder network',
     ecosystemTarget: 'Target · live stakeholder relationship',
@@ -312,6 +318,9 @@
     catalogTechnique: '#ffe082',
     catalogPreset: '#ff8a65',
     catalogReference: '#b39ddb',
+    catalogProtocol: '#ef9a9a',
+    catalogExperiment: '#9fa8da',
+    catalogEvidence: '#bcaaa4',
     ecosystemPerson: '#80cbc4',
     ecosystemOrganization: '#4db6ac',
     ecosystemTarget: '#90a4ae',
@@ -548,6 +557,18 @@
       {
         selector: 'node[kind="catalogReference"]',
         style: { shape: 'round-diamond' }
+      },
+      {
+        selector: 'node[kind="catalogProtocol"]',
+        style: { shape: 'round-pentagon', 'font-weight': 700 }
+      },
+      {
+        selector: 'node[kind="catalogExperiment"]',
+        style: { shape: 'round-octagon' }
+      },
+      {
+        selector: 'node[kind="catalogEvidence"]',
+        style: { shape: 'round-triangle' }
       },
       {
         selector: 'node[kind="ecosystemPerson"]',

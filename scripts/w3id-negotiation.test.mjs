@@ -4,8 +4,11 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Parser } from 'n3'
 
-import { expandRule } from './check-w3id-route-targets.mjs'
+import { RECORD_PATTERNS } from './check-w3id-route-targets.mjs'
+import { checkRecordRoutes, recordInventory } from './check-w3id-record-routes.mjs'
+import { buildRecordDocuments } from './gen-record-documents.mjs'
 import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
+import { recordFamilyOf } from '../src/rdf/recordFamilies.js'
 import { releaseDirectories } from './publish-latest-ontology.mjs'
 // The deep-link targets are graph-browser hashes, so the prefixes they use have
 // to be the ones the browser resolves against — assert against the real table
@@ -65,14 +68,6 @@ function graphEntityIri(target) {
   const base = PREFIXES[prefix]
   if (!base) throw new Error(`Graph entity target uses an unknown prefix: ${target}`)
   return base + curie.slice(colon + 1)
-}
-
-function routedCatalogEntityIris() {
-  return rules
-    .filter(({ target }) => /\/graph\/#(?:bsclab-preset|sstim-ref):/.test(target))
-    .flatMap(({ pattern, target }) => expandRule(pattern, target))
-    .map(graphEntityIri)
-    .sort()
 }
 
 async function buildLocalCatalogGraph(sourceUrls) {
@@ -391,74 +386,75 @@ test('every BSC replacement of a deprecated SSTIM term dereferences to its decla
   }
 })
 
-test('every committed public preset and reference has an exact entity route', () => {
-  // Derive the inventory from the same committed source map the app loads.
-  // Adding a public Preset or PublicSafeReference without adding an audited
-  // w3id route therefore fails here instead of shipping a copied IRI that 404s.
+test('every committed record resolves by its family pattern (ADR 0065)', () => {
+  // The record proof executes these rules against every committed record and
+  // every name that is not one; this keeps its verdict in the suite.
+  const { problems, records } = checkRecordRoutes({ rules })
+  expect(problems).toEqual([])
+  expect(records).toBeGreaterThan(150)
+
+  // The records routed before ADR 0065 keep their behaviour: a browser
+  // reaches the record's node, an RDF client the Turtle that describes it.
   const presets = typedSubjects(INSTANCE_URLS.presets, SSTIM + 'Preset')
   const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
-
   // Five: one reference preset per catalog group (Heal, Support, Perform,
-  // Indulge, Transcend). Grown from two on 2026-09-10 with matching routes above.
+  // Indulge, Transcend). Eleven public-safe references, the four
+  // neural-oscillation ones ADR 0049 added among them.
   expect(presets).toHaveLength(5)
-  // 7 + the four neural-oscillation references ADR 0049 added, each verified
-  // through Crossref before being written and each given an exact route below.
   expect(references).toHaveLength(11)
-
-  for (const { iri, sourceUrl } of [...presets, ...references]) {
+  for (const { iri, sourceUrl } of presets) {
     const path = sstimPath(iri)
-    const sourceDoc = logicalApplicationPath(sourceUrl).replace(/^\/ontology\//, '')
-    const html = go(path, BROWSER)
-
-    expect(html.status, `${iri} has no browser route`).toBe(303)
-    expect(html.doc, `${iri} does not deep-link to its graph node`)
+    expect(go(path, BROWSER).doc, `${iri} does not deep-link to its graph node`)
       .toBe(`https://w3c-cg.github.io/sstim/graph/#${toCurie(iri)}`)
     expect(go(path, 'text/turtle').doc, `${iri} does not return its owning Turtle`)
-      .toBe(sourceDoc)
-    expect(go(path, '').doc, `${iri} does not default to its owning Turtle`)
-      .toBe(sourceDoc)
+      .toBe(logicalApplicationPath(sourceUrl).replace(/^\/ontology\//, ''))
+    expect(go(path, '').doc).toBe(logicalApplicationPath(sourceUrl).replace(/^\/ontology\//, ''))
     expect(go(path, 'application/ld+json').status).toBe(406)
   }
+  for (const { iri } of references) {
+    const path = sstimPath(iri)
+    expect(go(path, BROWSER).doc).toBe(`https://w3c-cg.github.io/sstim/graph/#${toCurie(iri)}`)
+    // A document of its own, no longer the file every reference shares, so a
+    // key that is not there can never reach that file.
+    expect(go(path, 'text/turtle').doc).toBe(`records/${path}.ttl`)
+  }
 
-  // These static namespaces are deliberately fail-closed. An aggregate Turtle
-  // file must never make an uncommitted identifier appear to be a public record.
+  // A name that is no record is now redirected, because a pattern matches it,
+  // to a document nothing publishes: it still ends at 404, from Pages. A path
+  // outside every family's grammar is still refused here.
+  const generated = new Set(buildRecordDocuments().map(({ path }) => path))
+  for (const path of ['implementation/bsclab/preset/not-a-public-preset', 'ref/NOT_A_COMMITTED_REFERENCE']) {
+    const { status, doc } = go(path, 'text/turtle')
+    expect(status).toBe(303)
+    expect(generated.has(doc) || existsSync(join(repoRoot, 'static/ontology', doc)), `${doc} is published`)
+      .toBe(false)
+  }
   for (const path of [
-    'implementation/bsclab/preset/not-a-public-preset',
     'implementation/bsclab/preset/heal-theta-breathing-seed/voice',
-    'ref/NOT_A_COMMITTED_REFERENCE',
     'ref/ingendoh_2023',
   ]) {
     expect(go(path, BROWSER).status, `${path} acquired a broad HTML route`).toBe(404)
     expect(go(path, 'text/turtle').status, `${path} acquired a broad RDF route`).toBe(404)
   }
 
-  expect(PREFIXES).toHaveProperty('bsclab-preset')
-  expect(PREFIXES).toHaveProperty('sstim-ref')
-
-  const entityHashRules = rules.filter(({ target }) =>
-    target.includes('/graph/#bsclab-preset:') || target.includes('/graph/#sstim-ref:'),
-  )
-  expect(entityHashRules).toHaveLength(2)
+  const entityHashRules = rules.filter(({ pattern, target }) =>
+    RECORD_PATTERNS.has(pattern.replace(/^\^/, '').replace(/\$$/, '')) && target.includes('/graph/#'))
+  expect(entityHashRules).toHaveLength(3)
   for (const rule of entityHashRules) {
     expect(rule.flags, `${rule.pattern} must preserve its literal # fragment`).toContain('NE')
   }
 })
 
-test('every routed public preset and reference is materialized as a Graph node', async () => {
-  // Start from the actual browser-route targets, expand their audited
-  // alternations, and resolve the same CURIEs the Graph receives. Starting
-  // from the RDF inventory alone would miss a stale extra route and could pass
-  // vacuously if the route block disappeared.
-  const routedIris = routedCatalogEntityIris()
-  const presets = typedSubjects(INSTANCE_URLS.presets, SSTIM + 'Preset')
-  const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
-  const committed = [...presets, ...references].map(({ iri }) => iri).sort()
-
-  expect(routedIris).not.toEqual([])
-  expect(routedIris).toEqual(committed)
-
+test('every committed record is a Graph node of its family\'s kind', async () => {
+  // Build the graph the browser builds, from the navigator's own sources, and
+  // look for every record the routes resolve: one the routes reach but the
+  // graph lacks would land a reader on a "not found" banner.
+  const records = recordInventory()
   const elements = await buildLocalCatalogGraph([
     ...INSTANCE_URLS.presets,
+    ...INSTANCE_URLS.protocols,
+    ...INSTANCE_URLS.experiments,
+    ...INSTANCE_URLS.evidence,
     ...INSTANCE_URLS.references,
   ])
   const nodes = new Map(
@@ -467,10 +463,12 @@ test('every routed public preset and reference is materialized as a Graph node',
       .map(({ data }) => [data.iri, data]),
   )
 
-  const missing = routedIris.filter((iri) => !nodes.has(iri))
-  expect(missing, `routed Graph entities without nodes: ${missing.join(', ')}`).toEqual([])
-  for (const { iri } of presets) expect(nodes.get(iri)?.kind).toBe('catalogPreset')
-  for (const { iri } of references) expect(nodes.get(iri)?.kind).toBe('catalogReference')
+  const missing = records.map(({ identifier }) => identifier).filter((iri) => !nodes.has(iri))
+  expect(missing, `routed records without nodes: ${missing.join(', ')}`).toEqual([])
+  for (const { identifier } of records) {
+    expect(nodes.get(identifier).kind, identifier).toBe(recordFamilyOf(identifier).graphKind)
+    expect(graphEntityIri(go(sstimPath(identifier), BROWSER).doc)).toBe(identifier)
+  }
 }, 30_000)
 
 test('snapshot routes are patterns, bounded to version-shaped paths (ADR 0053)', () => {

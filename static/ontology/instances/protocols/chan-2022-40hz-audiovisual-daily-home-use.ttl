@@ -1,0 +1,214 @@
+# Daily 1-hour 40 Hz light and sound stimulation at home, randomized pilot in mild Alzheimer's dementia (Chan et al. 2022)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix mesh:            <http://id.nlm.nih.gov/mesh/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix c2022:           <https://w3id.org/sstim/implementation/bsclab/protocol/chan-2022-40hz-audiovisual-daily-home-use#> .
+
+
+###########################################################################
+# 5. Chan et al. 2022: daily 40 Hz light and sound at home, human pilot
+#    Full text: PLOS ONE (open access), Materials and methods.
+###########################################################################
+
+bsclab-protocol:chan-2022-40hz-audiovisual-daily-home-use a sstim:SensoryStimulationProtocol ;
+    rdfs:label "Daily 1-hour 40 Hz light and sound stimulation at home, randomized pilot in mild Alzheimer's dementia (Chan et al. 2022)"@en ;
+    dct:description "Participants sit 5 feet from a device that combines a 2 by 2 foot white LED panel (correlated colour temperature 3900 to 4000 K) with a sound bar, both driven by one custom circuit board. The active arm receives 40 Hz light flicker and a 40 Hz train of 1 ms rectangular sound pulses (a 4% duty cycle, 24 ms between pulses), at 68 dB for participants with mild Alzheimer's disease (78 dB in the cognitively normal cohort of the Phase 1 study). The control arm receives constant white light and white noise at 68 dB. Average light intensity at the participant's eyes was about 390 to 400 lux in both arms. In the Phase 2A study (NCT04055376), a single-blind randomized trial assigning participants 1:1, the device was used for 1 hour daily, planned for 6 months, with results reported to the 3-month assessment; a tablet at the centre of the panel showed videos to hold the viewer's attention. The paper does not say where the sound levels were measured, nor the light's duty cycle. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techAudiovisualEntrainment, sstim-v:techPhoticDriving, sstim-v:techGamma40Auditory, sstim-v:techClickTrain ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
+    sstim:intendedNeuralSystem sstim-v:systemAuditory, sstim-v:systemVisual ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
+    sstim:protocolStudyDesign sstim-v:designRandomizedControlledTrial ;
+    sstim:armAllocation sstim-v:allocationBetweenSubject ;
+    sstim:hasStudyPopulation c2022:population ;
+    sstim:hasSchedule c2022:schedule ;
+    sstim:hasStudyArm c2022:arm-active, c2022:arm-control ;
+    sstim-ex:hasExposureProfile c2022:profile, c2022:control-profile ;
+    dct:source sstim-ref:CHAN_2022 ;
+    skos:editorialNote "Encoded from the open-access full text (PMC9714926): Materials and methods, Study design and Sensory stimulation, and the Fig 2 caption. Light and sound render one 40 Hz signal because one board drives both at 40 Hz; their relative phase is not stated and no phase offset is asserted. Distances and the panel size are the paper's feet converted exactly to metres. The schedule's 6-month course is the planned one."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+c2022:population a sstim:PopulationDescriptor ;
+    rdfs:label "People with mild probable Alzheimer's dementia"@en ;
+    dct:description "The Phase 2A study's participants. The Phase 1 study also enrolled cognitively normal adults and patients with epilepsy, who are not this protocol's population."@en ;
+    sstim:populationTaxon obo:NCBITaxon_9606 ;
+    sstim:populationCondition mesh:D000544 .
+
+c2022:schedule a sstim:StimulationSchedule ;
+    sstim:sessionDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:sessionsPerDay "1.0"^^xsd:decimal ;
+    sstim:courseDurationValue "6.0"^^xsd:decimal ;
+    sstim:courseDurationUnit sstim-v:unitMonth .
+
+c2022:arm-active a sstim:StudyArm ;
+    rdfs:label "40 Hz light flicker and sound pulses"@en ;
+    sstim:armRole sstim-v:armExperimental ;
+    sstim:armStimulus c2022:stimulus .
+
+c2022:arm-control a sstim:StudyArm ;
+    rdfs:label "Constant white light and white noise"@en ;
+    sstim:armRole sstim-v:armSham ;
+    sstim:armStimulus c2022:control-stimulus .
+
+c2022:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Active arm: one hour of concurrent 40 Hz light flicker and 40 Hz sound pulses"@en ;
+    sstim-ex:usesStimulusChannel c2022:light, c2022:sound ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+c2022:light a sstim-ex:StimulusChannel ;
+    rdfs:label "White LED panel, 2 by 2 feet, flickering at 40 Hz, 5 feet from the participant"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternBlinking ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "40.0"^^xsd:decimal ;
+    sstim-ex:viewingDistanceMetres "1.524"^^xsd:decimal ;
+    sstim-ex:sourceWidthMetres "0.6096"^^xsd:decimal ;
+    sstim-ex:sourceHeightMetres "0.6096"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim:hasMagnitude c2022:light-illuminance ;
+    sstim:hasSignalRendering c2022:luminance-rendering .
+
+c2022:light-illuminance a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityIlluminance ;
+    sstim:magnitudeMinimum "390.0"^^xsd:decimal ;
+    sstim:magnitudeMaximum "400.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitLux ;
+    sstim:deliveryStage sstim-v:stageAtSubject ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "average light intensity around 390–400 lux at the participant’s eyes" .
+
+# A 1 ms rectangular pulse carries nothing: it is a click, so the 40 Hz reaches
+# the ear directly, with no carrier, unlike the 10 kHz tone pips of the mouse
+# protocols. The two GENUS sounds differ in exactly the way SSTIM's rendering
+# layer was built to state.
+c2022:sound a sstim-ex:StimulusChannel ;
+    rdfs:label "Sound bar: 1 ms rectangular pulses every 25 ms"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternPulsed ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasModulationFrequencyHz "40.0"^^xsd:decimal ;
+    sstim-ex:hasDutyCycle "0.04"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:hasMagnitude c2022:sound-level ;
+    sstim:hasSignalRendering c2022:click-rendering .
+
+c2022:sound-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
+    sstim:magnitudeValue "68.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "the 40Hz sound was 78dB (cognitively normal group) or 68dB (patients with mild AD or epilepsy)" .
+
+c2022:signal a sstim:StimulationSignal ;
+    rdfs:label "40 Hz on and off, shared by light and sound"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "40.0"^^xsd:decimal ;
+    sstim:hzMax "40.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:gamma, sstim-v:gamma40 .
+
+c2022:luminance-rendering a sstim:SignalRendering ;
+    rdfs:label "LED panel switched on and off at the signal rate"@en ;
+    sstim:rendersSignal c2022:signal ;
+    sstim:rendersOntoParameter sstim-v:paramLuminance ;
+    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .
+
+c2022:click-rendering a sstim:SignalRendering ;
+    rdfs:label "Rectangular sound pulses at the signal rate"@en ;
+    sstim:rendersSignal c2022:signal ;
+    sstim:rendersOntoParameter sstim-v:paramAmplitude ;
+    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .
+
+c2022:stimulus a sstim:StimulusSpecification ;
+    rdfs:label "Active 40 Hz light and sound stimulus (Chan et al. 2022)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasSignal c2022:signal ;
+    sstim:hasStimulusChannel c2022:light, c2022:sound ;
+    sstim:hasStimulationTarget c2022:subject .
+
+c2022:control-profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Control arm: one hour of constant white light and white noise"@en ;
+    sstim-ex:usesStimulusChannel c2022:control-light, c2022:control-noise ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+c2022:control-light a sstim-ex:StimulusChannel ;
+    rdfs:label "White LED panel, constant light"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternStatic, sstim-ex:visualFieldWhite ;
+    sstim-ex:channelRole sstim-ex:roleControlOrSham ;
+    sstim-ex:viewingDistanceMetres "1.524"^^xsd:decimal ;
+    sstim-ex:sourceWidthMetres "0.6096"^^xsd:decimal ;
+    sstim-ex:sourceHeightMetres "0.6096"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:hasMagnitude c2022:control-illuminance .
+
+c2022:control-illuminance a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityIlluminance ;
+    sstim:magnitudeMinimum "390.0"^^xsd:decimal ;
+    sstim:magnitudeMaximum "400.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitLux ;
+    sstim:deliveryStage sstim-v:stageAtSubject ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "both the control (constant white light) and active groups (40Hz light flicker; Fig 2B) received average light intensity around 390–400 lux at the participant’s eyes" .
+
+c2022:control-noise a sstim-ex:StimulusChannel ;
+    rdfs:label "Sound bar, white noise"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternNoise, sstim-ex:audioNoiseWhite ;
+    sstim-ex:channelRole sstim-ex:roleControlOrSham ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:hasMagnitude c2022:control-noise-level .
+
+c2022:control-noise-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
+    sstim:magnitudeValue "68.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "The control sound was white noise at 68dB." .
+
+c2022:control-stimulus a sstim:StimulusSpecification ;
+    rdfs:label "Control light and noise stimulus (Chan et al. 2022)"@en ;
+    sstim:stimulusRegime "stochastic" ;
+    sstim:hasStimulusChannel c2022:control-light, c2022:control-noise ;
+    sstim:hasStimulationTarget c2022:subject .
+
+c2022:subject a bfo:0000040, obo:NCBITaxon_9606 ;
+    rdfs:label "Human participant"@en .

@@ -257,10 +257,21 @@ export const INSTANCE_URLS = {
     applicationAsset('/ontology/instances/presets/indulge-alpha-warmth-seed.ttl'),
     applicationAsset('/ontology/instances/presets/transcend-theta-drift-seed.ttl'),
   ],
+  // One file per protocol, named after its identifier, so one w3id.org pattern
+  // resolves every protocol to the document that holds it (ADR 0065).
   protocols: [
-    applicationAsset('/ontology/instances/protocols/bsc-reference-protocols.ttl'),
+    applicationAsset('/ontology/instances/protocols/auditory-observation-reference.ttl'),
+    applicationAsset('/ontology/instances/protocols/guided-breathing-observation-reference.ttl'),
     // Nine published protocols encoded from their papers (ADR 0063, ADR 0064).
-    applicationAsset('/ontology/instances/protocols/published-protocols.ttl'),
+    applicationAsset('/ontology/instances/protocols/galambos-1981-40hz-auditory-steady-state-response.ttl'),
+    applicationAsset('/ontology/instances/protocols/thaut-1996-rhythmic-auditory-stimulation-gait.ttl'),
+    applicationAsset('/ontology/instances/protocols/lane-1998-binaural-beats-vigilance.ttl'),
+    applicationAsset('/ontology/instances/protocols/ngo-2013-closed-loop-auditory-slow-oscillation.ttl'),
+    applicationAsset('/ontology/instances/protocols/iaccarino-2016-40hz-visual-flicker.ttl'),
+    applicationAsset('/ontology/instances/protocols/wang-2017-ssvep-40-target-speller.ttl'),
+    applicationAsset('/ontology/instances/protocols/martorell-2019-40hz-auditory-tone-train.ttl'),
+    applicationAsset('/ontology/instances/protocols/martorell-2019-40hz-audiovisual.ttl'),
+    applicationAsset('/ontology/instances/protocols/chan-2022-40hz-audiovisual-daily-home-use.ttl'),
   ],
   evidence: [
     applicationAsset('/ontology/instances/evidence/technique-evidence.ttl'),
@@ -377,10 +388,11 @@ export function staticInstanceSources() {
 
 /**
  * The deliberately small manifest used by the unified Graph navigator.
- * It contains the citable term set, versioned catalog records (including the
- * exact public presets and references reached by w3id browser routes), and
- * optionally the mutable public ecosystem projection. Sessions, experiments,
- * standalone evidence sources, and synthetic fixtures are outside this view.
+ * It contains the citable term set, the versioned catalog, every committed
+ * record a w3id.org route sends a browser to (presets, protocols, experiments,
+ * evidence records and references, ADR 0065), and optionally the mutable
+ * public ecosystem projection. Sessions and synthetic fixtures, which no route
+ * reaches, are outside this view.
  */
 export function navigatorSources(options = {}) {
   const sources = [
@@ -389,6 +401,9 @@ export function navigatorSources(options = {}) {
     ...INSTANCE_SOURCES.frameworks,
     ...INSTANCE_SOURCES.implementations,
     ...INSTANCE_SOURCES.presets,
+    ...INSTANCE_SOURCES.protocols,
+    ...INSTANCE_SOURCES.experiments,
+    ...INSTANCE_SOURCES.evidence,
     ...INSTANCE_SOURCES.references,
   ]
   if (options.includeLive !== false) sources.push(...INSTANCE_SOURCES.ecosystem)

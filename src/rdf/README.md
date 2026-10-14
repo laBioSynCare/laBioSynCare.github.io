@@ -124,9 +124,11 @@ need loaded data should use `GRAPH ?g { ... }`. Annotations remain separate
 named graph records managed by `AnnotationStore.js`.
 
 **Source boundaries:** `loadNavigatorGraph()` deliberately loads only ontology
-and vocabulary terms, the versioned framework/implementation catalog, and the
-external approved current-state ecosystem. It excludes presets, experiments,
-sessions, evidence, references, and synthetic ecosystem fixtures. The live fetch
+and vocabulary terms, the versioned framework/implementation catalog, every
+committed record a w3id.org route sends a browser to (presets, protocols,
+experiments, evidence records and references, ADR 0065), and the external
+approved current-state ecosystem. It excludes sessions and synthetic ecosystem
+fixtures, which no route reaches. The live fetch
 uses `cache: 'no-store'`, omits credentials/referrer information, and returns an
 explicit `available`, `empty`, or `unavailable` status. `loadStaticKnowledgeGraph()`
 never fetches live agents or synthetic ecosystem fixtures; SPARQL users must opt

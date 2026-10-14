@@ -399,8 +399,8 @@ A level states where it holds: configured, emitted, at the subject, at a target
 in the body, relative to the subject's own measure, as perceived, or not stated.
 A value a source reports without a measurement point is recorded as not stated,
 with the source's words in `sstim:reportedAs`, never promoted to "at the ear".
-`instances/protocols/published-protocols.ttl` holds nine published protocols
-encoded this way, and `make protocol-layer` checks that every rule rejects what
+`instances/protocols/` holds nine published protocols encoded this way, one
+file per protocol, and `make protocol-layer` checks that every rule rejects what
 it claims to.
 
 ## Validation

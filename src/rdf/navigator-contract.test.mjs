@@ -63,13 +63,20 @@ describe('unified navigator source boundary', () => {
       ...INSTANCE_SOURCES.frameworks,
       INSTANCE_SOURCES.implementations[0],
       ...INSTANCE_SOURCES.presets,
+      ...INSTANCE_SOURCES.protocols,
+      ...INSTANCE_SOURCES.experiments,
+      ...INSTANCE_SOURCES.evidence,
       INSTANCE_SOURCES.references[0],
       INSTANCE_SOURCES.ecosystem[0],
     ])
 
     const urls = sources.map(source => source.url)
     expect(urls.some(url => url.includes('/sessions/'))).toBe(false)
-    expect(urls.some(url => url.includes('/experiments/'))).toBe(false)
+    // Every record family a w3id.org route sends a browser to is loaded, so an
+    // identifier followed in a browser lands on its node (ADR 0065).
+    expect(urls.filter(url => url.includes('/protocols/'))).toHaveLength(11)
+    expect(urls.filter(url => url.includes('/experiments/'))).toHaveLength(10)
+    expect(urls.filter(url => url.includes('/evidence/'))).toHaveLength(2)
     // One reference preset per catalog group since 2026-09-10.
     expect(urls.filter(url => url.includes('/presets/'))).toHaveLength(5)
     expect(urls.filter(url => url.includes('/references/'))).toHaveLength(1)

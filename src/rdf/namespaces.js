@@ -5,6 +5,10 @@ const { namedNode } = DataFactory
 const ns = base => local => namedNode(base + local)
 
 // ── SSTIM ontology and scoped implementation namespaces ──────────────────────
+
+// The path every SSTIM identifier hangs from at w3id.org: `/sstim/ref/X` is the
+// identifier `ref/X` under it, which is how a route reads it.
+export const SSTIM_IDENTIFIER_ROOT = 'https://w3id.org/sstim/'
 export const SSTIM    = ns('https://w3id.org/sstim#')
 export const SSTIM_V  = ns('https://w3id.org/sstim/vocab#')
 export const SSTIM_SH = ns('https://w3id.org/sstim/shapes#')
@@ -45,8 +49,10 @@ export const BIOSYNCARE_EVIDENCE = ns('https://w3id.org/sstim/implementation/bio
 export const BIOSYNCARE_SESSION = ns('https://w3id.org/sstim/implementation/biosyncare/session/')
 export const BIOSYNCARE_ANNOTATION = ns('https://w3id.org/sstim/implementation/biosyncare/annotation/')
 export const BSCLAB = ns('https://w3id.org/sstim/implementation/bsclab/')
-// Public members of bsclab-preset: use the same exact audited route inventory;
-// do not replace it with a namespace wildcard when adding local/private data.
+// Committed public records in bsclab-preset, -protocol, -experiment and
+// -evidence, and in sstim-ref, resolve at w3id.org by one pattern per family
+// (ADR 0065; recordFamilies.js). Mint only committed public records there:
+// local or private data under these bases would look like a public identifier.
 export const BSCLAB_PRESET = ns('https://w3id.org/sstim/implementation/bsclab/preset/')
 export const BSCLAB_PROTOCOL = ns('https://w3id.org/sstim/implementation/bsclab/protocol/')
 export const BSCLAB_EXPERIMENT = ns('https://w3id.org/sstim/implementation/bsclab/experiment/')

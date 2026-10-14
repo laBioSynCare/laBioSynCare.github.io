@@ -71,6 +71,17 @@ export function expandRule(pattern, target) {
 // rule with a different loose pattern still has to name a publishable target.
 const VERSION_WILDCARD = '(\\d+\\.\\d+\\.\\d+)'
 
+// The committed-record rules are patterns too (ADR 0065): they route records
+// added after them, so they cannot be expanded into a file list either.
+// check-w3id-record-routes.mjs proves them instead, by executing them against
+// every committed record and every name that is not one. Matched exactly, like
+// the version token, so no other loose pattern is excused by them.
+export const RECORD_PATTERNS = new Set([
+  'implementation/bsclab/(preset|protocol|experiment)/([a-z0-9-]+)/?',
+  'implementation/bsclab/evidence/([a-z0-9-]+(?:/[a-z0-9-]+)*)/?',
+  'ref/([A-Z][A-Z0-9_]*)/?',
+])
+
 export function routeTargets(htaccess) {
   const targets = []
   const ruleRe = /^RewriteRule\s+\^(\S*)\$\s+(\S+)\s+\[/gm
@@ -80,6 +91,7 @@ export function routeTargets(htaccess) {
     // `- [R=406,L]` is the deliberate not-acceptable fallthrough, not a document.
     if (target === '-') continue
     if (pattern.startsWith(VERSION_WILDCARD)) continue
+    if (RECORD_PATTERNS.has(pattern)) continue
     targets.push(...expandRule(pattern, target))
   }
   return targets

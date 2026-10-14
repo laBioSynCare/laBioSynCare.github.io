@@ -84,8 +84,9 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/framework/bsc/shapes` | The BSC framework's catalog shapes, Turtle for every client | Live since [#6827](https://github.com/perma-id/w3id.org/pull/6827) merged on 2026-10-09 |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
-| `/sstim/implementation/bsclab/preset/{heal-theta-breathing-seed,perform-alpha-10-seed}` | Exact public BSC Lab preset records; HTML deep-links to the requested graph node and RDF returns its owning preset Turtle file | Staged locally |
-| `/sstim/ref/{INGENDOH_2023,PICTON_2003,SKOE_KRAUS_2010,ZACCARO_2018,VIALATTE_2010,PETIT_2021,STEIN_STANFORD_2008}` | Exact public-safe reference records; HTML deep-links to the requested graph node and RDF returns the audited reference catalogue | Staged locally |
+| `/sstim/implementation/bsclab/{preset,protocol,experiment}/{name}` | Committed BSC Lab presets, protocols and experiments, one Turtle file each (ADR 0065). HTML deep-links to the record's graph node; RDF returns the record's own file | Patterns staged locally; the five presets live by exact name (measured 2026-10-14) |
+| `/sstim/implementation/bsclab/evidence/{path}` | Committed evidence records, nested paths included. HTML deep-links to the record's graph node; RDF returns its generated record document | Staged locally |
+| `/sstim/ref/{KEY}` | Committed bibliographic references. HTML deep-links to the record's graph node; RDF returns its generated record document | Pattern staged locally; eleven keys live by exact name, answering `references.ttl` (measured 2026-10-14) |
 | `/sstim/specialist/{id}` and `/sstim/organization/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/ecosystem-record/{relationship,activity,role}/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/void` | VoID + DCAT dataset description (Turtle only) | Live |
@@ -161,11 +162,18 @@ merged, since w3id.org performs the negotiation; that verification belongs to
 the merge, not to this repository.
 
 Audited static catalog routes send RDF clients to the owning Turtle instance
-file. Public preset and reference routes are an exact inventory, not namespace
-wildcards: adding, renaming, or retiring one of these committed records requires
-an intentional route update and a matching negotiation-test update. This keeps
-an unknown identifier at `404` instead of making an aggregate file appear to
-describe a record it does not contain. General live ecosystem namespace rules
+file. Committed public records (presets, protocols, experiments, evidence
+records and references) are routed by one pattern per family
+([ADR 0065](../../../decisions/0065-committed-records-resolve-by-family-pattern.md)),
+so adding a record needs no registry change. An RDF client receives a document
+describing that record alone: its own committed file, or, for families whose
+records share files, a record document the build generates under
+`ontology/records/`. A name that is no record is redirected to a document
+nothing publishes and ends at a `404` from GitHub Pages; no target is ever an
+aggregate file that would appear to describe a record it does not contain, and
+a path outside a family's grammar stays a `404` here.
+`scripts/check-w3id-record-routes.mjs` executes the rules against every
+committed record in `make w3id-routes`. General live ecosystem namespace rules
 send RDF clients to the mutable, live-only `current.ttl` projection. Current
 synthetic contract subjects reserve
 a `synthetic-*` slug rejected by those rules and are available only through the

@@ -861,7 +861,7 @@ core-profile-contract:
 full-equivalence:
 	$(PYTHON) scripts/check-sstim-full-equivalence.py
 
-## Check the w3id route contract three ways. First, that the committed .htaccess
+## Check the w3id route contract four ways. First, that the committed .htaccess
 ## snapshot-route region still matches the frozen snapshots on disk: the unit
 ## test only regenerates the region in memory, so without this a release that
 ## forgets `--write` would silently ship without persistent routes for the new
@@ -869,11 +869,16 @@ full-equivalence:
 ## repository actually publishes, so a renamed module or a dropped export flag
 ## cannot turn a persistent identifier into a 404. Third, clone those exact
 ## production rules in memory and prove the proposed W3C Pages locations change
-## targets only; the production registry file remains untouched.
+## targets only; the production registry file remains untouched. Fourth, that
+## every committed record resolves by its family pattern to a document that
+## describes it, that no name which is not a record reaches a published file,
+## and that every SSTIM identifier in committed RDF resolves or is unrouted on
+## purpose (ADR 0065).
 w3id-routes:
 	node scripts/sstim-w3id-snapshot-routes.mjs --check
 	node scripts/check-w3id-route-targets.mjs
 	node scripts/w3id-staged-routes.mjs --check
+	node scripts/check-w3id-record-routes.mjs
 
 ## Every link into SSTIM's own repository names w3c-cg/sstim and an immutable
 ## ref that holds its path, never a branch or the legacy repository (GB-08).
@@ -1163,7 +1168,7 @@ help:
 	@echo "  make publish-latest   Publish the newest release at latest/ in all three formats"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
 	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
-	@echo "  make w3id-routes      Verify w3id snapshot routes are current and every target is published"
+	@echo "  make w3id-routes      Verify w3id routes: snapshots current, targets published, every committed record resolves"
 	@echo "  make release-dryrun   Rehearse the next release without cutting one"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"

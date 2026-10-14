@@ -121,8 +121,8 @@ sstim-ref:BUZSAKI_2004 a sstim:PublicSafeReference ;
 ###########################################################################
 # Sources of the published protocols (ADR 0064)
 #
-# The papers instances/protocols/published-protocols.ttl was encoded from,
-# each cited by its protocol with dct:source. Typed sstim:BibliographicReference
+# The papers the published protocols in instances/protocols/ were encoded
+# from, each cited by its protocol with dct:source. Typed sstim:BibliographicReference
 # rather than sstim:PublicSafeReference: they are sources a description was
 # read from, not references cleared for product copy. Every record was built
 # from the Crossref response for its DOI, not recalled.

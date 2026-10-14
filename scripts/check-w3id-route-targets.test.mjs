@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { releaseDirectories } from './publish-latest-ontology.mjs'
 
 import {
+  RECORD_PATTERNS,
   developmentLineTargets,
   expandRule,
   isDerivedReleaseArtifact,
@@ -55,18 +56,25 @@ test('a route to a top-level ontology artifact is caught, and nothing else is', 
   ])
 })
 
-test('audited public preset and reference routes target their owning Turtle files', () => {
-  const targets = new Set(routeTargets(htaccess))
+test('committed-record patterns are left to the record proof, and nothing else is', () => {
+  // ADR 0065: these rules route records added after them, so they cannot be
+  // expanded into a file list; check-w3id-record-routes.mjs executes them.
+  const ontologyTargets = routeTargets(htaccess)
+    .filter((target) => target.startsWith('https://w3c-cg.github.io/sstim/ontology/'))
+  expect(ontologyTargets.some((target) => target.includes('$'))).toBe(false)
+  expect(ontologyTargets.some((target) => target.includes('/ontology/records/'))).toBe(false)
 
-  expect(targets).toContain(
-    'https://w3c-cg.github.io/sstim/ontology/instances/presets/heal-theta-breathing-seed.ttl',
+  // Exactly the three patterns, matched as written: a hand-written rule with
+  // another loose pattern still has to name a publishable target.
+  expect([...RECORD_PATTERNS]).toHaveLength(3)
+  const loose = routeTargets(
+    'RewriteRule ^implementation/bsclab/(preset|session)/([a-z0-9-]+)/?$ ' +
+    'https://w3c-cg.github.io/sstim/ontology/instances/$1s/$2.ttl [R=303,L]\n',
   )
-  expect(targets).toContain(
-    'https://w3c-cg.github.io/sstim/ontology/instances/presets/perform-alpha-10-seed.ttl',
-  )
-  expect(targets).toContain(
-    'https://w3c-cg.github.io/sstim/ontology/instances/references/references.ttl',
-  )
+  expect(loose).toEqual([
+    'https://w3c-cg.github.io/sstim/ontology/instances/presets/$2.ttl',
+    'https://w3c-cg.github.io/sstim/ontology/instances/sessions/$2.ttl',
+  ])
 })
 
 test('a rule target expands against its own alternation, unescaping the pattern', () => {

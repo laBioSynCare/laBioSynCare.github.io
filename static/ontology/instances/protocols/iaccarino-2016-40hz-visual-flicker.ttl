@@ -1,0 +1,128 @@
+# 40 Hz visual flicker, 1 hour a day for 7 days, in mice (Iaccarino et al. 2016)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix i2016:           <https://w3id.org/sstim/implementation/bsclab/protocol/iaccarino-2016-40hz-visual-flicker#> .
+
+
+###########################################################################
+# 2. Iaccarino et al. 2016: 40 Hz visual flicker in mice (visual GENUS)
+#    Full text: PMC author manuscript, Methods "Visual stimulation protocol".
+###########################################################################
+
+bsclab-protocol:iaccarino-2016-40hz-visual-flicker a sstim:SensoryStimulationProtocol, sstim:SensoryRouteNeuromodulationProtocol ;
+    rdfs:label "40 Hz visual flicker, 1 hour a day for 7 days, in mice (Iaccarino et al. 2016)"@en ;
+    dct:description "Mice are placed in a dark chamber lit by an LED bulb that flickers at 40 Hz, 12.5 ms on and 12.5 ms off, for 1 hour. In the chronic arm, 6-month-old 5XFAD mice received 1 hour a day for 7 days, and TauP301S mice the same course, against mice kept in the dark. Shorter experiments in the paper also used constant light, 20 Hz and 80 Hz flicker, and, during electrophysiology, random flicker with Poisson-distributed intervals averaging 40 Hz, interleaved with the other conditions in 10 s blocks. The intended neural phenomenon is 40 Hz oscillatory activity in visual cortex. Martorell et al. 2019 call this light-flicker method GENUS (Gamma ENtrainment Using Sensory stimulus). Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techPhoticDriving ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
+    sstim:intendedNeuralSystem sstim-v:systemVisual ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCortex ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
+    sstim:protocolStudyDesign sstim-v:designPreclinicalExperiment ;
+    sstim:armAllocation sstim-v:allocationBetweenSubject ;
+    sstim:hasStudyPopulation i2016:population ;
+    sstim:hasSchedule i2016:schedule ;
+    sstim:hasStudyArm i2016:arm-40hz, i2016:arm-dark ;
+    sstim-ex:hasExposureProfile i2016:profile ;
+    dct:source sstim-ref:IACCARINO_2016 ;
+    skos:editorialNote "Encoded from the PMC author manuscript (PMC5656389): Methods, Visual stimulation protocol; Results, chronic visual stimulation. The arms are the chronic design, 40 Hz flicker against darkness; the acute comparison conditions are in the description."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+i2016:population a sstim:PopulationDescriptor ;
+    rdfs:label "5XFAD and TauP301S transgenic mice"@en ;
+    dct:description "Mouse lines modelling amyloid and tau pathology; the chronic arm used 6-month-old 5XFAD mice."@en ;
+    sstim:populationTaxon obo:NCBITaxon_10090 .
+
+i2016:schedule a sstim:StimulationSchedule ;
+    sstim:sessionDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:sessionsPerDay "1.0"^^xsd:decimal ;
+    sstim:sessionCount 7 ;
+    sstim:courseDurationValue "7.0"^^xsd:decimal ;
+    sstim:courseDurationUnit sstim-v:unitDay .
+
+i2016:arm-40hz a sstim:StudyArm ;
+    rdfs:label "40 Hz light flicker"@en ;
+    sstim:armRole sstim-v:armExperimental ;
+    sstim:armStimulus i2016:stimulus .
+
+i2016:arm-dark a sstim:StudyArm ;
+    rdfs:label "Darkness"@en ;
+    sstim:armRole sstim-v:armNoStimulation .
+
+i2016:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "One hour of 40 Hz LED flicker in a dark chamber"@en ;
+    sstim-ex:usesStimulusChannel i2016:light ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+i2016:light a sstim-ex:StimulusChannel ;
+    rdfs:label "LED bulb flickering at 40 Hz, 12.5 ms on and 12.5 ms off"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternBlinking ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasFlickerRateHz "40.0"^^xsd:decimal ;
+    sstim-ex:hasDutyCycle "0.5"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim:hasMagnitude i2016:light-power ;
+    sstim:hasSignalRendering i2016:luminance-rendering .
+
+# "60 W" cannot be read as more than a power in watts: for an LED bulb it may
+# be the electrical draw or an incandescent-equivalent rating, and the paper
+# does not say which, nor where. Kept as the paper wrote it.
+i2016:light-power a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityPower ;
+    sstim:magnitudeValue "60.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitWatt ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "12.5 ms light on, 12.5 ms light off, 60 W" .
+
+i2016:signal a sstim:StimulationSignal ;
+    rdfs:label "40 Hz on and off"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "40.0"^^xsd:decimal ;
+    sstim:hzMax "40.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:gamma, sstim-v:gamma40 .
+
+i2016:luminance-rendering a sstim:SignalRendering ;
+    rdfs:label "LED light switched on and off at the signal rate"@en ;
+    sstim:rendersSignal i2016:signal ;
+    sstim:rendersOntoParameter sstim-v:paramLuminance ;
+    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .
+
+i2016:stimulus a sstim:StimulusSpecification ;
+    rdfs:label "40 Hz visual flicker stimulus (Iaccarino et al. 2016)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasSignal i2016:signal ;
+    sstim:hasStimulusChannel i2016:light ;
+    sstim:hasStimulationTarget i2016:subject .
+
+i2016:subject a bfo:0000040, obo:NCBITaxon_10090 ;
+    rdfs:label "Mouse (Mus musculus)"@en .

@@ -31,8 +31,8 @@ BioSynCare catalog and real participant records are not present.
 | `programmes/` | The BioSynCare Ecosystem programme identity and its `dct:hasPart` membership ([ADR 0047](../../../docs/decisions/0047-programme-identity-path.md)). Kept out of `ecosystem/`, whose subdirectories are a reserved contract path for agent records |
 | `frameworks/` | BSC framework identity and the three techniques it originated (generic techniques it applies are incorporated from the vocabulary — [ADR 0033](../../../docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md)) |
 | `implementations/` | Public identity records for BSC Lab, the BioSynCare application, and the Patch Studio component |
-| `protocols/` | Two narrow, non-clinical BSC Lab reference protocols, and nine published protocols encoded from their papers, which describe the method and assert no effect (ADR 0064) |
-| `presets/` | Two public reference preset fixtures |
+| `protocols/` | One file per protocol: two narrow, non-clinical BSC Lab reference protocols, and nine published protocols encoded from their papers, which describe the method and assert no effect (ADR 0064) |
+| `presets/` | One file per public reference preset, one per catalog group |
 | `evidence/` | Scoped technique-level evidence assessments |
 | `references/` | Eleven DOI-identified public-safe bibliographic records, and the eight papers the nine published protocols were encoded from |
 | `experiments/` | Ten exploratory protocols, exposure profiles, channels, and qualified claims |
@@ -75,7 +75,12 @@ implementation by `schema:sameAs` or `owl:sameAs`.
 ## Data Rules
 
 - A protocol names its framework and technique, or explicitly explains why it
-  is a baseline or capability-boundary protocol.
+  is a baseline or capability-boundary protocol. A published protocol may
+  instead cite the paper that specifies it (ADR 0064).
+- A record with its own file is named after its identifier: the protocol
+  `…/bsclab/protocol/{name}` is `protocols/{name}.ttl`, and likewise for
+  presets and experiments. Its parts are `#` identifiers in the same file.
+  That is what lets one w3id.org pattern resolve every such record (ADR 0065).
 - A preset names its implementation, protocol, public claim level, and caution
   metadata.
 - Every evidence assessment has one subject, tier, direction and bounded
@@ -107,6 +112,37 @@ implementation by `schema:sameAs` or `owl:sameAs`.
 - The committed ecosystem data is synthetic contract-test data. Real named
   records are added only after ADR 0031 plus Workstream 5's stable-release and
   live-dereferencing gates.
+
+## Published protocols
+
+Nine protocols from the published literature, from the 40 Hz auditory response
+of 1981 to a randomized home-use trial of 2022, are described with SSTIM terms.
+Each describes the method as its source reports it. None asserts that the
+method works and none is a recommendation: evidence about effects is a
+separate, authored claim (ADR 0027), and nothing in these files is one.
+
+**Why they exist.** A standard that can describe its field should be able to
+describe the field's best-known protocols, and encoding them is the cheapest
+way to find out where it cannot. These nine found thirteen things SSTIM could
+not say (ADR 0063, ADR 0064): a level without a measurement point, illuminance,
+a schedule, a study arm, a population, a closed-loop rule, random pulse timing,
+display geometry, a target's starting phase, and a protocol accountable to a
+paper rather than to a framework. Each is now a term, and each is used.
+
+**Provenance.** Each protocol cites its paper with `dct:source`, which is what
+lets a published protocol satisfy `sstim-sh:ProtocolProvenanceShape` without a
+framework (ADR 0064). Its `skos:editorialNote` says what was read: five were
+encoded from open full texts or the dataset's own files, four only from their
+PubMed abstracts. A parameter the source read does not state is absent, not
+guessed. Units converted exactly (feet to metres) say so.
+
+**Reported values.** Where a paper gives a level without saying where it was
+measured ("delivered at 60 dB"), the magnitude records the unstated stage and
+keeps the paper's words in `sstim:reportedAs`. Assigning a stage the source did
+not give would be the error this layer exists to prevent.
+
+`make protocol-layer` holds every published protocol to these rules, and the
+Workbench compares them side by side at `/protocols/`.
 
 ## Runtime Graphs
 

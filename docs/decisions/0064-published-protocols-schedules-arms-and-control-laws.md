@@ -122,7 +122,8 @@ offset:
   angle is stated when a source gives one, not derived.
 
 **8. The nine protocols are public data.** They live in
-`static/ontology/instances/protocols/published-protocols.ttl`, in the protocol
+`static/ontology/instances/protocols/` (one combined file when this was
+decided, one file per protocol since [ADR 0065](0065-committed-records-resolve-by-family-pattern.md)), in the protocol
 graph under `https://w3id.org/sstim/implementation/bsclab/protocol/`, and their
 eight source papers (Martorell 2019 supplies two protocols) in `references.ttl` as `sstim:BibliographicReference`, not
 `PublicSafeReference`: they are sources a description was read from, not

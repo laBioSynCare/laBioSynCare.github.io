@@ -1,0 +1,43 @@
+# 40 Hz auditory steady-state response recording (Galambos, Makeig and Talmachoff 1981)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix g1981:           <https://w3id.org/sstim/implementation/bsclab/protocol/galambos-1981-40hz-auditory-steady-state-response#> .
+
+
+###########################################################################
+# 1. Galambos, Makeig and Talmachoff 1981: the 40 Hz auditory response
+#    Abstract only. 40 Hz auditory stimulation as a measurement.
+###########################################################################
+
+bsclab-protocol:galambos-1981-40hz-auditory-steady-state-response a sstim:SensoryStimulationProtocol ;
+    rdfs:label "40 Hz auditory steady-state response recording (Galambos, Makeig and Talmachoff 1981)"@en ;
+    dct:description "Sounds are repeated at rates around 40 per second while the scalp EEG is averaged, so that the potentials appearing 8 to 80 ms after each sound combine into one stable composite wave: the 40 Hz event-related potential, later called the 40 Hz auditory steady-state response. The authors report the response at sound intensities close to normal adult hearing thresholds and propose it for clinical hearing testing. The purpose is to record a response, not to change one. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techClickTrain ;
+    sstim:hasStudyPopulation g1981:population ;
+    dct:source sstim-ref:GALAMBOS_1981 ;
+    skos:editorialNote "Encoded from the PubMed abstract only (PMID 6941317). The stimulus type (clicks or tone pips), the rates tested, the levels, the transducer and the subjects are not encoded: the scanned full text (PMC319406) was not read. techClickTrain rests on the abstract's repeated transient sounds."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+g1981:population a sstim:PopulationDescriptor ;
+    rdfs:label "Adult human listeners"@en ;
+    sstim:populationTaxon obo:NCBITaxon_9606 .

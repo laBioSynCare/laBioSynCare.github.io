@@ -72,14 +72,21 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 // or RDF/XML, so a client listing Turtle among other types gets the source
 // format: the six manifest-owned groups and the two version-IRI patterns each
 // gain one Turtle rule ahead of JSON-LD. Total 91 -> 99, ontology 47 -> 55.
+//
+// 2026-10-14, committed records by family pattern (ADR 0065): the exact preset
+// and reference inventory (two graph, two Turtle, two 406 rules) becomes three
+// families of the same three rules: presets, protocols and experiments to
+// their own files, evidence records and references to generated record
+// documents. Total 99 -> 102: ontology 55 -> 56, graph 17 -> 18, statusOnly
+// 18 -> 19.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 99,
-  ontology: 55,
+  total: 102,
+  ontology: 56,
   pinnedOntology: 1,
-  graph: 17,
+  graph: 18,
   application: 6,
   external: 2,
-  statusOnly: 18,
+  statusOnly: 19,
 })
 
 export const BROWSER_ACCEPT =
@@ -159,6 +166,50 @@ export const STAGED_REQUEST_MATRIX = Object.freeze([
   },
   { label: 'reference Graph deep link', path: 'ref/INGENDOH_2023', accept: BROWSER_ACCEPT, status: 303 },
   { label: 'reference Turtle', path: 'ref/INGENDOH_2023', accept: '', status: 303 },
+  { label: 'reference record document', path: 'ref/IACCARINO_2016', accept: 'text/turtle', status: 303 },
+  {
+    label: 'protocol Graph deep link',
+    path: 'implementation/bsclab/protocol/chan-2022-40hz-audiovisual-daily-home-use',
+    accept: BROWSER_ACCEPT,
+    status: 303,
+  },
+  {
+    label: 'protocol Turtle',
+    path: 'implementation/bsclab/protocol/chan-2022-40hz-audiovisual-daily-home-use',
+    accept: 'text/turtle',
+    status: 303,
+  },
+  {
+    label: 'experiment Turtle',
+    path: 'implementation/bsclab/experiment/color-field-blink',
+    accept: 'text/turtle',
+    status: 303,
+  },
+  {
+    label: 'nested evidence record document',
+    path: 'implementation/bsclab/evidence/alpha-attention-memory/revision/1/scope',
+    accept: 'text/turtle',
+    status: 303,
+  },
+  {
+    label: 'evidence Graph deep link',
+    path: 'implementation/bsclab/evidence/alpha-attention-memory/revision/1',
+    accept: BROWSER_ACCEPT,
+    status: 303,
+  },
+  {
+    label: 'unknown record delegates 404 to Pages',
+    path: 'implementation/bsclab/preset/not-a-committed-record',
+    accept: 'text/turtle',
+    status: 303,
+    targetStatus: 404,
+  },
+  {
+    label: 'nested record path stays closed',
+    path: 'implementation/bsclab/preset/heal-theta-breathing-seed/voice',
+    accept: 'text/turtle',
+    status: 404,
+  },
   {
     label: 'originated technique deep link',
     path: 'framework/bsc/technique/martigli-binaural-hybrid',

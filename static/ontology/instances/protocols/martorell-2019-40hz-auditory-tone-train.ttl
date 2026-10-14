@@ -1,0 +1,173 @@
+# 40 Hz auditory tone train, 1 hour a day for 7 days, in mice (Martorell et al. 2019)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix m2019a:          <https://w3id.org/sstim/implementation/bsclab/protocol/martorell-2019-40hz-auditory-tone-train#> .
+
+
+###########################################################################
+# 3. Martorell et al. 2019: 40 Hz tone train in mice (auditory GENUS)
+#    Full text: PMC author manuscript, STAR Methods.
+###########################################################################
+
+bsclab-protocol:martorell-2019-40hz-auditory-tone-train a sstim:SensoryStimulationProtocol, sstim:SensoryRouteNeuromodulationProtocol ;
+    rdfs:label "40 Hz auditory tone train, 1 hour a day for 7 days, in mice (Martorell et al. 2019)"@en ;
+    dct:description "Mice in a dimly lit chamber, in a quiet room insulated with sound-proof foam, hear 10 kHz tones 1 ms long repeated every 25 ms (40 Hz, a 4% duty cycle) from speakers placed above the chamber, delivered at 60 dB, for 1 hour a day over 7 days (5XFAD, APP/PS1 and P301S mice). Comparison conditions were no tones, tones at 8 Hz and 80 Hz, and tones at random intervals drawn from a uniform distribution with a 25 ms mean. The intended neural phenomenon is 40 Hz activity in auditory cortex, hippocampal CA1 and medial prefrontal cortex. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techGamma40Auditory, sstim-v:techIsochronicTones ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
+    sstim:intendedNeuralSystem sstim-v:systemAuditory ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCortex ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
+    sstim:protocolStudyDesign sstim-v:designPreclinicalExperiment ;
+    sstim:armAllocation sstim-v:allocationBetweenSubject ;
+    sstim:hasStudyPopulation m2019a:population ;
+    sstim:hasSchedule m2019a:schedule ;
+    sstim:hasStudyArm m2019a:arm-40hz, m2019a:arm-random, m2019a:arm-no-tones ;
+    sstim-ex:hasExposureProfile m2019a:profile, m2019a:random-profile ;
+    dct:source sstim-ref:MARTORELL_2019 ;
+    skos:editorialNote "Encoded from the PMC author manuscript (PMC6774262): STAR Methods, 40 Hz auditory tone train stimulation protocol; the 4% duty cycle is stated in the electrophysiology paragraph, and 1 hour a day for 7 days in the figure legends. The 8 Hz and 80 Hz comparisons are only described."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+m2019a:population a sstim:PopulationDescriptor ;
+    rdfs:label "5XFAD, APP/PS1 and P301S transgenic mice"@en ;
+    dct:description "Mouse lines modelling amyloid and tau pathology."@en ;
+    sstim:populationTaxon obo:NCBITaxon_10090 .
+
+m2019a:schedule a sstim:StimulationSchedule ;
+    sstim:sessionDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:sessionsPerDay "1.0"^^xsd:decimal ;
+    sstim:sessionCount 7 ;
+    sstim:courseDurationValue "7.0"^^xsd:decimal ;
+    sstim:courseDurationUnit sstim-v:unitDay .
+
+m2019a:arm-40hz a sstim:StudyArm ;
+    rdfs:label "40 Hz tone train"@en ;
+    sstim:armRole sstim-v:armExperimental ;
+    sstim:armStimulus m2019a:stimulus .
+
+m2019a:arm-random a sstim:StudyArm ;
+    rdfs:label "Tones at random intervals"@en ;
+    sstim:armRole sstim-v:armActiveComparator ;
+    sstim:armStimulus m2019a:random-stimulus .
+
+m2019a:arm-no-tones a sstim:StudyArm ;
+    rdfs:label "No tones"@en ;
+    sstim:armRole sstim-v:armNoStimulation .
+
+m2019a:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "One hour of a 40 Hz train of 10 kHz tone pips"@en ;
+    sstim-ex:usesStimulusChannel m2019a:tones ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+m2019a:tones a sstim-ex:StimulusChannel ;
+    rdfs:label "10 kHz tone pips, 1 ms long, every 25 ms, from speakers above the chamber"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternPulsed ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasCarrierFrequencyHz "10000.0"^^xsd:decimal ;
+    sstim-ex:hasModulationFrequencyHz "40.0"^^xsd:decimal ;
+    sstim-ex:hasDutyCycle "0.04"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:hasMagnitude m2019a:tone-level ;
+    sstim:hasSignalRendering m2019a:tone-rendering .
+
+# "Delivered at 60 dB" is a sound pressure level in all likelihood, but the
+# paper does not say where it was measured, and free-moving mice under a
+# speaker have no fixed ear position. So the stage is unstated, not at-subject.
+m2019a:tone-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
+    sstim:magnitudeValue "60.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "a 10 kHz tone that was 1 ms in duration and delivered at 60 dB" .
+
+m2019a:signal a sstim:StimulationSignal ;
+    rdfs:label "40 Hz pulse train"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "40.0"^^xsd:decimal ;
+    sstim:hzMax "40.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:gamma, sstim-v:gamma40 .
+
+# The 40 Hz gates a 10 kHz tone on and off: amplitude modulation of a carrier,
+# the isochronic case. A square signal with the channel's 4% duty cycle, since
+# SSTIM's square shape is two levels with any duty cycle.
+m2019a:tone-rendering a sstim:SignalRendering ;
+    rdfs:label "40 Hz gating of a 10 kHz tone"@en ;
+    sstim:rendersSignal m2019a:signal ;
+    sstim:rendersOntoParameter sstim-v:paramAmplitude ;
+    sstim:hasRenderingMechanism sstim-v:mechanismAmplitudeModulation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical ;
+    sstim:renderingCarrierHz "10000.0"^^xsd:decimal .
+
+m2019a:stimulus a sstim:StimulusSpecification ;
+    rdfs:label "40 Hz auditory tone train stimulus (Martorell et al. 2019)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasSignal m2019a:signal ;
+    sstim:hasStimulusChannel m2019a:tones ;
+    sstim:hasStimulationTarget m2019a:subject .
+
+# The comparison the paper calls "random frequency". Its timing is a
+# generating process, so its specification is stochastic, and the channel says
+# which process: uniform intervals with a 25 ms mean. The paper gives no range,
+# so none is asserted.
+m2019a:random-profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Comparison: the same tone pips at random intervals"@en ;
+    sstim-ex:usesStimulusChannel m2019a:random-tones ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+m2019a:random-tones a sstim-ex:StimulusChannel ;
+    rdfs:label "10 kHz tone pips, 1 ms long, at random intervals from a uniform distribution with a 25 ms mean"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternPulsed, sstim-ex:patternStochastic ;
+    sstim-ex:channelRole sstim-ex:roleControlOrSham ;
+    sstim-ex:hasCarrierFrequencyHz "10000.0"^^xsd:decimal ;
+    sstim-ex:hasOnsetIntervalDistribution sstim-ex:intervalUniform ;
+    sstim-ex:meanOnsetIntervalSeconds "0.025"^^xsd:decimal ;
+    sstim:channelDurationSeconds "3600.0"^^xsd:decimal ;
+    sstim:hasMagnitude m2019a:random-tone-level .
+
+m2019a:random-tone-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
+    sstim:magnitudeValue "60.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "Tones for the stimulation conditions consisted of a 10 kHz tone that was 1 ms in duration and delivered at 60 dB" .
+
+m2019a:random-stimulus a sstim:StimulusSpecification ;
+    rdfs:label "Random-interval tone comparison stimulus (Martorell et al. 2019)"@en ;
+    sstim:stimulusRegime "stochastic" ;
+    sstim:hasStimulusChannel m2019a:random-tones ;
+    sstim:hasStimulationTarget m2019a:subject .
+
+m2019a:subject a bfo:0000040, obo:NCBITaxon_10090 ;
+    rdfs:label "Mouse (Mus musculus)"@en .

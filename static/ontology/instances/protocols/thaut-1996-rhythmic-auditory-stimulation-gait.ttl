@@ -1,0 +1,67 @@
+# Rhythmic auditory stimulation for 3 weeks of home-based gait training in Parkinson's disease (Thaut et al. 1996)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix mesh:            <http://id.nlm.nih.gov/mesh/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix t1996:           <https://w3id.org/sstim/implementation/bsclab/protocol/thaut-1996-rhythmic-auditory-stimulation-gait#> .
+
+
+###########################################################################
+# 9. Thaut et al. 1996: rhythmic auditory stimulation for gait training
+#    Abstract only.
+###########################################################################
+
+bsclab-protocol:thaut-1996-rhythmic-auditory-stimulation-gait a sstim:SensoryStimulationProtocol ;
+    rdfs:label "Rhythmic auditory stimulation for 3 weeks of home-based gait training in Parkinson's disease (Thaut et al. 1996)"@en ;
+    dct:description "People with Parkinson's disease (n = 15) trained their gait at home for 3 weeks while walking to audiotapes on which metronome pulses were embedded in the on-beat and off-beat structure of rhythmically accentuated instrumental music, used as a pacemaker. The comparison groups did no gait training or trained with internally self-paced walking. Gait was assessed without the rhythm, before and after training. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techRhythmicAuditoryCueing ;
+    sstim:participantEngagementMode sstim-v:engagementGuidedFollowing ;
+    sstim:protocolStudyDesign sstim-v:designControlledTrial ;
+    sstim:armAllocation sstim-v:allocationBetweenSubject ;
+    sstim:hasStudyPopulation t1996:population ;
+    sstim:hasSchedule t1996:schedule ;
+    sstim:hasStudyArm t1996:arm-ras, t1996:arm-self-paced, t1996:arm-no-training ;
+    dct:source sstim-ref:THAUT_1996 ;
+    skos:editorialNote "Encoded from the PubMed abstract only (PMID 8684391). The tempi, how they progressed over the 3 weeks, the daily training time and the playback equipment are not encoded, so the arms name no stimulus and there is no exposure profile: the full text was not read. If the tempo was set from each patient's own cadence, sstim-v:referenceBaselineCadence now says so."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+t1996:population a sstim:PopulationDescriptor ;
+    rdfs:label "People with Parkinson's disease"@en ;
+    sstim:populationTaxon obo:NCBITaxon_9606 ;
+    sstim:populationCondition mesh:D010300 .
+
+t1996:schedule a sstim:StimulationSchedule ;
+    sstim:courseDurationValue "3.0"^^xsd:decimal ;
+    sstim:courseDurationUnit sstim-v:unitWeek .
+
+t1996:arm-ras a sstim:StudyArm ;
+    rdfs:label "Gait training with rhythmic auditory stimulation"@en ;
+    sstim:armRole sstim-v:armExperimental .
+
+t1996:arm-self-paced a sstim:StudyArm ;
+    rdfs:label "Internally self-paced gait training, no rhythm"@en ;
+    sstim:armRole sstim-v:armNoStimulation .
+
+t1996:arm-no-training a sstim:StudyArm ;
+    rdfs:label "No gait training"@en ;
+    sstim:armRole sstim-v:armNoStimulation .

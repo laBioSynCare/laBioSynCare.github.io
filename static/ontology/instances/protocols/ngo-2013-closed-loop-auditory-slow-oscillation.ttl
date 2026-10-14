@@ -1,0 +1,72 @@
+# Closed-loop auditory stimulation in phase with sleep slow-oscillation up states (Ngo et al. 2013)
+#
+# A published sensory stimulation protocol, encoded from its source with
+# SSTIM terms. It describes the method as the source reports it and asserts
+# no effect: evidence about effects is a separate, authored claim (ADR 0027).
+# The protocol cites its paper with dct:source instead of naming a framework
+# (ADR 0064), its skos:editorialNote says what was read, and a level the
+# source reports without a measurement point keeps the source's words in
+# sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
+# and how they are read: static/ontology/instances/README.md.
+
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:             <http://purl.obolibrary.org/obo/> .
+@prefix dct:             <http://purl.org/dc/terms/> .
+@prefix prov:            <http://www.w3.org/ns/prov#> .
+@prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
+@prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix n2013:           <https://w3id.org/sstim/implementation/bsclab/protocol/ngo-2013-closed-loop-auditory-slow-oscillation#> .
+
+
+###########################################################################
+# 7. Ngo, Martinetz, Born and Mölle 2013: closed-loop auditory stimulation
+#    of the sleep slow oscillation. Abstract only.
+###########################################################################
+
+bsclab-protocol:ngo-2013-closed-loop-auditory-slow-oscillation a sstim:SensoryStimulationProtocol ;
+    rdfs:label "Closed-loop auditory stimulation in phase with sleep slow-oscillation up states (Ngo et al. 2013)"@en ;
+    dct:description "In sleeping humans, sounds are delivered in phase with the ongoing rhythm of slow-oscillation up states, aimed at the slow-oscillation rhythm and the spindle activity coupled to it; a comparison condition stimulated out of phase with that rhythm. What reaches the sleeper depends on the sleeper's measured activity, so the stimulus specification is adaptive and is described by its control law: read the EEG, follow the slow oscillation, aim at its up state. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techClosedLoopAuditory ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
+    sstim:protocolStudyDesign sstim-v:designControlledTrial ;
+    sstim:hasStudyPopulation n2013:population ;
+    sstim:hasStudyArm n2013:arm-in-phase, n2013:arm-out-of-phase ;
+    dct:source sstim-ref:NGO_2013 ;
+    skos:editorialNote "Encoded from the PubMed abstract only (PMID 23583623). The sound, its level, the detection threshold, the delays, the number of stimuli per detection and the stimulation period are not encoded: the full text was not read. The terms for each now exist on sstim:ControlLaw. EEG as the control input is inferred rather than read: the slow oscillation is an EEG rhythm, and the abstract does not name the recording."@en ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+n2013:population a sstim:PopulationDescriptor ;
+    rdfs:label "Sleeping adult humans"@en ;
+    sstim:populationTaxon obo:NCBITaxon_9606 .
+
+n2013:arm-in-phase a sstim:StudyArm ;
+    rdfs:label "Stimulation in phase with slow-oscillation up states"@en ;
+    sstim:armRole sstim-v:armExperimental ;
+    sstim:armStimulus n2013:stimulus .
+
+n2013:arm-out-of-phase a sstim:StudyArm ;
+    rdfs:label "Stimulation out of phase with the slow-oscillation rhythm"@en ;
+    sstim:armRole sstim-v:armActiveComparator .
+
+n2013:stimulus a sstim:StimulusSpecification ;
+    rdfs:label "Slow-oscillation phase-locked sound stimulation (Ngo et al. 2013)"@en ;
+    sstim:stimulusRegime "adaptive" ;
+    sstim:hasControlLaw n2013:control-law ;
+    sstim:hasStimulationTarget n2013:subject .
+
+n2013:control-law a sstim:ControlLaw ;
+    sstim:controlInputSignal sstim-v:measuredEeg ;
+    sstim:trackedOscillation sstim-v:slowOscillation ;
+    sstim:targetOscillationPhase sstim-v:phaseUpState .
+
+n2013:subject a bfo:0000040, obo:NCBITaxon_9606 ;
+    rdfs:label "Sleeping human participant"@en .

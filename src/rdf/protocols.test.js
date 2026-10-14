@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { mergeStores, parseIntoStore } from './loader.js'
 import {
@@ -25,12 +25,15 @@ async function parseFixture(relativePath, graphIri) {
 let protocols
 const byId = id => protocols.find(protocol => protocol.id === id)
 
+// Every protocol file, BSC Lab's own two included: they name a framework and
+// cite no paper, so they must not be listed as published.
+const PROTOCOL_FILES = readdirSync(new URL('../../static/ontology/instances/protocols/', import.meta.url))
+  .filter(name => name.endsWith('.ttl'))
+
 beforeAll(async () => {
   const store = mergeStores(
-    await parseFixture('../../static/ontology/instances/protocols/published-protocols.ttl', PROTOCOL_GRAPH),
-    // BSC Lab's own reference protocols name a framework and cite no paper:
-    // they must not be listed as published.
-    await parseFixture('../../static/ontology/instances/protocols/bsc-reference-protocols.ttl', PROTOCOL_GRAPH),
+    ...await Promise.all(PROTOCOL_FILES.map(name =>
+      parseFixture(`../../static/ontology/instances/protocols/${name}`, PROTOCOL_GRAPH))),
     await parseFixture('../../static/ontology/instances/references/references.ttl', REFERENCE_GRAPH),
     await parseFixture('../../static/ontology/sstim-vocab.ttl', VOCAB_GRAPH),
     await parseFixture('../../static/ontology/sstim-exposure.ttl', EXPOSURE_GRAPH),
@@ -51,6 +54,7 @@ describe('listPublishedProtocols', () => {
       'Martorell et al. 2019',
       'Chan et al. 2022',
     ])
+    expect(PROTOCOL_FILES).toContain('auditory-observation-reference.ttl')
     expect(protocols.some(protocol => protocol.id === 'auditory-observation-reference')).toBe(false)
     for (const protocol of protocols) {
       expect(protocol.reference.doiUrl).toMatch(/^https:\/\/doi\.org\/10\./)

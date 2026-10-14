@@ -64,14 +64,16 @@ test('every production target belongs to an explicit reviewed category', () => {
   // +6 the same day for negotiating version IRIs (GB-09), all ontology targets,
   // and +1 for the live JSON-LD context. +8 on 2026-10-07: an explicit Turtle
   // rule leads each of the six manifest-owned groups and both version patterns.
+  // +3 on 2026-10-14: the exact preset and reference block became three record
+  // families by pattern (ADR 0065), one more graph, Turtle and 406 rule each.
   expect(ruleCounts(productionRules)).toEqual({
-    total: 99,
-    ontology: 55,
-    graph: 17,
+    total: 102,
+    ontology: 56,
+    graph: 18,
     application: 6,
     external: 2,
     pinnedOntology: 1,
-    statusOnly: 18,
+    statusOnly: 19,
   })
   expect(productionRules.filter(({ target }) => classifyTarget(target) === 'external'))
     .toHaveLength(2)
@@ -119,8 +121,11 @@ test('all expanded ontology targets preserve their publication-relative path', (
   // 2026-10-06: the BSC framework vocabulary and shapes files (ADR 0061). 131
   // the same day: each of the 11 pre-modular releases gained its page and its
   // version document in JSON-LD and RDF/XML (GB-09); the wildcard's targets are
-  // not expanded here. 132 with the live JSON-LD context.
-  expect(production).toHaveLength(132)
+  // not expanded here. 132 with the live JSON-LD context. 126 since 2026-10-14:
+  // the five preset files and references.ttl left the set, because the record
+  // patterns that replaced their exact rules route records added later and are
+  // proved by executing them instead (ADR 0065).
+  expect(production).toHaveLength(126)
   expect(staged.map((target) => target.slice(STAGED_TARGETS.ontology.length)))
     .toEqual(production.map((target) => target.slice(PRODUCTION_TARGETS.ontology.length)))
   expect(staged.every((target) => target.startsWith(STAGED_TARGETS.ontology))).toBe(true)

@@ -88,6 +88,7 @@ annotations lives here.
 | [0062](0062-sensory-stimulation-ecosystem-contributor.md) | One relationship type for anyone in the field, and a public directory of it | Accepted |
 | [0063](0063-stimulus-magnitudes-at-delivery-stages.md) | A level says where in the delivery chain it holds: stimulus magnitudes with a quantity, unit, stage and basis | Accepted |
 | [0064](0064-published-protocols-schedules-arms-and-control-laws.md) | Published protocols, and the twelve things they needed: a source in place of a framework, schedules, arms, populations, control laws | Accepted |
+| [0065](0065-committed-records-resolve-by-family-pattern.md) | Committed records resolve by family pattern: one w3id.org rule per family, each record to a document that describes it alone | Accepted |
 
 ## ADR lifecycle and revision policy
 
