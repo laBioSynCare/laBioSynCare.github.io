@@ -16,6 +16,7 @@
 @prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
 @prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
 @prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
 @prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
@@ -25,48 +26,115 @@
 
 ###########################################################################
 # 7. Ngo, Martinetz, Born and Mölle 2013: closed-loop auditory stimulation
-#    of the sleep slow oscillation. Abstract only.
+#    of the sleep slow oscillation. Full text: Experimental Procedures.
 ###########################################################################
 
 bsclab-protocol:ngo-2013-closed-loop-auditory-slow-oscillation a sstim:SensoryStimulationProtocol ;
     rdfs:label "Closed-loop auditory stimulation in phase with sleep slow-oscillation up states (Ngo et al. 2013)"@en ;
-    dct:description "In sleeping humans, sounds are delivered in phase with the ongoing rhythm of slow-oscillation up states, aimed at the slow-oscillation rhythm and the spindle activity coupled to it; a comparison condition stimulated out of phase with that rhythm. What reaches the sleeper depends on the sleeper's measured activity, so the stimulus specification is adaptive and is described by its control law: read the EEG, follow the slow oscillation, aim at its up state. Recorded as a description of the published method; it asserts no effect."@en ;
+    dct:description "Sleeping adults hear two 50 ms bursts of pink noise each time their frontal EEG crosses a threshold into the negative half-wave of a slow oscillation. The first burst comes after the subject's own interval from that trough to the following up state, measured in an adaptation night (508 ms on average); the second follows 1,075 ms later, the slow oscillation's period; detection then pauses for 2.5 s. Stimulation runs for 210 minutes from about 5 minutes after the first stable stage 2 sleep, and halts outside stage 2 and slow-wave sleep and during arousals. Each of 11 subjects sleeps two experimental nights at least a week apart, in balanced order: one with stimulation, and a sham night in which the same detections are marked but no sound is played. In a separate control experiment, 7 other subjects receive the bursts out of phase: the first immediately at detection and the second about half a slow-oscillation period later (550 ms on average), tuned to the hyperpolarisation the first one causes. Recorded as a description of the published method; it asserts no effect."@en ;
     sstim:usesTechnique sstim-v:techClosedLoopAuditory ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
     sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
     sstim:protocolStudyDesign sstim-v:designControlledTrial ;
+    sstim:armAllocation sstim-v:allocationWithinSubject ;
     sstim:hasStudyPopulation n2013:population ;
-    sstim:hasStudyArm n2013:arm-in-phase, n2013:arm-out-of-phase ;
+    sstim:hasSchedule n2013:schedule ;
+    sstim:hasStudyArm n2013:arm-in-phase, n2013:arm-sham, n2013:arm-out-of-phase ;
+    sstim-ex:hasExposureProfile n2013:profile ;
     dct:source sstim-ref:NGO_2013 ;
-    skos:editorialNote "Encoded from the PubMed abstract only (PMID 23583623). The sound, its level, the detection threshold, the delays, the number of stimuli per detection and the stimulation period are not encoded: the full text was not read. The terms for each now exist on sstim:ControlLaw. EEG as the control input is inferred rather than read: the slow oscillation is an EEG rhythm, and the abstract does not name the recording."@en ;
+    skos:editorialNote "Encoded from the full text (Neuron 78:545-553), Experimental Procedures, read 2026-10-15. Allocation is within subject: each stimulation condition is compared with its own sham night. The out-of-phase condition was a separate experiment on other subjects, compared with the in-phase one only between subjects. Four things the paper states have no SSTIM term yet, so they are in the description only: the interval between a detection's two bursts (1,075 ms in phase; individually tuned out of phase, 550 ms on average); the adaptive threshold (-80 microvolts by default, updated every 2 s to the most negative value of the preceding 5 s when that is lower); the in-phase trigger delay, set for each subject from an adaptation night, so no single delay is stated for that law; and the restriction of stimulation to stage 2 and slow-wave sleep. The sham night plays no sound, so it is a no-stimulation arm in SSTIM's terms, though the paper calls it sham. A third experiment (n = 4) that only moved the bursts 500 ms earlier is described in the paper and not encoded. The sound level was calibrated with a sound level meter, but the paper does not say where the level was measured."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 n2013:population a sstim:PopulationDescriptor ;
-    rdfs:label "Sleeping adult humans"@en ;
+    rdfs:label "Healthy young adults"@en ;
+    dct:description "Eleven volunteers in the main experiment (eight women, three men, mean age 24.2 ± 0.9 years) and seven others in the out-of-phase control (five women, two men, 21.1 ± 0.7 years): native German speakers, free of medication, nonsmokers, with no neurological, psychiatric or sleep disorder and a regular sleep-wake rhythm."@en ;
     sstim:populationTaxon obo:NCBITaxon_9606 .
+
+# Two experimental nights per subject, one per condition; the adaptation night
+# before them carries no stimulation and is not a session here.
+n2013:schedule a sstim:StimulationSchedule ;
+    sstim:sessionDurationSeconds "12600.0"^^xsd:decimal ;
+    sstim:sessionCount 2 .
 
 n2013:arm-in-phase a sstim:StudyArm ;
     rdfs:label "Stimulation in phase with slow-oscillation up states"@en ;
     sstim:armRole sstim-v:armExperimental ;
     sstim:armStimulus n2013:stimulus .
 
+n2013:arm-sham a sstim:StudyArm ;
+    rdfs:label "Sham night: detections marked, no sound played"@en ;
+    sstim:armRole sstim-v:armNoStimulation .
+
 n2013:arm-out-of-phase a sstim:StudyArm ;
-    rdfs:label "Stimulation out of phase with the slow-oscillation rhythm"@en ;
-    sstim:armRole sstim-v:armActiveComparator .
+    rdfs:label "Stimulation out of phase with the slow-oscillation rhythm (separate control experiment)"@en ;
+    sstim:armRole sstim-v:armActiveComparator ;
+    sstim:armStimulus n2013:out-of-phase-stimulus .
+
+n2013:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Pink-noise bursts during non-REM sleep, timed by the sleeper's EEG"@en ;
+    sstim-ex:usesStimulusChannel n2013:sound ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+n2013:sound a sstim-ex:StimulusChannel ;
+    rdfs:label "In-ear headphones, both ears: 50 ms bursts of pink noise with 5 ms rise and fall"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternPulsed, sstim-ex:patternAdaptive, sstim-ex:audioNoisePink ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim:hasMagnitude n2013:sound-level .
+
+n2013:sound-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
+    sstim:magnitudeValue "55.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageUnstated ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "Sound volume was calibrated to 55 dB SPL using a Voltcraft sound level meter SL-400" .
 
 n2013:stimulus a sstim:StimulusSpecification ;
     rdfs:label "Slow-oscillation phase-locked sound stimulation (Ngo et al. 2013)"@en ;
     sstim:stimulusRegime "adaptive" ;
+    sstim:hasStimulusChannel n2013:sound ;
     sstim:hasControlLaw n2013:control-law ;
     sstim:hasStimulationTarget n2013:subject .
 
+# Read the frontal EEG (Fpz against linked earlobes, 0.25 to 4 Hz), detect a
+# slow oscillation's negative half-wave below the threshold, aim at the up
+# state that follows, deliver two bursts, then ignore events for 2.5 s.
 n2013:control-law a sstim:ControlLaw ;
     sstim:controlInputSignal sstim-v:measuredEeg ;
     sstim:trackedOscillation sstim-v:slowOscillation ;
-    sstim:targetOscillationPhase sstim-v:phaseUpState .
+    sstim:targetOscillationPhase sstim-v:phaseUpState ;
+    sstim:detectionThresholdValue "-80.0"^^xsd:decimal ;
+    sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;
+    sstim:stimuliPerTrigger 2 ;
+    sstim:refractoryPeriodSeconds "2.5"^^xsd:decimal ;
+    sstim:controlsChannel n2013:sound .
+
+n2013:out-of-phase-stimulus a sstim:StimulusSpecification ;
+    rdfs:label "Out-of-phase sound stimulation, separate control experiment (Ngo et al. 2013)"@en ;
+    sstim:stimulusRegime "adaptive" ;
+    sstim:hasStimulusChannel n2013:sound ;
+    sstim:hasControlLaw n2013:out-of-phase-control-law ;
+    sstim:hasStimulationTarget n2013:subject .
+
+# The same detection, but the first burst at once, in the down state, and the
+# second timed to the hyperpolarisation the first one evokes.
+n2013:out-of-phase-control-law a sstim:ControlLaw ;
+    sstim:controlInputSignal sstim-v:measuredEeg ;
+    sstim:trackedOscillation sstim-v:slowOscillation ;
+    sstim:targetOscillationPhase sstim-v:phaseDownState ;
+    sstim:detectionThresholdValue "-80.0"^^xsd:decimal ;
+    sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;
+    sstim:triggerDelaySeconds "0.0"^^xsd:decimal ;
+    sstim:stimuliPerTrigger 2 ;
+    sstim:refractoryPeriodSeconds "2.5"^^xsd:decimal ;
+    sstim:controlsChannel n2013:sound .
 
 n2013:subject a bfo:0000040, obo:NCBITaxon_9606 ;
     rdfs:label "Sleeping human participant"@en .

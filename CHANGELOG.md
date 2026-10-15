@@ -63,7 +63,19 @@ one of each.
 - **A Workbench page comparing them**, `/protocols/`: one table of senses, rate,
   levels with the stage each holds at, schedule, arms and population, a full
   record per protocol with the paper's own words beside each reported level,
-  and a mark on the four encoded from an abstract only.
+  and a mark on any record encoded from an abstract only.
+- **The four abstract-level published protocols completed from their full
+  texts**, with Wang 2017's display and waveform. Galambos 1981's levels are
+  decibels above each listener's own threshold and Thaut 1996's tempi are
+  percentages of each patient's pretest cadence: the first real uses of
+  subject-relative levels. Ngo 2013's two closed-loop rules (in phase and out of
+  phase) are the first real uses of the control-law parameters. The full texts
+  also corrected three readings of the abstracts: Lane 1998's control tape was
+  always the first, training session, not a compared arm; Ngo 2013's sham
+  night played no sound, and its out-of-phase condition was a separate
+  experiment on other subjects; Thaut 1996's groups were randomized. Nine
+  things these papers state that SSTIM cannot yet say are listed in the
+  records' editorial notes.
 
 ### Changed
 

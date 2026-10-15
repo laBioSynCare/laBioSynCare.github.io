@@ -26,31 +26,35 @@
 
 ###########################################################################
 # 8. Lane, Kasian, Owens and Marsh 1998: binaural beats during a
-#    vigilance task. Abstract only, partly encoded.
+#    vigilance task. Full text: Materials and Methods.
 ###########################################################################
 
 bsclab-protocol:lane-1998-binaural-beats-vigilance a sstim:SensoryStimulationProtocol ;
     rdfs:label "Binaural beats in pink noise during a 30-minute vigilance task (Lane et al. 1998)"@en ;
-    dct:description "Participants (n = 29) performed a 30-minute visual vigilance task on three different days while listening to pink noise that contained simple tones (the control), binaural beats in the beta range (16 and 24 Hz), or binaural beats in the theta/delta range (1.5 and 4 Hz). Participants were kept blind to the presence of binaural beats. Recorded as a description of the published method; it asserts no effect."@en ;
+    dct:description "Participants perform a 30-minute visual vigilance task (letters shown once a second for 100 ms, a repeated letter as the target, six targets a minute) on three afternoons, seated in a dimly lit room, while a cassette tape plays through stereo headphones at a level each participant finds comfortable and that masks outside sound. Every tape holds pink noise, flat from 40 to 320 Hz and falling 12 dB per octave beyond, with carrier tones at 100, 200, 250 and 300 Hz set 15 dB above the noise. On the beta tape the 200 Hz tone carries a 16 Hz binaural beat and the 300 Hz tone a 24 Hz beat; on the theta/delta tape the 100 Hz tone carries a 1.5 Hz beat and the 200 and 250 Hz tones 4 Hz beats; the other tones carry none, and all play at once. The first session is training, with a control tape that holds the same sounds and no beats; the beta and theta/delta tapes follow in the second and third sessions in counterbalanced, double-blind order. Participants are told the sound is a uniform background and are not told about the beats. Recorded as a description of the published method; it asserts no effect."@en ;
     sstim:usesTechnique sstim-v:techBinauralBeats, sstim-v:techBroadbandNoise ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
     sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
     sstim:protocolStudyDesign sstim-v:designControlledTrial ;
     sstim:armAllocation sstim-v:allocationWithinSubject ;
     sstim:hasStudyPopulation l1998:population ;
     sstim:hasSchedule l1998:schedule ;
-    sstim:hasStudyArm l1998:arm-beta, l1998:arm-theta-delta, l1998:arm-control ;
+    sstim:hasStudyArm l1998:arm-beta, l1998:arm-theta-delta ;
     sstim-ex:hasExposureProfile l1998:beta-profile, l1998:theta-delta-profile, l1998:control-profile ;
     dct:source sstim-ref:LANE_1998 ;
-    skos:editorialNote "Encoded from the PubMed abstract only (PMID 9423966). The carrier frequencies, how the two beat frequencies of each condition were combined in time, the levels and the headphones are not encoded. Headphones are implied by the technique: a binaural beat needs one carrier per ear. The beat signals' sine shape follows from the binaural-beat definition, two tones, and should be checked against the full text."@en ;
+    skos:editorialNote "Encoded from the full text (Physiology and Behavior 63(2):249-252), Materials and Methods, read 2026-10-15. The comparison is beta against theta/delta, so beta is the experimental arm and theta/delta the active comparator, another frequency; the paper's directional hypothesis was that beta would do better. The control tape is not an arm: it was always played in the first, training session and never compared, so it is kept as that session's sound. The beat signals are sine: each beat is the difference between two pure tones. Two things the paper states have no SSTIM term yet and are in the description only: the carrier tones' level 15 dB above the noise, a level relative to another part of the same sound, and the noise's spectrum. The intended neural phenomenon is the paper's rationale, entrainment of the EEG bands named, which it did not measure."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 l1998:population a sstim:PopulationDescriptor ;
-    rdfs:label "Adult human participants"@en ;
+    rdfs:label "Healthy adults aged 19 to 51"@en ;
+    dct:description "Twenty-nine of 32 volunteers recruited from the Duke University community completed the protocol: 19 women and 10 men, mean age 32 ± 10 years, in good health, with normal hearing and normal or corrected vision, free of acute illness and medication, and nonsmokers."@en ;
     sstim:populationTaxon obo:NCBITaxon_9606 .
 
+# Three sessions on different days, at the same time of the afternoon for
+# each participant; the first is the training session.
 l1998:schedule a sstim:StimulationSchedule ;
     sstim:sessionDurationSeconds "1800.0"^^xsd:decimal ;
     sstim:sessionsPerDay "1.0"^^xsd:decimal ;
@@ -63,31 +67,26 @@ l1998:arm-beta a sstim:StudyArm ;
 
 l1998:arm-theta-delta a sstim:StudyArm ;
     rdfs:label "Theta/delta binaural beats, 1.5 and 4 Hz"@en ;
-    sstim:armRole sstim-v:armExperimental ;
+    sstim:armRole sstim-v:armActiveComparator ;
     sstim:armStimulus l1998:theta-delta-stimulus .
 
-l1998:arm-control a sstim:StudyArm ;
-    rdfs:label "Simple tones without beats"@en ;
-    sstim:armRole sstim-v:armSham ;
-    sstim:armStimulus l1998:control-stimulus .
-
 l1998:beta-profile a sstim-ex:ExposureProfile ;
-    rdfs:label "Beta condition: pink noise with 16 and 24 Hz binaural beats, 30 minutes"@en ;
+    rdfs:label "Beta condition: pink noise and tones with 16 and 24 Hz binaural beats, 30 minutes"@en ;
     sstim-ex:usesStimulusChannel l1998:beta-audio ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
 
 l1998:theta-delta-profile a sstim-ex:ExposureProfile ;
-    rdfs:label "Theta/delta condition: pink noise with 1.5 and 4 Hz binaural beats, 30 minutes"@en ;
+    rdfs:label "Theta/delta condition: pink noise and tones with 1.5 and 4 Hz binaural beats, 30 minutes"@en ;
     sstim-ex:usesStimulusChannel l1998:theta-delta-audio ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
 
 l1998:control-profile a sstim-ex:ExposureProfile ;
-    rdfs:label "Control condition: pink noise with simple tones, 30 minutes"@en ;
+    rdfs:label "Training session: the same pink noise and tones without binaural beats, 30 minutes"@en ;
     sstim-ex:usesStimulusChannel l1998:control-audio ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
 
 l1998:beta-audio a sstim-ex:StimulusChannel ;
-    rdfs:label "Headphone audio: pink noise with binaural beats at 16 and 24 Hz"@en ;
+    rdfs:label "Headphone audio: pink noise and tones at 100, 200, 250 and 300 Hz, with binaural beats at 16 and 24 Hz"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEarLeft, sstim-ex:placementEarRight ;
@@ -95,10 +94,11 @@ l1998:beta-audio a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
     sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
+    sstim:hasMagnitude l1998:listening-level ;
     sstim:hasSignalRendering l1998:beat-16-rendering, l1998:beat-24-rendering .
 
 l1998:theta-delta-audio a sstim-ex:StimulusChannel ;
-    rdfs:label "Headphone audio: pink noise with binaural beats at 1.5 and 4 Hz"@en ;
+    rdfs:label "Headphone audio: pink noise and tones at 100, 200, 250 and 300 Hz, with binaural beats at 1.5 and 4 Hz"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEarLeft, sstim-ex:placementEarRight ;
@@ -106,16 +106,29 @@ l1998:theta-delta-audio a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
     sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
-    sstim:hasSignalRendering l1998:beat-1-5-rendering, l1998:beat-4-rendering .
+    sstim:hasMagnitude l1998:listening-level ;
+    sstim:hasSignalRendering l1998:beat-1-5-rendering, l1998:beat-4-on-200-rendering, l1998:beat-4-on-250-rendering .
 
 l1998:control-audio a sstim-ex:StimulusChannel ;
-    rdfs:label "Headphone audio: pink noise with simple tones and no beats"@en ;
+    rdfs:label "Headphone audio: pink noise and the same tones, no binaural beats"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEarLeft, sstim-ex:placementEarRight ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleControlOrSham ;
-    sstim:channelDurationSeconds "1800.0"^^xsd:decimal .
+    sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
+    sstim:hasMagnitude l1998:listening-level .
+
+# Set by each participant: 0 dB above their own comfortable level is that level.
+l1998:listening-level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityLevelAboveReference ;
+    sstim:magnitudeValue "0.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceComfortableLevel ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "Auditory volume was adjusted to a comfortable listening level for the participant that would block perception of external sounds." .
 
 l1998:beat-16 a sstim:StimulationSignal ;
     rdfs:label "16 Hz binaural beat"@en ;
@@ -149,32 +162,44 @@ l1998:beat-4 a sstim:StimulationSignal ;
     sstim:signalWithinBand sstim-v:delta, sstim-v:theta .
 
 l1998:beat-16-rendering a sstim:SignalRendering ;
-    rdfs:label "16 Hz binaural beat between the two ears' tones"@en ;
+    rdfs:label "16 Hz binaural beat on the 200 Hz tone"@en ;
     sstim:rendersSignal l1998:beat-16 ;
     sstim:rendersOntoParameter sstim-v:paramFrequency ;
     sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
-    sstim:hasRenderingPresence sstim-v:presencePerceptual .
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "200.0"^^xsd:decimal .
 
 l1998:beat-24-rendering a sstim:SignalRendering ;
-    rdfs:label "24 Hz binaural beat between the two ears' tones"@en ;
+    rdfs:label "24 Hz binaural beat on the 300 Hz tone"@en ;
     sstim:rendersSignal l1998:beat-24 ;
     sstim:rendersOntoParameter sstim-v:paramFrequency ;
     sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
-    sstim:hasRenderingPresence sstim-v:presencePerceptual .
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "300.0"^^xsd:decimal .
 
 l1998:beat-1-5-rendering a sstim:SignalRendering ;
-    rdfs:label "1.5 Hz binaural beat between the two ears' tones"@en ;
+    rdfs:label "1.5 Hz binaural beat on the 100 Hz tone"@en ;
     sstim:rendersSignal l1998:beat-1-5 ;
     sstim:rendersOntoParameter sstim-v:paramFrequency ;
     sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
-    sstim:hasRenderingPresence sstim-v:presencePerceptual .
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "100.0"^^xsd:decimal .
 
-l1998:beat-4-rendering a sstim:SignalRendering ;
-    rdfs:label "4 Hz binaural beat between the two ears' tones"@en ;
+l1998:beat-4-on-200-rendering a sstim:SignalRendering ;
+    rdfs:label "4 Hz binaural beat on the 200 Hz tone"@en ;
     sstim:rendersSignal l1998:beat-4 ;
     sstim:rendersOntoParameter sstim-v:paramFrequency ;
     sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
-    sstim:hasRenderingPresence sstim-v:presencePerceptual .
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "200.0"^^xsd:decimal .
+
+l1998:beat-4-on-250-rendering a sstim:SignalRendering ;
+    rdfs:label "4 Hz binaural beat on the 250 Hz tone"@en ;
+    sstim:rendersSignal l1998:beat-4 ;
+    sstim:rendersOntoParameter sstim-v:paramFrequency ;
+    sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "250.0"^^xsd:decimal .
 
 l1998:beta-stimulus a sstim:StimulusSpecification ;
     rdfs:label "Beta binaural-beat condition (Lane et al. 1998)"@en ;
@@ -188,12 +213,6 @@ l1998:theta-delta-stimulus a sstim:StimulusSpecification ;
     sstim:stimulusRegime "stochastic" ;
     sstim:hasSignal l1998:beat-1-5, l1998:beat-4 ;
     sstim:hasStimulusChannel l1998:theta-delta-audio ;
-    sstim:hasStimulationTarget l1998:subject .
-
-l1998:control-stimulus a sstim:StimulusSpecification ;
-    rdfs:label "Control condition: pink noise with simple tones (Lane et al. 1998)"@en ;
-    sstim:stimulusRegime "stochastic" ;
-    sstim:hasStimulusChannel l1998:control-audio ;
     sstim:hasStimulationTarget l1998:subject .
 
 l1998:subject a bfo:0000040, obo:NCBITaxon_9606 ;

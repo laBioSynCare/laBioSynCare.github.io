@@ -1359,14 +1359,20 @@ Turtle files are listed in section 1. After they exist:
       published protocols typed `sstim:BibliographicReference` (ADR 0064);
       expand only with source and venue review.*
 
-- [ ] Complete the four abstract-level published protocols `P1`
-      *Galambos 1981, Ngo 2013, Lane 1998 and Thaut 1996 in
-      `instances/protocols/` (one file each) were encoded from their
-      PubMed abstracts only: their full texts sit behind publisher bot checks
-      and a PMC reCAPTCHA that were not bypassed. With the PDFs, encode the
-      stimuli, levels and timing their `skos:editorialNote`s list as missing.
-      The terms each needs exist (ADR 0063, ADR 0064), so this is data entry.
-      Wang 2017's display, refresh rate and waveform need the paper too.*
+- [x] Complete the four abstract-level published protocols `P1`
+      *Done 2026-10-15 from PDFs the maintainers supplied (kept outside the
+      repository): Galambos 1981, Ngo 2013, Lane 1998, Thaut 1996, and Wang
+      2017's display and waveform.*
+
+- [ ] Decide the terms the full texts showed missing `P2`
+      *Nine things the papers state that SSTIM cannot: the interval between
+      the stimuli of one closed-loop detection; an adaptive detection
+      threshold; a trigger delay calibrated per subject; restricting
+      stimulation to sleep stages; a stimulus parameter that progresses week
+      by week; an absolute tempo ceiling (no steps-per-minute unit); a level
+      relative to another component of the same sound; a noise spectrum's
+      shape; one ear of unstated side. Each record's `skos:editorialNote`
+      names its own. Proposed, not decided.*
 
 - [~] Route committed records at w3id.org `P2`
       *Measured 2026-10-14: 145 of 161 committed record identifiers answered

@@ -9,6 +9,7 @@
 # sstim:reportedAs at an unstated stage (ADR 0063). Why these protocols exist
 # and how they are read: static/ontology/instances/README.md.
 
+@prefix bfo:             <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obo:             <http://purl.obolibrary.org/obo/> .
 @prefix mesh:            <http://id.nlm.nih.gov/mesh/> .
 @prefix dct:             <http://purl.org/dc/terms/> .
@@ -16,6 +17,7 @@
 @prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
 @prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
 @prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
 @prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
@@ -25,43 +27,159 @@
 
 ###########################################################################
 # 9. Thaut et al. 1996: rhythmic auditory stimulation for gait training
-#    Abstract only.
+#    Full text: Movement Disorders 11(2):193-200, Methodology.
 ###########################################################################
 
 bsclab-protocol:thaut-1996-rhythmic-auditory-stimulation-gait a sstim:SensoryStimulationProtocol ;
     rdfs:label "Rhythmic auditory stimulation for 3 weeks of home-based gait training in Parkinson's disease (Thaut et al. 1996)"@en ;
-    dct:description "People with Parkinson's disease (n = 15) trained their gait at home for 3 weeks while walking to audiotapes on which metronome pulses were embedded in the on-beat and off-beat structure of rhythmically accentuated instrumental music, used as a pacemaker. The comparison groups did no gait training or trained with internally self-paced walking. Gait was assessed without the rhythm, before and after training. Recorded as a description of the published method; it asserts no effect."@en ;
+    dct:description "People with idiopathic Parkinson's disease walk for 30 minutes a day for 3 weeks, at home or in the community, alone or with a spouse, to tapes of rhythmically accentuated instrumental music (folk, classical, jazz or country, in 2/4 or 4/4 meter) whose on-beats are reinforced by a sequencer's metronome click, played on a portable tape player with a light headset. Each session divides its time equally between three tempi, with walking on a flat surface, stair stepping and stop-and-go exercises. In the first week the normal tempo is the patient's own pretest cadence, the quick tempo 5 to 10% faster and the fast tempo another 5 to 10% faster; after each week every tempo rises by 5 to 10%, so the quick tempo becomes the normal one, with the fastest kept at or below 130 steps per minute. Randomly divided comparison groups follow the same program at three self-chosen, increasing speeds without the music, or do no training. A research assistant visits weekly and patients keep daily logs. Gait is assessed without the rhythm, before and after the 3 weeks. Recorded as a description of the published method; it asserts no effect."@en ;
     sstim:usesTechnique sstim-v:techRhythmicAuditoryCueing ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonTemporalCoordination ;
     sstim:participantEngagementMode sstim-v:engagementGuidedFollowing ;
-    sstim:protocolStudyDesign sstim-v:designControlledTrial ;
+    sstim:protocolStudyDesign sstim-v:designRandomizedControlledTrial ;
     sstim:armAllocation sstim-v:allocationBetweenSubject ;
     sstim:hasStudyPopulation t1996:population ;
     sstim:hasSchedule t1996:schedule ;
     sstim:hasStudyArm t1996:arm-ras, t1996:arm-self-paced, t1996:arm-no-training ;
+    sstim-ex:hasExposureProfile t1996:profile ;
     dct:source sstim-ref:THAUT_1996 ;
-    skos:editorialNote "Encoded from the PubMed abstract only (PMID 8684391). The tempi, how they progressed over the 3 weeks, the daily training time and the playback equipment are not encoded, so the arms name no stimulus and there is no exposure profile: the full text was not read. If the tempo was set from each patient's own cadence, sstim-v:referenceBaselineCadence now says so."@en ;
+    skos:editorialNote "Encoded from the full text (Movement Disorders 11(2):193-200), Methodology, read 2026-10-15. The three tempi are stated for the first week as percentages of each patient's pretest cadence. The paper calls the fast tempo 'an additional 5 to 10% faster' than the quick one without saying whether the percentages compound, so its range, 110 to 121%, covers both readings. Two things the paper states have no SSTIM term yet and are in the description only: the weekly rise of every tempo by 5 to 10%, and the ceiling of 130 steps per minute. The design is a randomized controlled trial because the subject pool was randomly divided into the three groups. The playback level is not stated."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 t1996:population a sstim:PopulationDescriptor ;
     rdfs:label "People with Parkinson's disease"@en ;
+    dct:description "Volunteers with idiopathic Parkinson's disease from support-group and primary-care referral lists, able to walk without physical assistance but with reduced gait velocity, stride length and cadence, on a stable levodopa regimen and tested 90 to 120 minutes after the morning dose. Fifteen in the rhythmic group (ten men, five women, mean age 69 ± 8 years) and eleven in each comparison group; mean Hoehn and Yahr stage 2.4 to 2.6."@en ;
     sstim:populationTaxon obo:NCBITaxon_9606 ;
     sstim:populationCondition mesh:D010300 .
 
+# A 30-minute daily session for 3 weeks, divided equally between the three
+# tempi in the order they rise.
 t1996:schedule a sstim:StimulationSchedule ;
+    sstim:sessionDurationSeconds "1800.0"^^xsd:decimal ;
+    sstim:sessionsPerDay "1.0"^^xsd:decimal ;
     sstim:courseDurationValue "3.0"^^xsd:decimal ;
-    sstim:courseDurationUnit sstim-v:unitWeek .
+    sstim:courseDurationUnit sstim-v:unitWeek ;
+    sstim:hasScheduleSegment t1996:segment-normal, t1996:segment-quick, t1996:segment-fast .
+
+t1996:segment-normal a sstim:ScheduleSegment ;
+    sstim:segmentOrder 1 ;
+    sstim:segmentDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentStimulation ;
+    sstim:segmentStimulus t1996:stimulus-normal .
+
+t1996:segment-quick a sstim:ScheduleSegment ;
+    sstim:segmentOrder 2 ;
+    sstim:segmentDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentStimulation ;
+    sstim:segmentStimulus t1996:stimulus-quick .
+
+t1996:segment-fast a sstim:ScheduleSegment ;
+    sstim:segmentOrder 3 ;
+    sstim:segmentDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:segmentRole sstim-v:segmentStimulation ;
+    sstim:segmentStimulus t1996:stimulus-fast .
 
 t1996:arm-ras a sstim:StudyArm ;
     rdfs:label "Gait training with rhythmic auditory stimulation"@en ;
-    sstim:armRole sstim-v:armExperimental .
+    sstim:armRole sstim-v:armExperimental ;
+    sstim:armStimulus t1996:stimulus-normal, t1996:stimulus-quick, t1996:stimulus-fast .
 
 t1996:arm-self-paced a sstim:StudyArm ;
-    rdfs:label "Internally self-paced gait training, no rhythm"@en ;
+    rdfs:label "Same training, self-paced at three increasing speeds, no rhythm"@en ;
     sstim:armRole sstim-v:armNoStimulation .
 
 t1996:arm-no-training a sstim:StudyArm ;
     rdfs:label "No gait training"@en ;
     sstim:armRole sstim-v:armNoStimulation .
+
+t1996:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Music with metronome clicks on the beat at three tempi, 30 minutes a day"@en ;
+    sstim-ex:usesStimulusChannel t1996:music-normal, t1996:music-quick, t1996:music-fast ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+t1996:music-normal a sstim-ex:StimulusChannel ;
+    rdfs:label "Headset: accentuated music with metronome clicks, normal tempo"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim:channelDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:hasMagnitude t1996:tempo-normal .
+
+t1996:music-quick a sstim-ex:StimulusChannel ;
+    rdfs:label "Headset: accentuated music with metronome clicks, quick tempo"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim:channelDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:hasMagnitude t1996:tempo-quick .
+
+t1996:music-fast a sstim-ex:StimulusChannel ;
+    rdfs:label "Headset: accentuated music with metronome clicks, fast tempo"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim:channelDurationSeconds "600.0"^^xsd:decimal ;
+    sstim:hasMagnitude t1996:tempo-fast .
+
+# Tempi in the first week, relative to the patient's own pretest cadence.
+t1996:tempo-normal a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
+    sstim:magnitudeValue "100.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitPercent ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "For the first week of training, the normal tempo was the pretest cadence" .
+
+t1996:tempo-quick a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
+    sstim:magnitudeMinimum "105.0"^^xsd:decimal ;
+    sstim:magnitudeMaximum "110.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitPercent ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "the quick tempo was 5 to 10% faster" .
+
+t1996:tempo-fast a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
+    sstim:magnitudeMinimum "110.0"^^xsd:decimal ;
+    sstim:magnitudeMaximum "121.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitPercent ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "and the fast tempo an additional 5 to 10% faster" .
+
+t1996:stimulus-normal a sstim:StimulusSpecification ;
+    rdfs:label "Music at the normal tempo (Thaut et al. 1996)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasStimulusChannel t1996:music-normal ;
+    sstim:hasStimulationTarget t1996:subject .
+
+t1996:stimulus-quick a sstim:StimulusSpecification ;
+    rdfs:label "Music at the quick tempo (Thaut et al. 1996)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasStimulusChannel t1996:music-quick ;
+    sstim:hasStimulationTarget t1996:subject .
+
+t1996:stimulus-fast a sstim:StimulusSpecification ;
+    rdfs:label "Music at the fast tempo (Thaut et al. 1996)"@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasStimulusChannel t1996:music-fast ;
+    sstim:hasStimulationTarget t1996:subject .
+
+t1996:subject a bfo:0000040, obo:NCBITaxon_9606 ;
+    rdfs:label "Person with Parkinson's disease"@en .

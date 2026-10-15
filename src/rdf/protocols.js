@@ -261,12 +261,26 @@ export function listPublishedProtocols(store) {
       .flatMap(stimulus => objects(store, stimulus, SSTIM('hasControlLaw')))
       .map(law => controlLawDetail(store, law))
 
+    // Channels in the order the schedule plays them, then by label, so a
+    // session's three tempi read normal, quick, fast rather than alphabetically.
+    const playOrder = new Map()
+    for (const segment of objects(store, schedule, SSTIM('hasScheduleSegment'))) {
+      const order = number(store, segment, SSTIM('segmentOrder'))
+      for (const stimulus of objects(store, segment, SSTIM('segmentStimulus'))) {
+        for (const channel of objects(store, stimulus, SSTIM('hasStimulusChannel'))) {
+          if (!playOrder.has(channel.value)) playOrder.set(channel.value, order ?? Infinity)
+        }
+      }
+    }
+    const byPlayOrder = (a, b) =>
+      (playOrder.get(a.iri) ?? Infinity) - (playOrder.get(b.iri) ?? Infinity) || byNumericLabel(a, b)
+
     const profiles = objects(store, protocol, SSTIM_EX('hasExposureProfile')).map(profile => ({
       iri: profile.value,
       label: labelOf(store, profile),
       channels: objects(store, profile, SSTIM_EX('usesStimulusChannel'))
         .map(channel => channelDetail(store, channel))
-        .sort(byNumericLabel),
+        .sort(byPlayOrder),
     }))
 
     const note = englishLiteral(store, protocol, SKOS('editorialNote'))
@@ -352,11 +366,15 @@ export function formatMagnitude(magnitude) {
   return amount ? `${amount} ${magnitude.unit}`.trim() : ''
 }
 
-/** The magnitudes stated on a protocol's intervention channels. */
+/** The magnitudes stated on a protocol's intervention channels, each once. */
 export function protocolLevels(protocol) {
+  // One level shared by several channels, as a participant-set listening
+  // level is, is still one level.
+  const seen = new Set()
   return protocol.profiles.flatMap(profile => profile.channels)
     .filter(channel => channel.roleId !== 'roleControlOrSham')
     .flatMap(channel => channel.magnitudes)
+    .filter(level => !seen.has(level.iri) && seen.add(level.iri))
 }
 
 const DURATION_UNITS = [[3600, 'h'], [60, 'min'], [1, 's']]

@@ -131,10 +131,11 @@ paper rather than to a framework. Each is now a term, and each is used.
 
 **Provenance.** Each protocol cites its paper with `dct:source`, which is what
 lets a published protocol satisfy `sstim-sh:ProtocolProvenanceShape` without a
-framework (ADR 0064). Its `skos:editorialNote` says what was read: five were
-encoded from open full texts or the dataset's own files, four only from their
-PubMed abstracts. A parameter the source read does not state is absent, not
-guessed. Units converted exactly (feet to metres) say so.
+framework (ADR 0064). Its `skos:editorialNote` says what was read: all nine
+were encoded from their full texts (four of them first from abstracts, then
+completed on 2026-10-15). A parameter the source does not state is absent, not
+guessed, and something it states that SSTIM has no term for is named in the
+note. Units converted exactly (feet to metres) say so.
 
 **Reported values.** Where a paper gives a level without saying where it was
 measured ("delivered at 60 dB"), the magnitude records the unstated stage and

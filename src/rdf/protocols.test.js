@@ -61,9 +61,23 @@ describe('listPublishedProtocols', () => {
     }
   })
 
-  it('marks the four abstract-level records as such', () => {
-    expect(protocols.filter(protocol => protocol.encodedFrom === 'abstract').map(protocol => protocol.reference.citation))
-      .toEqual(['Galambos et al. 1981', 'Thaut et al. 1996', 'Lane et al. 1998', 'Ngo et al. 2013'])
+  it('encodes every published protocol from its full text', () => {
+    expect(protocols.filter(protocol => protocol.encodedFrom === 'abstract')).toEqual([])
+  })
+
+  it('states levels relative to the subject where the paper set them so', () => {
+    const galambos = protocolLevels(byId('galambos-1981-40hz-auditory-steady-state-response'))
+    expect(galambos).toEqual([expect.objectContaining({
+      quantity: 'Level above reference', minimum: 5, maximum: 50, unit: 'dB',
+      stageId: 'stageSubjectRelative', relativeTo: 'Hearing threshold',
+    })])
+
+    const thaut = protocolLevels(byId('thaut-1996-rhythmic-auditory-stimulation-gait'))
+    expect(thaut.map(formatMagnitude)).toEqual(['100 %', '105 to 110 %', '110 to 121 %'])
+    for (const tempo of thaut) expect(tempo).toMatchObject({ stageId: 'stageSubjectRelative', relativeTo: 'Baseline cadence' })
+
+    const lane = byId('lane-1998-binaural-beats-vigilance')
+    expect(protocolLevels(lane)).toEqual([expect.objectContaining({ value: 0, relativeTo: 'Most comfortable level' })])
   })
 
   it('keeps a reported level at the stage its source gave, with the source\'s words', () => {
@@ -92,7 +106,7 @@ describe('listPublishedProtocols', () => {
     expect(formatSchedule(iaccarino.schedule)).toBe('1 h a day for 7 days')
 
     expect(formatSchedule(byId('lane-1998-binaural-beats-vigilance').schedule)).toBe('30 min a day on 3 days')
-    expect(formatSchedule(byId('thaut-1996-rhythmic-auditory-stimulation-gait').schedule)).toBe('for 3 weeks')
+    expect(formatSchedule(byId('thaut-1996-rhythmic-auditory-stimulation-gait').schedule)).toBe('30 min a day for 3 weeks')
     expect(formatSchedule(byId('wang-2017-ssvep-40-target-speller').schedule)).toBe('6 blocks of 40 trials')
   })
 
@@ -106,7 +120,7 @@ describe('listPublishedProtocols', () => {
     expect(protocolRates(combined)).toBe('40 Hz')
   })
 
-  it('summarises the SSVEP targets from their channels, without a signal', () => {
+  it('reads each SSVEP target with its own sinusoid, phase and display', () => {
     const wang = byId('wang-2017-ssvep-40-target-speller')
     const targets = wang.profiles[0].channels
     expect(targets).toHaveLength(40)
@@ -114,6 +128,21 @@ describe('listPublishedProtocols', () => {
     expect(targets.at(-1).label).toMatch(/^Target 40:/)
     expect(new Set(targets.map(target => target.initialPhase))).toEqual(new Set([0, 0.25, 0.5, 0.75]))
     expect(protocolRates(wang)).toBe('8 to 15.8 Hz')
+    for (const target of targets) {
+      expect(target.renderings).toHaveLength(1)
+      expect(target.renderings[0].signal).toMatchObject({ hzMin: target.flickerHz, hzMax: target.flickerHz, shape: 'Sine' })
+      expect(target.geometry).toMatchObject({ viewingDistanceMetres: 0.7, refreshHz: 60, visualAngleDegrees: 3.2 })
+    }
+  })
+
+  it('compares binaural beats on their own carriers, with the training tape kept out of the arms', () => {
+    const lane = byId('lane-1998-binaural-beats-vigilance')
+    expect(lane.arms.map(arm => arm.roleId)).toEqual(['armExperimental', 'armActiveComparator'])
+    const carriers = lane.profiles.flatMap(profile => profile.channels)
+      .flatMap(channel => channel.renderings)
+      .map(rendering => `${rendering.signal.hzMin} on ${rendering.carrierHz}`)
+      .sort()
+    expect(carriers).toEqual(['1.5 on 100', '16 on 200', '24 on 300', '4 on 200', '4 on 250'])
   })
 
   it('reads the random comparison timing and the closed-loop control law', () => {
@@ -123,8 +152,15 @@ describe('listPublishedProtocols', () => {
     expect(random.roleId).toBe('roleControlOrSham')
 
     const ngo = byId('ngo-2013-closed-loop-auditory-slow-oscillation')
-    expect(ngo.controlLaws).toHaveLength(1)
-    expect(ngo.controlLaws[0]).toMatchObject({ oscillation: 'Slow oscillation', phase: 'Up state' })
+    const laws = Object.fromEntries(ngo.controlLaws.map(law => [law.phase, law]))
+    expect(Object.keys(laws).sort()).toEqual(['Down state', 'Up state'])
+    expect(laws['Up state']).toMatchObject({
+      oscillation: 'Slow oscillation', thresholdValue: -80, thresholdUnit: 'µV',
+      triggerDelaySeconds: null, stimuliPerTrigger: 2, refractorySeconds: 2.5,
+    })
+    expect(laws['Down state']).toMatchObject({ triggerDelaySeconds: 0, stimuliPerTrigger: 2 })
+    expect(ngo.arms.map(arm => arm.roleId)).toEqual(['armExperimental', 'armNoStimulation', 'armActiveComparator'])
+    expect(protocolLevels(ngo)).toEqual([expect.objectContaining({ value: 55, unit: 'dB', stageId: 'stageUnstated' })])
     expect(protocolSenses(ngo)).toEqual(['Auditory'])
   })
 })

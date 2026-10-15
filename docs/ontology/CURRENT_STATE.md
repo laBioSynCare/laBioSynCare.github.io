@@ -99,8 +99,8 @@ and levels for any modality, each stated at a stage of delivery
 ([ADR 0063](../decisions/0063-stimulus-magnitudes-at-delivery-stages.md)). A
 published protocol may cite its paper instead of naming a framework. Nine
 published protocols, from the 40 Hz auditory response of 1981 to a 2022
-randomized home-use trial, are public data; five are complete as far as their
-open sources go and four are abstract-level.
+randomized home-use trial, are public data, all nine encoded from their full
+texts.
 
 Evidence is scoped and revisioned. An `EvidenceAssessmentClaim` evaluates one
 subject, assesses one bounded proposition, has one or more qualified evidence

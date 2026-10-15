@@ -139,6 +139,12 @@ objective is 40 Hz activity at a named cortical target.
 - Five protocols are complete as far as their sources go; four (Galambos, Ngo,
   Lane, Thaut) are abstract-level and wait for their full texts. The terms each
   needs now exist, so completing them is data entry, not modelling.
+  *2026-10-15: completed from the full texts, and the prediction was wrong.
+  The terms covered most of what the papers say, but the full texts named nine
+  more things SSTIM cannot yet state, among them the interval between the two
+  stimuli of one closed-loop detection, an adaptive detection threshold, a
+  stimulus that progresses week by week, and a level relative to another part
+  of the same sound. Each record's editorial note lists its own.*
 - `make protocol-layer` holds the layer: every promised term is declared, all
   nine protocols cite their paper and none a framework, and 30 fixtures each
   break one rule and must be rejected on their own focus node by their own

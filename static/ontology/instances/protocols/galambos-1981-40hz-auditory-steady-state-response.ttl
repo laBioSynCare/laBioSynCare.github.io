@@ -15,6 +15,7 @@
 @prefix rdfs:            <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:            <http://www.w3.org/2004/02/skos/core#> .
 @prefix sstim:           <https://w3id.org/sstim#> .
+@prefix sstim-ex:        <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v:         <https://w3id.org/sstim/vocab#> .
 @prefix sstim-ref:       <https://w3id.org/sstim/ref/> .
 @prefix xsd:             <http://www.w3.org/2001/XMLSchema#> .
@@ -24,20 +25,67 @@
 
 ###########################################################################
 # 1. Galambos, Makeig and Talmachoff 1981: the 40 Hz auditory response
-#    Abstract only. 40 Hz auditory stimulation as a measurement.
+#    Full text: PNAS 78(4):2643-2647, Methods and Results.
+#    40 Hz auditory stimulation as a measurement.
 ###########################################################################
 
 bsclab-protocol:galambos-1981-40hz-auditory-steady-state-response a sstim:SensoryStimulationProtocol ;
     rdfs:label "40 Hz auditory steady-state response recording (Galambos, Makeig and Talmachoff 1981)"@en ;
-    dct:description "Sounds are repeated at rates around 40 per second while the scalp EEG is averaged, so that the potentials appearing 8 to 80 ms after each sound combine into one stable composite wave: the 40 Hz event-related potential, later called the 40 Hz auditory steady-state response. The authors report the response at sound intensities close to normal adult hearing thresholds and propose it for clinical hearing testing. The purpose is to record a response, not to change one. Recorded as a description of the published method; it asserts no effect."@en ;
-    sstim:usesTechnique sstim-v:techClickTrain ;
+    dct:description "Monaural clicks or tone bursts (usually 6 ms long, with 2 ms rise and fall) are delivered through an earphone at rates near 40 per second while the EEG between the forehead and the earlobe of the stimulated ear is averaged over several hundred stimuli, so that the waves appearing 8 to 80 ms after each sound combine into one stable composite wave: the 40 Hz event-related potential, later called the 40 Hz auditory steady-state response. A rate series ran from 3.3 to about 55 sounds per second, with the largest response near 40. Levels were set relative to each listener's own threshold, from 5 to 50 dB above it, and threshold estimates went down to the threshold itself. Tones were of 250, 350, 500, 2500 and 5000 Hz. Twenty adults, two of them authors, sat or lay comfortably, usually awake and sometimes dozing, in rooms that ranged from a sound-proofed chamber to an ordinary laboratory; each tracing took about 2 minutes. The purpose is to record a response, not to change one. Recorded as a description of the published method; it asserts no effect."@en ;
+    sstim:usesTechnique sstim-v:techClickTrain, sstim-v:techIsochronicTones ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAuditorySteadyStateResponse ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
     sstim:hasStudyPopulation g1981:population ;
+    sstim-ex:hasExposureProfile g1981:profile ;
     dct:source sstim-ref:GALAMBOS_1981 ;
-    skos:editorialNote "Encoded from the PubMed abstract only (PMID 6941317). The stimulus type (clicks or tone pips), the rates tested, the levels, the transducer and the subjects are not encoded: the scanned full text (PMC319406) was not read. techClickTrain rests on the abstract's repeated transient sounds."@en ;
+    skos:editorialNote "Encoded from the full text (PNAS 78(4):2643-2647, scanned), read 2026-10-15. The 40 per second condition is the one encoded as the signal: the rate series (3.3 to about 55 per second), the intensity series and the tone frequencies were exploratory series on a few subjects, not arms, so they are stated in the description. Levels are in decibels above each listener's own threshold (dB SL), so they are subject-relative. The stimulation was monaural and the paper does not say which ear; SSTIM has no placement for one ear of unstated side, so the channel names the ears. Several earphone types were used, including a hearing-aid transducer. techClickTrain and techIsochronicTones cover the clicks and the gated tone bursts; techGamma40Auditory is not used, because its defining objective is to modulate gamma activity and this protocol records a response."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 g1981:population a sstim:PopulationDescriptor ;
-    rdfs:label "Adult human listeners"@en ;
+    rdfs:label "Adult listeners"@en ;
+    dct:description "Twenty adults, including two of the authors, all audiometrically normal except one author, who had a high-frequency hearing loss. Three subjects, studied repeatedly over 3 months, provided most of the data; seven young adults took part in the threshold series."@en ;
     sstim:populationTaxon obo:NCBITaxon_9606 .
+
+g1981:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Clicks or tone bursts at about 40 per second through an earphone"@en ;
+    sstim-ex:usesStimulusChannel g1981:sound ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+g1981:sound a sstim-ex:StimulusChannel ;
+    rdfs:label "Earphone, one ear: clicks or 6 ms tone bursts with 2 ms rise and fall, about 40 per second"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternPulsed, sstim-ex:patternRhythmic ;
+    sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
+    sstim-ex:hasModulationFrequencyHz "40.0"^^xsd:decimal ;
+    sstim:hasMagnitude g1981:level ;
+    sstim:hasSignalRendering g1981:rendering .
+
+g1981:level a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityLevelAboveReference ;
+    sstim:magnitudeMinimum "5.0"^^xsd:decimal ;
+    sstim:magnitudeMaximum "50.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceHearingThreshold ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "The signals used included clicks and tones (250, 350, and 500 Hz) presented at intensities between 5 and 50 dBSL." .
+
+g1981:signal a sstim:StimulationSignal ;
+    rdfs:label "Sounds repeated 40 times a second"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "40.0"^^xsd:decimal ;
+    sstim:hzMax "40.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:gamma, sstim-v:gamma40 .
+
+g1981:rendering a sstim:SignalRendering ;
+    rdfs:label "Clicks or tone bursts gated at the signal rate"@en ;
+    sstim:rendersSignal g1981:signal ;
+    sstim:rendersOntoParameter sstim-v:paramAmplitude ;
+    sstim:hasRenderingMechanism sstim-v:mechanismAmplitudeModulation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .

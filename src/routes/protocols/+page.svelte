@@ -40,7 +40,7 @@
     && (speciesFilter === 'all' || row.species.includes(speciesFilter))))
   const paperCount = $derived(new Set(rows.map(row => row.reference.iri)).size)
   const years = $derived(rows.map(row => row.reference.year).filter(Boolean).sort())
-  const abstractOnly = $derived(rows.filter(row => row.encodedFrom === 'abstract').length)
+  const fullText = $derived(rows.filter(row => row.encodedFrom === 'full text').length)
 
   async function loadProtocols() {
     loading = true
@@ -82,6 +82,11 @@
   function rateFromControlLaw(row) {
     const law = row.controlLaws.find(candidate => candidate.oscillation)
     return law ? `closed loop, follows the ${lower(law.oscillation)}` : ''
+  }
+
+  // A cue tempo set from each patient's own cadence has no single rate in Hz.
+  function rateFromCadence(row) {
+    return row.levels.some(level => level.relativeTo === 'Baseline cadence') ? "set from each patient's cadence" : ''
   }
 
   function renderingText(rendering) {
@@ -147,7 +152,10 @@
     const phases = [...new Set(channels.map(channel => channel.initialPhase).filter(value => value !== null))]
       .sort((a, b) => a - b)
     const phaseText = phases.length ? `, starting at ${phases.join(', ')} of a cycle` : ''
-    return `${channels.length} channels flickering at ${rates}${phaseText}`
+    // The display, when every target shares it.
+    const displays = new Set(channels.map(channel => geometry(channel)))
+    const displayText = displays.size === 1 && [...displays][0] ? `; ${[...displays][0]}` : ''
+    return `${channels.length} channels flickering at ${rates}${phaseText}${displayText}`
   }
 
   function sharedSignals(profile) {
@@ -215,7 +223,7 @@
       <div><dt>Protocols</dt><dd>{rows.length}</dd></div>
       <div><dt>Papers</dt><dd>{paperCount}</dd></div>
       <div><dt>Published</dt><dd>{years[0]} to {years.at(-1)}</dd></div>
-      <div><dt>From the abstract only</dt><dd>{abstractOnly}</dd></div>
+      <div><dt>From full texts</dt><dd>{fullText} of {rows.length}</dd></div>
     </dl>
 
     <div class="filters" role="group" aria-label="Filter protocols">
@@ -259,14 +267,14 @@
                 {#if row.encodedFrom === 'abstract'}<span class="badge">abstract only</span>{/if}
               </th>
               <td>{list(row.senses) || '—'}</td>
-              <td>{row.rates || rateFromControlLaw(row) || 'not encoded'}</td>
+              <td>{row.rates || rateFromControlLaw(row) || rateFromCadence(row) || 'not encoded'}</td>
               <td>
                 {#if row.levels.length}
                   <ul class="plain">
                     {#each row.levels as level}
                       <li>
                         <strong>{formatMagnitude(level)}</strong>
-                        <span class="muted">{[lower(level.quantity), lower(level.stage)].filter(Boolean).join(', ')}</span>
+                        <span class="muted">{[lower(level.quantity), level.relativeTo ? `relative to ${lower(level.relativeTo)}` : lower(level.stage)].filter(Boolean).join(', ')}</span>
                       </li>
                     {/each}
                   </ul>
