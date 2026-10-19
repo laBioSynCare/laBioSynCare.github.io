@@ -4,10 +4,12 @@ import { mergeStores, parseIntoStore } from './loader.js'
 import {
   formatFrequency,
   formatMagnitude,
+  formatProgression,
   formatRates,
   formatSchedule,
   listPublishedProtocols,
   protocolLevels,
+  protocolProgressions,
   protocolRates,
   protocolSenses,
 } from './protocols.js'
@@ -77,7 +79,31 @@ describe('listPublishedProtocols', () => {
     for (const tempo of thaut) expect(tempo).toMatchObject({ stageId: 'stageSubjectRelative', relativeTo: 'Baseline cadence' })
 
     const lane = byId('lane-1998-binaural-beats-vigilance')
-    expect(protocolLevels(lane)).toEqual([expect.objectContaining({ value: 0, relativeTo: 'Most comfortable level' })])
+    expect(protocolLevels(lane)).toEqual([
+      expect.objectContaining({ value: 0, relativeTo: 'Most comfortable level' }),
+      expect.objectContaining({
+        label: 'Carrier tones above the pink noise', quantity: 'Level above another component',
+        value: 15, unit: 'dB', stageId: 'stageConfigured', relativeTo: '',
+      }),
+    ])
+  })
+
+  it('raises every tempo each week up to a ceiling in steps per minute', () => {
+    const thaut = byId('thaut-1996-rhythmic-auditory-stimulation-gait')
+    const progressions = protocolProgressions(thaut)
+    expect(progressions).toHaveLength(1)
+    for (const tempo of protocolLevels(thaut)) expect(tempo.progression.iri).toBe(progressions[0].iri)
+    expect(progressions[0]).toMatchObject({
+      step: null, stepMinimum: 5, stepMaximum: 10, stepUnit: '%', intervalValue: 1, intervalUnit: 'week',
+      limit: { quantity: 'Tempo', value: 130, unit: 'bpm', stageId: 'stageConfigured', progression: null },
+    })
+    expect(progressions[0].limit.reportedAs).toContain('130 steps/min')
+    expect(formatProgression(progressions[0])).toBe('rises 5 to 10 % every week, up to 130 bpm')
+  })
+
+  it('places monaural clicks in one ear of unstated side', () => {
+    const galambos = byId('galambos-1981-40hz-auditory-steady-state-response')
+    expect(galambos.profiles.flatMap(profile => profile.channels).map(channel => channel.placements)).toEqual([['one ear']])
   })
 
   it('keeps a reported level at the stage its source gave, with the source\'s words', () => {
@@ -156,12 +182,31 @@ describe('listPublishedProtocols', () => {
     expect(Object.keys(laws).sort()).toEqual(['Down state', 'Up state'])
     expect(laws['Up state']).toMatchObject({
       oscillation: 'Slow oscillation', thresholdValue: -80, thresholdUnit: 'µV',
-      triggerDelaySeconds: null, stimuliPerTrigger: 2, refractorySeconds: 2.5,
+      thresholdUpdateSeconds: 2, thresholdWindowSeconds: 5,
+      triggerDelaySeconds: null, triggerDelayReference: 'Trough-to-peak interval',
+      stimuliPerTrigger: 2, interStimulusSeconds: 1.075, refractorySeconds: 2.5,
+      sleepStages: ['Sleep stage N2', 'Sleep stage N3'],
     })
-    expect(laws['Down state']).toMatchObject({ triggerDelaySeconds: 0, stimuliPerTrigger: 2 })
+    expect(laws['Down state']).toMatchObject({
+      triggerDelaySeconds: 0, triggerDelayReference: '', stimuliPerTrigger: 2, interStimulusSeconds: null,
+      thresholdUpdateSeconds: 2, sleepStages: ['Sleep stage N2', 'Sleep stage N3'],
+    })
     expect(ngo.arms.map(arm => arm.roleId)).toEqual(['armExperimental', 'armNoStimulation', 'armActiveComparator'])
     expect(protocolLevels(ngo)).toEqual([expect.objectContaining({ value: 55, unit: 'dB', stageId: 'stageUnstated' })])
     expect(protocolSenses(ngo)).toEqual(['Auditory'])
+  })
+})
+
+describe('formatProgression', () => {
+  const progression = { step: null, stepMinimum: null, stepMaximum: null, stepUnit: 'dB', intervalValue: 1, intervalUnit: 'day', limit: null }
+
+  it('names one step, a range, or a fall, and how often', () => {
+    expect(formatProgression({ ...progression, step: 2 })).toBe('rises 2 dB every day')
+    expect(formatProgression({ ...progression, step: 2, intervalValue: 3 })).toBe('rises 2 dB every 3 days')
+    expect(formatProgression({ ...progression, stepMinimum: -4, stepMaximum: -2 })).toBe('falls 2 to 4 dB every day')
+    expect(formatProgression({ ...progression, step: -2, limit: { value: 40, minimum: null, maximum: null, unit: 'dB' } }))
+      .toBe('falls 2 dB every day, down to 40 dB')
+    expect(formatProgression(null)).toBe('')
   })
 })
 

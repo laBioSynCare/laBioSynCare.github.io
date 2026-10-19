@@ -83,11 +83,16 @@ function unitSymbol(store, unit) {
   return symbol || labelOf(store, unit).toLocaleLowerCase()
 }
 
-function magnitudeDetail(store, magnitude) {
+// A progression's limit is a magnitude of its own, read without following a
+// progression of the limit's, so a limit that names its own magnitude cannot loop.
+function magnitudeDetail(store, magnitude, { followProgression = true } = {}) {
   const stage = first(store, magnitude, SSTIM('deliveryStage'))
   const basis = first(store, magnitude, SSTIM('valueBasis'))
   return {
     iri: magnitude.value,
+    // Only the magnitude's own label: a level above another component names
+    // the two components in it (ADR 0066), and most magnitudes have none.
+    label: englishLiteral(store, magnitude, RDFS('label')),
     quantity: labelOf(store, first(store, magnitude, SSTIM('magnitudeQuantity'))),
     unit: unitSymbol(store, first(store, magnitude, SSTIM('magnitudeUnit'))),
     value: number(store, magnitude, SSTIM('magnitudeValue')),
@@ -100,6 +105,22 @@ function magnitudeDetail(store, magnitude) {
     relativeTo: labelOf(store, first(store, magnitude, SSTIM('relativeToParticipantMeasure'))),
     distanceMetres: number(store, magnitude, SSTIM('measurementDistanceMetres')),
     reportedAs: text(store, magnitude, SSTIM('reportedAs')),
+    progression: followProgression ? progressionDetail(store, first(store, magnitude, SSTIM('hasProgression'))) : null,
+  }
+}
+
+function progressionDetail(store, progression) {
+  if (!progression) return null
+  const limit = first(store, progression, SSTIM('progressionLimit'))
+  return {
+    iri: progression.value,
+    step: number(store, progression, SSTIM('progressionStepValue')),
+    stepMinimum: number(store, progression, SSTIM('progressionStepMinimum')),
+    stepMaximum: number(store, progression, SSTIM('progressionStepMaximum')),
+    stepUnit: unitSymbol(store, first(store, progression, SSTIM('progressionStepUnit'))),
+    intervalValue: number(store, progression, SSTIM('progressionIntervalValue')),
+    intervalUnit: labelOf(store, first(store, progression, SSTIM('progressionIntervalUnit'))).toLocaleLowerCase(),
+    limit: limit ? magnitudeDetail(store, limit, { followProgression: false }) : null,
   }
 }
 
@@ -163,9 +184,15 @@ function controlLawDetail(store, law) {
     phase: labelOf(store, first(store, law, SSTIM('targetOscillationPhase'))),
     thresholdValue: number(store, law, SSTIM('detectionThresholdValue')),
     thresholdUnit: unitSymbol(store, first(store, law, SSTIM('detectionThresholdUnit'))),
+    thresholdUpdateSeconds: number(store, law, SSTIM('thresholdUpdateIntervalSeconds')),
+    thresholdWindowSeconds: number(store, law, SSTIM('thresholdWindowSeconds')),
     triggerDelaySeconds: number(store, law, SSTIM('triggerDelaySeconds')),
+    triggerDelayReference: labelOf(store, first(store, law, SSTIM('triggerDelayReference'))),
     stimuliPerTrigger: number(store, law, SSTIM('stimuliPerTrigger')),
+    interStimulusSeconds: number(store, law, SSTIM('interStimulusIntervalSeconds')),
     refractorySeconds: number(store, law, SSTIM('refractoryPeriodSeconds')),
+    sleepStages: labels(store, law, SSTIM('deliveryRestrictedToSleepStage'))
+      .sort((a, b) => a.localeCompare(b, 'en', { numeric: true })),
   }
 }
 
@@ -364,6 +391,38 @@ export function formatMagnitude(magnitude) {
     amount = `${trim(magnitude.minimum)} to ${trim(magnitude.maximum)}`
   }
   return amount ? `${amount} ${magnitude.unit}`.trim() : ''
+}
+
+/** "rises 5 to 10 % every week, up to 130 bpm": how a level changes over a course. */
+export function formatProgression(progression) {
+  if (!progression) return ''
+  const steps = [progression.step, progression.stepMinimum, progression.stepMaximum].filter(value => value !== null)
+  if (!steps.length) return ''
+  const direction = steps.every(value => value >= 0) ? 'rises' : steps.every(value => value <= 0) ? 'falls' : 'changes'
+  const size = value => trim(direction === 'falls' ? -value : value)
+  let amount = progression.step !== null ? size(progression.step) : ''
+  if (progression.step === null && progression.stepMinimum !== null && progression.stepMaximum !== null) {
+    const [low, high] = direction === 'falls'
+      ? [progression.stepMaximum, progression.stepMinimum]
+      : [progression.stepMinimum, progression.stepMaximum]
+    amount = `${size(low)} to ${size(high)}`
+  }
+  const count = progression.intervalValue
+  const every = count === null || count === 1
+    ? `every ${progression.intervalUnit}`
+    : `every ${trim(count)} ${progression.intervalUnit}s`
+  const bound = { rises: 'up to', falls: 'down to', changes: 'within' }[direction]
+  const limit = progression.limit && formatMagnitude(progression.limit)
+  return [`${direction} ${amount} ${progression.stepUnit} ${every}`.replace(/\s+/g, ' ').trim(), limit && `${bound} ${limit}`]
+    .filter(Boolean).join(', ')
+}
+
+/** The progressions a protocol's levels follow, each once. */
+export function protocolProgressions(protocol) {
+  const seen = new Set()
+  return protocolLevels(protocol)
+    .map(level => level.progression)
+    .filter(progression => progression && !seen.has(progression.iri) && seen.add(progression.iri))
 }
 
 /** The magnitudes stated on a protocol's intervention channels, each once. */

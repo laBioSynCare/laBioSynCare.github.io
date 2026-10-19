@@ -1659,6 +1659,60 @@
       "@id": "sstim:trackedOscillation",
       "@type": "@id"
     },
+    "SleepStage": "sstim:SleepStage",
+    "MagnitudeProgression": "sstim:MagnitudeProgression",
+    "interStimulusIntervalSeconds": {
+      "@id": "sstim:interStimulusIntervalSeconds",
+      "@type": "xsd:decimal"
+    },
+    "thresholdUpdateIntervalSeconds": {
+      "@id": "sstim:thresholdUpdateIntervalSeconds",
+      "@type": "xsd:decimal"
+    },
+    "thresholdWindowSeconds": {
+      "@id": "sstim:thresholdWindowSeconds",
+      "@type": "xsd:decimal"
+    },
+    "triggerDelayReference": {
+      "@id": "sstim:triggerDelayReference",
+      "@type": "@id"
+    },
+    "deliveryRestrictedToSleepStage": {
+      "@id": "sstim:deliveryRestrictedToSleepStage",
+      "@type": "@id"
+    },
+    "hasProgression": {
+      "@id": "sstim:hasProgression",
+      "@type": "@id"
+    },
+    "progressionStepValue": {
+      "@id": "sstim:progressionStepValue",
+      "@type": "xsd:decimal"
+    },
+    "progressionStepMinimum": {
+      "@id": "sstim:progressionStepMinimum",
+      "@type": "xsd:decimal"
+    },
+    "progressionStepMaximum": {
+      "@id": "sstim:progressionStepMaximum",
+      "@type": "xsd:decimal"
+    },
+    "progressionStepUnit": {
+      "@id": "sstim:progressionStepUnit",
+      "@type": "@id"
+    },
+    "progressionIntervalValue": {
+      "@id": "sstim:progressionIntervalValue",
+      "@type": "xsd:decimal"
+    },
+    "progressionIntervalUnit": {
+      "@id": "sstim:progressionIntervalUnit",
+      "@type": "@id"
+    },
+    "progressionLimit": {
+      "@id": "sstim:progressionLimit",
+      "@type": "@id"
+    },
     "hasSchedule": {
       "@id": "sstim:hasSchedule",
       "@type": "@id"

@@ -50,7 +50,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0031-qualified-ecosystem-records.md> .
 
@@ -4323,13 +4323,28 @@ sstim-sh:StimulusMagnitudeShape a sh:NodeShape ;
                 FILTER NOT EXISTS { $this <https://w3id.org/sstim#reportedAs> ?words }
             }
         """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A level above another component of the same stimulus must name both components in its rdfs:label, or the number says nothing (ADR 0066)."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#magnitudeQuantity> <https://w3id.org/sstim/vocab#quantityLevelAboveComponent> .
+                FILTER NOT EXISTS { $this <http://www.w3.org/2000/01/rdf-schema#label> ?label }
+            }
+        """ ;
     ] .
 
 sstim-sh:StimulusMagnitudeRangeShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim:magnitudeQuantity, sstim:magnitudeUnit, sstim:magnitudeValue,
         sstim:magnitudeMinimum, sstim:magnitudeMaximum, sstim:deliveryStage, sstim:valueBasis,
-        sstim:relativeToParticipantMeasure, sstim:measurementDistanceMetres, sstim:reportedAs ;
+        sstim:relativeToParticipantMeasure, sstim:measurementDistanceMetres, sstim:reportedAs,
+        sstim:hasProgression ;
     sh:name "Stimulus magnitude ranges"@en ;
+    sh:property [
+        sh:path sstim:hasProgression ; sh:maxCount 1 ; sh:class sstim:MagnitudeProgression ;
+        sh:message "sstim:hasProgression takes one sstim:MagnitudeProgression value."@en ;
+    ] ;
     sh:property [
         sh:path sstim:magnitudeQuantity ; sh:maxCount 1 ; sh:class sstim:QuantityKind ;
         sh:message "sstim:magnitudeQuantity takes one sstim:QuantityKind value."@en ;
@@ -4369,6 +4384,96 @@ sstim-sh:StimulusMagnitudeRangeShape a sh:NodeShape ;
     sh:property [
         sh:path sstim:reportedAs ; sh:maxCount 1 ; sh:datatype xsd:string ;
         sh:message "sstim:reportedAs takes one xsd:string, the source's words verbatim."@en ;
+    ] .
+
+# A level that changes over a course (ADR 0066): by how much, how often, and
+# up to what limit. The magnitude it qualifies states the value at the start.
+sstim-sh:MagnitudeProgressionShape a sh:NodeShape ;
+    sh:targetClass sstim:MagnitudeProgression ;
+    sh:name "MagnitudeProgression"@en ;
+    sh:property [
+        sh:path sstim:progressionStepUnit ; sh:minCount 1 ;
+        sh:message "A progression must state the unit of its steps."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionIntervalValue ; sh:minCount 1 ;
+        sh:message "A progression must state how often it steps: an interval and its calendar unit."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionIntervalUnit ; sh:minCount 1 ;
+        sh:message "A progression must state how often it steps: an interval and its calendar unit."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A progression states either one step or both bounds of a range of steps: never neither, and never a step beside a bound."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                OPTIONAL { $this <https://w3id.org/sstim#progressionStepValue> ?step }
+                OPTIONAL { $this <https://w3id.org/sstim#progressionStepMinimum> ?low }
+                OPTIONAL { $this <https://w3id.org/sstim#progressionStepMaximum> ?high }
+                FILTER( ( !BOUND(?step) && !( BOUND(?low) && BOUND(?high) ) )
+                        || ( BOUND(?step) && ( BOUND(?low) || BOUND(?high) ) ) )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A progression's range of steps must not run backwards: its minimum may not exceed its maximum."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#progressionStepMinimum> ?low ;
+                      <https://w3id.org/sstim#progressionStepMaximum> ?high .
+                FILTER( ?low > ?high )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A progression steps in percent of the magnitude's value or in a unit the magnitude's quantity is stated in."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                ?magnitude <https://w3id.org/sstim#hasProgression> $this ;
+                           <https://w3id.org/sstim#magnitudeQuantity> ?quantity .
+                $this <https://w3id.org/sstim#progressionStepUnit> ?unit .
+                FILTER( ?unit != <https://w3id.org/sstim/vocab#unitPercent> )
+                FILTER NOT EXISTS { ?quantity <https://w3id.org/sstim#quantityUnit> ?unit }
+            }
+        """ ;
+    ] .
+
+sstim-sh:MagnitudeProgressionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:progressionStepValue, sstim:progressionStepMinimum, sstim:progressionStepMaximum,
+        sstim:progressionStepUnit, sstim:progressionIntervalValue, sstim:progressionIntervalUnit,
+        sstim:progressionLimit ;
+    sh:name "Magnitude progression ranges"@en ;
+    sh:property [
+        sh:path sstim:progressionStepValue ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:progressionStepValue takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionStepMinimum ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:progressionStepMinimum takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionStepMaximum ; sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "sstim:progressionStepMaximum takes one xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionStepUnit ; sh:maxCount 1 ; sh:class sstim:MeasurementUnit ;
+        sh:message "sstim:progressionStepUnit takes one sstim:MeasurementUnit value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionIntervalValue ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:progressionIntervalValue takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionIntervalUnit ; sh:maxCount 1 ;
+        sh:in ( sstim-v:unitDay sstim-v:unitWeek sstim-v:unitMonth ) ;
+        sh:message "sstim:progressionIntervalUnit takes one calendar unit: day, week or month."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:progressionLimit ; sh:maxCount 1 ; sh:class sstim:StimulusMagnitude ;
+        sh:message "sstim:progressionLimit takes one sstim:StimulusMagnitude value."@en ;
     ] .
 
 sstim-sh:HasMagnitudeRangeShape a sh:NodeShape ;
@@ -4417,12 +4522,59 @@ sstim-sh:ControlLawShape a sh:NodeShape ;
                 }
             }
         """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An inter-stimulus interval separates the stimuli of one trigger, so a law stating one delivers at least two per trigger (ADR 0066)."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#interStimulusIntervalSeconds> ?interval .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#stimuliPerTrigger> ?count . FILTER(?count >= 2) }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A trigger delay is either stated in seconds or set from the subject's own measure, never both (ADR 0066)."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#triggerDelaySeconds> ?seconds ;
+                      <https://w3id.org/sstim#triggerDelayReference> ?measure .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An adaptive threshold states both how often it is recomputed and from how much recent signal (ADR 0066)."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim#thresholdUpdateIntervalSeconds> ?every .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#thresholdWindowSeconds> ?window }
+                } UNION {
+                    $this <https://w3id.org/sstim#thresholdWindowSeconds> ?window .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#thresholdUpdateIntervalSeconds> ?every }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An adaptive threshold starts from a stated detection threshold value (ADR 0066)."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#thresholdUpdateIntervalSeconds> ?every .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#detectionThresholdValue> ?value }
+            }
+        """ ;
     ] .
 
 sstim-sh:ControlLawRangeShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim:controlInputSignal, sstim:trackedOscillation, sstim:targetOscillationPhase,
         sstim:detectionThresholdValue, sstim:detectionThresholdUnit, sstim:triggerDelaySeconds,
-        sstim:stimuliPerTrigger, sstim:refractoryPeriodSeconds, sstim:controlsChannel ;
+        sstim:stimuliPerTrigger, sstim:refractoryPeriodSeconds, sstim:controlsChannel,
+        sstim:interStimulusIntervalSeconds, sstim:thresholdUpdateIntervalSeconds, sstim:thresholdWindowSeconds,
+        sstim:triggerDelayReference, sstim:deliveryRestrictedToSleepStage ;
     sh:name "Control law ranges"@en ;
     sh:property [
         sh:path sstim:controlInputSignal ; sh:class sstim:MeasuredSignalKind ;
@@ -4460,6 +4612,26 @@ sstim-sh:ControlLawRangeShape a sh:NodeShape ;
         sh:path sstim:controlsChannel ;
         sh:or ( [ sh:class sstim-ex:StimulusChannel ] sstim-sh:RecordDescribedElsewhereShape ) ;
         sh:message "sstim:controlsChannel takes sstim-ex:StimulusChannel values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:interStimulusIntervalSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:interStimulusIntervalSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:thresholdUpdateIntervalSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:thresholdUpdateIntervalSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:thresholdWindowSeconds ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "sstim:thresholdWindowSeconds takes one positive xsd:decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:triggerDelayReference ; sh:maxCount 1 ; sh:class sstim:ParticipantReference ;
+        sh:message "sstim:triggerDelayReference takes one sstim:ParticipantReference value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:deliveryRestrictedToSleepStage ; sh:class sstim:SleepStage ;
+        sh:message "sstim:deliveryRestrictedToSleepStage takes sstim:SleepStage values."@en ;
     ] .
 
 # ADR 0041: only an adaptive stimulus is described by a rule. A control law on a

@@ -51,7 +51,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-06-18"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/w3c-cg/sstim/blob/v0.19.0/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
@@ -1655,6 +1655,17 @@ sstim-ex:placementEarRight a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:C
     skos:notation "ear-right" ;
     skos:definition "The right ear specifically, for dichotic or per-ear delivery such as a binaural beat."@en .
 
+sstim-ex:placementOneEar a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
+    skos:inScheme sstim-ex:BodyPlacementScheme ;
+    skos:broader sstim-ex:placementEars ;
+    skos:prefLabel "one ear"@en,
+                   "un orecchio"@it,
+                   "uma orelha"@pt,
+                   "un oído"@es ;
+    skos:notation "ear-one" ;
+    skos:definition "A single ear when the source does not say which, or the side varies between recordings: monaural delivery. Where the side is known, the left or the right ear says so."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
 sstim-ex:placementEyeLeft a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:broader sstim-ex:placementEyes ;
@@ -2517,7 +2528,7 @@ sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension
 ###########################################################################
 
 # Materialized inverse hierarchy links for clients without OWL inference.
-sstim-ex:placementEars skos:narrower sstim-ex:placementEarLeft, sstim-ex:placementEarRight .
+sstim-ex:placementEars skos:narrower sstim-ex:placementEarLeft, sstim-ex:placementEarRight, sstim-ex:placementOneEar .
 sstim-ex:placementEyes skos:narrower sstim-ex:placementEyeLeft, sstim-ex:placementEyeRight .
 
 # Body placements

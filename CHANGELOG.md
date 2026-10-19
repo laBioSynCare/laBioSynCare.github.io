@@ -56,7 +56,7 @@ one of each.
   distance, source size and visual angle.
 - **Nine published protocols as public data**, from the 40 Hz auditory response
   of 1981 to a randomized home-use trial of 2022, each citing its paper and
-  asserting no effect, with `make protocol-layer` holding the layer to 30
+  asserting no effect, with `make protocol-layer` holding the layer to 47
   adversarial fixtures. Their eight source papers join `references.ttl` as
   `sstim:BibliographicReference` records, which a new shape requires to carry a
   title and a source IRI or an identifier.
@@ -74,8 +74,22 @@ one of each.
   always the first, training session, not a compared arm; Ngo 2013's sham
   night played no sound, and its out-of-phase condition was a separate
   experiment on other subjects; Thaut 1996's groups were randomized. Nine
-  things these papers state that SSTIM cannot yet say are listed in the
-  records' editorial notes.
+  things these papers state that SSTIM could not say became ADR 0066.
+- **Eight things the full texts asked for**
+  ([ADR 0066](docs/decisions/0066-eight-things-the-full-texts-asked-for.md)).
+  A control law can space the stimuli of one detection
+  (`sstim:interStimulusIntervalSeconds`), recompute its threshold from recent
+  signal (`sstim:thresholdUpdateIntervalSeconds`,
+  `sstim:thresholdWindowSeconds`), set its delay to each subject's own measure
+  (`sstim:triggerDelayReference`, with `sstim-v:referenceTroughToPeakInterval`)
+  and deliver only in named sleep stages (`sstim:SleepStage`, a scheme of wake,
+  N1, N2, N3 and REM, and `sstim:deliveryRestrictedToSleepStage`). A magnitude
+  can change over a course: `sstim:MagnitudeProgression` states its step or
+  range of steps, how often, and a limit that may be in another quantity. Tempo
+  in beats per minute, a level above another component of the same stimulus,
+  and one ear of unstated side join the vocabularies. Every new rule constrains
+  only the new terms. A noise's spectrum is not added; one paper was not enough
+  to design it.
 
 ### Changed
 

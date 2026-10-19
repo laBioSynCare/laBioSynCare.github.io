@@ -1364,15 +1364,17 @@ Turtle files are listed in section 1. After they exist:
       repository): Galambos 1981, Ngo 2013, Lane 1998, Thaut 1996, and Wang
       2017's display and waveform.*
 
-- [ ] Decide the terms the full texts showed missing `P2`
-      *Nine things the papers state that SSTIM cannot: the interval between
+- [x] Decide the terms the full texts showed missing `P2`
+      *Nine things the papers state that SSTIM could not: the interval between
       the stimuli of one closed-loop detection; an adaptive detection
       threshold; a trigger delay calibrated per subject; restricting
       stimulation to sleep stages; a stimulus parameter that progresses week
       by week; an absolute tempo ceiling (no steps-per-minute unit); a level
       relative to another component of the same sound; a noise spectrum's
-      shape; one ear of unstated side. Each record's `skos:editorialNote`
-      names its own. Proposed, not decided.*
+      shape; one ear of unstated side. Decided 2026-10-16 as
+      [ADR 0066](docs/decisions/0066-eight-things-the-full-texts-asked-for.md):
+      eight became terms and the four records use them; a noise's spectrum
+      stays in Lane 1998's editorial note until a second source needs it.*
 
 - [~] Route committed records at w3id.org `P2`
       *Measured 2026-10-14: 145 of 161 committed record identifiers answered
@@ -1387,9 +1389,10 @@ Turtle files are listed in section 1. After they exist:
       their Apache harness), and after the merge confirm a sample of each
       family live: 303 from w3id.org, 200 Turtle at the target.*
 
-- [ ] Native review of the labels ADR 0063 and ADR 0064 added `P2`
-      *237 labels in Italian, Portuguese and Spanish on the 79 new concepts,
-      written by the maintainers, as with the earlier vocabulary.*
+- [ ] Native review of the labels ADRs 0063, 0064 and 0066 added `P2`
+      *267 labels in Italian, Portuguese and Spanish on 89 new concepts (237
+      on the 79 of ADRs 0063 and 0064, 30 on the ten of ADR 0066), written by
+      the maintainers, as with the earlier vocabulary.*
 
 - [~] Grow the public preset catalog beyond its two seeds `P2`
       *Measured 2026-09-10 against the production build: `/presets/` renders
@@ -1578,7 +1581,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
       ANS), the plain names the preferred labels bury, and the `systemAutonomic`
       label divergence the alignment work exposed. Proposal and the rejected
       candidates: `~/sstim-drafts/altlabel-proposal.md`. Still partial by design:
-      most of the 635 concepts have no alias worth writing, and non-English
+      most of the 645 concepts have no alias worth writing, and non-English
       aliases wait for the same native reviewer as the labels.*
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,

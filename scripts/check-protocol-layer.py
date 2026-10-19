@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Assert the ADR 0063/0064 protocol layer exists, is used, and rejects abuse.
+"""Assert the ADR 0063/0064/0066 protocol layer exists, is used, and rejects abuse.
 
 Encoding nine published protocols found thirteen things SSTIM could not say.
 ADR 0063 added stimulus magnitudes stated at a stage of delivery; ADR 0064
 added schedules, study arms, populations, designs, control laws, random onset
 timing, initial phase, display geometry and the sleep oscillations, and let a
 published protocol be accountable to its paper instead of to a framework.
+Completing four of them from their full texts found eight more, which ADR 0066
+added: an interval between the stimuli of one trigger, an adaptive threshold,
+a trigger delay calibrated to each subject, delivery restricted to stages of
+sleep, a level that changes over a course up to a limit, tempo in beats per
+minute, a level above another component of the same sound, and one ear.
 
 Three checks.
 
-**Adds.** Every class, property and concept the two ADRs promised is declared.
+**Adds.** Every class, property and concept the three ADRs promised is declared.
 
 **Uses.** The nine protocols are present, one file each named after its
 identifier (ADR 0065), and each cites a bibliographic record, which is the only
@@ -53,7 +58,7 @@ REQUIRED_CLASSES = {
     SSTIM: ["StimulusMagnitude", "QuantityKind", "MeasurementUnit", "DeliveryStage", "ValueBasis",
             "ParticipantReference", "ControlLaw", "MeasuredSignalKind", "OscillationPhaseTarget",
             "StimulationSchedule", "ScheduleSegment", "SegmentRole", "StudyArm", "StudyArmRole",
-            "ArmAllocation"],
+            "ArmAllocation", "SleepStage", "MagnitudeProgression"],
     SSTIM_EX: ["OnsetIntervalDistribution"],
 }
 REQUIRED_PROPERTIES = {
@@ -67,19 +72,27 @@ REQUIRED_PROPERTIES = {
             "courseDurationUnit", "trialsPerBlock", "blocksPerSession", "hasScheduleSegment",
             "segmentOrder", "segmentDurationSeconds", "segmentRole", "segmentStimulus", "hasStudyArm",
             "armRole", "armStimulus", "armAllocation", "hasStudyPopulation", "protocolStudyDesign",
-            "populationTaxon", "populationCondition"],
+            "populationTaxon", "populationCondition", "interStimulusIntervalSeconds",
+            "thresholdUpdateIntervalSeconds", "thresholdWindowSeconds", "triggerDelayReference",
+            "deliveryRestrictedToSleepStage", "hasProgression", "progressionStepValue",
+            "progressionStepMinimum", "progressionStepMaximum", "progressionStepUnit",
+            "progressionIntervalValue", "progressionIntervalUnit", "progressionLimit"],
     SSTIM_EX: ["hasInitialPhase", "hasOnsetIntervalDistribution", "meanOnsetIntervalSeconds",
                "minOnsetIntervalSeconds", "maxOnsetIntervalSeconds", "displayRefreshRateHz",
                "viewingDistanceMetres", "sourceWidthMetres", "sourceHeightMetres", "visualAngleDegrees"],
 }
 # Concepts the published protocols or the constraints depend on by name.
-REQUIRED_CONCEPTS = [
-    "stageConfigured", "stageEmitted", "stageAtSubject", "stageAtTarget", "stageSubjectRelative",
-    "stagePerceived", "stageUnstated", "valueSpecified", "valueMeasured", "valueReported",
-    "valueModelled", "unitDay", "unitWeek", "unitMonth", "quantitySoundPressureLevel",
-    "quantityIlluminance", "armExperimental", "armActiveComparator", "armSham", "armNoStimulation",
-    "slowOscillation", "sleepSpindle", "measuredEeg", "phaseUpState",
-]
+REQUIRED_CONCEPTS = {
+    SSTIM_V: ["stageConfigured", "stageEmitted", "stageAtSubject", "stageAtTarget",
+              "stageSubjectRelative", "stagePerceived", "stageUnstated", "valueSpecified",
+              "valueMeasured", "valueReported", "valueModelled", "unitDay", "unitWeek", "unitMonth",
+              "quantitySoundPressureLevel", "quantityIlluminance", "armExperimental",
+              "armActiveComparator", "armSham", "armNoStimulation", "slowOscillation", "sleepSpindle",
+              "measuredEeg", "phaseUpState", "quantityTempo", "quantityLevelAboveComponent",
+              "unitBeatsPerMinute", "referenceTroughToPeakInterval", "sleepWake", "sleepN1", "sleepN2",
+              "sleepN3", "sleepRem"],
+    SSTIM_EX: ["placementOneEar"],
+}
 # Named rather than inferred: calling a protocol published because it cites a
 # paper would make the check that each one cites a paper true by construction.
 PUBLISHED_PROTOCOLS = (
@@ -170,7 +183,7 @@ ex:channel a sstim-ex:StimulusChannel ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
     sstim-ex:hasInitialPhase 0.25 ;
-    sstim:hasMagnitude ex:level, ex:range, ex:relative .
+    sstim:hasMagnitude ex:level, ex:range, ex:relative, ex:tempo, ex:tone-level .
 
 ex:level a sstim:StimulusMagnitude ;
     sstim:magnitudeQuantity sstim-v:quantitySoundPressureLevel ;
@@ -194,13 +207,52 @@ ex:relative a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitDecibel ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceHearingThreshold ;
+    sstim:valueBasis sstim-v:valueSpecified ;
+    sstim:hasProgression ex:level-progression .
+
+ex:level-progression a sstim:MagnitudeProgression ;
+    sstim:progressionStepValue 2.0 ;
+    sstim:progressionStepUnit sstim-v:unitDecibel ;
+    sstim:progressionIntervalValue 3.0 ;
+    sstim:progressionIntervalUnit sstim-v:unitDay .
+
+ex:tempo a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
+    sstim:magnitudeValue 105.0 ;
+    sstim:magnitudeUnit sstim-v:unitPercent ;
+    sstim:deliveryStage sstim-v:stageSubjectRelative ;
+    sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:valueBasis sstim-v:valueSpecified ;
+    sstim:hasProgression ex:tempo-progression .
+
+ex:tempo-progression a sstim:MagnitudeProgression ;
+    sstim:progressionStepMinimum 5.0 ;
+    sstim:progressionStepMaximum 10.0 ;
+    sstim:progressionStepUnit sstim-v:unitPercent ;
+    sstim:progressionIntervalValue 1.0 ;
+    sstim:progressionIntervalUnit sstim-v:unitWeek ;
+    sstim:progressionLimit ex:tempo-ceiling .
+
+ex:tempo-ceiling a sstim:StimulusMagnitude ;
+    sstim:magnitudeQuantity sstim-v:quantityTempo ;
+    sstim:magnitudeValue 130.0 ;
+    sstim:magnitudeUnit sstim-v:unitBeatsPerMinute ;
+    sstim:deliveryStage sstim-v:stageConfigured ;
+    sstim:valueBasis sstim-v:valueSpecified .
+
+ex:tone-level a sstim:StimulusMagnitude ;
+    rdfs:label "Tones above the noise"@en ;
+    sstim:magnitudeQuantity sstim-v:quantityLevelAboveComponent ;
+    sstim:magnitudeValue 15.0 ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageConfigured ;
     sstim:valueBasis sstim-v:valueSpecified .
 
 ex:random-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Fixture randomly timed channel"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
-    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementOneEar ;
     sstim-ex:hasOnsetIntervalDistribution sstim-ex:intervalUniform ;
     sstim-ex:minOnsetIntervalSeconds 0.01 ;
     sstim-ex:meanOnsetIntervalSeconds 0.025 ;
@@ -237,9 +289,26 @@ ex:law a sstim:ControlLaw ;
     sstim:targetOscillationPhase sstim-v:phaseUpState ;
     sstim:detectionThresholdValue -75.0 ;
     sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;
+    sstim:thresholdUpdateIntervalSeconds 2.0 ;
+    sstim:thresholdWindowSeconds 5.0 ;
     sstim:triggerDelaySeconds 0.4 ;
     sstim:stimuliPerTrigger 3 ;
+    sstim:interStimulusIntervalSeconds 1.0 ;
     sstim:refractoryPeriodSeconds 2.0 ;
+    sstim:deliveryRestrictedToSleepStage sstim-v:sleepN2, sstim-v:sleepN3 ;
+    sstim:controlsChannel ex:channel .
+
+ex:calibrated a sstim:StimulusSpecification ;
+    rdfs:label "Fixture calibrated stimulus"@en ;
+    sstim:stimulusRegime "adaptive" ;
+    sstim:hasControlLaw ex:calibrated-law .
+
+ex:calibrated-law a sstim:ControlLaw ;
+    sstim:controlInputSignal sstim-v:measuredEeg ;
+    sstim:trackedOscillation sstim-v:slowOscillation ;
+    sstim:targetOscillationPhase sstim-v:phaseUpState ;
+    sstim:triggerDelayReference sstim-v:referenceTroughToPeakInterval ;
+    sstim:stimuliPerTrigger 1 ;
     sstim:controlsChannel ex:channel .
 """
 
@@ -354,6 +423,67 @@ CASES = [
     ("a quantity kind listing no unit",
      BASELINE + "\nex:unitless-quantity a sstim:QuantityKind .\n",
      "must list at least one"),
+    # ADR 0066
+    ("an inter-stimulus interval on a law delivering one stimulus per trigger",
+     swap("    sstim:stimuliPerTrigger 3 ;", "    sstim:stimuliPerTrigger 1 ;"),
+     "An inter-stimulus interval separates the stimuli of one trigger"),
+    ("an inter-stimulus interval of zero",
+     swap("    sstim:interStimulusIntervalSeconds 1.0 ;", "    sstim:interStimulusIntervalSeconds 0.0 ;"),
+     "interStimulusIntervalSeconds takes one positive"),
+    ("a trigger delay both stated and calibrated",
+     swap("    sstim:triggerDelayReference sstim-v:referenceTroughToPeakInterval ;",
+          "    sstim:triggerDelayReference sstim-v:referenceTroughToPeakInterval ;\n"
+          "    sstim:triggerDelaySeconds 0.5 ;"),
+     "either stated in seconds or set from the subject's own measure"),
+    ("a calibrated delay set to something that is not a participant measure",
+     swap("    sstim:triggerDelayReference sstim-v:referenceTroughToPeakInterval ;",
+          "    sstim:triggerDelayReference sstim-v:sleepN2 ;"),
+     "triggerDelayReference takes one sstim:ParticipantReference"),
+    ("an adaptive threshold recomputed from no stated window",
+     drop(BASELINE, "    sstim:thresholdWindowSeconds 5.0 ;\n"),
+     "states both how often it is recomputed and from how much recent signal"),
+    ("an adaptive threshold with no starting value",
+     drop(BASELINE, "    sstim:detectionThresholdValue -75.0 ;\n").replace(
+         "    sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;\n", ""),
+     "starts from a stated detection threshold value"),
+    ("delivery restricted to something that is not a sleep stage",
+     swap("    sstim:deliveryRestrictedToSleepStage sstim-v:sleepN2, sstim-v:sleepN3 ;",
+          "    sstim:deliveryRestrictedToSleepStage sstim-v:sleepN2, sstim-v:phaseUpState ;"),
+     "deliveryRestrictedToSleepStage takes sstim:SleepStage values"),
+    ("a progression stating no step unit",
+     drop(BASELINE, "    sstim:progressionStepUnit sstim-v:unitPercent ;\n"),
+     "must state the unit of its steps"),
+    ("a progression stating no interval",
+     drop(BASELINE, "    sstim:progressionIntervalValue 1.0 ;\n"),
+     "must state how often it steps"),
+    ("a progression stating neither a step nor a range",
+     drop(BASELINE, "    sstim:progressionStepMinimum 5.0 ;\n").replace(
+         "    sstim:progressionStepMaximum 10.0 ;\n", ""),
+     "either one step or both bounds of a range of steps"),
+    ("a progression stating a step beside a bound",
+     swap("    sstim:progressionStepMinimum 5.0 ;",
+          "    sstim:progressionStepMinimum 5.0 ;\n    sstim:progressionStepValue 7.0 ;"),
+     "either one step or both bounds of a range of steps"),
+    ("a progression's range of steps running backwards",
+     swap("    sstim:progressionStepMinimum 5.0 ;\n    sstim:progressionStepMaximum 10.0 ;",
+          "    sstim:progressionStepMinimum 10.0 ;\n    sstim:progressionStepMaximum 5.0 ;"),
+     "range of steps must not run backwards"),
+    ("a progression stepping in a unit its quantity is not stated in",
+     swap("    sstim:progressionStepUnit sstim-v:unitDecibel ;", "    sstim:progressionStepUnit sstim-v:unitLux ;"),
+     "steps in percent of the magnitude's value or in a unit"),
+    ("a progression stepping every few hours",
+     swap("    sstim:progressionIntervalUnit sstim-v:unitDay .", "    sstim:progressionIntervalUnit sstim-v:unitDecibel ."),
+     "progressionIntervalUnit takes one calendar unit"),
+    ("a progression limited by something that is not a magnitude",
+     swap("    sstim:progressionLimit ex:tempo-ceiling .", "    sstim:progressionLimit ex:paper ."),
+     "progressionLimit takes one sstim:StimulusMagnitude"),
+    ("a magnitude with two progressions",
+     swap("    sstim:hasProgression ex:tempo-progression .",
+          "    sstim:hasProgression ex:tempo-progression, ex:level-progression ."),
+     "hasProgression takes one sstim:MagnitudeProgression"),
+    ("a level above another component that does not name them",
+     drop(BASELINE, '    rdfs:label "Tones above the noise"@en ;\n'),
+     "must name both components"),
 ]
 
 
@@ -386,9 +516,10 @@ def main() -> int:
             properties += 1
             if not set(graph.objects(namespace[name], RDF.type)) & {OWL.ObjectProperty, OWL.DatatypeProperty}:
                 failures.append(f"{namespace[name]} is not declared as a property")
-    for name in REQUIRED_CONCEPTS:
-        if not list(graph.objects(SSTIM_V[name], SKOS.notation)):
-            failures.append(f"sstim-v:{name} is not a declared concept with a notation")
+    for namespace, names in REQUIRED_CONCEPTS.items():
+        for name in names:
+            if not list(graph.objects(namespace[name], SKOS.notation)):
+                failures.append(f"{namespace[name]} is not a declared concept with a notation")
 
     # ── Uses ────────────────────────────────────────────────────────────────
     data = Graph()
@@ -479,7 +610,7 @@ def main() -> int:
     classes = sum(len(v) for v in REQUIRED_CLASSES.values())
     print(
         f"protocol-layer: passed ({classes} classes, {properties} properties and "
-        f"{len(REQUIRED_CONCEPTS)} named concepts present; {len(published)} published protocols, "
+        f"{sum(len(v) for v in REQUIRED_CONCEPTS.values())} named concepts present; {len(published)} published protocols, "
         f"each citing its paper and none a framework; {len(CASES)} adversarial cases rejected "
         f"by their own constraint, 1 positive fixture using every new term accepted)"
     )

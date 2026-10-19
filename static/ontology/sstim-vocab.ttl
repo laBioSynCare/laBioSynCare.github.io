@@ -44,7 +44,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en ;
     skos:historyNote "0.7.0 adds orthogonal evidence-basis, proposition, scope, search, source-governance, review, and ecosystem relationship/purpose/outcome controlled values. Legacy overloaded evidence tags remain deprecated for compatibility."@en .
@@ -4560,7 +4560,7 @@ sstim-v:QuantityKindScheme a skos:ConceptScheme ;
         sstim-v:quantityMelanopicEdi, sstim-v:quantityPower, sstim-v:quantityVibrationAcceleration,
         sstim-v:quantityVibrationDisplacement, sstim-v:quantityElectricCurrent, sstim-v:quantityCurrentDensity,
         sstim-v:quantityElectricFieldStrength, sstim-v:quantityTemperature, sstim-v:quantityRelativeOutputLevel,
-        sstim-v:quantityLevelAboveReference, sstim-v:quantityRatioToReference .
+        sstim-v:quantityLevelAboveReference, sstim-v:quantityRatioToReference, sstim-v:quantityTempo, sstim-v:quantityLevelAboveComponent .
 
 sstim-v:quantitySoundPressureLevel a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
     skos:inScheme sstim-v:QuantityKindScheme ;
@@ -4653,6 +4653,24 @@ sstim-v:quantityVibrationDisplacement a owl:NamedIndividual, sstim:QuantityKind,
     skos:definition "Displacement amplitude of a vibrating surface or contactor against the skin, in micrometres, the quantity vibrotactile thresholds are usually stated in."@en ;
     sstim:quantityUnit sstim-v:unitMicrometre .
 
+sstim-v:quantityTempo a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Tempo"@en, "Tempo ritmico"@it, "Andamento rítmico"@pt, "Tempo rítmico"@es ;
+    skos:notation "tempo" ;
+    skos:definition "The rate of a rhythmic cue or movement in beats per minute, as the tempo of music walked to or a walking cadence is stated."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en ;
+    sstim:quantityUnit sstim-v:unitBeatsPerMinute .
+
+sstim-v:quantityLevelAboveComponent a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
+    skos:inScheme sstim-v:QuantityKindScheme ;
+    skos:topConceptOf sstim-v:QuantityKindScheme ;
+    skos:prefLabel "Level above another component"@en, "Livello rispetto a un'altra componente"@it, "Nível acima de outro componente"@pt, "Nivel sobre otro componente"@es ;
+    skos:notation "level-above-component" ;
+    skos:definition "The level of one component of a stimulus above another component of the same stimulus, in decibels, such as carrier tones mixed 15 dB above the noise they sound in: a signal-to-noise ratio. The magnitude's label names the two components."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en ;
+    sstim:quantityUnit sstim-v:unitDecibel .
+
 sstim-v:quantityElectricCurrent a owl:NamedIndividual, sstim:QuantityKind, skos:Concept ;
     skos:inScheme sstim-v:QuantityKindScheme ;
     skos:topConceptOf sstim-v:QuantityKindScheme ;
@@ -4718,7 +4736,7 @@ sstim-v:MeasurementUnitScheme a skos:ConceptScheme ;
         sstim-v:unitWattPerSquareMetre, sstim-v:unitLumen, sstim-v:unitWatt, sstim-v:unitMetrePerSecondSquared,
         sstim-v:unitMicrometre, sstim-v:unitMilliampere, sstim-v:unitMilliamperePerSquareCentimetre,
         sstim-v:unitVoltPerMetre, sstim-v:unitMicrovolt, sstim-v:unitDegreeCelsius, sstim-v:unitPercent,
-        sstim-v:unitRatio, sstim-v:unitDay, sstim-v:unitWeek, sstim-v:unitMonth .
+        sstim-v:unitRatio, sstim-v:unitDay, sstim-v:unitWeek, sstim-v:unitMonth, sstim-v:unitBeatsPerMinute .
 
 sstim-v:unitDecibel a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
     skos:inScheme sstim-v:MeasurementUnitScheme ;
@@ -4861,6 +4879,15 @@ sstim-v:unitWeek a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
     skos:notation "week" ;
     skos:definition "A calendar week of seven days."@en .
 
+sstim-v:unitBeatsPerMinute a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
+    skos:inScheme sstim-v:MeasurementUnitScheme ;
+    skos:topConceptOf sstim-v:MeasurementUnitScheme ;
+    skos:prefLabel "Beats per minute"@en, "Battiti al minuto"@it, "Batidas por minuto"@pt, "Pulsos por minuto"@es ;
+    skos:altLabel "bpm"@en, "steps per minute"@en ;
+    skos:notation "beats-per-minute" ;
+    skos:definition "Events of a rhythm per minute: the beats of a cue or the steps of a walk."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
 sstim-v:unitMonth a owl:NamedIndividual, sstim:MeasurementUnit, skos:Concept ;
     skos:inScheme sstim-v:MeasurementUnitScheme ;
     skos:topConceptOf sstim-v:MeasurementUnitScheme ;
@@ -4964,7 +4991,7 @@ sstim-v:ParticipantReferenceScheme a skos:ConceptScheme ;
     skos:definition "Measures of the subject's own that a stimulus value is set relative to."@en ;
     skos:hasTopConcept sstim-v:referenceHearingThreshold, sstim-v:referenceDetectionThreshold, sstim-v:referencePainThreshold,
         sstim-v:referenceRestingMotorThreshold, sstim-v:referenceComfortableLevel, sstim-v:referenceBaselineCadence,
-        sstim-v:referenceIndividualAlphaFrequency .
+        sstim-v:referenceIndividualAlphaFrequency, sstim-v:referenceTroughToPeakInterval .
 
 sstim-v:referenceHearingThreshold a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
     skos:inScheme sstim-v:ParticipantReferenceScheme ;
@@ -5007,6 +5034,14 @@ sstim-v:referenceBaselineCadence a owl:NamedIndividual, sstim:ParticipantReferen
     skos:prefLabel "Baseline cadence"@en, "Cadenza di base"@it, "Cadência basal"@pt, "Cadencia basal"@es ;
     skos:notation "baseline-cadence" ;
     skos:definition "This subject's own walking step rate measured before training, as the tempo of a rhythmic cue is set relative to."@en .
+
+sstim-v:referenceTroughToPeakInterval a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantReferenceScheme ;
+    skos:topConceptOf sstim-v:ParticipantReferenceScheme ;
+    skos:prefLabel "Trough-to-peak interval"@en, "Intervallo tra minimo e picco"@it, "Intervalo entre vale e pico"@pt, "Intervalo entre valle y pico"@es ;
+    skos:notation "trough-to-peak-interval" ;
+    skos:definition "The time this subject's tracked rhythm takes from a detected trough to the following peak, measured for them before stimulation, as a closed-loop trigger delay is calibrated to."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
 
 sstim-v:referenceIndividualAlphaFrequency a owl:NamedIndividual, sstim:ParticipantReference, skos:Concept ;
     skos:inScheme sstim-v:ParticipantReferenceScheme ;
@@ -5090,6 +5125,55 @@ sstim-v:phaseTrough a owl:NamedIndividual, sstim:OscillationPhaseTarget, skos:Co
     skos:prefLabel "Trough"@en, "Valle"@it, "Vale"@pt, "Valle"@es ;
     skos:notation "trough" ;
     skos:definition "The minimum of the tracked rhythm's cycle, for rhythms without up and down states."@en .
+
+sstim-v:SleepStageScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Sleep Stage Vocabulary"@en ;
+    skos:definition "The stages of sleep, and wakefulness, a subject can be scored in, by the AASM names; N3 merges stages 3 and 4 of the older Rechtschaffen and Kales rules."@en ;
+    skos:hasTopConcept sstim-v:sleepWake, sstim-v:sleepN1, sstim-v:sleepN2, sstim-v:sleepN3, sstim-v:sleepRem .
+
+sstim-v:sleepWake a owl:NamedIndividual, sstim:SleepStage, skos:Concept ;
+    skos:inScheme sstim-v:SleepStageScheme ;
+    skos:topConceptOf sstim-v:SleepStageScheme ;
+    skos:prefLabel "Wakefulness"@en, "Veglia"@it, "Vigília"@pt, "Vigilia"@es ;
+    skos:notation "wake" ;
+    skos:definition "Awake, as scored from the EEG; stimulation restricted to sleep stages halts in it."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
+sstim-v:sleepN1 a owl:NamedIndividual, sstim:SleepStage, skos:Concept ;
+    skos:inScheme sstim-v:SleepStageScheme ;
+    skos:topConceptOf sstim-v:SleepStageScheme ;
+    skos:prefLabel "Sleep stage N1"@en, "Stadio di sonno N1"@it, "Estágio do sono N1"@pt, "Fase del sueño N1"@es ;
+    skos:altLabel "Stage 1"@en ;
+    skos:notation "n1" ;
+    skos:definition "The lightest stage of non-REM sleep, the transition from wakefulness."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
+sstim-v:sleepN2 a owl:NamedIndividual, sstim:SleepStage, skos:Concept ;
+    skos:inScheme sstim-v:SleepStageScheme ;
+    skos:topConceptOf sstim-v:SleepStageScheme ;
+    skos:prefLabel "Sleep stage N2"@en, "Stadio di sonno N2"@it, "Estágio do sono N2"@pt, "Fase del sueño N2"@es ;
+    skos:altLabel "Stage 2"@en ;
+    skos:notation "n2" ;
+    skos:definition "Non-REM sleep with sleep spindles and K-complexes, the stage most of a night is spent in."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
+sstim-v:sleepN3 a owl:NamedIndividual, sstim:SleepStage, skos:Concept ;
+    skos:inScheme sstim-v:SleepStageScheme ;
+    skos:topConceptOf sstim-v:SleepStageScheme ;
+    skos:prefLabel "Sleep stage N3"@en, "Stadio di sonno N3"@it, "Estágio do sono N3"@pt, "Fase del sueño N3"@es ;
+    skos:altLabel "Slow-wave sleep"@en, "Stages 3 and 4"@en ;
+    skos:notation "n3" ;
+    skos:definition "The deepest non-REM sleep, dominated by slow waves: slow-wave sleep, which the Rechtschaffen and Kales rules split into stages 3 and 4."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
+
+sstim-v:sleepRem a owl:NamedIndividual, sstim:SleepStage, skos:Concept ;
+    skos:inScheme sstim-v:SleepStageScheme ;
+    skos:topConceptOf sstim-v:SleepStageScheme ;
+    skos:prefLabel "REM sleep"@en, "Sonno REM"@it, "Sono REM"@pt, "Sueño REM"@es ;
+    skos:notation "rem" ;
+    skos:definition "Rapid eye movement sleep, with a low-amplitude mixed-frequency EEG and the muscles at rest."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en .
 
 sstim-v:SegmentRoleScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

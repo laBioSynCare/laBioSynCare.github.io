@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-180 classes · 358 properties · 635 concepts · 18 modules · 76 of them deprecated
+182 classes · 371 properties · 645 concepts · 18 modules · 76 of them deprecated
 
 A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061 moved out of SSTIM point at the BSC framework vocabulary (`bsc-v:`, in `static/ontology/frameworks/bsc/`), which is not part of SSTIM and is not indexed here.
 
@@ -99,6 +99,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:IndependenceDetermination` | evidence |  | A policy-based determination of reviewer independence: independent, not independent, or undetermined. An independent or not-independent… |
 | `sstim:IntendedEffect` | common |  | A controlled information category identifying a target change in physiological, psychological, or cognitive state that a sensory stimulation… |
 | `sstim:InterventionalNeuromodulation` | neuromodulation | sstim:Neuromodulation | Neuromodulation applied to an individual by an external agent, device, or agent-administered means. This is the sense the ADR 0034 non-sensory… |
+| `sstim:MagnitudeProgression` | common |  | How a stated magnitude changes over a course of sessions: by how much at each step, how often, and up to what limit, as a cue tempo rises 5 to 10%… |
 | `sstim:MartigliBinauralVoice` | patch-studio | sstim:Voice | **deprecated** → `bsc-v:MartigliBinauralVoice`. Binaural beat combined with Martigli breathing oscillation. Both carriers sweep in parallel, maintaining constant beat frequency while timbral… |
 | `sstim:MartigliVoice` | patch-studio | sstim:Voice | **deprecated** → `bsc-v:MartigliVoice`. A single tone whose frequency oscillates sinusoidally with a breathing arc that decelerates linearly from mp0 to mp1 over md seconds. |
 | `sstim:MeasuredSignalKind` | stimulus |  | A controlled information category for the kind of physiological signal a control law reads from the subject, such as the electroencephalogram or… |
@@ -166,6 +167,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:SessionSpecification` | session |  | A complete, reproducible description of a specific intended execution of a preset, including user-defined overrides of preset defaults. The unit of… |
 | `sstim:SignalRendering` | stimulus |  | How one signal is made to reach a subject through one channel: onto which renderable parameter, by which mechanism, and whether the result is… |
 | `sstim:SignalShape` | stimulus |  | A controlled information category naming the form of a time-varying signal: the periodic shapes (sine, square, sawtooth, triangle), an envelope,… |
+| `sstim:SleepStage` | common |  | A controlled information category for the stage of sleep, or wakefulness, a subject is in, as scored from the EEG and the other polysomnographic… |
 | `sstim:SourceGovernanceRecord` | evidence |  | An immutable record governing a research output used as evidence: source version and digest, custodian, access classification, consent/ethics basis… |
 | `sstim:Stimulation` | core |  | A deliberately parameterized process in which structured physical energy, mechanical input, a chemical agent, or another controlled input is applied… |
 | `sstim:StimulationDeliveryApproach` | common |  | A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external,… |
@@ -342,6 +344,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:definedByFramework` | object | technique | OBI_0000272 → sstim:SensoryStimulationFramework | Links a protocol to the broader framework that defines or constrains it. The domain is the general OBI protocol class, not a stimulation protocol: a… |
 | `sstim:definesTechnique` | object | technique | sstim:SensoryStimulationFramework → sstim:SensoryStimulationTechnique | Links a sensory stimulation framework to a technique that it defines or governs. |
 | `sstim:deliveredDurationSeconds` | data | session | sstim:SessionInstance → XMLSchema:decimal | Time during which the session was actually delivering stimulus, excluding paused intervals. Distinct from the elapsed duration: a session paused for… |
+| `sstim:deliveryRestrictedToSleepStage` | object | common | sstim:ControlLaw → sstim:SleepStage | A sleep stage the subject must be in for the control law to deliver; it halts outside the stages it names, as stimulation timed to slow oscillations… |
 | `sstim:deliveryStage` | object | common | sstim:StimulusMagnitude → sstim:DeliveryStage | Where in the delivery chain the stated magnitude holds. Required, and the unstated stage is a value of it, so a record says either where a value… |
 | `sstim:derivedFrom` | object | configuration | sstim:Preset → sstim:Preset | Links a preset to its immediate predecessor preset version. The relation is directional, asymmetric, and not transitive; use repeated links to… |
 | `sstim:describesStimulation` | object | stimulus | sstim:StimulusSpecification → sstim:Stimulation | Links a specification, which is an information artifact, to the stimulation process it describes. |
@@ -391,6 +394,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:hasOscillationStateContext` | data | common | sstim:NeuralOscillationType → XMLSchema:string | Behavioural or physiological state in which this rhythm is characteristically observed, such as eyes closed or slow-wave sleep. |
 | `sstim:hasPerceivedRelatedness` | object | session | sstim:UnwantedExperienceObservation → sstim:PerceivedRelatedness | Records whether the participant perceived this experience as connected to the session. |
 | `sstim:hasPersistence` | object | session | sstim:UnwantedExperienceObservation → sstim:ExperiencePersistence | Records how long the experience persisted, as a controlled category. |
+| `sstim:hasProgression` | object | common | sstim:StimulusMagnitude → sstim:MagnitudeProgression | How this magnitude changes over the course; the magnitude itself states its value at the start. |
 | `sstim:hasPropositionForm` | object | evidence | — → sstim:EvidencePropositionForm | The single controlled logical form of an assessment proposition. |
 | `sstim:hasPublicClaimLevel` | object | evidence | sstim:Preset → sstim:PublicClaimLevel | Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that… |
 | `sstim:hasRenderingMechanism` | object | stimulus | sstim:SignalRendering → sstim:RenderingMechanism | How the rendering produces the signal in this channel: amplitude modulation of a carrier, a binaural or monaural beat, direct presentation. |
@@ -432,6 +436,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:intendedNeuralPhenomenon` | object | neuromodulation | — → sstim:NeuralPhenomenon | Links a stimulation process, technique, protocol, or intervention to the functional neural phenomenon it is intended to affect. Records target… |
 | `sstim:intendedNeuralSystem` | object | neuromodulation | — → sstim:NeuralSystem | Links a stimulation process, technique, protocol, or intervention to the distributed neural system it is intended to engage. Independent of the… |
 | `sstim:intendedNeuralTargetSite` | object | neuromodulation | — → sstim:NeuralTargetSite | Links a stimulation process, technique, protocol, or intervention to the broad nervous-system site it is intended to engage. Records target… |
+| `sstim:interStimulusIntervalSeconds` | data | stimulus | sstim:ControlLaw → XMLSchema:decimal | Time from the onset of one stimulus to the onset of the next among the stimuli a single detected event triggers, in seconds. With two stimuli per… |
 | `sstim:isBreathReference` | data | patch-studio | sstim:Voice → XMLSchema:boolean | **deprecated** → `sstim:breathGuideTrack`. True iff this voice is the breathing reference (isOn): its oscillation drives the visual breathing animation and haptic pulse. At most one voice per… |
 | `sstim:luminanceCdM2` | data | common | sstim-ex:StimulusChannel → XMLSchema:decimal | Luminance presented to the subject, in candelas per square metre. |
 | `sstim:magnitudeMaximum` | data | common | sstim:StimulusMagnitude → XMLSchema:decimal | The upper bound of a stated range, in the magnitude's unit. |
@@ -477,6 +482,13 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:presetVersion` | data | configuration | sstim:Preset → XMLSchema:string | Semantic version string (X.Y.Z) of this preset. |
 | `sstim:primaryAffect` | data | session | sstim:SelfReport → XMLSchema:integer | Affect rating at the report's declared collection phase, from 1 (very negative) to 5 (very positive). |
 | `sstim:primaryFrequencyBand` | object | configuration | sstim:Preset → sstim:FrequencyBand | The single primary band among a preset's sstim:targetsFrequencyBand values, when more than one is declared. Corrects the former convention of an… |
+| `sstim:progressionIntervalUnit` | object | common | sstim:MagnitudeProgression → sstim:MeasurementUnit | The calendar unit of the progression interval: day, week or month. |
+| `sstim:progressionIntervalValue` | data | common | sstim:MagnitudeProgression → XMLSchema:decimal | How often a step is applied: every this many of sstim:progressionIntervalUnit. |
+| `sstim:progressionLimit` | object | common | sstim:MagnitudeProgression → sstim:StimulusMagnitude | The value the progression may not pass, stated as a magnitude of its own because it may be in another quantity: a tempo set relative to each… |
+| `sstim:progressionStepMaximum` | data | common | sstim:MagnitudeProgression → XMLSchema:decimal | The largest change applied at a step, when the source gives a range of steps. |
+| `sstim:progressionStepMinimum` | data | common | sstim:MagnitudeProgression → XMLSchema:decimal | The smallest change applied at a step, when the source gives a range of steps. |
+| `sstim:progressionStepUnit` | object | common | sstim:MagnitudeProgression → sstim:MeasurementUnit | The unit of each step. A step in percent is a percentage of the magnitude's value at that point; a step in any other unit is an amount added in that… |
+| `sstim:progressionStepValue` | data | common | sstim:MagnitudeProgression → XMLSchema:decimal | The change applied at each step, in sstim:progressionStepUnit. A progression states either one step or both bounds of a range of steps. |
 | `sstim:promptIdentifier` | data | session | sstim:ParticipantObservation → XMLSchema:string | Stable identifier of the question as shown, within its instrument. |
 | `sstim:promptText` | data | session | sstim:ParticipantObservation → XMLSchema:string | The exact wording shown to the participant. |
 | `sstim:proposedMechanism` | object | technique | sstim:StimulationTechnique → sstim:StimulationMechanism | Links a stimulation technique to a controlled mechanism category proposed to explain a response. The relation records a hypothesis or evidence… |
@@ -545,10 +557,13 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:targetsFrequencyBand` | object | configuration | sstim:Preset → sstim:FrequencyBand | Links a preset to 1–2 target frequency bands. RDF property values are unordered; use sstim:primaryFrequencyBand to identify which one is primary… |
 | `sstim:techniqueModality` | object | technique | sstim:SensoryStimulationTechnique → sstim:SensoryModality | Coarse legacy/convenience relation linking a sensory stimulation technique to broad sensory modality tags. Use the SSTIM exposure module when… |
 | `sstim:tempoBpm` | data | patch-studio | sstim:SessionSpecification | sstim:Preset → XMLSchema:decimal | Optional authoring tempo in beats per minute. |
+| `sstim:thresholdUpdateIntervalSeconds` | data | stimulus | sstim:ControlLaw → XMLSchema:decimal | How often an adaptive detection threshold is recomputed from the measured signal, in seconds. A control law that states it has an adaptive… |
+| `sstim:thresholdWindowSeconds` | data | stimulus | sstim:ControlLaw → XMLSchema:decimal | The span of the most recent measured signal from which an adaptive detection threshold is recomputed, in seconds, such as the preceding 5 s. |
 | `sstim:tierRank` | data | evidence | sstim:EvidenceTierValue → XMLSchema:integer | Ordinal rank 1–6 for SPARQL ORDER BY. Speculative=1, Anecdotal=2, Preliminary=3, Moderate=4, Strong=5, Established=6. |
 | `sstim:trackedOscillation` | object | common | sstim:ControlLaw → sstim:NeuralOscillationType | The named rhythm whose phase a control law follows, such as the sleep slow oscillation. Declared here rather than beside the control law because… |
 | `sstim:trialsPerBlock` | data | technique | sstim:StimulationSchedule → XMLSchema:integer | How many trials one block of a session contains, each trial being one pass through the schedule's ordered segments. |
 | `sstim:triggerCondition` | data | common | sstim:CautionTag → XMLSchema:string | Machine-readable-content companion text describing the stimulus feature, context, or user state that activates a caution. |
+| `sstim:triggerDelayReference` | object | common | sstim:ControlLaw → sstim:ParticipantReference | The subject's own measure the trigger delay is set to when it is calibrated for each subject rather than fixed: the delay equals that measure, such… |
 | `sstim:triggerDelaySeconds` | data | stimulus | sstim:ControlLaw → XMLSchema:decimal | Time from the detected event to the first stimulus, in seconds. A delay is how a law reaches a later phase than the one it detects: detecting a… |
 | `sstim:usesSpecification` | object | session | sstim:SessionInstance → sstim:SessionSpecification | Links a recorded session execution to the single immutable session specification it realizes. |
 | `sstim:usesTechnique` | object | technique | sstim:StimulationProtocol → sstim:StimulationTechnique | Links a stimulation protocol to a technique used by the protocol. Naming a method does not make the protocol sensory, nor imply that any framework… |
@@ -761,6 +776,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-ex:placementMouth` | sstim-ex:BodyPlacement | exposure | mouth |  |
 | `sstim-ex:placementNearbyEnvironment` | sstim-ex:BodyPlacement | exposure | nearby-environment |  |
 | `sstim-ex:placementNose` | sstim-ex:BodyPlacement | exposure | nose |  |
+| `sstim-ex:placementOneEar` | sstim-ex:BodyPlacement | exposure | ear-one |  |
 | `sstim-ex:placementTopOfHead` | sstim-ex:BodyPlacement | exposure | top-of-head |  |
 | `sstim-ex:placementTorso` | sstim-ex:BodyPlacement | exposure | torso |  |
 | `sstim-ex:placementWholeBody` | sstim-ex:BodyPlacement | exposure | whole-body |  |
@@ -991,6 +1007,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:quantityHearingLevel` | sstim:QuantityKind | vocab | hearing-level |  |
 | `sstim-v:quantityIlluminance` | sstim:QuantityKind | vocab | illuminance |  |
 | `sstim-v:quantityIrradiance` | sstim:QuantityKind | vocab | irradiance |  |
+| `sstim-v:quantityLevelAboveComponent` | sstim:QuantityKind | vocab | level-above-component |  |
 | `sstim-v:quantityLevelAboveReference` | sstim:QuantityKind | vocab | level-above-reference |  |
 | `sstim-v:quantityLoudnessLevel` | sstim:QuantityKind | vocab | loudness-level |  |
 | `sstim-v:quantityLuminance` | sstim:QuantityKind | vocab | luminance |  |
@@ -1001,6 +1018,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:quantityRelativeOutputLevel` | sstim:QuantityKind | vocab | relative-output-level |  |
 | `sstim-v:quantitySoundPressureLevel` | sstim:QuantityKind | vocab | sound-pressure-level |  |
 | `sstim-v:quantityTemperature` | sstim:QuantityKind | vocab | temperature |  |
+| `sstim-v:quantityTempo` | sstim:QuantityKind | vocab | tempo |  |
 | `sstim-v:quantityVibrationAcceleration` | sstim:QuantityKind | vocab | vibration-acceleration |  |
 | `sstim-v:quantityVibrationDisplacement` | sstim:QuantityKind | vocab | vibration-displacement |  |
 | `sstim-v:referenceBaselineCadence` | sstim:ParticipantReference | vocab | baseline-cadence |  |
@@ -1010,6 +1028,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:referenceIndividualAlphaFrequency` | sstim:ParticipantReference | vocab | individual-alpha-frequency |  |
 | `sstim-v:referencePainThreshold` | sstim:ParticipantReference | vocab | pain-threshold |  |
 | `sstim-v:referenceRestingMotorThreshold` | sstim:ParticipantReference | vocab | resting-motor-threshold |  |
+| `sstim-v:referenceTroughToPeakInterval` | sstim:ParticipantReference | vocab | trough-to-peak-interval |  |
 | `sstim-v:relatednessDeclined` | sstim:PerceivedRelatedness | vocab | relatedness-declined |  |
 | `sstim-v:relatednessPossiblyRelated` | sstim:PerceivedRelatedness | vocab | relatedness-possibly-related |  |
 | `sstim-v:relatednessRelated` | sstim:PerceivedRelatedness | vocab | relatedness-related |  |
@@ -1075,7 +1094,12 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:shapeSine` | sstim:SignalShape | vocab | sine |  |
 | `sstim-v:shapeSquare` | sstim:SignalShape | vocab | square |  |
 | `sstim-v:shapeTriangle` | sstim:SignalShape | vocab | triangle |  |
+| `sstim-v:sleepN1` | sstim:SleepStage | vocab | n1 |  |
+| `sstim-v:sleepN2` | sstim:SleepStage | vocab | n2 |  |
+| `sstim-v:sleepN3` | sstim:SleepStage | vocab | n3 |  |
+| `sstim-v:sleepRem` | sstim:SleepStage | vocab | rem |  |
 | `sstim-v:sleepSpindle` | sstim:NeuralOscillationType | vocab | sleep-spindle |  |
+| `sstim-v:sleepWake` | sstim:SleepStage | vocab | wake |  |
 | `sstim-v:slowOscillation` | sstim:NeuralOscillationType | vocab | slow-oscillation |  |
 | `sstim-v:smr` | sstim:FrequencyBand | vocab | smr |  |
 | `sstim-v:smrOscillation` | sstim:NeuralOscillationType | vocab | smr-oscillation |  |
@@ -1170,6 +1194,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:tierStrong` | sstim:EvidenceTierValue | vocab | strong |  |
 | `sstim-v:timingAudioHardwareClock` | sstim:TimingAuthority | vocab | audio-hardware |  |
 | `sstim-v:timingMonotonicSubstitute` | sstim:TimingAuthority | vocab | monotonic-substitute |  |
+| `sstim-v:unitBeatsPerMinute` | sstim:MeasurementUnit | vocab | beats-per-minute |  |
 | `sstim-v:unitCandelaPerSquareMetre` | sstim:MeasurementUnit | vocab | cd/m2 |  |
 | `sstim-v:unitDay` | sstim:MeasurementUnit | vocab | day |  |
 | `sstim-v:unitDecibel` | sstim:MeasurementUnit | vocab | dB |  |

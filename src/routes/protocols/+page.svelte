@@ -6,11 +6,13 @@
   import {
     formatFrequency,
     formatMagnitude,
+    formatProgression,
     formatRates,
     formatSchedule,
     formatSeconds,
     listPublishedProtocols,
     protocolLevels,
+    protocolProgressions,
     protocolRates,
     protocolSenses,
   } from '../../rdf/protocols.js'
@@ -30,6 +32,7 @@
     senses: protocolSenses(protocol),
     rates: protocolRates(protocol),
     levels: protocolLevels(protocol),
+    progressions: protocolProgressions(protocol),
     scheduleText: formatSchedule(protocol.schedule),
     species: protocol.population?.taxa ?? [],
   })))
@@ -71,10 +74,20 @@
     const parts = [`Reads ${lower(list(law.inputs)) || 'a recorded signal'}`]
     if (law.oscillation) parts.push(`follows the ${lower(law.oscillation)}`)
     if (law.phase) parts.push(`aims at its ${lower(law.phase)}`)
-    if (law.thresholdValue !== null) parts.push(`threshold ${law.thresholdValue} ${law.thresholdUnit}`.trim())
+    if (law.thresholdValue !== null) {
+      const adaptive = law.thresholdUpdateSeconds !== null
+        ? ` recomputed every ${formatSeconds(law.thresholdUpdateSeconds)} from the last ${formatSeconds(law.thresholdWindowSeconds)}`
+        : ''
+      parts.push(`${`threshold ${law.thresholdValue} ${law.thresholdUnit}`.trim()}${adaptive}`)
+    }
     if (law.triggerDelaySeconds !== null) parts.push(`delay ${formatSeconds(law.triggerDelaySeconds)}`)
-    if (law.stimuliPerTrigger !== null) parts.push(`${law.stimuliPerTrigger} stimuli per event`)
+    if (law.triggerDelayReference) parts.push(`delay set to each subject's ${lower(law.triggerDelayReference)}`)
+    if (law.stimuliPerTrigger !== null) {
+      const apart = law.interStimulusSeconds !== null ? ` ${formatSeconds(law.interStimulusSeconds)} apart` : ''
+      parts.push(`${law.stimuliPerTrigger} stimuli per event${apart}`)
+    }
     if (law.refractorySeconds !== null) parts.push(`then waits ${formatSeconds(law.refractorySeconds)}`)
+    if (law.sleepStages.length) parts.push(`only during ${orList(law.sleepStages.map(lower))}`)
     return `${parts.join(', ')}.`
   }
 
@@ -99,8 +112,13 @@
   }
 
   function levelText(level) {
-    return [lower(level.quantity), lower(level.stage), lower(level.basis), level.relativeTo && `relative to ${lower(level.relativeTo)}`]
+    return [level.label && lower(level.label), lower(level.quantity), lower(level.stage), lower(level.basis),
+      level.relativeTo && `relative to ${lower(level.relativeTo)}`]
       .filter(Boolean).join(' · ')
+  }
+
+  function capitalised(value) {
+    return value.charAt(0).toLocaleUpperCase() + value.slice(1)
   }
 
   function graphLink(iri) {
@@ -113,6 +131,10 @@
 
   function list(items) {
     return items.filter(Boolean).join(', ')
+  }
+
+  function orList(items) {
+    return items.length > 1 ? `${items.slice(0, -1).join(', ')} or ${items.at(-1)}` : items.join('')
   }
 
   function channelRate(channel) {
@@ -274,10 +296,13 @@
                     {#each row.levels as level}
                       <li>
                         <strong>{formatMagnitude(level)}</strong>
-                        <span class="muted">{[lower(level.quantity), level.relativeTo ? `relative to ${lower(level.relativeTo)}` : lower(level.stage)].filter(Boolean).join(', ')}</span>
+                        <span class="muted">{[lower(level.label || level.quantity), level.relativeTo ? `relative to ${lower(level.relativeTo)}` : lower(level.stage)].filter(Boolean).join(', ')}</span>
                       </li>
                     {/each}
                   </ul>
+                  {#each row.progressions as progression (progression.iri)}
+                    <p class="muted progression">{formatProgression(progression)}</p>
+                  {/each}
                 {:else}
                   <span class="muted">none stated</span>
                 {/if}
@@ -406,6 +431,10 @@
                         <div class="level">
                           <p><strong>{formatMagnitude(level) || 'No number'}</strong> {levelText(level)}</p>
                           {#if level.reportedAs}<blockquote>“{level.reportedAs}”</blockquote>{/if}
+                          {#if level.progression}
+                            <p>{capitalised(formatProgression(level.progression))}.</p>
+                            {#if level.progression.limit?.reportedAs}<blockquote>“{level.progression.limit.reportedAs}”</blockquote>{/if}
+                          {/if}
                         </div>
                       {/each}
                     </article>
@@ -584,6 +613,7 @@
   .plain li { list-style: none; }
   .plain li + li { margin-top: 0.3rem; }
   .muted { color: var(--app-muted); }
+  .progression { margin: 0.3rem 0 0; font-size: inherit; }
 
   .records h2 { margin: 0 0 1rem; font-size: 1.2rem; color: var(--app-text-strong); }
 

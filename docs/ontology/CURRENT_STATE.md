@@ -353,24 +353,24 @@ The main gaps are design and coverage gaps, not current parser failures:
   `Q141325360` was created on Wikidata on 2026-09-06 and **all 58 mapped Wikidata
   items now carry a `P2888` statement naming an SSTIM term**, measured by
   `make wikidata-inbound`. The three exceptions are the `relatedMatch` rows held
-  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 635 concepts carry
-  English, Italian, Portuguese and Spanish, across all 79 concept schemes
-  (measured 2026-10-13), and every scheme has carried all four since 2026-08-18. `make language-coverage` measures it and now guards against
+  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 645 concepts carry
+  English, Italian, Portuguese and Spanish, across all 80 concept schemes
+  (measured 2026-10-16), and every scheme has carried all four since 2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be
   recorded deliberately. The 276 labels added that day were written by the
   maintainers and have **not yet had native review**, and neither have the twelve
-  added for ADR 0061's neutral status values or the 237 added for ADRs 0063 and
-  0064; see the review request in the
+  added for ADR 0061's neutral status values, the 237 added for ADRs 0063 and
+  0064 or the 30 added for ADR 0066; see the review request in the
   repository issues. The four languages are the vocabulary's: class and property
   labels are English while translating them waits for native review, and
-  `make language-coverage` reports that layer without gating it (21 of 170
-  current classes carry the other three languages, none of the 319 current
-  properties does, measured 2026-10-13; GB-13). `skos:definition` remains English-only for all 635
+  `make language-coverage` reports that layer without gating it (21 of 172
+  current classes carry the other three languages, none of the 332 current
+  properties does, measured 2026-10-16; GB-13). `skos:definition` remains English-only for all 645
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
-  than absent: 84 alternate labels on 62 of the 635 concepts, all English, including the
+  than absent: 90 alternate labels on 66 of the 645 concepts, all English, including the
   oscillation aliases
   [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
-  added (measured 2026-10-13). `make language-coverage` reports it but does not
+  added (measured 2026-10-16). `make language-coverage` reports it but does not
   gate it.
 - VoID subsets are checked against the frozen release manifest but are not
   generated from the live manifest, leaving an avoidable maintenance seam.

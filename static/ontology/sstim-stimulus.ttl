@@ -39,7 +39,7 @@
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-07-31"^^xsd:date ;
     dct:issued "2026-10-10"^^xsd:date ;
-    dct:modified "2026-10-13"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -322,6 +322,30 @@ sstim:refractoryPeriodSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "refractory period (s)"@en ;
     skos:definition "Time after a stimulation sequence during which the control law ignores new events, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:interStimulusIntervalSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "inter-stimulus interval (s)"@en ;
+    skos:definition "Time from the onset of one stimulus to the onset of the next among the stimuli a single detected event triggers, in seconds. With two stimuli per trigger it is when the second follows the first, as one slow-oscillation period of 1.075 s does."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:thresholdUpdateIntervalSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "threshold update interval (s)"@en ;
+    skos:definition "How often an adaptive detection threshold is recomputed from the measured signal, in seconds. A control law that states it has an adaptive threshold, and its sstim:detectionThresholdValue is the value the threshold starts from; a law that does not has a fixed threshold."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:thresholdWindowSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ControlLaw ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "threshold window (s)"@en ;
+    skos:definition "The span of the most recent measured signal from which an adaptive detection threshold is recomputed, in seconds, such as the preceding 5 s."@en ;
+    skos:historyNote "Added on the 0.20.0 development line (ADR 0066)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
 sstim:controlsChannel a owl:ObjectProperty ;

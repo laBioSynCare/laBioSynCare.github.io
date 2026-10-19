@@ -42,10 +42,10 @@ bsclab-protocol:ngo-2013-closed-loop-auditory-slow-oscillation a sstim:SensorySt
     sstim:hasStudyArm n2013:arm-in-phase, n2013:arm-sham, n2013:arm-out-of-phase ;
     sstim-ex:hasExposureProfile n2013:profile ;
     dct:source sstim-ref:NGO_2013 ;
-    skos:editorialNote "Encoded from the full text (Neuron 78:545-553), Experimental Procedures, read 2026-10-15. Allocation is within subject: each stimulation condition is compared with its own sham night. The out-of-phase condition was a separate experiment on other subjects, compared with the in-phase one only between subjects. Four things the paper states have no SSTIM term yet, so they are in the description only: the interval between a detection's two bursts (1,075 ms in phase; individually tuned out of phase, 550 ms on average); the adaptive threshold (-80 microvolts by default, updated every 2 s to the most negative value of the preceding 5 s when that is lower); the in-phase trigger delay, set for each subject from an adaptation night, so no single delay is stated for that law; and the restriction of stimulation to stage 2 and slow-wave sleep. The sham night plays no sound, so it is a no-stimulation arm in SSTIM's terms, though the paper calls it sham. A third experiment (n = 4) that only moved the bursts 500 ms earlier is described in the paper and not encoded. The sound level was calibrated with a sound level meter, but the paper does not say where the level was measured."@en ;
+    skos:editorialNote "Encoded from the full text (Neuron 78:545-553), Experimental Procedures, read 2026-10-15. Allocation is within subject: each stimulation condition is compared with its own sham night. The out-of-phase condition was a separate experiment on other subjects, compared with the in-phase one only between subjects. The interval between a detection's two bursts, the adaptive threshold (updated every 2 s from the preceding 5 s), the in-phase delay set to each subject's own trough-to-peak interval and the restriction to sleep stages N2 and N3 use the terms ADR 0066 added for them. The threshold's -80 microvolts is its default and also its bound: the paper updates it only to values more negative than that, which SSTIM does not state, nor that detection also halts during arousals. The out-of-phase interval was tuned for each subject to the hyperpolarisation the first burst evoked (550 ms on average), so no single interval is stated for that law. The sham night plays no sound, so it is a no-stimulation arm in SSTIM's terms, though the paper calls it sham. A third experiment (n = 4) that only moved the bursts 500 ms earlier is described in the paper and not encoded. The sound level was calibrated with a sound level meter, but the paper does not say where the level was measured."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-15"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 n2013:population a sstim:PopulationDescriptor ;
@@ -104,16 +104,23 @@ n2013:stimulus a sstim:StimulusSpecification ;
     sstim:hasStimulationTarget n2013:subject .
 
 # Read the frontal EEG (Fpz against linked earlobes, 0.25 to 4 Hz), detect a
-# slow oscillation's negative half-wave below the threshold, aim at the up
-# state that follows, deliver two bursts, then ignore events for 2.5 s.
+# slow oscillation's negative half-wave below the adaptive threshold, wait the
+# subject's own trough-to-peak interval to meet the up state, deliver two
+# bursts one slow-oscillation period apart, then ignore events for 2.5 s; only
+# in N2 and slow-wave sleep.
 n2013:control-law a sstim:ControlLaw ;
     sstim:controlInputSignal sstim-v:measuredEeg ;
     sstim:trackedOscillation sstim-v:slowOscillation ;
     sstim:targetOscillationPhase sstim-v:phaseUpState ;
     sstim:detectionThresholdValue "-80.0"^^xsd:decimal ;
     sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;
+    sstim:thresholdUpdateIntervalSeconds "2.0"^^xsd:decimal ;
+    sstim:thresholdWindowSeconds "5.0"^^xsd:decimal ;
+    sstim:triggerDelayReference sstim-v:referenceTroughToPeakInterval ;
     sstim:stimuliPerTrigger 2 ;
+    sstim:interStimulusIntervalSeconds "1.075"^^xsd:decimal ;
     sstim:refractoryPeriodSeconds "2.5"^^xsd:decimal ;
+    sstim:deliveryRestrictedToSleepStage sstim-v:sleepN2, sstim-v:sleepN3 ;
     sstim:controlsChannel n2013:sound .
 
 n2013:out-of-phase-stimulus a sstim:StimulusSpecification ;
@@ -131,9 +138,12 @@ n2013:out-of-phase-control-law a sstim:ControlLaw ;
     sstim:targetOscillationPhase sstim-v:phaseDownState ;
     sstim:detectionThresholdValue "-80.0"^^xsd:decimal ;
     sstim:detectionThresholdUnit sstim-v:unitMicrovolt ;
+    sstim:thresholdUpdateIntervalSeconds "2.0"^^xsd:decimal ;
+    sstim:thresholdWindowSeconds "5.0"^^xsd:decimal ;
     sstim:triggerDelaySeconds "0.0"^^xsd:decimal ;
     sstim:stimuliPerTrigger 2 ;
     sstim:refractoryPeriodSeconds "2.5"^^xsd:decimal ;
+    sstim:deliveryRestrictedToSleepStage sstim-v:sleepN2, sstim-v:sleepN3 ;
     sstim:controlsChannel n2013:sound .
 
 n2013:subject a bfo:0000040, obo:NCBITaxon_9606 ;

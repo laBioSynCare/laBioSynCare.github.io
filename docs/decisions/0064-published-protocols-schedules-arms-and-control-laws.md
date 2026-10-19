@@ -145,6 +145,8 @@ objective is 40 Hz activity at a named cortical target.
   stimuli of one closed-loop detection, an adaptive detection threshold, a
   stimulus that progresses week by week, and a level relative to another part
   of the same sound. Each record's editorial note lists its own.*
+  *2026-10-16: [ADR 0066](0066-eight-things-the-full-texts-asked-for.md)
+  states eight of the nine; a noise's spectrum stays in Lane 1998's note.*
 - `make protocol-layer` holds the layer: every promised term is declared, all
   nine protocols cite their paper and none a framework, and 30 fixtures each
   break one rule and must be rejected on their own focus node by their own

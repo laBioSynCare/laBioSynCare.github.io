@@ -394,6 +394,8 @@ than which techniques it uses. Since the 0.20.0 development line
 | Its design | `sstim:protocolStudyDesign` → a `sstim:StudyDesign` value |
 | A closed-loop rule | `sstim:hasControlLaw` → `sstim:ControlLaw` on an adaptive `StimulusSpecification` |
 | A level, in any modality | `sstim:hasMagnitude` → `sstim:StimulusMagnitude`, stating its stage of delivery ([ADR 0063](../../docs/decisions/0063-stimulus-magnitudes-at-delivery-stages.md)) |
+| A level that changes over a course | `sstim:hasProgression` → `sstim:MagnitudeProgression`: a step or range of steps, how often, and a limit ([ADR 0066](../../docs/decisions/0066-eight-things-the-full-texts-asked-for.md)) |
+| When a closed loop may deliver | `sstim:deliveryRestrictedToSleepStage` → a `sstim:SleepStage`; an adaptive threshold, a delay calibrated to the subject, and the spacing of a detection's stimuli are stated on the same `sstim:ControlLaw` |
 
 A level states where it holds: configured, emitted, at the subject, at a target
 in the body, relative to the subject's own measure, as perceived, or not stated.

@@ -38,10 +38,10 @@ bsclab-protocol:galambos-1981-40hz-auditory-steady-state-response a sstim:Sensor
     sstim:hasStudyPopulation g1981:population ;
     sstim-ex:hasExposureProfile g1981:profile ;
     dct:source sstim-ref:GALAMBOS_1981 ;
-    skos:editorialNote "Encoded from the full text (PNAS 78(4):2643-2647, scanned), read 2026-10-15. The 40 per second condition is the one encoded as the signal: the rate series (3.3 to about 55 per second), the intensity series and the tone frequencies were exploratory series on a few subjects, not arms, so they are stated in the description. Levels are in decibels above each listener's own threshold (dB SL), so they are subject-relative. The stimulation was monaural and the paper does not say which ear; SSTIM has no placement for one ear of unstated side, so the channel names the ears. Several earphone types were used, including a hearing-aid transducer. techClickTrain and techIsochronicTones cover the clicks and the gated tone bursts; techGamma40Auditory is not used, because its defining objective is to modulate gamma activity and this protocol records a response."@en ;
+    skos:editorialNote "Encoded from the full text (PNAS 78(4):2643-2647, scanned), read 2026-10-15. The 40 per second condition is the one encoded as the signal: the rate series (3.3 to about 55 per second), the intensity series and the tone frequencies were exploratory series on a few subjects, not arms, so they are stated in the description. Levels are in decibels above each listener's own threshold (dB SL), so they are subject-relative. The stimulation was monaural and the paper does not say which ear, so the channel uses the one-ear placement ADR 0066 added. Several earphone types were used, including a hearing-aid transducer. techClickTrain and techIsochronicTones cover the clicks and the gated tone bursts; techGamma40Auditory is not used, because its defining objective is to modulate gamma activity and this protocol records a response."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-15"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 g1981:population a sstim:PopulationDescriptor ;
@@ -58,7 +58,7 @@ g1981:sound a sstim-ex:StimulusChannel ;
     rdfs:label "Earphone, one ear: clicks or 6 ms tone bursts with 2 ms rise and fall, about 40 per second"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
-    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementOneEar ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
     sstim-ex:hasStimulusPattern sstim-ex:patternPulsed, sstim-ex:patternRhythmic ;
     sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;

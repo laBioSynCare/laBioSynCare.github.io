@@ -31,7 +31,7 @@
 
 bsclab-protocol:lane-1998-binaural-beats-vigilance a sstim:SensoryStimulationProtocol ;
     rdfs:label "Binaural beats in pink noise during a 30-minute vigilance task (Lane et al. 1998)"@en ;
-    dct:description "Participants perform a 30-minute visual vigilance task (letters shown once a second for 100 ms, a repeated letter as the target, six targets a minute) on three afternoons, seated in a dimly lit room, while a cassette tape plays through stereo headphones at a level each participant finds comfortable and that masks outside sound. Every tape holds pink noise, flat from 40 to 320 Hz and falling 12 dB per octave beyond, with carrier tones at 100, 200, 250 and 300 Hz set 15 dB above the noise. On the beta tape the 200 Hz tone carries a 16 Hz binaural beat and the 300 Hz tone a 24 Hz beat; on the theta/delta tape the 100 Hz tone carries a 1.5 Hz beat and the 200 and 250 Hz tones 4 Hz beats; the other tones carry none, and all play at once. The first session is training, with a control tape that holds the same sounds and no beats; the beta and theta/delta tapes follow in the second and third sessions in counterbalanced, double-blind order. Participants are told the sound is a uniform background and are not told about the beats. Recorded as a description of the published method; it asserts no effect."@en ;
+    dct:description "Participants perform a 30-minute visual vigilance task (letters shown once a second for 100 ms, a repeated letter as the target, six targets a minute) on three afternoons, seated in a dimly lit room, while a cassette tape plays through stereo headphones at a level each participant finds comfortable and that masks outside sound. Every tape holds pink noise, flat from 40 to 320 Hz and falling 12 dB per octave above and below, with carrier tones at 100, 200, 250 and 300 Hz set 15 dB above the noise. On the beta tape the 200 Hz tone carries a 16 Hz binaural beat and the 300 Hz tone a 24 Hz beat; on the theta/delta tape the 100 Hz tone carries a 1.5 Hz beat and the 200 and 250 Hz tones 4 Hz beats; the other tones carry none, and all play at once. The first session is training, with a control tape that holds the same sounds and no beats; the beta and theta/delta tapes follow in the second and third sessions in counterbalanced, double-blind order. Participants are told the sound is a uniform background and are not told about the beats. Recorded as a description of the published method; it asserts no effect."@en ;
     sstim:usesTechnique sstim-v:techBinauralBeats, sstim-v:techBroadbandNoise ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
     sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
@@ -42,10 +42,10 @@ bsclab-protocol:lane-1998-binaural-beats-vigilance a sstim:SensoryStimulationPro
     sstim:hasStudyArm l1998:arm-beta, l1998:arm-theta-delta ;
     sstim-ex:hasExposureProfile l1998:beta-profile, l1998:theta-delta-profile, l1998:control-profile ;
     dct:source sstim-ref:LANE_1998 ;
-    skos:editorialNote "Encoded from the full text (Physiology and Behavior 63(2):249-252), Materials and Methods, read 2026-10-15. The comparison is beta against theta/delta, so beta is the experimental arm and theta/delta the active comparator, another frequency; the paper's directional hypothesis was that beta would do better. The control tape is not an arm: it was always played in the first, training session and never compared, so it is kept as that session's sound. The beat signals are sine: each beat is the difference between two pure tones. Two things the paper states have no SSTIM term yet and are in the description only: the carrier tones' level 15 dB above the noise, a level relative to another part of the same sound, and the noise's spectrum. The intended neural phenomenon is the paper's rationale, entrainment of the EEG bands named, which it did not measure."@en ;
+    skos:editorialNote "Encoded from the full text (Physiology and Behavior 63(2):249-252), Materials and Methods, read 2026-10-15. The comparison is beta against theta/delta, so beta is the experimental arm and theta/delta the active comparator, another frequency; the paper's directional hypothesis was that beta would do better. The control tape is not an arm: it was always played in the first, training session and never compared, so it is kept as that session's sound. The beat signals are sine: each beat is the difference between two pure tones. The carrier tones' level 15 dB above the noise uses the term ADR 0066 added for a level relative to another part of the same sound. The noise's spectrum, flat from 40 to 320 Hz and falling 12 dB per octave above and below, has no SSTIM term and is in the description only. The intended neural phenomenon is the paper's rationale, entrainment of the EEG bands named, which it did not measure."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-15"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 l1998:population a sstim:PopulationDescriptor ;
@@ -94,7 +94,7 @@ l1998:beta-audio a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
     sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
-    sstim:hasMagnitude l1998:listening-level ;
+    sstim:hasMagnitude l1998:listening-level, l1998:tone-level ;
     sstim:hasSignalRendering l1998:beat-16-rendering, l1998:beat-24-rendering .
 
 l1998:theta-delta-audio a sstim-ex:StimulusChannel ;
@@ -106,7 +106,7 @@ l1998:theta-delta-audio a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleIntendedIntervention ;
     sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
-    sstim:hasMagnitude l1998:listening-level ;
+    sstim:hasMagnitude l1998:listening-level, l1998:tone-level ;
     sstim:hasSignalRendering l1998:beat-1-5-rendering, l1998:beat-4-on-200-rendering, l1998:beat-4-on-250-rendering .
 
 l1998:control-audio a sstim-ex:StimulusChannel ;
@@ -118,7 +118,7 @@ l1998:control-audio a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:audioNoisePink ;
     sstim-ex:channelRole sstim-ex:roleControlOrSham ;
     sstim:channelDurationSeconds "1800.0"^^xsd:decimal ;
-    sstim:hasMagnitude l1998:listening-level .
+    sstim:hasMagnitude l1998:listening-level, l1998:tone-level .
 
 # Set by each participant: 0 dB above their own comfortable level is that level.
 l1998:listening-level a sstim:StimulusMagnitude ;
@@ -129,6 +129,18 @@ l1998:listening-level a sstim:StimulusMagnitude ;
     sstim:relativeToParticipantMeasure sstim-v:referenceComfortableLevel ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "Auditory volume was adjusted to a comfortable listening level for the participant that would block perception of external sounds." .
+
+# Set on the tape: the carrier tones sound 15 dB above the pink noise. A level
+# between two parts of one recording holds at every stage a playback passes
+# through unchanged, so its stage is the configured one, where it was set.
+l1998:tone-level a sstim:StimulusMagnitude ;
+    rdfs:label "Carrier tones above the pink noise"@en ;
+    sstim:magnitudeQuantity sstim-v:quantityLevelAboveComponent ;
+    sstim:magnitudeValue "15.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitDecibel ;
+    sstim:deliveryStage sstim-v:stageConfigured ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "Tapes also contained carrier tones at 100, 200, 250, and 300 Hz, which had amplitudes 15 db above the amplitude of the pink noise." .
 
 l1998:beat-16 a sstim:StimulationSignal ;
     rdfs:label "16 Hz binaural beat"@en ;

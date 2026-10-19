@@ -43,10 +43,10 @@ bsclab-protocol:thaut-1996-rhythmic-auditory-stimulation-gait a sstim:SensorySti
     sstim:hasStudyArm t1996:arm-ras, t1996:arm-self-paced, t1996:arm-no-training ;
     sstim-ex:hasExposureProfile t1996:profile ;
     dct:source sstim-ref:THAUT_1996 ;
-    skos:editorialNote "Encoded from the full text (Movement Disorders 11(2):193-200), Methodology, read 2026-10-15. The three tempi are stated for the first week as percentages of each patient's pretest cadence. The paper calls the fast tempo 'an additional 5 to 10% faster' than the quick one without saying whether the percentages compound, so its range, 110 to 121%, covers both readings. Two things the paper states have no SSTIM term yet and are in the description only: the weekly rise of every tempo by 5 to 10%, and the ceiling of 130 steps per minute. The design is a randomized controlled trial because the subject pool was randomly divided into the three groups. The playback level is not stated."@en ;
+    skos:editorialNote "Encoded from the full text (Movement Disorders 11(2):193-200), Methodology, read 2026-10-15. The three tempi are stated for the first week as percentages of each patient's pretest cadence. The paper calls the fast tempo 'an additional 5 to 10% faster' than the quick one without saying whether the percentages compound, so its range, 110 to 121%, covers both readings. The weekly rise of every tempo by 5 to 10% and the ceiling of 130 steps per minute use the progression terms ADR 0066 added for them. The paper chose each step within that range by the subject's ability to match the tempi, and its ceiling binds the fastest tempo, so it holds for all three. The design is a randomized controlled trial because the subject pool was randomly divided into the three groups. The playback level is not stated."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-15"^^xsd:date ;
+    dct:modified "2026-10-16"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 t1996:population a sstim:PopulationDescriptor ;
@@ -141,7 +141,8 @@ t1996:tempo-normal a sstim:StimulusMagnitude ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
     sstim:valueBasis sstim-v:valueReported ;
-    sstim:reportedAs "For the first week of training, the normal tempo was the pretest cadence" .
+    sstim:reportedAs "For the first week of training, the normal tempo was the pretest cadence" ;
+    sstim:hasProgression t1996:progression .
 
 t1996:tempo-quick a sstim:StimulusMagnitude ;
     sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
@@ -151,7 +152,8 @@ t1996:tempo-quick a sstim:StimulusMagnitude ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
     sstim:valueBasis sstim-v:valueReported ;
-    sstim:reportedAs "the quick tempo was 5 to 10% faster" .
+    sstim:reportedAs "the quick tempo was 5 to 10% faster" ;
+    sstim:hasProgression t1996:progression .
 
 t1996:tempo-fast a sstim:StimulusMagnitude ;
     sstim:magnitudeQuantity sstim-v:quantityRatioToReference ;
@@ -161,7 +163,29 @@ t1996:tempo-fast a sstim:StimulusMagnitude ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
     sstim:valueBasis sstim-v:valueReported ;
-    sstim:reportedAs "and the fast tempo an additional 5 to 10% faster" .
+    sstim:reportedAs "and the fast tempo an additional 5 to 10% faster" ;
+    sstim:hasProgression t1996:progression .
+
+# After each week every tempo rises by 5 to 10% of itself, so the quick
+# tempo becomes the normal one, while the fastest stays at or below 130 steps
+# per minute. A tempo is the same at every stage of delivery; the ceiling is
+# the tempo set on the sequencer, so its stage is the configured one.
+t1996:progression a sstim:MagnitudeProgression ;
+    sstim:progressionStepMinimum "5.0"^^xsd:decimal ;
+    sstim:progressionStepMaximum "10.0"^^xsd:decimal ;
+    sstim:progressionStepUnit sstim-v:unitPercent ;
+    sstim:progressionIntervalValue "1.0"^^xsd:decimal ;
+    sstim:progressionIntervalUnit sstim-v:unitWeek ;
+    sstim:progressionLimit t1996:tempo-ceiling .
+
+t1996:tempo-ceiling a sstim:StimulusMagnitude ;
+    rdfs:label "Ceiling of the fastest tempo"@en ;
+    sstim:magnitudeQuantity sstim-v:quantityTempo ;
+    sstim:magnitudeValue "130.0"^^xsd:decimal ;
+    sstim:magnitudeUnit sstim-v:unitBeatsPerMinute ;
+    sstim:deliveryStage sstim-v:stageConfigured ;
+    sstim:valueBasis sstim-v:valueReported ;
+    sstim:reportedAs "the requirement to keep the fastest tempo from exceeding 130 steps/min" .
 
 t1996:stimulus-normal a sstim:StimulusSpecification ;
     rdfs:label "Music at the normal tempo (Thaut et al. 1996)"@en ;
