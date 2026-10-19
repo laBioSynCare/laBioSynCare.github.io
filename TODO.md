@@ -1062,7 +1062,7 @@ indexed, examiner-searchable records.
       *Cut 2026-10-10, the previous release: tag `v0.19.0` on both remotes, its
       [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0), which was the first on
       `w3c-cg/sstim`, and version DOI
-      [10.5281/zenodo.23271908](https://doi.org/10.5281/zenodo.23271908), deposited
+      [10.5281/zenodo.23271908](https://doi.org/10.5281/zenodo.23271908), which was deposited
       over the API into the concept series; the concept DOI then resolved to it.
       Two gates caught defects on the way: the BioPortal bundle refused a
       history note that called the release "the 0.19.0-dev line" (fixed

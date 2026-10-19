@@ -15,7 +15,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.20.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.20.0`, released 2026-10-19 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.23271908` | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.23480076` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | Published protocols: nine published protocols are encoded from their papers, levels are stated at a stage of delivery (ADR 0063), protocols gain schedules, arms, populations, designs and control laws and may cite their paper instead of a framework (ADR 0064), and eight more terms complete four of them from their full texts (ADR 0066); no term is removed or deprecated | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
