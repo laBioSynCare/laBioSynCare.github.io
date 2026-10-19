@@ -12,7 +12,7 @@ and phase numbering below is dependency order, not a version.
 findings GB-01 to GB-11, sequenced in [§1.6](#16-close-what-a-green-gate-does-not-see).
 
 For the implemented baseline and the ordered work that remains after the
-`0.19.0` release, start with the maintained
+`0.20.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
 logic and acceptance gates; it is not a claim that every bullet is still open.
 
@@ -434,12 +434,12 @@ explicit instruction naming each file.
   [ADR 0061](../decisions/0061-universal-namespaces-carry-no-framework-structure.md):
   BSC's structure moves to a BSC framework vocabulary outside the manifest, and
   implementation status becomes neutral and scoped. [Directions](SSTIM_DIRECTIONS.md)
-  §3 names the set. The migration is a 0.19.0 release gate, tracked in
+  §3 names the set. The migration was a 0.19.0 release gate, tracked in
   `TODO.md`. Migrated 2026-10-06 for 0.19.0, with every moved term
   deprecated in place; Directions §3 records what moved and what stayed. The
   upstream route for the BSC vocabulary,
   [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827), is
-  the one step left before 0.19.0; it merged on 2026-10-09. The release review on 2026-10-07 found five
+  the step that was left before 0.19.0; it merged on 2026-10-09. The release review on 2026-10-07 found five
   more definitions and the notes of 14 terms that still depended on BSC or
   recorded its status, now neutral too (ADR 0061's implementation note).*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
@@ -516,7 +516,9 @@ explicit instruction naming each file.
     projection; correct CLAUDE.md §5.3.
   - *Done when* a test runs the CLAUDE.md queries and checks their row counts.
 - [ ] **GB-05 Neuromodulation exclusions** (*protected*:
-  `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`).
+  `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`). *Not in 0.20.0: on
+  2026-10-19 the maintainer chose to cut 0.20.0 without it, so it moves to
+  the 0.21.0 line.*
   - *Next step:* decide which ADR 0036 and 0037 exclusions are true
     disjointness. Assert them in OWL at the process layer, and as a SHACL rule
     on `participantEngagementMode` at the technique layer. Add entailment
@@ -549,7 +551,7 @@ explicit instruction naming each file.
     `dct:modified` question.
   - *Done when* the truth audit also checks the CURRENT_STATE instance totals.
 - [x] **GB-08 Source links** (*protected*; 20 files). *Closed 2026-10-06 for
-  0.19.0. 152 links in 23 live files then named `w3c-cg/sstim`: 147
+  0.19.0, as it was being prepared. 152 links in 23 live files then named `w3c-cg/sstim`: 147
   were pinned to `v0.18.0`, the previous release's tag, one to a published commit (ADR 0061, which no release
   holds yet), the repository root, and three `void.ttl` landing pages that stay
   on `main` because their datasets change between releases. All 39 distinct

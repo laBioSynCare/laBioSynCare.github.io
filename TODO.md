@@ -251,7 +251,7 @@ indexed, examiner-searchable records.
       1379859 (sha256 `e6006592…532f605`). The next nightly pull should create
       its submission: capture that ID, confirm it survives a second unchanged
       pull, then PATCH it to Released 2026-10-10 and check the Version IRI reads
-      `https://w3id.org/sstim/0.19.0` (the item below).*
+      `https://w3id.org/sstim/0.19.0`, as it was then (the item below).*
 
       *2026-10-11: three rows still showed 2026-04-12 and are corrected.
       Submissions 29 (the captured 0.16.0 transition row), 31 (0.17.0) and 32
@@ -989,8 +989,8 @@ indexed, examiner-searchable records.
 - [x] **Move BSC's structure out of the universal namespaces** `P1`
       *[ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md),
       accepted 2026-10-05; the term set is in
-      [Directions](docs/ontology/SSTIM_DIRECTIONS.md) §3. A 0.19.0 release gate:
-      the release is not cut before this lands. Renato named the protected files
+      [Directions](docs/ontology/SSTIM_DIRECTIONS.md) §3. It was a 0.19.0 release gate:
+      the release was not cut before this landed. Renato named the protected files
       on 2026-10-06, and steps 1 to 5 landed that day. Step 6 is what still
       holds the release.*
 
@@ -1011,7 +1011,7 @@ indexed, examiner-searchable records.
             voice a session specification. Import the 0.19.0 version IRI once
             that release exists.
             *Done otherwise on 2026-10-10: `dct:requires` now names
-            `https://w3id.org/sstim/0.19.0`, the release the terms were built
+            `https://w3id.org/sstim/0.19.0`, the earlier release the terms were built
             against. An `owl:imports` would make `validate-profile` and
             `entailment-check`, which reason over this file with the live
             modules, fetch the release over the network and mix it with the
@@ -1055,19 +1055,19 @@ indexed, examiner-searchable records.
             requests over every route #6827 added answered as the mirror's rules
             say, and every target served. All 32 replacement targets in the BSC
             vocabulary dereference and are described there. Five targets are
-            terms new in 0.19.0 (`sstim:breathGuideTrack` and four exposure
+            terms first released in 0.19.0 (`sstim:breathGuideTrack` and four exposure
             values); unversioned IRIs serve the latest release, so they appear
             with 0.19.0 itself, together with the deprecations that name them.*
 - [x] **Cut 0.19.0** `P1`
-      *Cut 2026-10-10: tag `v0.19.0` on both remotes, the
-      [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0) on
+      *Cut 2026-10-10, the previous release: tag `v0.19.0` on both remotes, its
+      [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0), which was the first on
       `w3c-cg/sstim`, and version DOI
       [10.5281/zenodo.23271908](https://doi.org/10.5281/zenodo.23271908), deposited
-      over the API into the concept series; the concept DOI now resolves to it.
+      over the API into the concept series; the concept DOI then resolved to it.
       Two gates caught defects on the way: the BioPortal bundle refused a
       history note that called the release "the 0.19.0-dev line" (fixed
       before the snapshot was committed), and the truth audit found prose
-      still treating 0.18.0 as current. The line reopened as 0.20.0-dev the
+      still treating 0.18.0 as current. The line was reopened as 0.20.0-dev the
       same day. Step 4's import became a pinned `dct:requires`, for the
       reason given in the BSC vocabulary's header; the registries and the
       announcement remain.*
@@ -1088,7 +1088,7 @@ indexed, examiner-searchable records.
          `make push`, publish the GitHub release from the changelog section,
          and confirm the Zenodo DOI.
       4. After the cut: the BSC vocabulary's `dct:requires <https://w3id.org/sstim>`
-         becomes `owl:imports <https://w3id.org/sstim/0.19.0>`; the development
+         was to become `owl:imports <https://w3id.org/sstim/0.19.0>`; the development
          line reopens for the next release; the registry publishers move to the
          Community Group (the item above); the Community Group announcement,
          drafted, goes out.
@@ -1376,7 +1376,7 @@ Turtle files are listed in section 1. After they exist:
       eight became terms and the four records use them; a noise's spectrum
       stays in Lane 1998's editorial note until a second source needs it.*
 
-- [~] Route committed records at w3id.org `P2`
+- [x] Route committed records at w3id.org `P2`
       *Measured 2026-10-14: 145 of 161 committed record identifiers answered
       404 (every protocol, experiment and evidence record, and the eight new
       references). Repository side done the same day
@@ -1388,6 +1388,11 @@ Turtle files are listed in section 1. After they exist:
       `sstim-committed-record-patterns`, upstream checker clean, tested on
       their Apache harness), and after the merge confirm a sample of each
       family live: 303 from w3id.org, 200 Turtle at the target.*
+      *Done: perma-id/w3id.org#6904 merged 2026-10-15. Checked 2026-10-19
+      against every record, not a sample: all 161 answer 303 from w3id.org
+      and then 200, as Turtle naming the record and as the graph browser's
+      page for it; an unknown protocol, reference or evidence name still
+      ends in 404.*
 
 - [ ] Native review of the labels ADRs 0063, 0064 and 0066 added `P2`
       *267 labels in Italian, Portuguese and Spanish on 89 new concepts (237

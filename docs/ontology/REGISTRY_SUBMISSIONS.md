@@ -959,7 +959,7 @@ assigns its own node URI on save.
 | Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
 | Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
 | Languages | en, it, pt, es |
-| Size | `164 classes, 305 properties, 556 concepts, 68 concept schemes (SSTIM 0.19.0, 2026-10)` |
+| Size | `182 classes, 371 properties, 645 concepts, 80 concept schemes (SSTIM 0.20.0, 2026-10)` |
 
 *Structure:*
 
@@ -980,8 +980,8 @@ assigns its own node URI on save.
 | Additional links | `https://github.com/w3c-cg/sstim` ; `https://w3id.org/sstim` |
 | Formats | search + add **SKOS**, **RDF/XML**, **Turtle**, **JSON-LD**, **OWL** (whatever BARTOC lists) |
 | Access | **freely available** |
-| Publisher name | live value BSC Lab (Æterni Anima); from 0.19.0, W3C Sensory Stimulation Vocabulary Community Group ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)) |
-| Publisher URI | live value `https://github.com/laBioSynCare`; from 0.19.0, `https://www.w3.org/community/sstim/` |
+| Publisher name | W3C Sensory Stimulation Vocabulary Community Group ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)), the publisher since 0.19.0; earlier releases name BSC Lab (Æterni Anima) |
+| Publisher URI | `https://www.w3.org/community/sstim/`, since 0.19.0; earlier releases name `https://github.com/laBioSynCare` |
 | Address | optional — City: Modena, Country: Italy (or leave blank) |
 | Contact | `renato.fabbri@gmail.com` |
 | Listed In | optionally add **prefix.cc**, and **LOV** since its 2026-09-28 listing |

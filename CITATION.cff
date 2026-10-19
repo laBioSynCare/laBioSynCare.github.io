@@ -13,8 +13,8 @@ abstract: >-
   assessments, and ecosystem relationships. Committed ecosystem-agent
   fixtures are synthetic.
 type: software
-version: 0.19.0
-date-released: 2026-10-10
+version: 0.20.0
+date-released: 2026-10-19
 doi: 10.5281/zenodo.23271908
 authors:
   - family-names: Fabbri

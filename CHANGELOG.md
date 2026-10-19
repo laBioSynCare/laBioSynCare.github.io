@@ -17,6 +17,10 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Nothing yet on the 0.21.0-dev line.
+
+## [0.20.0] - 2026-10-19
+
 **Upgrading from 0.19.0.** Nothing is removed or deprecated, and every 0.19.0
 triple survives. One rule is relaxed: a sensory stimulation protocol no longer
 has to name a framework if it cites the paper that specifies it. One is added:
@@ -1707,7 +1711,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/w3c-cg/sstim/compare/v0.19.0...HEAD
+[Unreleased]: https://github.com/w3c-cg/sstim/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.20.0
 [0.19.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.19.0
 [0.18.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.18.0
 [0.17.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.17.0
