@@ -118,8 +118,9 @@ one of each.
   evidence, whose source files are shared. References therefore no longer
   resolve to `references.ttl` as a whole. `make w3id-routes` executes the rules
   against every committed record and fails on any SSTIM identifier in the
-  committed RDF that resolves nowhere without a stated reason. Takes effect
-  when the matching perma-id/w3id.org pull request merges.
+  committed RDF that resolves nowhere without a stated reason. In effect since
+  perma-id/w3id.org#6904 merged on 2026-10-15: all 161 committed records
+  resolve.
 - One file per protocol: `published-protocols.ttl` and
   `bsc-reference-protocols.ttl` are replaced by eleven files in
   `instances/protocols/`, each named after its protocol's identifier, which is

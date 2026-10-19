@@ -13,7 +13,7 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.20.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
+| What is being edited? | `0.21.0-dev`, reopened when `0.20.0` was frozen | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.20.0`, released 2026-10-19 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
 | Which DOI identifies that release? | `10.5281/zenodo.23480076` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |

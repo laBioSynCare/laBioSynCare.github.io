@@ -1,12 +1,12 @@
 {
-  "$schema": "https://w3id.org/sstim/0.20.0/manifest.schema.json",
+  "$schema": "https://w3id.org/sstim/manifest-schema/1",
   "schemaVersion": "1.2.0",
   "manifestIri": "https://w3id.org/sstim/manifest",
   "suite": {
     "id": "sstim",
     "ontologyIri": "https://w3id.org/sstim",
-    "version": "0.20.0",
-    "status": "released",
+    "version": "0.21.0-dev",
+    "status": "development",
     "versionPolicy": "synchronized",
     "defaultProfile": "full"
   },
@@ -81,11 +81,11 @@
         "core"
       ],
       "ontologyIri": "https://w3id.org/sstim",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-core.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d5ee742d416400ba396e40fbf087f3671ade9079366218840073d3ea3736d3a6"
+        "sha256": "6f7daa4868fc629a9b902de2bfdcba5b7ef46974f9751ab35ab64ed50678aceb"
       },
       "runtime": {
         "url": "sstim-core.ttl",
@@ -96,8 +96,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/kernel",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-core.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl"
       },
       "release": {
         "snapshot": true,
@@ -113,11 +112,11 @@
         "core"
       ],
       "ontologyIri": "https://w3id.org/sstim/stimulus",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "8068cbd5eb6b85c22901cf558a1a0ee24cdee33c0c08ef6ff5a32241297e5bf7"
+        "sha256": "2b373c01c5c568cb5a29c64316c2243a4c6af42d0adf6e54618b69f29d0f06e4"
       },
       "runtime": {
         "url": "sstim-stimulus.ttl",
@@ -130,8 +129,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/stimulus",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-stimulus.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-stimulus.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-stimulus.ttl"
       },
       "release": {
         "snapshot": true,
@@ -147,11 +145,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/core-shapes",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-core-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "36e8bba786dfd731c192494a9db59414d146da05b2737657866598f2ad01afde"
+        "sha256": "1a35f48487a315ee1aad316c32582a328afec7901512041b5894bed33e4c60d4"
       },
       "runtime": {
         "url": "sstim-core-shapes.ttl",
@@ -165,8 +163,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/core-shapes",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-shapes.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-core-shapes.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-shapes.ttl"
       },
       "release": {
         "snapshot": true,
@@ -182,11 +179,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/common",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "338f132b5e0e9c5eb040a525c0caf6da3d96144120f61d44e37a5287697a781d"
+        "sha256": "ab88dede32b6429b353e646835a2c98fc2f0b278d3a3e78c9e9f4761cf7087eb"
       },
       "runtime": {
         "url": "sstim-common.ttl",
@@ -199,8 +196,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/common",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-common.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-common.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-common.ttl"
       },
       "release": {
         "snapshot": true,
@@ -215,11 +211,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/technique",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-technique.ttl",
         "mediaType": "text/turtle",
-        "sha256": "35afa0240c29c32b99885652878cd8674e8af779d6f1bf8c343fd7063641c73a"
+        "sha256": "a5c7dab2fd84a655be81922ecac789de9aedc5b5d29bf339706531fb5e8b35a1"
       },
       "runtime": {
         "url": "sstim-technique.ttl",
@@ -233,8 +229,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/technique",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-technique.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique.ttl"
       },
       "release": {
         "snapshot": true,
@@ -249,11 +244,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/configuration",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "3fcb5961ab3b4ebc7cbc851596d5d34454b1dab5ec500c8276b67feb9d9e17a8"
+        "sha256": "37532290d21fa51a0cc762a4a553244f373668f93122ce3bf3f48cd01961aee9"
       },
       "runtime": {
         "url": "sstim-configuration.ttl",
@@ -268,8 +263,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/configuration",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-configuration.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-configuration.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-configuration.ttl"
       },
       "release": {
         "snapshot": true,
@@ -284,11 +278,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/session",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "5922c093fc6c123265a679188c8f98ac4f5470070e5cca741b69fcb106718f17"
+        "sha256": "4ce42ed220d32a2e6ea27b6a38cb648ea724f805bd187b3c9e98f8b0acf774b4"
       },
       "runtime": {
         "url": "sstim-session.ttl",
@@ -304,8 +298,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/session",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-session.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-session.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-session.ttl"
       },
       "release": {
         "snapshot": true,
@@ -320,11 +313,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/evidence",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "17072b62b64d12fb6266a725e296b3172aac4586f375b213aa0514823d4b7af2"
+        "sha256": "01ff1e441306ec860756304e74bf3a648a05d4fcc6d5ca20284dc533b6f06f1a"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -339,8 +332,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/evidence",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-evidence.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence.ttl"
       },
       "release": {
         "snapshot": true,
@@ -355,11 +347,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/neuromodulation",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-neuromodulation.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1ded8e08ca0afec1a51e65a586a05da6978d721530a6664de454a2e0bb29f693"
+        "sha256": "e82f21a98996e42699e1f02f05c290cf42aadef1a2fc837f39e5490372902c33"
       },
       "runtime": {
         "url": "sstim-neuromodulation.ttl",
@@ -375,8 +367,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/neuromodulation",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-neuromodulation.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation.ttl"
       },
       "release": {
         "snapshot": true,
@@ -391,11 +382,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/patch-studio",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-patch-studio.ttl",
         "mediaType": "text/turtle",
-        "sha256": "97c281c26a035bacc1cac8e10692f4bb258b7d568ba34f926b4d80b4cd84ac7c"
+        "sha256": "d979e47c3927e30f4d202b96b72161891a05f5ffcfc4c700c0871b55d62bbea5"
       },
       "runtime": {
         "url": "sstim-patch-studio.ttl",
@@ -409,8 +400,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/patch-studio",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-patch-studio.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-patch-studio.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-patch-studio.ttl"
       },
       "release": {
         "snapshot": true,
@@ -427,11 +417,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/vocab",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f7d8561dfe2a7d066adb8e563cbe67a8f986903900d1ae03285cdaeff39f351a"
+        "sha256": "12301a3f5fa1b33c8c1e7ae368c619ae4c27608a696cacdbc7ad4c6b646a794a"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -451,8 +441,7 @@
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/vocab",
         "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-vocab.ttl",
-        "documentationUrl": "https://w3c-cg.github.io/sstim/ontology/docs/vocab/",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-vocab.ttl"
+        "documentationUrl": "https://w3c-cg.github.io/sstim/ontology/docs/vocab/"
       },
       "release": {
         "snapshot": true,
@@ -467,11 +456,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/exposure",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1f649b7e695bad131b1a3f9b94d2f6510cbd29cca17294c2759797f053d40535"
+        "sha256": "e21cf7d202cdee0be759bb2ed3ff125e424e627ccfc6d389a190c2c1fea945b7"
       },
       "runtime": {
         "url": "sstim-exposure.ttl",
@@ -489,8 +478,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/module/exposure",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-exposure.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-exposure.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -505,11 +493,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/ecosystem",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "7a10a1ab6a6d6abf87242621952b05b2da188cd7186b360cf8c4fd697ecc5e7e"
+        "sha256": "e20ab532b9620436009f5569e0b138b262393920998cd17ced7eb1819ca7d459"
       },
       "runtime": {
         "url": "sstim-ecosystem.ttl",
@@ -522,8 +510,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/ecosystem",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-ecosystem.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-ecosystem.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-ecosystem.ttl"
       },
       "release": {
         "snapshot": true,
@@ -539,11 +526,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/neuromodulation-evidence",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-neuromodulation-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0c2c5785e7575d1596b1961a3d8bfed2cc8845e95564822c65e3508e4cd638ec"
+        "sha256": "e7878824d52e92a84e7df7f6f434e509dc16677f6b752f6adf2f9286a4b99543"
       },
       "runtime": {
         "url": "sstim-neuromodulation-evidence.ttl",
@@ -557,8 +544,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/neuromodulation-evidence",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation-evidence.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-neuromodulation-evidence.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-neuromodulation-evidence.ttl"
       },
       "release": {
         "snapshot": true,
@@ -574,11 +560,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/evidence-exposure",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-evidence-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "bd55424240638e5665dda51e802a2eda5afc4f7ec6896c728574f915e64ff570"
+        "sha256": "fd3a9f564eb7b22e23996a3bf61c830a75b602b0d589e496668978c41560a9ad"
       },
       "runtime": {
         "url": "sstim-evidence-exposure.ttl",
@@ -595,8 +581,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/evidence-exposure",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence-exposure.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-evidence-exposure.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-evidence-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -612,11 +597,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/technique-exposure",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-technique-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "646fcb694318abb720e0c20fd0181a64bd1a7b7a611ef77014901cd6a440be7a"
+        "sha256": "83bbddc598f0725d3b8553091e39259d116185ba2d09df51d13dba8cff33f154"
       },
       "runtime": {
         "url": "sstim-technique-exposure.ttl",
@@ -630,8 +615,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/technique-exposure",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique-exposure.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-technique-exposure.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-technique-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -648,11 +632,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/alignments",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d186dadf6d8fd3f8901941e558849c6f83246e4f5c764bdb273f977a7ac906de"
+        "sha256": "00c3e633d964e9cad0cdbe4e37b38ab69851609c8eabbf4b5a47e2ece4cc46b3"
       },
       "runtime": {
         "url": "sstim-alignments.ttl",
@@ -668,8 +652,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/alignments",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-alignments.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-alignments.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-alignments.ttl"
       },
       "release": {
         "snapshot": true,
@@ -685,11 +668,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/shapes",
-      "version": "0.20.0",
+      "version": "0.21.0-dev",
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "b815dd92f60be6cf310818883dd6843613ddabc1b7fc76a6745e7eeda1bbbe6f"
+        "sha256": "08b19a2aa11d3604612c87733fa4b378e2fb91595d61a7d2f19bdc0b033b8c8e"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -714,8 +697,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/shapes",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-shapes.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-shapes.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-shapes.ttl"
       },
       "release": {
         "snapshot": true,
@@ -729,13 +711,13 @@
       "id": "kernel",
       "title": "SSTIM Kernel Profile",
       "iri": "https://w3id.org/sstim/profile/kernel",
-      "version": "0.20.0",
-      "status": "released",
+      "version": "0.21.0-dev",
+      "status": "development",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-kernel-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d364f0ac4ec4719abe8b41d5a39d0a38000000475e9691b7041027d9277e25e8"
+        "sha256": "2fd7f4ae4fadbb4fe7b8df72183257cc1d9d5af5e2f47f92ebbdb12e1b6f78be"
       },
       "runtime": {
         "url": "sstim-kernel-profile.ttl"
@@ -743,8 +725,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/kernel",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-kernel-profile.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-kernel-profile.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-kernel-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -764,19 +745,19 @@
       "competencyQueries": [
         "test/competency/kernel.rq"
       ],
-      "sha256": "a76dc0a6cebafecd1af02056d8f0ca5abcd738522b7d4cb2383cf043700ac586"
+      "sha256": "4aed2dcc4a08fad40f999038abb7a9688117a9426357770cc562fe58ba7aeae1"
     },
     {
       "id": "core",
       "title": "SSTIM Core Profile",
       "iri": "https://w3id.org/sstim/profile/core",
-      "version": "0.20.0",
-      "status": "released",
+      "version": "0.21.0-dev",
+      "status": "development",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-core-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "abc3a85839615b8a331da9587c5c7b58a3016e73dbbc8e5e12a2b4c0d280b375"
+        "sha256": "16ab440c45c2383d16bf41f7f5dc9343faa2236b8b4142d181e31d27f72d4138"
       },
       "runtime": {
         "url": "sstim-core-profile.ttl"
@@ -784,8 +765,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/core",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-profile.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-core-profile.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -814,19 +794,19 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "4a459a7776eeac2f67115789cb37bbc9cd923c68c3de9d9348d045b77604604c"
+      "sha256": "bd141688824f835894f15781b9546d5cfacedf41b80f0763a23fbbec0303278c"
     },
     {
       "id": "core-plus",
       "title": "SSTIM Core Plus Profile",
       "iri": "https://w3id.org/sstim/profile/core-plus",
-      "version": "0.20.0",
-      "status": "released",
+      "version": "0.21.0-dev",
+      "status": "development",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-core-plus-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f99182d75db227641d3ca3ee6cf4b7def43bc7004d97dc434992ad713dadcfef"
+        "sha256": "8798108059faf510f43e54bcaba16df937022f73e805af1c9309ad927a22f557"
       },
       "runtime": {
         "url": "sstim-core-plus-profile.ttl"
@@ -834,8 +814,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/core-plus",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-plus-profile.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-core-plus-profile.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-core-plus-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -863,19 +842,19 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "1b119eee18f51723d7cea7570d1192584757cefb3513797d8aea761b554f59cc"
+      "sha256": "f1beabc7080115634df997790fd16c571dfc6e493befa7c3ea9c89580bdfd565"
     },
     {
       "id": "full",
       "title": "SSTIM Full Profile",
       "iri": "https://w3id.org/sstim/profile/full",
-      "version": "0.20.0",
-      "status": "released",
+      "version": "0.21.0-dev",
+      "status": "development",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-full-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "72b2f6f628c0dd5e2ef4f3f39b48af5b255c45ddc1da1ee64e8ea6efbb85d6b4"
+        "sha256": "60f1a7425e98fa23ef31041d05e20ac1e59fdd88732b3275c22ea7e0d297f9f3"
       },
       "runtime": {
         "url": "sstim-full-profile.ttl"
@@ -883,8 +862,7 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/full",
-        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-full-profile.ttl",
-        "versionedUrl": "https://w3id.org/sstim/0.20.0/sstim-full-profile.ttl"
+        "distributionUrl": "https://w3c-cg.github.io/sstim/ontology/sstim-full-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -927,12 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "4c07c9a713c60f244e4d29e9c9c84140a4a08ba617d660011c5a005e3dc256a3"
+      "sha256": "d813dfd68a4334db58b7eac50b1bcf815fd9903e6c42e8b56f32e07a5555a000"
     }
-  ],
-  "immutableRelease": {
-    "baseUrl": "https://w3id.org/sstim/0.20.0/",
-    "manifestUrl": "https://w3id.org/sstim/0.20.0/manifest",
-    "schemaUrl": "https://w3id.org/sstim/0.20.0/manifest.schema.json"
-  }
+  ]
 }

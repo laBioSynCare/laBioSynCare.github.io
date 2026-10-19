@@ -2,7 +2,7 @@
 #
 #  SSTIM Core Stimulus Description Module
 #
-#  Version:    0.20.0
+#  Version:    0.21.0-dev
 #  Date:       2026-10-19
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -30,7 +30,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/stimulus> a owl:Ontology ;
-    owl:versionInfo "0.20.0" ;
+    owl:versionInfo "0.21.0-dev" ;
     dct:title "SSTIM Core Stimulus Description Module"@en ;
     dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, optional stimulation target, signals and their renderings, measurement units, and the control laws of adaptive specifications."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

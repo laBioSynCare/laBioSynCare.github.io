@@ -271,6 +271,12 @@ indexed, examiner-searchable records.
       `pullLocation`, is prepared for the maintainer to run rather than run
       from an agent session. Either way the row then needs its date PATCHed.*
 
+      *2026-10-19: 0.20.0 went out with ledger bytes 1562519 (sha256
+      `0bdb0598…849c548`). After the nightly pull creates its row, capture the
+      ID, confirm it survives a second unchanged pull, then PATCH it to
+      Released 2026-10-19 and check the Version IRI reads
+      `https://w3id.org/sstim/0.20.0`.*
+
 - [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
@@ -1058,6 +1064,17 @@ indexed, examiner-searchable records.
             terms first released in 0.19.0 (`sstim:breathGuideTrack` and four exposure
             values); unversioned IRIs serve the latest release, so they appear
             with 0.19.0 itself, together with the deprecations that name them.*
+- [x] **Cut 0.20.0** `P1`
+      *Cut 2026-10-19: tag `v0.20.0` on both remotes, the
+      [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.20.0) on
+      `w3c-cg/sstim`, and version DOI
+      [10.5281/zenodo.23480076](https://doi.org/10.5281/zenodo.23480076), deposited
+      over the API into the concept series, which resolves to it. The
+      published-protocols release: ADRs 0063, 0064 and 0066, with ADR 0065's
+      routes live. GB-05 moved to the 0.21.0 line. The line reopened as
+      0.21.0-dev the same day. Remaining: BioPortal's row for 0.20.0 (the
+      BioPortal item above) and the Community Group announcement, drafted at
+      `~/sstim-drafts/sstim-0.20.0-cg-announcement.md`.*
 - [x] **Cut 0.19.0** `P1`
       *Cut 2026-10-10, the previous release: tag `v0.19.0` on both remotes, its
       [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0), which was the first on
