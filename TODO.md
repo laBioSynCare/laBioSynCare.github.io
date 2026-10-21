@@ -1073,8 +1073,9 @@ indexed, examiner-searchable records.
       published-protocols release: ADRs 0063, 0064 and 0066, with ADR 0065's
       routes live. GB-05 moved to the 0.21.0 line. The line reopened as
       0.21.0-dev the same day. Remaining: BioPortal's row for 0.20.0 (the
-      BioPortal item above) and the Community Group announcement, drafted at
-      `~/sstim-drafts/sstim-0.20.0-cg-announcement.md`.*
+      BioPortal item above). The Community Group announcement was posted on
+      2026-10-21:
+      https://www.w3.org/community/sstim/2026/10/21/sstim-0-20-0-published-protocols/*
 - [x] **Cut 0.19.0** `P1`
       *Cut 2026-10-10, the previous release: tag `v0.19.0` on both remotes, its
       [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.19.0), which was the first on
