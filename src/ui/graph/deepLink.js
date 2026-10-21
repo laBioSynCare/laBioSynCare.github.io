@@ -17,17 +17,15 @@ export const MIN_ZOOM = 0.1
 export const MAX_ZOOM = 4
 
 export const FOCUS_PARAM_VALUE = 'neighborhood'
-// The explicit opposite, written only where it differs from the default: a
-// record selected with its neighbourhood unfolded.
+// The explicit opposite: a node shown with the whole graph around it.
 export const FOCUS_OFF_VALUE = 'none'
 
-// Records are read in their neighbourhood; terms against the whole vocabulary.
-// A catalog record (a protocol, a preset, an evidence record, a reference) or a
-// live ecosystem agent is defined by its links, and arriving on one in the
-// whole graph buried it among some nine hundred nodes. A term is the opposite:
-// where it sits in the vocabulary is the point. So a link with no `?focus=`
-// folds the graph for a record and not for a term.
-export const FOCUSED_ARRIVAL_LAYERS = new Set(['catalog', 'ecosystem'])
+// Arriving on a node folds the graph to its neighbourhood unless the link says
+// otherwise. The whole graph used to be the default, from when it was small
+// enough to read around a node; at over a thousand nodes it buried whatever a
+// link named, a protocol under its own long label and a term among hundreds of
+// others. The neighbourhood is at most a few dozen nodes, and Exit focus is one
+// click away.
 
 /**
  * Read the framing parameters out of a query string.
@@ -40,8 +38,7 @@ export const FOCUSED_ARRIVAL_LAYERS = new Set(['catalog', 'ecosystem'])
  * reproduces the sharer's framing independently of layout.
  *
  * `focus` is the stated value, `neighborhood` or `none`, or null when the link
- * states none, which leaves the choice to the node it lands on
- * (focusOnArrival).
+ * states none, which focusOnArrival reads as the default, folded.
  *
  * @param {string} search `window.location.search`
  * @returns {{ zoom: number|null, neighborhoodFocus: boolean, focus: string|null }}
@@ -58,29 +55,24 @@ export function parseViewParams(search) {
 }
 
 /**
- * Whether arriving on a node folds the graph to its neighbourhood: what the
- * link states, or else the default for the node's layer.
+ * Whether arriving on a node folds the graph to its neighbourhood: yes, unless
+ * the link states `focus=none`.
  * @param {string|null} focus the `focus` parseViewParams read
- * @param {string|undefined} layer the arrival node's layer
  * @returns {boolean}
  */
-export function focusOnArrival(focus, layer) {
-  if (focus === FOCUS_PARAM_VALUE) return true
-  if (focus === FOCUS_OFF_VALUE) return false
-  return FOCUSED_ARRIVAL_LAYERS.has(layer)
+export function focusOnArrival(focus) {
+  return focus !== FOCUS_OFF_VALUE
 }
 
 /**
- * The `?focus=` value that makes a link reproduce this view, or null for none.
- * Focus is always stated; its absence is stated only where the node's default
- * would fold the graph, so an unfolded record shares as unfolded.
+ * The `?focus=` value that makes a link reproduce this view. Both states are
+ * written, so a shared link opens on what its sender saw even if the default
+ * ever changes again.
  * @param {boolean} focused
- * @param {string|undefined} layer the selected node's layer
- * @returns {string|null}
+ * @returns {string}
  */
-export function focusParamFor(focused, layer) {
-  if (focused) return FOCUS_PARAM_VALUE
-  return FOCUSED_ARRIVAL_LAYERS.has(layer) ? FOCUS_OFF_VALUE : null
+export function focusParamFor(focused) {
+  return focused ? FOCUS_PARAM_VALUE : FOCUS_OFF_VALUE
 }
 
 // ── Namespace-qualified arrival ─────────────────────────────────────────────

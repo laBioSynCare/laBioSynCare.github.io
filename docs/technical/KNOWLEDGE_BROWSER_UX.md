@@ -90,20 +90,22 @@ are the choices a future change could quietly undo:
   stimulation switched off holds one steady halo instead. And `?focus=` is
   dropped when its node does not resolve, so focus can never be armed with no
   selection and no button to turn it off.
-- **A record arrives in its neighbourhood, a term in the whole graph.** A link
-  that states no `?focus=` is decided by the node it lands on: a catalog record
-  (protocol, preset, evidence record, reference) or a live ecosystem agent is
-  defined by its links and folds to them, while a term's place in the whole
-  vocabulary is the point. That is what a w3id record identifier gets, since its
-  route states no framing. A link that states `focus=neighborhood` or
-  `focus=none` wins either way, and the view writes `focus=none` for a record
-  shown unfolded, so a shared link still opens on what its sender saw
+- **A link arrives in its node's neighbourhood.** A link that states no
+  `?focus=` folds the graph to the node it names and that node's neighbours.
+  The whole graph used to be the default, from when it was small enough to read
+  around a node; at over a thousand nodes it buried whatever a link named, a
+  protocol under its own hundred-character label and a term among hundreds of
+  others, while the widest neighbourhood is 36 nodes. This is what every w3id
+  identifier gets, since no route states a framing. `focus=none` asks for the
+  whole graph, Exit focus gives it in one click, and the view writes both
+  states, so a shared link still opens on what its sender saw
   (`focusOnArrival` and `focusParamFor` in `deepLink.js`).
 - **Focus lays the neighbourhood out around its node.** Folding the graph used
   to leave the neighbours where the full layout had put them, scattered over a
   canvas of hundreds, so the fit framed them at a fifth of normal size. Entering
-  focus now places the selected node at the centre and its neighbours in a ring,
-  and leaving it puts every node back where the full layout had it.
+  focus now places the selected node at the centre and its neighbours in rings,
+  a dozen in the first and eight more in each further one, grouped by kind; and
+  leaving it puts every node back where the full layout had it.
 - **A record's canvas label is short; its panel keeps the whole.** A record's
   `rdfs:label` is written for the panel, and a published protocol's runs past a
   hundred characters, ending in its citation. On the canvas it is drawn by its

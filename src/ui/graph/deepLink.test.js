@@ -139,26 +139,16 @@ describe('focus on arrival', () => {
     expect(parseViewParams('').focus).toBeNull()
   })
 
-  it('folds the graph around a record and not around a term when the link states nothing', () => {
-    expect(focusOnArrival(null, 'catalog')).toBe(true)
-    expect(focusOnArrival(null, 'ecosystem')).toBe(true)
-    expect(focusOnArrival(null, 'ontology')).toBe(false)
-    expect(focusOnArrival(null, 'vocabulary')).toBe(false)
-    expect(focusOnArrival(null, undefined)).toBe(false)
+  it('folds the graph around whatever a link names unless it states none', () => {
+    expect(focusOnArrival(null)).toBe(true)
+    expect(focusOnArrival('neighborhood')).toBe(true)
+    expect(focusOnArrival('none')).toBe(false)
   })
 
-  it('lets the link overrule the default either way', () => {
-    expect(focusOnArrival('none', 'catalog')).toBe(false)
-    expect(focusOnArrival('neighborhood', 'vocabulary')).toBe(true)
-  })
-
-  it('writes what a recipient needs to see the same view, and only that', () => {
-    for (const layer of ['catalog', 'ecosystem', 'ontology', 'vocabulary']) {
-      for (const focused of [true, false]) {
-        const written = focusParamFor(focused, layer)
-        expect(focusOnArrival(written, layer), `${layer} focused=${focused}`).toBe(focused)
-      }
+  it('writes what a recipient needs to see the same view', () => {
+    for (const focused of [true, false]) {
+      expect(focusOnArrival(focusParamFor(focused)), `focused=${focused}`).toBe(focused)
     }
-    expect(focusParamFor(false, 'vocabulary')).toBeNull()
+    expect(focusParamFor(false)).toBe('none')
   })
 })

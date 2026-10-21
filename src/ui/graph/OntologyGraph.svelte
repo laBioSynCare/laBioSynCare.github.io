@@ -228,9 +228,9 @@
   let iriCopyTimer = null
   // A deep link is authoritative about its own framing: what it states wins over
   // whatever this session had left on, or a shared link would open into a view
-  // its sender never saw. A link that states nothing is decided by the node it
-  // lands on, once the graph has loaded: a record folds, a term does not
-  // (focusOnArrival in deepLink.js).
+  // its sender never saw. A link that states nothing arrives folded to the
+  // node's neighbourhood, once the graph has loaded (focusOnArrival in
+  // deepLink.js).
   let neighborhoodFocus = $state(
     urlView.neighborhoodFocus || (!initialUrlHash && graphSession.neighborhoodFocus))
   let connectionFilters = $state(new Set(graphSession.connectionFilters))
@@ -1206,6 +1206,12 @@
     focusLayoutId = null
   }
 
+  // The first ring holds a dozen neighbours and each further ring eight more,
+  // so the widest neighbourhood, a few dozen nodes, stays a compact disc rather
+  // than one circle so wide the fit has to shrink it.
+  const FIRST_RING = 12
+  const RING_GROWTH = 8
+
   function layoutFocusedNeighborhood(targets) {
     const center = selected?.id
     if (!cy || !center || !targets || focusLayoutId === center) return
@@ -1213,9 +1219,23 @@
     const nodes = targets.nodes()
     focusSavedPositions = new Map(nodes.map((node) => [node.id(), { ...node.position() }]))
     focusLayoutId = center
-    nodes.layout({
+    // Kind first, then label, so a ring reads in groups rather than at random.
+    const neighbours = nodes.filter((node) => node.id() !== center).sort((a, b) =>
+      String(a.data('kind')).localeCompare(String(b.data('kind'))) ||
+      canvasLabel(a).localeCompare(canvasLabel(b)))
+    const ringOf = new Map()
+    let ring = 1
+    let capacity = FIRST_RING
+    let used = 0
+    neighbours.forEach((node) => {
+      if (used === capacity) { ring += 1; used = 0; capacity += RING_GROWTH }
+      ringOf.set(node.id(), ring)
+      used += 1
+    })
+    const rings = ring
+    nodes.getElementById(center).union(neighbours).layout({
       name: 'concentric',
-      concentric: (node) => (node.id() === center ? 2 : 1),
+      concentric: (node) => (node.id() === center ? rings + 1 : rings + 1 - ringOf.get(node.id())),
       levelWidth: () => 1,
       minNodeSpacing: 28,
       nodeDimensionsIncludeLabels: true,
@@ -1701,7 +1721,7 @@
     if (!cy) return
     updateSearchParams((params) => {
       params.set('zoom', formatZoomParam(cy.zoom()))
-      const focus = selected && !selected.source ? focusParamFor(neighborhoodFocus, selected.layer) : null
+      const focus = selected && !selected.source ? focusParamFor(neighborhoodFocus) : null
       if (focus) params.set('focus', focus)
       else params.delete('focus')
     })
@@ -2164,10 +2184,9 @@
       if (deepLinkId) {
         widenScopeToShow(deepLinkId)
         selectElementById(deepLinkId, { camera: false })
-        // A record arrives folded to its neighbourhood unless the link says
-        // otherwise; a term arrives in the whole graph (deepLink.js).
-        const arrived = allElements.find((el) => !el.data?.source && el.data?.id === deepLinkId)
-        neighborhoodFocus = focusOnArrival(urlView.focus, arrived?.data?.layer)
+        // A link arrives folded to the node's neighbourhood unless it states
+        // focus=none (deepLink.js).
+        neighborhoodFocus = focusOnArrival(urlView.focus)
         if (neighborhoodFocus) layoutFocusedNeighborhood(applyGraphDisplay({ animate: false }))
       } else if (graphSession.selectedIri) {
         const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
