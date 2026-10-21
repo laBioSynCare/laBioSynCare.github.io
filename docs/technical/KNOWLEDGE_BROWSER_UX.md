@@ -90,6 +90,27 @@ are the choices a future change could quietly undo:
   stimulation switched off holds one steady halo instead. And `?focus=` is
   dropped when its node does not resolve, so focus can never be armed with no
   selection and no button to turn it off.
+- **A record arrives in its neighbourhood, a term in the whole graph.** A link
+  that states no `?focus=` is decided by the node it lands on: a catalog record
+  (protocol, preset, evidence record, reference) or a live ecosystem agent is
+  defined by its links and folds to them, while a term's place in the whole
+  vocabulary is the point. That is what a w3id record identifier gets, since its
+  route states no framing. A link that states `focus=neighborhood` or
+  `focus=none` wins either way, and the view writes `focus=none` for a record
+  shown unfolded, so a shared link still opens on what its sender saw
+  (`focusOnArrival` and `focusParamFor` in `deepLink.js`).
+- **Focus lays the neighbourhood out around its node.** Folding the graph used
+  to leave the neighbours where the full layout had put them, scattered over a
+  canvas of hundreds, so the fit framed them at a fifth of normal size. Entering
+  focus now places the selected node at the centre and its neighbours in a ring,
+  and leaving it puts every node back where the full layout had it.
+- **A record's canvas label is short; its panel keeps the whole.** A record's
+  `rdfs:label` is written for the panel, and a published protocol's runs past a
+  hundred characters, ending in its citation. On the canvas it is drawn by its
+  citation ("Thaut et al. 1996"), with the opening words of its title where two
+  records share one, and any other record label is cut at a word after 40
+  characters (`src/rdf/recordLabels.js`). The panel heads such a record with the
+  citation and puts the title beneath it.
 - **The opening camera is decided in exactly one place.** Selection, focus and
   relayout all end in a fit, and Svelte gives no ordering guarantee between an
   effect flush and the mount continuation — a link's zoom was set and then

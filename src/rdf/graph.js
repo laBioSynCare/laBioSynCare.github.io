@@ -32,6 +32,7 @@ import { select } from './query.js'
 import { MODULE_ID_BY_GRAPH_IRI } from './loader.js'
 import { PROV } from './namespaces.js'
 import { recordFamilyOf } from './recordFamilies.js'
+import { recordCanvasLabels } from './recordLabels.js'
 import { DataFactory } from 'n3'
 
 const { namedNode } = DataFactory
@@ -570,6 +571,11 @@ export async function buildGraphElements(store, { onProgress = null } = {}) {
       searchText: [label, ...aliases, localName(id), 'versioned catalog'].join(' '),
     })
   }
+  // A record's label is written for the panel; the canvas draws a short one,
+  // decided across all records because two can share a citation.
+  const catalogLabels = recordCanvasLabels(
+    [...catalogResources.keys()].map(id => ({ id, label: nodes.get(id).data.label })))
+  for (const [id, canvas] of catalogLabels) Object.assign(nodes.get(id).data, canvas)
 
 
   // ── 11. Current public ecosystem agents ───────────────────────────────────
@@ -640,6 +646,12 @@ export async function buildGraphElements(store, { onProgress = null } = {}) {
     [SSTIM_NS + 'usesTechnique', 'uses technique'],
     [SSTIM_NS + 'definedByFramework', 'defined by'],
     [DCT + 'source', 'source'],
+    // What a protocol is for and how it is studied (ADR 0064): each names a
+    // vocabulary concept, so a protocol arrives among them rather than alone.
+    [SSTIM_NS + 'intendedNeuralPhenomenon', 'intended phenomenon'],
+    [SSTIM_NS + 'participantEngagementMode', 'engagement'],
+    [SSTIM_NS + 'protocolStudyDesign', 'design'],
+    [SSTIM_NS + 'armAllocation', 'allocation'],
     // An evidence assessment and its parts (ADR 0027), so a claim arrives with
     // its proposition, scope, bases and the activity that produced it.
     [SSTIM_NS + 'evaluatesSubject', 'evaluates'],

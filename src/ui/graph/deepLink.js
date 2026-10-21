@@ -17,6 +17,17 @@ export const MIN_ZOOM = 0.1
 export const MAX_ZOOM = 4
 
 export const FOCUS_PARAM_VALUE = 'neighborhood'
+// The explicit opposite, written only where it differs from the default: a
+// record selected with its neighbourhood unfolded.
+export const FOCUS_OFF_VALUE = 'none'
+
+// Records are read in their neighbourhood; terms against the whole vocabulary.
+// A catalog record (a protocol, a preset, an evidence record, a reference) or a
+// live ecosystem agent is defined by its links, and arriving on one in the
+// whole graph buried it among some nine hundred nodes. A term is the opposite:
+// where it sits in the vocabulary is the point. So a link with no `?focus=`
+// folds the graph for a record and not for a term.
+export const FOCUSED_ARRIVAL_LAYERS = new Set(['catalog', 'ecosystem'])
 
 /**
  * Read the framing parameters out of a query string.
@@ -28,8 +39,12 @@ export const FOCUS_PARAM_VALUE = 'neighborhood'
  * reader lands centred on that node — and `?zoom=` says how closely. That pair
  * reproduces the sharer's framing independently of layout.
  *
+ * `focus` is the stated value, `neighborhood` or `none`, or null when the link
+ * states none, which leaves the choice to the node it lands on
+ * (focusOnArrival).
+ *
  * @param {string} search `window.location.search`
- * @returns {{ zoom: number|null, neighborhoodFocus: boolean }}
+ * @returns {{ zoom: number|null, neighborhoodFocus: boolean, focus: string|null }}
  */
 export function parseViewParams(search) {
   const params = new URLSearchParams(search ?? '')
@@ -37,7 +52,35 @@ export function parseViewParams(search) {
   const zoom = params.get('zoom') !== null && Number.isFinite(raw) && raw > 0
     ? Math.min(Math.max(raw, MIN_ZOOM), MAX_ZOOM)
     : null
-  return { zoom, neighborhoodFocus: params.get('focus') === FOCUS_PARAM_VALUE }
+  const stated = params.get('focus')
+  const focus = stated === FOCUS_PARAM_VALUE || stated === FOCUS_OFF_VALUE ? stated : null
+  return { zoom, neighborhoodFocus: focus === FOCUS_PARAM_VALUE, focus }
+}
+
+/**
+ * Whether arriving on a node folds the graph to its neighbourhood: what the
+ * link states, or else the default for the node's layer.
+ * @param {string|null} focus the `focus` parseViewParams read
+ * @param {string|undefined} layer the arrival node's layer
+ * @returns {boolean}
+ */
+export function focusOnArrival(focus, layer) {
+  if (focus === FOCUS_PARAM_VALUE) return true
+  if (focus === FOCUS_OFF_VALUE) return false
+  return FOCUSED_ARRIVAL_LAYERS.has(layer)
+}
+
+/**
+ * The `?focus=` value that makes a link reproduce this view, or null for none.
+ * Focus is always stated; its absence is stated only where the node's default
+ * would fold the graph, so an unfolded record shares as unfolded.
+ * @param {boolean} focused
+ * @param {string|undefined} layer the selected node's layer
+ * @returns {string|null}
+ */
+export function focusParamFor(focused, layer) {
+  if (focused) return FOCUS_PARAM_VALUE
+  return FOCUSED_ARRIVAL_LAYERS.has(layer) ? FOCUS_OFF_VALUE : null
 }
 
 // ── Namespace-qualified arrival ─────────────────────────────────────────────

@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   parseViewParams,
+  focusOnArrival,
+  focusParamFor,
   formatZoomParam,
   pulseSchedule,
   pulseRateHz,
@@ -54,7 +56,7 @@ describe('qualifyArrivalHash', () => {
 describe('parseViewParams', () => {
   it('reads a zoom level and the neighborhood focus flag', () => {
     const view = parseViewParams('?layer=terms,ecosystem&zoom=1.85&focus=neighborhood')
-    expect(view).toEqual({ zoom: 1.85, neighborhoodFocus: true })
+    expect(view).toEqual({ zoom: 1.85, neighborhoodFocus: true, focus: 'neighborhood' })
   })
 
   it('reports no zoom when the parameter is absent', () => {
@@ -125,5 +127,38 @@ describe('arrival beacon', () => {
 
   it('finishes fast enough to be an arrival cue, not an animation', () => {
     expect(pulseDurationMs()).toBeLessThanOrEqual(2500)
+  })
+})
+
+describe('focus on arrival', () => {
+  it('reads both stated values, and nothing else', () => {
+    expect(parseViewParams('?focus=neighborhood').focus).toBe('neighborhood')
+    expect(parseViewParams('?focus=none').focus).toBe('none')
+    expect(parseViewParams('?focus=none').neighborhoodFocus).toBe(false)
+    expect(parseViewParams('?focus=1').focus).toBeNull()
+    expect(parseViewParams('').focus).toBeNull()
+  })
+
+  it('folds the graph around a record and not around a term when the link states nothing', () => {
+    expect(focusOnArrival(null, 'catalog')).toBe(true)
+    expect(focusOnArrival(null, 'ecosystem')).toBe(true)
+    expect(focusOnArrival(null, 'ontology')).toBe(false)
+    expect(focusOnArrival(null, 'vocabulary')).toBe(false)
+    expect(focusOnArrival(null, undefined)).toBe(false)
+  })
+
+  it('lets the link overrule the default either way', () => {
+    expect(focusOnArrival('none', 'catalog')).toBe(false)
+    expect(focusOnArrival('neighborhood', 'vocabulary')).toBe(true)
+  })
+
+  it('writes what a recipient needs to see the same view, and only that', () => {
+    for (const layer of ['catalog', 'ecosystem', 'ontology', 'vocabulary']) {
+      for (const focused of [true, false]) {
+        const written = focusParamFor(focused, layer)
+        expect(focusOnArrival(written, layer), `${layer} focused=${focused}`).toBe(focused)
+      }
+    }
+    expect(focusParamFor(false, 'vocabulary')).toBeNull()
   })
 })

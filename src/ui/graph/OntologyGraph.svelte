@@ -9,7 +9,7 @@
   import { graphSession, saveGraphSession } from './graphSession.js'
   import {
     parseViewParams, formatZoomParam, pulseSchedule, qualifyArrivalHash,
-    MIN_ZOOM, MAX_ZOOM, FOCUS_PARAM_VALUE,
+    focusOnArrival, focusParamFor, MIN_ZOOM, MAX_ZOOM,
   } from './deepLink.js'
   import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
   import { GRAPH_CONCERNS } from './concerns.js'
@@ -226,9 +226,11 @@
   let neighbors = $state([])
   let iriCopied = $state(false)
   let iriCopyTimer = null
-  // A deep link is authoritative about its own framing: arriving on `#node`
-  // without `?focus=` must show the whole graph even if this session had left
-  // focus on, or a shared link would open into a view its sender never saw.
+  // A deep link is authoritative about its own framing: what it states wins over
+  // whatever this session had left on, or a shared link would open into a view
+  // its sender never saw. A link that states nothing is decided by the node it
+  // lands on, once the graph has loaded: a record folds, a term does not
+  // (focusOnArrival in deepLink.js).
   let neighborhoodFocus = $state(
     urlView.neighborhoodFocus || (!initialUrlHash && graphSession.neighborhoodFocus))
   let connectionFilters = $state(new Set(graphSession.connectionFilters))
@@ -496,21 +498,27 @@
     return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.5
   }
 
+  // A record's label is written for the panel and can run past a hundred
+  // characters; recordLabels.js gives it a short one for the canvas.
+  function canvasLabel(ele) {
+    return ele.data('shortLabel') ?? ele.data('label') ?? ''
+  }
+
   function styleSheet() {
     const theme = themeTokens()
     return [
       {
         selector: 'node',
         style: {
-          'label': 'data(label)',
+          'label': canvasLabel,
           'font-family': theme.font,
           'font-size': 11,
           'text-valign': 'center',
           'text-halign': 'center',
           'text-wrap': 'wrap',
           'text-max-width': 90,
-          'width': (ele) => Math.min(110, Math.max(38, (ele.data('label')?.length ?? 0) * 5.5)),
-          'height': (ele) => (ele.data('label')?.length ?? 0) > 18 ? 34 : 22,
+          'width': (ele) => Math.min(110, Math.max(38, canvasLabel(ele).length * 5.5)),
+          'height': (ele) => canvasLabel(ele).length > 18 ? 34 : 22,
           'padding': 8,
           'shape': 'round-rectangle',
           'background-color': (ele) => nodeColor(ele.data()),
@@ -1182,6 +1190,41 @@
     fitGraph()
   }
 
+  // Focus lays the neighbourhood out around the selected node. Its nodes keep
+  // their places in the full layout otherwise, scattered across a canvas of
+  // hundreds, and fitting them framed specks at a fifth of normal size. Where
+  // they stood is kept, so leaving focus puts the full layout back as it was.
+  let focusLayoutId = null
+  let focusSavedPositions = null
+
+  function restoreFocusLayout() {
+    if (!cy || !focusSavedPositions) return
+    cy.batch(() => {
+      for (const [id, position] of focusSavedPositions) cy.getElementById(id).position(position)
+    })
+    focusSavedPositions = null
+    focusLayoutId = null
+  }
+
+  function layoutFocusedNeighborhood(targets) {
+    const center = selected?.id
+    if (!cy || !center || !targets || focusLayoutId === center) return
+    restoreFocusLayout()
+    const nodes = targets.nodes()
+    focusSavedPositions = new Map(nodes.map((node) => [node.id(), { ...node.position() }]))
+    focusLayoutId = center
+    nodes.layout({
+      name: 'concentric',
+      concentric: (node) => (node.id() === center ? 2 : 1),
+      levelWidth: () => 1,
+      minNodeSpacing: 28,
+      nodeDimensionsIncludeLabels: true,
+      avoidOverlap: true,
+      animate: false,
+      fit: false,
+    }).run()
+  }
+
   function setStrayMode(value) {
     if (value === strayMode) return
     strayMode = value
@@ -1658,7 +1701,8 @@
     if (!cy) return
     updateSearchParams((params) => {
       params.set('zoom', formatZoomParam(cy.zoom()))
-      if (neighborhoodFocus && selected && !selected.source) params.set('focus', FOCUS_PARAM_VALUE)
+      const focus = selected && !selected.source ? focusParamFor(neighborhoodFocus, selected.layer) : null
+      if (focus) params.set('focus', focus)
       else params.delete('focus')
     })
   }
@@ -1930,14 +1974,22 @@
       focusFitPrimed = true
       return
     }
+    if (neighborhoodFocus) layoutFocusedNeighborhood(targets)
+    else restoreFocusLayout()
     fitGraph(targets)
   })
 
+  // Selecting another node while focused moves the focus with it: the old
+  // neighbourhood goes back to its places and the new one is laid out.
   $effect(() => {
     if (!cy || !neighborhoodFocus) return
     selected?.id
     if (!setupReady) return
-    applyGraphDisplay()
+    const targets = applyGraphDisplay()
+    if (focusLayoutId && focusLayoutId !== selected?.id) {
+      layoutFocusedNeighborhood(targets)
+      fitGraph(targets)
+    }
   })
 
   $effect(() => {
@@ -2112,7 +2164,11 @@
       if (deepLinkId) {
         widenScopeToShow(deepLinkId)
         selectElementById(deepLinkId, { camera: false })
-        if (neighborhoodFocus) applyGraphDisplay({ animate: false })
+        // A record arrives folded to its neighbourhood unless the link says
+        // otherwise; a term arrives in the whole graph (deepLink.js).
+        const arrived = allElements.find((el) => !el.data?.source && el.data?.id === deepLinkId)
+        neighborhoodFocus = focusOnArrival(urlView.focus, arrived?.data?.layer)
+        if (neighborhoodFocus) layoutFocusedNeighborhood(applyGraphDisplay({ animate: false }))
       } else if (graphSession.selectedIri) {
         const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
         if (id) selectElementById(id, { camera: false })
@@ -2128,7 +2184,7 @@
           : null
         if (node) {
           arrivalStatus = 'resolved'
-          arrivalLabel = node.data.label ?? ''
+          arrivalLabel = node.data.shortLabel ?? node.data.label ?? ''
           arrivalNodeIri = node.data.iri ?? arrivalIri
         } else {
           arrivalStatus = 'missing'
@@ -2477,7 +2533,10 @@
               {/if}
               <button type="button" class="close" onclick={clearSelection} aria-label="Clear selection" title="Clear selection (Esc)">✕</button>
             </header>
-            <h2 class="selection-title">{selected.recordLabel ?? selected.label}</h2>
+            <h2 class="selection-title">{selected.labelLead ?? selected.recordLabel ?? selected.label}</h2>
+            {#if selected.labelLead && selected.labelRest}
+              <p class="selection-subtitle">{selected.labelRest}</p>
+            {/if}
 
             <AnnotationPanel target={selected}>
               {#snippet between()}
@@ -3349,6 +3408,13 @@
     font-weight: 700;
     line-height: 1.3;
     text-wrap: balance;
+  }
+
+  .selection-subtitle {
+    margin: 0.2rem 0 0;
+    color: var(--app-muted);
+    font-size: 0.86rem;
+    line-height: 1.4;
   }
 
   .description {
