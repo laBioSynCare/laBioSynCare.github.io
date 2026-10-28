@@ -1,15 +1,17 @@
 <script>
   import { onMount, onDestroy, tick } from 'svelte'
   import { replaceState } from '$app/navigation'
+  import { DataFactory } from 'n3'
   import { applicationAsset, applicationRoute } from '../../config/applicationUrls.js'
   import { buildGraphElements } from '../../rdf/graph.js'
   import { MODULE_DOCUMENTS, ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
-  import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
+  import { toCurie, PREFIXES, OWL, RDF } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
   import {
     parseViewParams, formatZoomParam, pulseSchedule, qualifyArrivalHash,
-    focusOnArrival, focusParamFor, MIN_ZOOM, MAX_ZOOM,
+    focusOnArrival, focusParamFor, propertyEnds, propertyFocusPositions,
+    MIN_ZOOM, MAX_ZOOM,
   } from './deepLink.js'
   import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
   import { GRAPH_CONCERNS } from './concerns.js'
@@ -780,6 +782,24 @@
     return termAxesVisible(data)
   }
 
+  // Turn an edge layer on for a link that names one of its edges. Returns
+  // whether anything changed, so the caller re-renders only when it must.
+  function showEdgeLayer(kind) {
+    if (edgeLayerVisible(kind)) return false
+    switch (kind) {
+      case 'subClassOf': showSubClassOf = true; break
+      case 'objProp': showObjProp = true; break
+      case 'dataProp': showDataProp = true; break
+      case 'narrower': showNarrower = true; break
+      case 'related': showRelated = true; break
+      case 'instanceOf': showInstanceOf = true; break
+      case 'catalogRelation': showCatalogRelation = true; break
+      case 'ecosystemRelationship': showEcosystemRelationship = true; break
+      default: return false
+    }
+    return true
+  }
+
   function edgeLayerVisible(kind) {
     const rules = {
       subClassOf:  showSubClassOf,
@@ -842,6 +862,12 @@
         else if (data.target === selected.id) focused.add(data.source)
       }
       visibleNodeIds = focused
+    } else if (neighborhoodFocus && selected?.source && edgeLayerVisible(selected.kind)) {
+      // A property's neighbourhood is what it connects: the ends of every edge
+      // drawn for it.
+      const { sources, targets } = propertyEnds(
+        allElements, selected, (id) => visibleNodeIds.has(id))
+      if (sources.length) visibleNodeIds = new Set([...sources, ...targets])
     }
 
     return allElements.filter((element) => {
@@ -1213,6 +1239,10 @@
   const RING_GROWTH = 8
 
   function layoutFocusedNeighborhood(targets) {
+    if (selected?.source) {
+      layoutFocusedProperty(targets)
+      return
+    }
     const center = selected?.id
     if (!cy || !center || !targets || focusLayoutId === center) return
     restoreFocusLayout()
@@ -1240,6 +1270,29 @@
       minNodeSpacing: 28,
       nodeDimensionsIncludeLabels: true,
       avoidOverlap: true,
+      animate: false,
+      fit: false,
+    }).run()
+  }
+
+  // A focused property has no centre node to ring the others around. Its ends
+  // go in two columns instead, the classes it links from on the left and what
+  // it links to on the right, so its edges read like its own statement.
+  function layoutFocusedProperty(targets) {
+    const edgeId = selected?.id
+    if (!cy || !edgeId || !targets || focusLayoutId === edgeId) return
+    restoreFocusLayout()
+    const nodes = targets.nodes()
+    focusSavedPositions = new Map(nodes.map((node) => [node.id(), { ...node.position() }]))
+    focusLayoutId = edgeId
+    const byLabel = (a, b) =>
+      canvasLabel(nodes.getElementById(a)).localeCompare(canvasLabel(nodes.getElementById(b)))
+    const { sources, targets: ends } = propertyEnds(
+      allElements, selected, (id) => nodes.getElementById(id).length > 0)
+    const positions = propertyFocusPositions(sources.sort(byLabel), ends.sort(byLabel))
+    nodes.layout({
+      name: 'preset',
+      positions: (node) => positions.get(node.id()) ?? node.position(),
       animate: false,
       fit: false,
     }).run()
@@ -1513,6 +1566,13 @@
   let arrivalStatus = $state('pending')   // 'pending' | 'resolved' | 'missing'
   let arrivalLabel = $state('')
   let arrivalNodeIri = $state('')
+  // A property arrives as an edge rather than a node, and the banner says so.
+  let arrivalIsProperty = $state(false)
+  // Defined in the loaded RDF but not drawn: 'property' or 'term', else ''.
+  // The graph draws a property only between a declared domain and range, and
+  // many SSTIM properties leave both to SHACL; shapes and module records are
+  // not drawn at all. Those are real terms, not typos.
+  let arrivalUndrawn = $state('')
   let arrivalDismissed = $state(false)
   const arrivalDoc = $derived(arrivalNodeIri ? docsUrlForIri(arrivalNodeIri) : null)
 
@@ -1599,9 +1659,20 @@
   // session: widen one axis at a time, least destructive first, and only clear
   // the reader's filters if the target is still not on screen.
   function widenScopeToShow(id) {
-    const element = allElements.find((el) => !el.data?.source && el.data?.id === id)
+    const element = allElements.find((el) => el.data?.id === id)
     if (!element) return
     const data = element.data
+    // A property arrives as an edge, which is drawn only when its edge layer is
+    // on and both of its ends are shown. The data-property layer is off by
+    // default, which is how a link to `beatHz` used to select a property that
+    // was nowhere on the canvas.
+    if (data.source) {
+      const layerTurnedOn = showEdgeLayer(data.kind)
+      widenScopeToShow(data.source)
+      widenScopeToShow(data.target)
+      if (layerTurnedOn) applyGraphDisplay({ animate: false })
+      return
+    }
     let widened = false
 
     if (hiddenNodes.has(id)) {
@@ -1721,7 +1792,7 @@
     if (!cy) return
     updateSearchParams((params) => {
       params.set('zoom', formatZoomParam(cy.zoom()))
-      const focus = selected && !selected.source ? focusParamFor(neighborhoodFocus) : null
+      const focus = selected ? focusParamFor(neighborhoodFocus) : null
       if (focus) params.set('focus', focus)
       else params.delete('focus')
     })
@@ -2198,15 +2269,25 @@
       // named something here. An unresolved fragment is reported rather than
       // hidden, because a banner that vanishes reads as a page that lost the link.
       if (arrivalIri) {
-        const node = deepLinkId
-          ? allElements.find((el) => !el.data?.source && el.data?.id === deepLinkId)
+        // A node or a property's edge: both are things the link named.
+        const element = deepLinkId
+          ? allElements.find((el) => el.data?.id === deepLinkId)
           : null
-        if (node) {
+        if (element) {
           arrivalStatus = 'resolved'
-          arrivalLabel = node.data.shortLabel ?? node.data.label ?? ''
-          arrivalNodeIri = node.data.iri ?? arrivalIri
+          arrivalLabel = element.data.shortLabel ?? element.data.label ?? ''
+          arrivalNodeIri = element.data.iri ?? arrivalIri
+          arrivalIsProperty = Boolean(element.data.source)
         } else {
           arrivalStatus = 'missing'
+          const subject = DataFactory.namedNode(arrivalIri)
+          if (store.countQuads(subject, null, null, null) > 0) {
+            const isProperty = [OWL('ObjectProperty'), OWL('DatatypeProperty')]
+              .some((type) => store.countQuads(subject, RDF('type'), type, null) > 0)
+            arrivalUndrawn = isProperty ? 'property' : 'term'
+            // Its reference entry still has the definition the canvas cannot show.
+            arrivalNodeIri = arrivalIri
+          }
         }
       }
 
@@ -2488,22 +2569,28 @@
          RDF identifier had resolved. This speaks from first paint, beside the
          loader, because that is when the question is live. -->
     {#if arrivalIri && !arrivalDismissed}
-      <div class="arrival" class:missing={arrivalStatus === 'missing'} role="status">
+      <div class="arrival" class:missing={arrivalStatus === 'missing' && !arrivalUndrawn} role="status">
         <span class="arrival-tag">Resolved IRI</span>
         <code class="arrival-iri">{arrivalNodeIri || arrivalIri}</code>
         <span class="arrival-said">
           {#if arrivalStatus === 'pending'}
             a SSTIM term, being located in the graph
+          {:else if arrivalStatus === 'resolved' && arrivalIsProperty}
+            {arrivalLabel ? `“${arrivalLabel}”, a property, shown with what it connects` : 'a property, shown with what it connects'}
           {:else if arrivalStatus === 'resolved'}
             {arrivalLabel ? `“${arrivalLabel}”, selected below` : 'selected below'}
+          {:else if arrivalUndrawn === 'property'}
+            a property defined here but not drawn: the graph draws a property only between a declared domain and range.
+          {:else if arrivalUndrawn}
+            defined in the loaded data but not drawn in this graph.
           {:else}
             not a node in this graph. It may be a shape, a retired term, or a typo.
           {/if}
         </span>
-        {#if arrivalStatus === 'resolved' && arrivalDoc}
+        {#if (arrivalStatus === 'resolved' || arrivalUndrawn) && arrivalDoc}
           <a class="arrival-link" href={arrivalDoc.href} target="_blank" rel="noreferrer">{arrivalDoc.label}</a>
         {/if}
-        {#if arrivalStatus === 'missing'}
+        {#if arrivalStatus === 'missing' && !arrivalUndrawn}
           <a class="arrival-link" href={applicationRoute('/namespace/')}>What resolves where</a>
         {/if}
         <button
@@ -2772,6 +2859,23 @@
                     </div>
                   {/if}
                 </dl>
+
+                {#if selected.source && selected.iri}
+                  <!-- A property is drawn as edges, so its "neighbourhood" is the
+                       classes it connects. Same toggle as a node's, so a link
+                       that arrives folded can always be unfolded. -->
+                  <p class="property-focus">
+                    <button
+                      type="button"
+                      class="focus-btn"
+                      class:active={neighborhoodFocus}
+                      onclick={toggleNeighborhoodFocus}
+                      title={neighborhoodFocus ? 'Show the full graph again' : 'Show only what this property connects'}
+                    >
+                      {neighborhoodFocus ? 'Exit focus' : 'Focus on what it connects'}
+                    </button>
+                  </p>
+                {/if}
 
                 {#if !selected.source && neighbors.length}
                   <section class="neighbors">
@@ -3728,6 +3832,7 @@
   .focus-btn.active:hover {
     background: color-mix(in srgb, var(--app-accent-soft) 70%, var(--app-accent) 30%);
   }
+  .property-focus { margin: 0.6rem 0 0; }
 
   .neighbors ul {
     list-style: none;

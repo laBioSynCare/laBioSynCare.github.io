@@ -75,6 +75,65 @@ export function focusParamFor(focused) {
   return focused ? FOCUS_PARAM_VALUE : FOCUS_OFF_VALUE
 }
 
+// ── A property's neighbourhood ──────────────────────────────────────────────
+// A class or a concept is a node, and its neighbourhood is the nodes one edge
+// away. A property is drawn as edges instead, one from each class in its domain
+// to each range (a union domain draws several), so what it connects is the
+// ends of those edges. Every arrival rule above was written for nodes, and a
+// link to a property, from its w3id IRI or from a Patch Studio knob, selected
+// the property but reported it "not a node in this graph" and left it buried
+// in the whole graph.
+
+/**
+ * The ends of every edge drawn for one property, each listed once.
+ *
+ * Only edges of the selected edge's own kind count: an object property is also
+ * the predicate of catalog relations between records, and a property's
+ * neighbourhood is its domain and range, not every record that uses it.
+ *
+ * @param {Array<{ data?: object }>} elements graph elements
+ * @param {{ iri?: string, kind?: string }} property the selected edge's data
+ * @param {(id: string) => boolean} [shown] whether an end may be shown
+ * @returns {{ sources: string[], targets: string[] }} a node that is both a
+ *   source and a target (a property whose domain is its range) is a source
+ */
+export function propertyEnds(elements, property, shown = () => true) {
+  const sources = new Set()
+  const targets = new Set()
+  if (!property?.iri) return { sources: [], targets: [] }
+  for (const element of elements ?? []) {
+    const data = element?.data
+    if (!data?.source || data.iri !== property.iri || data.kind !== property.kind) continue
+    if (!shown(data.source) || !shown(data.target)) continue
+    sources.add(data.source)
+    targets.add(data.target)
+  }
+  for (const id of sources) targets.delete(id)
+  return { sources: [...sources], targets: [...targets] }
+}
+
+/**
+ * Where a focused property's ends sit: what it links from in a column on the
+ * left, what it links to on the right, both centred on the origin, so the
+ * edges read in one direction like the property's own statement.
+ *
+ * @param {string[]} sources ids, in display order
+ * @param {string[]} targets ids, in display order
+ * @param {{ columnGap?: number, rowGap?: number }} [spacing]
+ * @returns {Map<string, { x: number, y: number }>}
+ */
+export function propertyFocusPositions(sources, targets, { columnGap = 360, rowGap = 96 } = {}) {
+  const positions = new Map()
+  const column = (ids, x) => {
+    const top = -((ids.length - 1) * rowGap) / 2
+    ids.forEach((id, row) => positions.set(id, { x, y: top + row * rowGap }))
+  }
+  // A property linking a class to itself has no second column to face.
+  column(sources, targets.length ? -columnGap / 2 : 0)
+  column(targets, sources.length ? columnGap / 2 : 0)
+  return positions
+}
+
 // ── Namespace-qualified arrival ─────────────────────────────────────────────
 // A server never sees a URL fragment, so the w3id route for a hash namespace
 // can only name the namespace, and the browser re-attaches the fragment it

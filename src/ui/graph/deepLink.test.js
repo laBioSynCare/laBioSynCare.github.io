@@ -13,8 +13,10 @@ import {
   MAX_ZOOM,
   FLASH_SAFE_MAX_HZ,
   qualifyArrivalHash,
+  propertyEnds,
+  propertyFocusPositions,
 } from './deepLink.js'
-import { PREFIXES } from '../../rdf/namespaces.js'
+import { PREFIXES, SSTIM } from '../../rdf/namespaces.js'
 
 describe('qualifyArrivalHash', () => {
   it('qualifies the bare fragment a namespace route delivers, and drops the parameter', () => {
@@ -150,5 +152,63 @@ describe('focus on arrival', () => {
       expect(focusOnArrival(focusParamFor(focused)), `focused=${focused}`).toBe(focused)
     }
     expect(focusParamFor(false)).toBe('none')
+  })
+})
+
+describe("a property's neighbourhood", () => {
+  // The shapes graph.js draws: one edge per domain class and range, carrying
+  // the property's IRI, beside catalog relations that use the same predicate.
+  const USES = SSTIM('usesTechnique').value
+  const BEAT = SSTIM('beatHz').value
+  const edge = (id, kind, iri, source, target) => ({ data: { id, kind, iri, source, target } })
+  const elements = [
+    { data: { id: 'Protocol' } },
+    { data: { id: 'Preset' } },
+    { data: { id: 'Technique' } },
+    edge('obj_a', 'objProp', USES, 'Protocol', 'Technique'),
+    edge('obj_b', 'objProp', USES, 'Preset', 'Technique'),
+    edge('rel_1', 'catalogRelation', USES, 'some-record', 'Technique'),
+    edge('dat_1', 'dataProp', BEAT, 'AudioTrack', 'xsd:decimal'),
+  ]
+
+  it('collects the ends of every edge drawn for the property, once each', () => {
+    expect(propertyEnds(elements, { iri: USES, kind: 'objProp' }))
+      .toEqual({ sources: ['Protocol', 'Preset'], targets: ['Technique'] })
+  })
+
+  it('is the domain and range, not every record using the predicate', () => {
+    const { sources } = propertyEnds(elements, { iri: USES, kind: 'objProp' })
+    expect(sources).not.toContain('some-record')
+  })
+
+  it('reaches a datatype property through its datatype node', () => {
+    expect(propertyEnds(elements, { iri: BEAT, kind: 'dataProp' }))
+      .toEqual({ sources: ['AudioTrack'], targets: ['xsd:decimal'] })
+  })
+
+  it('leaves out an end the view may not show', () => {
+    const shown = (id) => id !== 'Preset'
+    expect(propertyEnds(elements, { iri: USES, kind: 'objProp' }, shown).sources).toEqual(['Protocol'])
+  })
+
+  it('treats a class the property links to itself as a source only', () => {
+    const loop = [edge('obj_l', 'objProp', USES, 'Concept', 'Concept')]
+    expect(propertyEnds(loop, { iri: USES, kind: 'objProp' }))
+      .toEqual({ sources: ['Concept'], targets: [] })
+  })
+
+  it('finds nothing for a selection that is not a property', () => {
+    expect(propertyEnds(elements, { kind: 'objProp' })).toEqual({ sources: [], targets: [] })
+  })
+
+  it('lays the ends out left to right, each column centred', () => {
+    const positions = propertyFocusPositions(['a', 'b'], ['c'], { columnGap: 200, rowGap: 100 })
+    expect(positions.get('a')).toEqual({ x: -100, y: -50 })
+    expect(positions.get('b')).toEqual({ x: -100, y: 50 })
+    expect(positions.get('c')).toEqual({ x: 100, y: 0 })
+  })
+
+  it('centres a lone class that the property links to itself', () => {
+    expect(propertyFocusPositions(['a'], []).get('a')).toEqual({ x: 0, y: 0 })
   })
 })

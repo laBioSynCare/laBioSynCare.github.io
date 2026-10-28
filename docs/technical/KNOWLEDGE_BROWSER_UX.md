@@ -106,6 +106,19 @@ are the choices a future change could quietly undo:
   focus now places the selected node at the centre and its neighbours in rings,
   a dozen in the first and eight more in each further one, grouped by kind; and
   leaving it puts every node back where the full layout had it.
+- **A property arrives as what it connects.** A property is drawn as edges, one
+  from each class in its domain to each range, and every rule above was written
+  for nodes. A link to one, from its w3id IRI or from a Patch Studio knob,
+  selected the property in the panel while the banner called it "not a node in
+  this graph… or a typo" over the whole graph, and a datatype property's edges
+  were not even drawn, its layer being off by default. Now the link turns the
+  property's edge layer on, folds the graph to the ends of every edge drawn for
+  it, laid out in two columns (what it links from on the left, what it links to
+  on the right), and the banner says it is a property. The property panel has
+  the same Focus toggle as a node's (`propertyEnds` and `propertyFocusPositions`
+  in `deepLink.js`). A term the loaded data defines but the graph does not draw,
+  such as a property that leaves its domain and range to SHACL, is reported as
+  exactly that, with its reference entry, rather than as a possible typo.
 - **A record's canvas label is short; its panel keeps the whole.** A record's
   `rdfs:label` is written for the panel, and a published protocol's runs past a
   hundred characters, ending in its citation. On the canvas it is drawn by its
