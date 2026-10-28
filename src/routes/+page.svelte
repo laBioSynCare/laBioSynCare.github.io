@@ -5,7 +5,6 @@
   import ConversionBar from '../ui/entrance/ConversionBar.svelte'
   import ContributeProtocolModal from '../ui/entrance/ContributeProtocolModal.svelte'
   import CiteSstimModal from '../ui/entrance/CiteSstimModal.svelte'
-  import Isotype from '../ui/brand/Isotype.svelte'
   import { CONCEPT_DOI, RELEASE_VERSION, doiUrl } from '../ui/entrance/releaseMetadata.js'
   import {
     BIOSYNCARE_URL,
@@ -32,8 +31,9 @@
       copy: 'Navigate precise concepts, inspect relationships and evidence, or query the published knowledge directly.',
       primary: { label: 'Explore the graph', href: applicationRoute('/graph/') },
       secondary: [
-        { label: 'Hands-on manual', href: applicationRoute('/manual/') },
+        { label: 'Published protocols', href: applicationRoute('/protocols/') },
         { label: 'Query with SPARQL', href: applicationRoute('/sparql/') },
+        { label: 'Hands-on manual', href: applicationRoute('/manual/') },
       ],
     },
     {
@@ -141,25 +141,24 @@
 <main class="entrance">
   <section class="hero" id="hero" bind:this={heroEl} aria-labelledby="hero-title">
     <div class="hero-copy">
-      <div class="identity">
-        <Isotype name="bsclab" size={38} title="SSTIM mark" />
-        <div class="identity-text"><strong>SSTIM</strong><span>Open science / shared knowledge</span></div>
-      </div>
-      <p class="kicker"><span class="kicker-line"></span> AN OPEN REFERENCE THAT EVOLVES</p>
+      <!-- The top bar already carries the mark and the name, so the hero opens
+           on its kicker. The SSTIM identity block that stood here put both
+           buttons below the fold on a 1366x768 laptop and on a 1080p screen. -->
+      <p class="kicker"><span class="kicker-line"></span> SSTIM · AN OPEN REFERENCE THAT EVOLVES</p>
       <h1 id="hero-title">A living reference for <span>sensory stimulation.</span></h1>
       <p class="lead">{SHARE_DESCRIPTION}</p>
-      <p class="hero-detail">
-        Built to advance with scientific understanding while keeping previous meanings,
-        sources and versions interpretable.
-      </p>
       <div class="hero-actions">
         <a class="action action-primary" href={applicationRoute('/graph/')}>Explore the knowledge <span aria-hidden="true">↗</span></a>
-        <a class="action action-secondary" href={applicationRoute('/manual/')}>See how it works <span aria-hidden="true">↗</span></a>
+        <a class="action action-secondary" href={applicationRoute('/protocols/')}>Published protocols <span aria-hidden="true">↗</span></a>
       </div>
+      <p class="hero-detail">
+        Today SSTIM is an open ontology and controlled vocabulary in RDF, with persistent
+        identifiers, validation profiles and citable releases.
+      </p>
       <p class="hero-footnote">
         <span class="status-dot" aria-hidden="true"></span>
         Open and versioned · <a href={doiUrl(CONCEPT_DOI)} rel="external">Citable releases</a> ·
-        <a href={ghBlob('docs/concept/REFERENCE_VISION.md')} rel="external">Our direction</a>
+        <a href={applicationRoute('/manual/')}>How it works</a>
       </p>
     </div>
 
@@ -269,6 +268,9 @@
       SSTIM separates physical stimulation, intended experience, actual observations
       and the evidence for each assertion.
     </p>
+    <a class="precision-next" href={applicationRoute('/protocols/')}>
+      See how published studies stated theirs, side by side <span aria-hidden="true">→</span>
+    </a>
   </section>
 
   <section class="pathways section-block" id="explore" aria-labelledby="pathways-title">
@@ -394,20 +396,16 @@
     outline: 3px solid var(--app-accent);
     outline-offset: 4px;
   }
-  .hero { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr); gap: clamp(2rem, 5vw, 5.5rem); align-items: center; padding: 1.25rem 0 3.25rem; }
-  .identity { display: flex; align-items: center; gap: .8rem; margin-bottom: clamp(2rem, 5vw, 4.1rem); }
-  .identity-text { display: flex; flex-direction: column; gap: .06rem; }
-  .identity-text strong { font-size: 1.06rem; letter-spacing: .025em; color: var(--app-text-strong); }
-  .identity-text span { color: var(--app-muted); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr); gap: clamp(2rem, 5vw, 5.5rem); align-items: center; padding: .5rem 0 3.25rem; }
   .kicker, .section-tag { color: var(--app-accent); font-family: var(--app-font-mono); font-size: .67rem; letter-spacing: .14em; font-weight: 750; }
   .kicker { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.1rem; }
   .kicker-line { width: 27px; height: 1px; background: currentColor; }
-  .hero h1 { max-width: 12ch; margin: 0 0 1.5rem; font-size: clamp(2.8rem, 5vw, 5.1rem); letter-spacing: -.055em; line-height: 1.065; color: var(--app-text-strong); font-weight: 810; }
+  .hero h1 { max-width: 12ch; margin: 0 0 1.25rem; font-size: clamp(2.8rem, 5vw, 4.4rem); letter-spacing: -.055em; line-height: 1.065; color: var(--app-text-strong); font-weight: 810; }
   .hero h1 span { color: var(--app-accent); }
-  .lead { max-width: 55ch; font-size: clamp(1.06rem, 1.35vw, 1.23rem); color: var(--app-text); line-height: 1.66; margin-bottom: 1rem; }
-  .hero-detail { max-width: 58ch; font-size: .91rem; color: var(--app-muted); line-height: 1.68; margin-bottom: 2rem; }
-  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-bottom: 1.7rem; }
-  .action { display: inline-flex; align-items: center; justify-content: space-between; gap: 1.7rem; padding: .85rem 1.05rem; border-radius: 4px; text-decoration: none; font-size: .85rem; font-weight: 750; transition: transform .2s ease, background .2s ease; }
+  .lead { max-width: 60ch; font-size: clamp(1.06rem, 1.35vw, 1.23rem); color: var(--app-text); line-height: 1.66; margin-bottom: 1rem; }
+  .hero-detail { max-width: 58ch; font-size: .91rem; color: var(--app-muted); line-height: 1.68; margin-bottom: 1rem; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin: 1.35rem 0 1.4rem; }
+  .action { display: inline-flex; align-items: center; justify-content: space-between; gap: 1.2rem; padding: .85rem 1.05rem; border-radius: 4px; text-decoration: none; font-size: .85rem; font-weight: 750; transition: transform .2s ease, background .2s ease; }
   .action:hover { transform: translateY(-2px); text-decoration: none; }
   .action-primary { background: var(--app-accent); color: var(--app-on-accent); border: 1px solid var(--app-accent); }
   .action-primary:hover { color: var(--app-on-accent); filter: brightness(1.08); }
@@ -445,6 +443,8 @@
   .signal-card > p:last-child { color: var(--app-muted); line-height: 1.6; font-size: .84rem; margin-bottom: 0; }
   .diagram-note { color: var(--app-muted); font-size: .78rem; line-height: 1.6; margin-top: 1rem; }
   .diagram-note strong { color: var(--app-text); font-weight: 670; }
+  .precision-next { display: inline-flex; align-items: center; gap: .6rem; margin-top: .4rem; color: var(--app-accent); font-weight: 720; font-size: .92rem; text-decoration: none; }
+  .precision-next:hover { text-decoration: underline; text-underline-offset: .2rem; }
   .pathways-head { max-width: none; display: grid; grid-template-columns: 1fr .75fr; align-items: end; gap: 3rem; }
   .door-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
   .door { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-surface); padding: 1.65rem; min-height: 288px; transition: border-color .2s ease, transform .2s ease; }
@@ -501,7 +501,6 @@
   }
   @media (max-width: 760px) {
     .hero { grid-template-columns: 1fr; padding-top: .5rem; gap: 2rem; }
-    .identity { margin-bottom: 2.5rem; }
     .hero h1 { font-size: clamp(2.8rem, 10vw, 4.4rem); max-width: 14ch; }
     .knowledge-visual { width: 100%; max-width: 580px; margin-inline: auto; }
     .principles { grid-template-columns: 1fr 1fr; gap: 1rem 0; }

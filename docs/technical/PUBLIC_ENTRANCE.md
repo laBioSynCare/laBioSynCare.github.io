@@ -1,9 +1,9 @@
 # Public Entrance — audience-first landing IA & copy
 
-> **Status: revised 2026-10-10** (`src/routes/+page.svelte`). This is the
+> **Status: revised 2026-10-23** (`src/routes/+page.svelte`). This is the
 > public entrance design and copy source of record. The 2026-07-18 decisions
 > below are preserved as historical rationale; the current design is documented
-> immediately below. Pairs with
+> immediately below, with the 2026-10-23 revision after it. Pairs with
 > [`KNOWLEDGE_BROWSER_UX.md`](KNOWLEDGE_BROWSER_UX.md).
 
 ## Current direction (2026-10-10)
@@ -27,7 +27,7 @@ difference, isochronic amplitude modulation and visual flicker), explicitly
 labeling schematic artwork as illustrative. Distinguish what was specified,
 delivered, observed and supported by evidence.
 
-**Four working paths:** Explore (Graph, manual, SPARQL); For AI & developers
+**Four working paths:** Explore (Graph, published protocols, SPARQL, manual); For AI & developers
 (read-only published MCP reference, published clients); Experiment (ready-made
 patch, Patch Studio, presets); Contribute (Community Group, correction channel,
 protocol contribution). Do not represent AI-proposed ontology changes,
@@ -46,6 +46,37 @@ diagrams, four accessible action cards, and no extra dependencies or externally
 hosted assets. Existing `?example=` and graph deep links survive. A reduced
 motion preference is respected. The page's description and share metadata are
 the subhead verbatim.
+
+## Revision 2026-10-23: buttons in view, protocols up front, one navigation
+
+Measured in a browser, both hero buttons sat below the fold at every common
+desktop size, from 1280x720 to 1920x1080 (at 1920 the headline broke into four
+lines because the column stops at 1280px while the type kept growing). The
+revision:
+
+- **Hero.** The SSTIM identity block repeated the top bar's mark and name, so
+  the hero opens on its kicker, which now begins "SSTIM ·". The headline stops
+  growing at 4.4rem. The buttons follow the subhead directly; both are in view
+  at 1280x720, 1366x768, 1366x900, 1440x900 and 1920x1080.
+- **Protocols up front.** The second button is *Published protocols*
+  (`/protocols/`), the most concrete page on the site; *How it works* (the
+  manual) moved into the footnote. The 40 Hz section ends on a link to the
+  protocols, and the Explore door lists them.
+- **What SSTIM is, plainly.** One caption line under the buttons says that
+  today SSTIM is an open ontology and controlled vocabulary in RDF, with
+  persistent identifiers, validation profiles and citable releases. The hero
+  still leads with scientific value; the line is there so a researcher or
+  developer is not left to infer what kind of thing SSTIM is.
+- **One navigation.** The dock carries Home, Graph, Protocols and Patch Studio,
+  and a Menu that lists every page in groups. The top bar's `+` menu and Patch
+  Studio's own `+` menu, two differently ordered copies, are gone. All of it is
+  rendered from `src/ui/navigation/siteNavigation.js`, and its test fails when a
+  route is reachable from neither.
+- **Titles and descriptions.** `app.html` carries neither. SvelteKit appends a
+  page's own tags after the shell's, and a crawler or link preview reads only
+  the first, so every page had been titled "SSTIM Workbench" and described as
+  the homepage. Each page now sets both, `scripts/smoke-static.mjs` checks it,
+  and `src/routes/+error.svelte` replaces SvelteKit's bare 404.
 
 ---
 
