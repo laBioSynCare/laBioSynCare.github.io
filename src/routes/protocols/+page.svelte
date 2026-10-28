@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import { applicationRoute } from '../../config/applicationUrls.js'
   import { loadStaticKnowledgeGraph } from '../../rdf/loader.js'
   import { toCurie } from '../../rdf/namespaces.js'
@@ -56,6 +56,23 @@
     } finally {
       loading = false
     }
+    revealRecordFromHash()
+  }
+
+  // A link to one record (`/protocols/#thaut-1996-...`) names a closed
+  // <details> that exists only once the graph has loaded, so the browser's own
+  // jump to the fragment found nothing and left the reader at the top. Open the
+  // record and bring it into view once it is there, and again whenever the
+  // fragment changes, as it does when a citation in the table is followed.
+  async function revealRecordFromHash() {
+    let id = window.location.hash.slice(1)
+    try { id = decodeURIComponent(id) } catch { /* keep it as written */ }
+    if (!id) return
+    await tick()
+    const record = document.getElementById(id)
+    if (!(record instanceof HTMLDetailsElement)) return
+    record.open = true
+    record.scrollIntoView({ block: 'start' })
   }
 
   // Labels end with their citation, "(Chan et al. 2022)"; the table already shows it.
@@ -193,7 +210,11 @@
     return [...bySignal.values()].filter(entry => entry.channels.size > 1)
   }
 
-  onMount(loadProtocols)
+  onMount(() => {
+    loadProtocols()
+    window.addEventListener('hashchange', revealRecordFromHash)
+    return () => window.removeEventListener('hashchange', revealRecordFromHash)
+  })
 </script>
 
 <svelte:head>
