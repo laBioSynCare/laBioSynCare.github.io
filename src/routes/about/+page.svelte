@@ -1,6 +1,6 @@
 <script>
-  // Static content page — no runes needed. The bottom-dock screens, described
-  // here for orientation, are kept in the same order as AppBottomDock.svelte.
+  // Static content page, no runes needed. The screens described here for
+  // orientation follow the Menu's order (src/ui/navigation/siteNavigation.js).
   import { applicationRoute } from '../../config/applicationUrls.js'
   import {
     CONCEPT_DOI,
@@ -37,6 +37,20 @@
         'Choose a scope, search with /, and select a node for its definition, stable IRI, ' +
         'source, and connections. Focus its neighbourhood when the whole graph is too dense. ' +
         'Public and private annotations remain separate from authoritative SSTIM terms.',
+    },
+    {
+      href: applicationRoute('/protocols/'),
+      label: 'Published protocols',
+      role: 'Research, encoded',
+      emoji: '📚',
+      color: 'var(--app-haptic)',
+      action: 'Compare the protocols',
+      what:
+        'Stimulation protocols from published studies, encoded from their papers and set side ' +
+        'by side: what reached the subject, how loud or bright, how often, against what, and in whom.',
+      how:
+        'Filter by sense or species, open a full record from its citation, and see which values a ' +
+        'paper left unstated. A record describes a method as its paper reports it; it asserts no effect.',
     },
     {
       href: applicationRoute('/creator/'),
@@ -251,8 +265,9 @@
   <section class="block" id="surfaces">
     <h2>What you can do here</h2>
     <p class="section-intro">
-      Every screen below is reachable from the dock at the bottom of the window. This is a
-      working application, not a landing page — jump straight in from any card.
+      Every screen below is in the Menu at the bottom right of the window, and the bar beside
+      it keeps Graph, Protocols and Patch Studio one click away. This is a working application,
+      not a landing page: jump straight in from any card.
     </p>
     <div class="screen-grid">
       {#each screens as s}
@@ -288,8 +303,8 @@
     </aside>
 
     <p class="more-screens">
-      Two more reference surfaces open from the <strong>+</strong> menu in the top bar: your
-      optional account <strong>Profile</strong> (private, sign-in based), and the generated
+      The same <strong>Menu</strong> also holds your optional account <strong>Profile</strong>
+      (private, sign-in based) and the generated
       <a href={ONTOLOGY_DOCS_URL} rel="external">Ontology docs</a> and
       <a href={VOCAB_DOCS_URL} rel="external">Vocabulary docs</a>.
     </p>

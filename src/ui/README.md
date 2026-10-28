@@ -116,11 +116,16 @@ optional Firebase sign-in.
 
 ## `navigation/`, `theme/`, `safety/`, `auth/`
 
-- **navigation/** — `AppTopBar.svelte` (graph scope/search/fit + keyboard help +
-  the global `+` menu, including the Ecosystem architecture page), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
-  SPARQL · Logbook · Settings · About), `ProfileControl.svelte`,
-  `graphNavigation.js`. Sensory Field is discoverable through Studio's starter
-  palette rather than represented as another application screen.
+- **navigation/**: `siteNavigation.js` is the one list of destinations: the
+  dock's four (Home · Graph · Protocols · Patch Studio) and the Menu's grouped
+  rest (Explore, Create, Learn, Take part, You). `AppBottomDock.svelte` renders
+  the dock and its Menu button on every screen, Patch Studio included;
+  `SiteMenu.svelte` renders the groups and the account control
+  (`ProfileControl.svelte`). `siteNavigation.test.js` fails when a route is
+  reachable from neither. `AppTopBar.svelte` holds the graph's
+  scope/search/fit controls and the keyboard help; `graphNavigation.js` is
+  their store. Sensory Field is discoverable through Studio's starter palette
+  rather than represented as another application screen.
 - **theme/** — `skins.js`: five palettes (default `paper`) applied via a
   `data-skin` attribute, persisted to `localStorage`, pre-applied before first
   paint by an inline script in `app.html` to avoid a flash of the wrong theme.

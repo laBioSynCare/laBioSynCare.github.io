@@ -63,7 +63,12 @@
     </button>
   {:else}
     <p><small>Notes, patches and your profile are kept in this browser. Sign in to keep them with your account instead.</small></p>
-    <SignInForm />
+    <!-- Folded: the form is three fields and two buttons, and open it made the
+         menu that hosts this control taller than a laptop screen. -->
+    <details class="sign-in">
+      <summary>Sign in</summary>
+      <SignInForm />
+    </details>
   {/if}
 </section>
 
@@ -92,4 +97,16 @@
     text-decoration: none;
   }
   .profile-link:hover { text-decoration: underline; }
+
+  .sign-in summary {
+    width: fit-content;
+    padding: 0.35rem 0.75rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    font-size: 0.8rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .sign-in summary:hover { border-color: var(--app-accent); color: var(--app-accent); }
+  .sign-in[open] summary { margin-bottom: 0.6rem; }
 </style>

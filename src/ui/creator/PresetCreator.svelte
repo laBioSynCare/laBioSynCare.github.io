@@ -1932,19 +1932,6 @@
         title="Patch Studio help (?)"
         onclick={toggleHelp}
       >?</button>
-      <details class="nav-menu">
-        <summary title="Navigate">+</summary>
-        <div class="nav-panel">
-          <a href={applicationRoute('/')}>Home</a>
-          <a href={applicationRoute('/agents/')}>AI agents: contribute</a>
-          <a href={applicationRoute('/contribute/')}>Report a flaw or need</a>
-          <a href={applicationRoute('/creator/')}>Patch Studio</a>
-          <a href={applicationRoute('/settings/')}>Settings</a>
-          <a href={applicationRoute('/presets/')}>Presets</a>
-          <a href={applicationRoute('/sparql/')}>SPARQL</a>
-          <a href={applicationRoute('/graph/')}>Graph</a>
-        </div>
-      </details>
     </div>
   </header>
 
@@ -3310,16 +3297,12 @@
     cursor: default;
   }
 
-  /* ── Nav menu ──────────────────────────────────────────────────────────────── */
-  .hdr-icon,
-  .nav-menu { position: relative; margin: 0; }
-  .nav-menu {
-    display: inline-flex;
-    align-items: center;
-    height: var(--hdr-control);
-  }
-  .hdr-icon,
-  .nav-menu summary {
+  /* ── Header icon button (help) ─────────────────────────────────────────────
+     The Studio's own + navigation menu used to live here too; every page is in
+     the dock's Menu now (siteNavigation.js). */
+  .hdr-icon {
+    position: relative;
+    margin: 0;
     display: grid;
     place-items: center;
     width: var(--hdr-control);
@@ -3331,46 +3314,11 @@
     font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
-    list-style: none;
     transition: color .1s, border-color .1s;
     padding: 0;
     font-family: inherit;
   }
-  .nav-menu summary::marker,
-  .nav-menu summary::after { display: none; content: ''; }
-  .nav-menu summary::-webkit-details-marker { display: none; }
-  .hdr-icon:hover,
-  .nav-menu summary:hover { color: var(--txt); border-color: var(--acc); background: var(--acc-s); }
-  .nav-panel {
-    position: absolute;
-    right: 0;
-    top: calc(100% + 4px);
-    z-index: 60;
-    min-width: 190px;
-    background: var(--sur2);
-    border: 1px solid var(--bdr);
-    border-radius: 4px;
-    padding: 3px 5px;
-    box-shadow: 0 8px 20px #00000099;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .nav-panel a {
-    /* 24px minimum, WCAG 2.5.8 (AA). These rows were 18px tall and stacked
-       18px apart, so they failed both the size rule and the spacing exception
-       that excuses the rest of the Studio's small controls. Flex rather than
-       extra padding so the 10px type stays optically centred. */
-    display: flex;
-    align-items: center;
-    min-height: 24px;
-    padding: 2px 5px;
-    color: var(--txt);
-    text-decoration: none;
-    font-size: 10px;
-    border-radius: 3px;
-  }
-  .nav-panel a:hover { background: var(--acc-s); color: var(--acc); }
+  .hdr-icon:hover { color: var(--txt); border-color: var(--acc); background: var(--acc-s); }
 
   .studio-help-overlay {
     position: fixed;

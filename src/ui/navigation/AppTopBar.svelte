@@ -1,7 +1,6 @@
 <script>
   import { onMount } from 'svelte'
   import { applicationRoute } from '../../config/applicationUrls.js'
-  import ProfileControl from './ProfileControl.svelte'
   import BrandHomeLink from './BrandHomeLink.svelte'
   import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
@@ -286,31 +285,9 @@
     onclick={toggleHelp}
   >?</button>
 
-  <details class="global-menu">
-    <summary aria-label="Open navigation menu">+</summary>
-    <div class="global-menu-panel">
-      <a href={applicationRoute('/')}>Home</a>
-      <a href={applicationRoute('/agents/')}>AI agents: contribute</a>
-      <a href={applicationRoute('/contribute/')}>Report a gap or correction</a>
-      <a href={applicationRoute('/graph/')}>Graph</a>
-      <a href={applicationRoute('/creator/')}>Patch Studio</a>
-      <a href={applicationRoute('/presets/')}>Presets</a>
-      <a href={applicationRoute('/protocols/')}>Published protocols</a>
-      <a href={applicationRoute('/sparql/')}>SPARQL</a>
-      <a href={applicationRoute('/logbook/')}>Logbook</a>
-      <a href={applicationRoute('/settings/')}>Settings</a>
-      <a href={applicationRoute('/ecosystem/')}>Ecosystem</a>
-      <a href={applicationRoute('/ecosystem/directory/')}>Stakeholder directory</a>
-      <a href={applicationRoute('/manual/')}>Manual & tutorials</a>
-      <a href={applicationRoute('/about/')}>About</a>
-      <!-- Generated docs (WIDOCO for OWL core, pyLODE for the SKOS vocabulary)
-           exist only in the deployed artifact; rel="external" keeps the
-           prerender crawler and router away from them -->
-      <a href={ONTOLOGY_DOCS_URL} rel="external">Ontology docs</a>
-      <a href={VOCAB_DOCS_URL} rel="external">Vocabulary docs</a>
-      <ProfileControl />
-    </div>
-  </details>
+  <!-- Every page, the account control included, is in the dock's Menu
+       (siteNavigation.js), which is on every screen; this bar used to carry a
+       second, differently ordered copy behind a "+". -->
 </header>
 
 {#if helpOpen}
@@ -373,7 +350,7 @@
         </dl>
       {:else}
         <p class="help-fallback">
-          Use the bottom navigation or the + menu to explore. SSTIM is a living reference with sources and reviewed contributions. <a href={applicationRoute('/agents/')}>Report a gap or contribute as an AI agent.</a>
+          Use the bar at the bottom of the window: its Menu lists every page. SSTIM is a living reference with sources and reviewed contributions. <a href={applicationRoute('/agents/')}>Report a gap or contribute as an AI agent.</a>
         </p>
       {/if}
     </div>
@@ -469,8 +446,15 @@
   .help-agent-call { margin: .75rem 0 1.1rem; line-height: 1.6; color: var(--app-muted); }
   .brand small { font-weight: 500; color: var(--app-muted); }
 
+  /* Off the graph the brand is the bar's only content. It used to sit in the
+     325px scope column and wrap onto a second line at every width. */
   .brand {
+    grid-column: 1 / -1;
     align-self: center;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-weight: 700;
     text-decoration: none;
     color: inherit;
@@ -888,63 +872,6 @@
   .help-list .sep {
     color: #aaa;
     font-size: 0.78rem;
-  }
-
-  .global-menu {
-    position: relative;
-    flex-shrink: 0;
-    margin: 0;
-  }
-
-  .global-menu summary {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
-    border: var(--app-border-width) solid var(--app-border);
-    border-radius: var(--app-radius);
-    background: transparent;
-    color: var(--app-accent);
-    cursor: pointer;
-    font-size: 1.35rem;
-    line-height: 1;
-    list-style: none;
-    list-style-type: none;
-  }
-
-  .global-menu summary::marker,
-  .global-menu summary::after {
-    display: none;
-    content: '';
-  }
-
-  .global-menu summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .global-menu-panel {
-    position: absolute;
-    right: 0;
-    z-index: 30;
-    width: min(20rem, calc(100vw - 2rem));
-    margin-top: 0.5rem;
-    padding: 0.7rem;
-    border: var(--app-border-width) solid var(--app-border);
-    border-radius: var(--app-radius);
-    background: var(--app-surface-2);
-    box-shadow: 0 0.65rem 1.6rem #0005;
-  }
-
-  .global-menu-panel > a {
-    display: block;
-    padding: 0.4rem 0;
-    text-decoration: none;
-    color: var(--app-text);
-  }
-
-  .global-menu-panel > a:hover {
-    color: var(--app-accent);
   }
 
   @media (max-width: 980px) {
