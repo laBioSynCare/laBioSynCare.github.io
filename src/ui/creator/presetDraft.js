@@ -1005,7 +1005,6 @@ export function validateDraft(draft) {
     }
   }
   if ((timing.lengthSec ?? 0) <= 0) issues.push(err('Length must be > 0 sec.'))
-  if (draft.controlTracks.length === 0) issues.push(warn('No control tracks — add an LFO, Permutation, or Sinusoid.'))
 
   if (bpmEnabled) {
     for (const mod of timing.bpm?.mods ?? []) {

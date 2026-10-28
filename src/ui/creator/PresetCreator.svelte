@@ -4919,6 +4919,15 @@
       min-height: 22rem;
     }
 
+    /* Stacked, an empty lane is its add buttons and a one-line invitation.
+       Held at 22rem it pushed the tracks a patch actually has below the fold:
+       an example with no controls opened on an empty Controls box. */
+    .col.is-empty {
+      min-height: 0;
+    }
+    .col.is-empty .col-body { padding: 4px 10px 8px; }
+    .col.is-empty .empty { padding: 6px 10px; }
+
     /* The header is a fixed-height, non-wrapping row of ~600px of controls.
        The columns below it reflowed at this width but the header never did, so
        on a phone everything past "Share link" — Examples, Import, Save / Load,

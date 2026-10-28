@@ -15,13 +15,30 @@ describe('the bundled example patches', () => {
   })
 
   // The point of an example is that it opens clean. One that loads with a
-  // validation error teaches the reader that errors are normal.
+  // validation error or warning teaches the reader that they are normal.
   it.each(EXAMPLE_PATCHES.map((example) => [example.id, example]))(
-    '%s builds a draft that validates with no errors',
+    '%s builds a draft that validates with no errors or warnings',
+    (_id, example) => {
+      expect(validateDraft(example.build())).toEqual([])
+    },
+  )
+
+  // Five of six examples once carried an LFO linked to nothing, added only to
+  // silence a warning that a steady tone needs no control signal for. A
+  // newcomer's first look at a patch should not include a control that does
+  // nothing.
+  it.each(EXAMPLE_PATCHES.map((example) => [example.id, example]))(
+    '%s has no control track that drives nothing',
     (_id, example) => {
       const built = example.build()
-      const errors = validateDraft(built).filter((issue) => issue.level === 'error')
-      expect(errors).toEqual([])
+      const sensory = [...built.audioTracks, ...built.visualTracks, ...(built.hapticTracks ?? [])]
+      const linked = new Set([
+        ...sensory.flatMap((track) => Object.values(track.params).flatMap((param) => param.mods ?? [])),
+        ...(built.timing?.bpm?.mods ?? []),
+      ].map((mod) => mod.controlId))
+      for (const control of built.controlTracks) {
+        expect(linked.has(control.id), control.name).toBe(true)
+      }
     },
   )
 

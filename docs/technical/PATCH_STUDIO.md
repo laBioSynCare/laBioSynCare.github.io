@@ -765,13 +765,24 @@ defects were found and fixed:
   left out on purpose: one keypress would put a gain at full scale on someone's
   headphones. The modulation button no longer sits inside the slider, where
   `tabindex="-1"` had made modulation unreachable without a mouse.
+- **Examples open without a control that does nothing.** Five of the six
+  bundled examples carried an LFO linked to nothing, only because
+  `validateDraft` warned when a patch had no control track; a steady tone needs
+  none, and the empty Controls lane already invites one. The warning is gone,
+  and `examplePatches.test.js` fails on an example that opens with any issue
+  or with a control track that drives nothing.
+- **Empty lanes stop at their buttons on a phone.** Stacked below 860px, each
+  lane kept a 22rem minimum height, so an example with no controls opened on an
+  empty Controls box and its tracks below the fold. Empty lanes now take only
+  their add buttons and one line.
 
 Open, and not yet decided:
 
 - The header meta (`1c · 1a · 0v · 0h · 0m`) now explains itself on hover, but
   it is still a pill of abbreviations at rest, and it truncates under about
   1000px.
-- Unused Visual and Haptic columns still occupy half the viewport.
+- Unused Visual and Haptic columns still occupy half the viewport on a wide
+  screen; only the stacked phone layout collapses them.
 - The graph route blocks for roughly three and a half minutes in a production
   build before a `#term` selection resolves, measured while building the browser
   checks. The loading panel is shown throughout, so nothing appears broken, but

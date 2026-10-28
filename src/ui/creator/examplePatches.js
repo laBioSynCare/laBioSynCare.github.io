@@ -56,10 +56,6 @@ export const EXAMPLE_PATCHES = Object.freeze([
     label: 'Alpha 10 Hz isochronic',
     blurb: 'A 200 Hz tone pulsed ten times a second, with a soft attack and release on each pulse. The smallest complete patch the Studio makes.',
     build: () => draft('Alpha 10 Hz isochronic', {
-      // A patch needs at least one control track to validate cleanly, even
-      // when nothing is linked to it yet: the Studio warns otherwise, and an
-      // example that opens with a warning teaches the wrong thing.
-      controlTracks: [createLfoTrack({ name: 'Spare LFO', periodSec: 10, targetPeriodSec: 10 })],
       audioTracks: [isochronic({ name: 'Alpha pulse', frequency: 200, pulseRate: 10 })],
     }),
   },
@@ -68,7 +64,6 @@ export const EXAMPLE_PATCHES = Object.freeze([
     label: 'Gamma 40 Hz isochronic',
     blurb: 'The same shape at forty pulses a second, the rate most often used in gamma-band studies. Compare it with the alpha patch to hear what the pulse rate alone changes.',
     build: () => draft('Gamma 40 Hz isochronic', {
-      controlTracks: [createLfoTrack({ name: 'Spare LFO', periodSec: 10, targetPeriodSec: 10 })],
       audioTracks: [isochronic({ name: 'Gamma pulse', frequency: 220, pulseRate: 40 })],
     }),
   },
@@ -83,7 +78,6 @@ export const EXAMPLE_PATCHES = Object.freeze([
       beat.params.leftFreq.value = 200
       beat.params.rightFreq.value = 210
       return draft('Binaural alpha beat', {
-        controlTracks: [createLfoTrack({ name: 'Spare LFO', periodSec: 10, targetPeriodSec: 10 })],
         audioTracks: [beat],
       })
     },
@@ -125,7 +119,6 @@ export const EXAMPLE_PATCHES = Object.freeze([
       drone.params.gain.value = 0.18
       drone.params.frequency.value = 110
       return draft('Ocean and drone', {
-        controlTracks: [createLfoTrack({ name: 'Spare LFO', periodSec: 12, targetPeriodSec: 12 })],
         audioTracks: [ocean, drone],
       })
     },
@@ -140,7 +133,6 @@ export const EXAMPLE_PATCHES = Object.freeze([
       carrier.params.frequency.value = 160
       const wash = createVisualTrack('Gradient', { name: 'Colour wash' })
       return draft('Colour wash and tone', {
-        controlTracks: [createLfoTrack({ name: 'Wash LFO', periodSec: 8, targetPeriodSec: 8 })],
         audioTracks: [carrier],
         visualTracks: [wash],
       })
