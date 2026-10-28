@@ -42,7 +42,9 @@
   :global(:root) {
     color-scheme: light;
     --app-header-height: 56px;
-    --app-bottom-dock-height: 48px;
+    /* 48px of dock, and below it whatever the device keeps for its home
+       indicator; zero everywhere but a phone with one. */
+    --app-bottom-dock-height: calc(48px + env(safe-area-inset-bottom, 0px));
     --app-radius: 4px;
     --app-border-width: 1px;
     --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -224,10 +226,25 @@
     margin: 0;
     font-family: var(--app-font-ui);
     padding-bottom: var(--app-bottom-dock-height);
+    /* Clear of a notch when a phone is held sideways. */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
   .app-page-shell {
     overflow: hidden;
+  }
+
+  /* iPhone Safari zooms the page into any field whose text is under 16px and
+     leaves it zoomed; fields here ran from 9px to 14px. On a touch phone they
+     are 16px whatever their component sets. The other cure, maximum-scale=1,
+     would also stop people zooming the page themselves. */
+  @media (pointer: coarse) and (max-width: 760px) {
+    :global(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color'])),
+    :global(select),
+    :global(textarea) {
+      font-size: 16px !important;
+    }
   }
 
   :global(body.studio-page .app-topbar) { display: none; }

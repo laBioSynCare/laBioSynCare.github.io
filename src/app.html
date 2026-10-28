@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- viewport-fit=cover hands the screen's safe areas to the page, which
+         pads for them (the dock above the home indicator, the content clear of
+         a notch in landscape). Without it an installed app's fixed dock sat
+         under the iPhone home indicator. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <!-- No title element or description here. SvelteKit appends a page's own after
          the shell's rather than replacing them, and a crawler or link preview
          reads only the first, so a static pair here titled every page

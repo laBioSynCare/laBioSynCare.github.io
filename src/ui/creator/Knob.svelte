@@ -274,6 +274,10 @@
     cursor: ns-resize;
     border-radius: 50%;
     transition: filter 0.12s;
+    /* A finger dragging up a knob scrolled the lane and cancelled the pointer
+       instead of turning it, so no knob could be dragged on a touch screen.
+       The knob claims the gesture; the page scrolls from anywhere else. */
+    touch-action: none;
   }
 
   .knob-svg-wrap:focus { outline: none; filter: drop-shadow(0 0 4px var(--knob-glow, #3b9eff88)); }
@@ -382,5 +386,14 @@
     border-color: var(--acc, var(--app-accent, #3b9eff));
     background: var(--bg, var(--app-bg, #07111d));
     outline: none;
+  }
+
+  /* Touch: a 14px caption, a 17px value and a 17px modulation button were
+     sized for a pointer. The column keeps its 56px width, so every caption
+     still fits it (paramLabels.test.js). */
+  @media (pointer: coarse) {
+    .knob-label-button { height: 24px; line-height: 24px; }
+    .knob-val { height: 26px; line-height: 24px; font-size: 0.7rem; }
+    .mod-dot { width: 22px; height: 22px; font-size: 0.6rem; }
   }
 </style>

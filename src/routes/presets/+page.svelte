@@ -1206,12 +1206,7 @@
   @media (max-width: 520px) {
     .presets-page { padding-inline: 0.75rem; }
     .hero-actions { display: grid; grid-template-columns: 1fr; }
-    .catalog-facts { grid-template-columns: 1fr; }
-    .catalog-facts div,
-    .catalog-facts div:nth-child(2) { border-right: 0; border-bottom: var(--app-border-width) solid var(--app-border); }
-    .catalog-facts div:last-child { border-bottom: 0; }
     .discovery-heading { align-items: flex-start; }
-    .filter-row { grid-template-columns: 1fr; }
     .configuration-grid { grid-template-columns: 1fr; }
     .configuration-grid div,
     .configuration-grid div:nth-child(2n),
@@ -1221,6 +1216,16 @@
     .card-actions { width: 100%; }
     .card-actions > * { flex: 1; text-align: center; }
     .guide-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Two columns of facts and filters hold down to a small phone; stacked one
+     to a row at 390px they put about 700px of controls above the first record. */
+  @media (max-width: 360px) {
+    .catalog-facts { grid-template-columns: 1fr; }
+    .catalog-facts div,
+    .catalog-facts div:nth-child(2) { border-right: 0; border-bottom: var(--app-border-width) solid var(--app-border); }
+    .catalog-facts div:last-child { border-bottom: 0; }
+    .filter-row { grid-template-columns: 1fr; }
   }
 
   @media (prefers-reduced-motion: reduce) {

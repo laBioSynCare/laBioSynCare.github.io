@@ -330,7 +330,7 @@
   })
 
   const STUDIO_HELP = [
-    ['Start', 'New here? Open Examples in the header for a ready-made patch, then press Space.'],
+    ['Start', 'New here? Open Examples in the header for a ready-made patch, then play it with ▶ or the Space bar.'],
     ['Add', 'Use the column + buttons to add control, audio, visual, and haptic tracks.'],
     ['Tune', 'Adjust each card directly; linked modulation appears under the M controls.'],
     ['Export', 'Copy or download JSON, or save signed-in patches to Firebase.'],
@@ -1117,7 +1117,9 @@
     currentPatchName = null
     examplesMenuOpen = false
     saveMenuOpen = false
-    tip(`Opened ${example.label}. Press Space to play.`)
+    // Space is a keyboard's play key; a touch screen has only the button.
+    const playHint = window.matchMedia?.('(pointer: coarse)').matches ? 'Tap ▶ to play.' : 'Press Space to play.'
+    tip(`Opened ${example.label}. ${playHint}`)
   }
 
   function resetLiveDraftState(nextDraft) {
@@ -2685,6 +2687,7 @@
   .link-offer-body {
     max-width: 34rem;
     max-height: min(48rem, calc(100vh - 2rem));
+    max-height: min(48rem, calc(100dvh - 2rem));
     overflow: auto;
     padding: 1.25rem 1.5rem;
     border-radius: 0.75rem;
@@ -2816,6 +2819,7 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - var(--app-bottom-dock-height, 48px));
+    height: calc(100dvh - var(--app-bottom-dock-height, 48px));
     overflow: hidden;
     background: var(--bg);
     color: var(--txt);
@@ -3177,6 +3181,7 @@
     z-index: 80;
     width: min(19rem, 82vw);
     max-height: min(28rem, calc(100vh - 6rem));
+    max-height: min(28rem, calc(100dvh - 6rem));
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -4478,10 +4483,13 @@
   .mix-dialog {
     width: min(52rem, calc(100vw - 3rem));
     height: min(32rem, calc(100vh - 3rem));
+    height: min(32rem, calc(100dvh - 3rem));
     min-width: min(22rem, calc(100vw - 1rem));
     min-height: min(16rem, calc(100vh - 1rem));
+    min-height: min(16rem, calc(100dvh - 1rem));
     max-width: calc(100vw - 1.5rem);
     max-height: calc(100vh - 1.5rem);
+    max-height: calc(100dvh - 1.5rem);
     box-sizing: border-box;
     margin: auto;
     padding: 0;
@@ -4509,6 +4517,7 @@
   .visual-stage:fullscreen {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     border-radius: 0;
   }
 
@@ -4952,6 +4961,33 @@
       height: auto;
       row-gap: 4px;
     }
+
+    /* Wrapped, a menu button can sit at the left edge, and its panel, aligned
+       to the button's right, opened 123px past the screen at 360px. Below this
+       width the panels hang from the header and span it instead. */
+    .hdr { position: relative; }
+    .hdr-actions,
+    .cloud-menu { position: static; }
+    .cloud-panel {
+      top: calc(100% + 4px);
+      left: 12px;
+      right: 12px;
+      width: auto;
+    }
+  }
+
+  /* On a phone the summary pill truncated to a lone digit beside the name. The
+     same counts are visible as the lanes themselves. */
+  @media (max-width: 600px) {
+    .pill { display: none; }
+  }
+
+  /* Touch: 9px toolbar labels and 24px add buttons were sized for a pointer. */
+  @media (pointer: coarse) {
+    .studio { --hdr-control: 40px; }
+    .act-btn,
+    .cloud-menu summary { font-size: 11px; padding: 0 10px; }
+    .add-btn { height: 34px; padding: 0 10px; font-size: 11px; }
   }
 
   @media (prefers-reduced-motion: reduce) {

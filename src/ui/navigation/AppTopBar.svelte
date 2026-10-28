@@ -8,6 +8,7 @@
   import { PREFIXES } from '../../rdf/namespaces.js'
 
   let searchInput = $state(null)
+  let topbar = $state(null)
   let helpOpen = $state(false)
   let scopeGuideOpen = $state(false)
   let scopeMenuOpen = $state(false)
@@ -92,14 +93,23 @@
   onMount(() => {
     window.addEventListener('keydown', handleWindowKeydown)
     window.addEventListener('pointerdown', handleWindowPointerDown)
+    // The bar is one 56px row on a desktop and several rows once the graph's
+    // controls stack, so pages that fill the rest of the screen read its real
+    // height from --app-topbar-height rather than assuming 56px.
+    const publishHeight = () => document.documentElement.style.setProperty(
+      '--app-topbar-height', `${topbar?.offsetHeight ?? 0}px`)
+    const heightObserver = new ResizeObserver(publishHeight)
+    if (topbar) heightObserver.observe(topbar)
+    publishHeight()
     return () => {
       window.removeEventListener('keydown', handleWindowKeydown)
       window.removeEventListener('pointerdown', handleWindowPointerDown)
+      heightObserver.disconnect()
     }
   })
 </script>
 
-<header class="app-topbar">
+<header class="app-topbar" bind:this={topbar}>
   <BrandHomeLink compact size={32} />
   <div class="topbar-main">
     {#if $graphNavigation.available}
@@ -460,6 +470,10 @@
     color: inherit;
   }
 
+  @media (max-width: 600px) {
+    .brand small { display: none; }
+  }
+
   .topbar-control {
     height: 2.25rem;
     box-sizing: border-box;
@@ -540,6 +554,7 @@
     z-index: 40;
     width: min(30rem, calc(100vw - 2rem));
     max-height: min(32rem, calc(100vh - var(--app-header-height, 56px) - 2rem));
+    max-height: min(32rem, calc(100dvh - var(--app-header-height, 56px) - 2rem));
     overflow-y: auto;
     padding: 0.75rem;
     display: flex;
@@ -894,5 +909,20 @@
     .stray-field {
       grid-column: 1 / -1;
     }
+  }
+
+  /* A tablet, or a phone held sideways, has the width for scope and search
+     side by side; stacked, the bar took four rows of a 390px-tall screen and
+     left the graph about 60px. */
+  @media (max-width: 980px) and (min-width: 601px) {
+    .topbar-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .topbar-actions { grid-column: 1 / -1; }
+  }
+
+  /* On a phone, upright or sideways, Center, Fit and Relayout sit on the
+     canvas itself (OntologyGraph.svelte), so the bar keeps only the scope and
+     the search. */
+  @media (max-width: 760px), (max-height: 500px) {
+    .topbar-actions { display: none; }
   }
 </style>

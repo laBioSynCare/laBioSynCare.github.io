@@ -79,6 +79,8 @@
     bottom: 0;
     z-index: 120;
     height: var(--app-bottom-dock-height, 48px);
+    /* The links keep their 48px; the safe areas are padding around them. */
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: stretch;

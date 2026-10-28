@@ -119,6 +119,19 @@ are the choices a future change could quietly undo:
   in `deepLink.js`). A term the loaded data defines but the graph does not draw,
   such as a property that leaves its domain and range to SHACL, is reported as
   exactly that, with its reference entry, rather than as a possible typo.
+- **The navigator fits a phone and a tablet.** The three panes (a 248px
+  filter sidebar, the canvas, a 360px detail panel) had no narrow layout, so a
+  tablet's canvas was 160px wide and a phone's had none at all. Below 1100px the
+  sidebar is a drawer opened by a Filters button on the canvas; on a phone,
+  upright or sideways, Center, Fit and Relayout move onto the canvas too and the
+  top bar keeps only the scope and the search; upright, the detail is a section
+  below the canvas that appears only while something is selected, so a term
+  reached from its w3id IRI is readable on the first screen. The top bar
+  publishes its real height (`--app-topbar-height`) and a `ResizeObserver`
+  tells cytoscape when its container changes size, which it does not notice by
+  itself (the arrival banner closing used to leave a stale canvas). On a
+  portrait canvas, disconnected nodes are packed below the main cluster rather
+  than beside it, where the pair made a wide strip the fit shrank to specks.
 - **A record's canvas label is short; its panel keeps the whole.** A record's
   `rdfs:label` is written for the panel, and a published protocol's runs past a
   hundred characters, ending in its citation. On the canvas it is drawn by its

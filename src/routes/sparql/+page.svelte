@@ -531,7 +531,7 @@ LIMIT 100`
             {:else}
               <!-- svelte-ignore a11y_no_noninteractive_tabindex (keyboard access to the overflow region) -->
               <div class="results-scroll" role="region" tabindex="0" aria-label="Scrollable query results">
-                <table>
+                <table style:--result-columns={columns.length + (hasWikidataLinks ? 1 : 0)}>
                   <caption class="visually-hidden">SPARQL SELECT query results</caption>
                   <thead>
                     <tr>
@@ -1441,6 +1441,10 @@ LIMIT 25</code></pre>
     .result-copy > span { text-align: left; }
     .external-note { grid-template-columns: 1fr; gap: 0.8rem; }
     .external-actions { align-items: flex-start; }
+    /* A 42rem table scrolled sideways on a phone even for two columns, and
+       hid the second. Below this width it needs only about 9rem a column, and
+       long IRIs wrap. */
+    .results-panel table { min-width: calc(var(--result-columns, 3) * 9rem); }
   }
 
   @media (max-width: 440px) {

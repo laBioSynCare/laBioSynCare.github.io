@@ -1009,6 +1009,7 @@
 
   .settings-page {
     min-height: calc(100vh - var(--app-header-height, 56px));
+    min-height: calc(100dvh - var(--app-header-height, 56px));
     padding: clamp(1.25rem, 3vw, 2.5rem);
     padding-bottom: 5rem;
     background:

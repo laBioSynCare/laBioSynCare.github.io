@@ -1128,14 +1128,21 @@
 
     // Shelf-pack tallest-first (keeps rows tight) into a block roughly as tall
     // as the core it sits beside, so the two read as one balanced composition.
+    // On a portrait canvas (a phone) the block goes below the core instead, as
+    // wide as it: beside it, the pair made a wide strip that the fit shrank to
+    // specks in the middle of a tall, empty screen.
+    const portrait = container ? container.clientHeight > container.clientWidth * 1.15 : false
     blocks.sort((a, b) => b.h - a.h)
     const totalArea = blocks.reduce((sum, b) => sum + (b.w + GAP) * (b.h + GAP), 0)
     const targetH = Math.max(coreBB.h, 420)
-    const maxRowW = Math.min(4000, Math.max(360, totalArea / (targetH * 0.8)))
+    const maxRowW = portrait
+      ? Math.min(4000, Math.max(360, coreBB.w))
+      : Math.min(4000, Math.max(360, totalArea / (targetH * 0.8)))
 
     let cursorX = 0
     let cursorY = 0
     let rowH = 0
+    let blockW = 0
     for (const block of blocks) {
       if (cursorX > 0 && cursorX + block.w > maxRowW) {
         cursorX = 0
@@ -1145,12 +1152,13 @@
       block.tx = cursorX
       block.ty = cursorY
       cursorX += block.w + GAP
+      blockW = Math.max(blockW, cursorX - GAP)
       rowH = Math.max(rowH, block.h)
     }
 
     const blockH = cursorY + rowH
-    const originX = coreBB.x2 + GUTTER
-    const originY = coreBB.y1 + (coreBB.h - blockH) / 2
+    const originX = portrait ? coreBB.x1 + (coreBB.w - blockW) / 2 : coreBB.x2 + GUTTER
+    const originY = portrait ? coreBB.y2 + GUTTER : coreBB.y1 + (coreBB.h - blockH) / 2
 
     for (const block of blocks) {
       block.eles.shift({
@@ -2122,12 +2130,35 @@
     return ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName)
   }
 
+  // Below 1100px the filter sidebar is a drawer over the canvas: beside a
+  // 360px detail panel it left a tablet's canvas 160px wide and a phone's none.
+  let filtersOpen = $state(false)
+  const NARROW = '(max-width: 760px)'
+  let canvasResizeObserver = null
+
+  // The canvas changes size without the window doing so: the arrival banner
+  // closes, and on a phone the detail section opens below it. Cytoscape only
+  // follows window resizes, so it is told, and on a phone the view is framed
+  // again around what the reader is looking at.
+  function handleCanvasResize() {
+    if (!cy) return
+    cy.resize()
+    if (!setupReady || !window.matchMedia?.(NARROW).matches) return
+    if (neighborhoodFocus) fitGraph(null, { animate: false })
+    else if (selected && !selected.source) cy.center(cy.getElementById(selected.id))
+  }
+
   function handleGraphKeydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
     if (isTypingTarget(document.activeElement)) return
 
     switch (event.key) {
       case 'Escape':
+        if (filtersOpen) {
+          event.preventDefault()
+          filtersOpen = false
+          return
+        }
         if (selected) {
           event.preventDefault()
           clearSelection()
@@ -2202,6 +2233,9 @@
       })
 
       cy.on('zoom', scheduleViewUrlWrite)
+
+      canvasResizeObserver = new ResizeObserver(handleCanvasResize)
+      canvasResizeObserver.observe(container)
 
       cy.on('tap', 'node', (evt) => {
         const d = evt.target.data()
@@ -2316,6 +2350,7 @@
     for (const timer of pulseTimers) clearTimeout(timer)
     unsubscribeSkin?.()
     resetGraphNavigation()
+    canvasResizeObserver?.disconnect()
     cy?.destroy()
   })
 
@@ -2399,8 +2434,12 @@
 
 <div class="graph-shell">
 
-  <!-- Controls sidebar -->
-  <aside class="controls">
+  <!-- Controls sidebar; a drawer below 1100px, opened from the canvas -->
+  <aside class="controls" id="graph-filters" class:open={filtersOpen} aria-label="Graph filters">
+    <div class="drawer-head">
+      <strong>Filters</strong>
+      <button type="button" class="drawer-done" onclick={() => (filtersOpen = false)}>Done</button>
+    </div>
     <div class="panel-head">
       <strong>Data sources</strong>
       <div class="panel-head-actions">
@@ -2562,6 +2601,9 @@
       {/each}
     </ul>
   </aside>
+  {#if filtersOpen}
+    <button type="button" class="filters-backdrop" aria-label="Close filters" onclick={() => (filtersOpen = false)}></button>
+  {/if}
 
   <section class="graph-workspace">
     <!-- ADR 0055 §4. A visitor who dereferenced a term IRI used to get a
@@ -2602,6 +2644,25 @@
       </div>
     {/if}
     <div class="graph-body">
+      <!-- On narrow screens the canvas carries its own controls: the filter
+           drawer's toggle, and on a phone the top bar's Center, Fit and
+           Relayout, which no longer fit there. -->
+      <div class="canvas-tools" role="toolbar" aria-label="Graph view">
+        <button
+          type="button"
+          class="canvas-tool"
+          aria-expanded={filtersOpen}
+          aria-controls="graph-filters"
+          onclick={() => (filtersOpen = !filtersOpen)}
+        >Filters{#if scopeFilterCount > 0}<span class="canvas-tool-badge">{scopeFilterCount}</span>{/if}</button>
+        <span class="canvas-tools-spacer"></span>
+        <span class="canvas-view-tools">
+          <button type="button" class="canvas-tool" onclick={() => focusNode()} disabled={!selected && !focusNodeQuery.trim()}>Center</button>
+          <button type="button" class="canvas-tool" onclick={() => fitGraph()}>Fit</button>
+          <button type="button" class="canvas-tool" onclick={() => relayoutGraph()}>Relayout</button>
+        </span>
+      </div>
+
       <!-- Graph canvas -->
       <div class="canvas" bind:this={container}>
         {#if loading}
@@ -2618,8 +2679,9 @@
         {/if}
       </div>
 
-      <!-- Detail panel -->
-      <aside class="detail">
+      <!-- Detail panel; on a phone a section below the canvas, shown only
+           while something is selected -->
+      <aside class="detail" class:has-selection={!!selected}>
         {#if selected}
           <section class="selection-panel">
             <header class="selection-header">
@@ -3083,7 +3145,11 @@
   .graph-shell {
     display: flex;
     gap: 0;
-    height: calc(100vh - var(--app-header-height, 56px) - var(--app-bottom-dock-height, 48px));
+    /* The top bar's measured height (AppTopBar.svelte): it is one 56px row on
+       a desktop and several once its controls stack. dvh where supported, so
+       a phone's collapsing browser bar does not push the canvas under the dock. */
+    height: calc(100vh - var(--app-topbar-height, var(--app-header-height, 56px)) - var(--app-bottom-dock-height, 48px));
+    height: calc(100dvh - var(--app-topbar-height, var(--app-header-height, 56px)) - var(--app-bottom-dock-height, 48px));
     overflow: hidden;
     background: var(--app-bg);
     color: var(--app-text);
@@ -3472,6 +3538,162 @@
     color: var(--app-text);
     font-size: 0.82rem;
     line-height: 1.4;
+  }
+
+  /* Narrow-screen controls, hidden while the sidebar and the top bar carry
+     them. */
+  .drawer-head,
+  .filters-backdrop,
+  .canvas-tools {
+    display: none;
+  }
+
+  @media (max-width: 1100px) {
+    .graph-shell { position: relative; }
+
+    .controls {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      width: min(86vw, 20rem);
+      box-shadow: 0.5rem 0 2rem #00000040;
+      transform: translateX(-105%);
+      visibility: hidden;
+      transition: transform 0.2s ease, visibility 0s linear 0.2s;
+    }
+    .controls.open {
+      transform: none;
+      visibility: visible;
+      transition: transform 0.2s ease, visibility 0s;
+    }
+
+    .drawer-head {
+      position: sticky;
+      top: -0.75rem;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin: -0.75rem -0.75rem 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border-bottom: var(--app-border-width) solid var(--app-border);
+      background: var(--app-surface);
+    }
+    .drawer-done {
+      width: auto;
+      margin: 0;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+    }
+
+    .filters-backdrop {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 39;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: #00000059;
+      cursor: pointer;
+    }
+
+    .graph-body { position: relative; }
+
+    /* The detail panel sits beside the canvas here, so the tools gather at
+       the canvas's left edge; spread across the body they covered the panel's
+       header and its close button. */
+    .canvas-tools {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 15;
+      display: flex;
+      gap: 0.35rem;
+      pointer-events: none;
+    }
+    .canvas-tools-spacer { display: none; }
+    .canvas-view-tools { display: none; gap: 0.35rem; }
+
+    .canvas-tool {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      width: auto;
+      min-height: 2.5rem;
+      margin: 0;
+      padding: 0.3rem 0.75rem;
+      border: var(--app-border-width) solid var(--app-border);
+      border-radius: var(--app-radius);
+      background: color-mix(in srgb, var(--app-surface) 92%, transparent);
+      color: var(--app-text-strong);
+      font-size: 0.82rem;
+      font-weight: 650;
+      box-shadow: 0 0.25rem 0.8rem #0000001f;
+    }
+    .canvas-tool[aria-expanded='true'] { border-color: var(--app-accent); color: var(--app-accent); }
+    .canvas-tool:disabled { opacity: 0.5; }
+    .canvas-tool-badge {
+      min-width: 1.15rem;
+      padding: 0 0.3rem;
+      border-radius: 999px;
+      background: var(--app-accent);
+      color: var(--app-on-accent);
+      font-size: 0.68rem;
+      line-height: 1.15rem;
+      text-align: center;
+    }
+  }
+
+  /* A phone: the detail is a section below the canvas, there only while
+     something is selected, and Center, Fit and Relayout move onto the canvas. */
+  @media (max-width: 760px) {
+    .graph-body { flex-direction: column; }
+    .canvas { min-height: 0; }
+    .canvas-view-tools { display: inline-flex; }
+    /* A bar above the canvas rather than buttons over it, where they hid the
+       topmost nodes of a fitted neighbourhood. */
+    .canvas-tools {
+      position: static;
+      flex-shrink: 0;
+      padding: 0.4rem 0.5rem;
+      border-bottom: var(--app-border-width) solid var(--app-border);
+      background: var(--app-surface);
+    }
+    .canvas-tools-spacer { display: block; flex: 1; }
+    .canvas-tool {
+      min-height: 2.25rem;
+      padding: 0.25rem 0.65rem;
+      box-shadow: none;
+    }
+    .detail {
+      width: auto;
+      max-height: 55%;
+      flex-shrink: 0;
+      border-left: 0;
+      border-top: var(--app-border-width) solid var(--app-border);
+      box-shadow: 0 -0.5rem 1.5rem #0000001f;
+    }
+    .detail:not(.has-selection) { display: none; }
+  }
+
+  /* A phone held sideways: the top bar drops its view buttons (AppTopBar),
+     so the canvas shows its own, and the arrival banner keeps to one line. */
+  @media (max-height: 500px) {
+    .canvas-view-tools { display: inline-flex; }
+    .arrival { padding-block: 0.3rem; }
+    .arrival-tag { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .controls,
+    .controls.open { transition: none; }
   }
 
   .selection-panel {

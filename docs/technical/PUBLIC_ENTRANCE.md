@@ -78,6 +78,34 @@ revision:
   the homepage. Each page now sets both, `scripts/smoke-static.mjs` checks it,
   and `src/routes/+error.svelte` replaces SvelteKit's bare 404.
 
+## Phones and tablets (2026-10-26)
+
+Every route was checked at 360x740, 390x844, 414x896, 844x390 (a phone held
+sideways) and 768x1024, with touch emulated, for content cut off at the screen
+edge, sideways scrolling and script errors; all are clean. Two things that
+check could not see before were fixed with it: `.app-page-shell` hides
+horizontal overflow, so content wider than the screen was clipped rather than
+scrolled (the namespace page lost a third of every panel), and a measurement
+that skipped clipped content reported it as fine. Site-wide rules:
+
+- `viewport-fit=cover`, with the dock padded by the safe-area insets, so an
+  installed app's dock clears the iPhone home indicator and the page clears a
+  notch held sideways. `--app-bottom-dock-height` includes the inset.
+- Form fields are 16px on a touch phone, below which iPhone Safari zooms into
+  them and stays zoomed; `maximum-scale=1` would also have stopped users
+  zooming.
+- Full-height screens use `dvh` after `vh`, so a phone's collapsing browser bar
+  cannot hide their bottom under the dock.
+- A grid of content takes `minmax(0, 1fr)` columns: an implicit column grows to
+  its widest unbreakable line, which is how the namespace page's panels became
+  594px wide on a 390px phone.
+
+Per page: the published protocols become one card per protocol on a phone; the
+SPARQL results table needs about 9rem a column there rather than 42rem; the
+preset facts and filters keep two columns down to 360px; the Graph Navigator
+and Patch Studio are described in `KNOWLEDGE_BROWSER_UX.md` and
+`PATCH_STUDIO.md` §11.5.
+
 ---
 
 ## Site-wide implementation of the reference vision (2026-10-10)

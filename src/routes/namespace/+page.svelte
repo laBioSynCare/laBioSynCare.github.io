@@ -259,6 +259,11 @@
     margin: 0 auto;
     padding: 2rem 1.25rem 4rem;
     display: grid;
+    /* One column that may shrink. An implicit grid column is sized to its
+       widest unbreakable content, here a curl command, so on a phone every
+       panel grew to 594px and was cut off at the screen edge instead of its
+       tables scrolling inside their own boxes. */
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
   }
 

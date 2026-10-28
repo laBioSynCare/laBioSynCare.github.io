@@ -288,9 +288,9 @@
                 <span class="row-title">{title(row)}</span>
                 {#if row.encodedFrom === 'abstract'}<span class="badge">abstract only</span>{/if}
               </th>
-              <td>{list(row.senses) || '—'}</td>
-              <td>{row.rates || rateFromControlLaw(row) || rateFromCadence(row) || 'not encoded'}</td>
-              <td>
+              <td data-label="Senses">{list(row.senses) || '—'}</td>
+              <td data-label="Rate">{row.rates || rateFromControlLaw(row) || rateFromCadence(row) || 'not encoded'}</td>
+              <td data-label="Levels, and where they hold">
                 {#if row.levels.length}
                   <ul class="plain">
                     {#each row.levels as level}
@@ -307,9 +307,9 @@
                   <span class="muted">none stated</span>
                 {/if}
               </td>
-              <td>{row.scheduleText || 'not encoded'}</td>
-              <td>{row.arms.length ? armSummary(row.arms) : 'single condition'}</td>
-              <td>
+              <td data-label="Schedule">{row.scheduleText || 'not encoded'}</td>
+              <td data-label="Arms">{row.arms.length ? armSummary(row.arms) : 'single condition'}</td>
+              <td data-label="Population">
                 {row.population?.label ?? 'not encoded'}
                 {#if row.species.length}<span class="muted"> ({list(row.species)})</span>{/if}
               </td>
@@ -682,5 +682,45 @@
     .facts div:nth-child(2) { border-right: 0; }
     .record-facts div { grid-template-columns: 1fr; gap: 0.15rem; }
     .result-count { margin-left: 0; }
+
+    /* A phone gets one card per protocol instead of a seven-column table that
+       showed two columns, cut the rest off and stretched every row to the
+       height of the cells out of view. Each cell names its column. */
+    .table-scroll { overflow: visible; border: 0; border-radius: 0; }
+    .comparison { min-width: 0; font-size: 0.86rem; }
+    .comparison thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .comparison,
+    .comparison tbody,
+    .comparison tr,
+    .comparison tbody th,
+    .comparison td { display: block; width: auto; }
+    /* Short fields pair up; levels and arms take the full width. */
+    .comparison tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-auto-flow: dense;
+      margin-bottom: 0.8rem;
+      border: var(--app-border-width) solid var(--app-border);
+      border-radius: calc(var(--app-radius) * 2);
+      background: var(--app-surface);
+      overflow: hidden;
+    }
+    .comparison tbody th,
+    .comparison td[data-label^='Levels'],
+    .comparison td[data-label='Arms'] { grid-column: 1 / -1; }
+    .comparison tbody th,
+    .comparison td { border-bottom: 0; }
+    .comparison tbody th { min-width: 0; padding: 0.8rem 0.9rem 0.7rem; background: var(--app-surface-2); }
+    .comparison td { padding: 0.55rem 0.9rem; border-top: var(--app-border-width) solid var(--app-border); }
+    .comparison td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.15rem;
+      color: var(--app-muted);
+      font-size: 0.7rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
   }
 </style>

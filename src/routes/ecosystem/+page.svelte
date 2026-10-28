@@ -542,6 +542,8 @@
     .facet.review { grid-column: 1 / -1; }
     .overlap-map { grid-template-columns: 1fr; }
     .overlap-bridge { min-height: 96px; }
+    /* Side by side, three unshrinkable links ran 70px past a tablet's edge. */
+    .directory-actions { flex-direction: column; align-items: flex-start; }
   }
 
   @media (max-width: 620px) {

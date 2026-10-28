@@ -775,6 +775,24 @@ defects were found and fixed:
   lane kept a 22rem minimum height, so an example with no controls opened on an
   empty Controls box and its tracks below the fold. Empty lanes now take only
   their add buttons and one line.
+- **Knobs turn under a finger.** A vertical drag on a knob scrolled the lane
+  and cancelled the pointer instead of turning it, so no knob could be dragged
+  on a phone or a tablet; measured with a real touch gesture, a 72px drag moved
+  the gain from 0.28 to 0.40 before the scroll took over. The dial now claims
+  the gesture (`touch-action: none`) and the same drag reaches 0.76; the lane
+  still scrolls from anywhere else. Dragging from the dial's centre opens
+  modulation instead, as it always did.
+- **Touch sizes and touch wording.** On a coarse pointer the toolbar buttons
+  are 40px with 11px labels (they were 34px with 9px), the add buttons 34px,
+  and a knob's caption, value and modulation button grow to fingertip height
+  inside the same 56px column, so every caption still fits it. Form fields are
+  16px on a phone, below which iPhone Safari zooms the page into them. The
+  opening hint says "Tap ▶ to play" where there is no Space bar, the header's
+  summary pill, which truncated to a lone digit, is hidden below 600px, and the
+  Examples and Save / Load panels hang from the header and span it on a narrow
+  screen: aligned to their buttons, one opened 123px past the screen at 360px.
+  The Studio's height uses `dvh` where supported, so a phone's browser bar does
+  not push its bottom under the dock.
 
 Open, and not yet decided:
 
