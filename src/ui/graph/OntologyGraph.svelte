@@ -566,7 +566,9 @@
       },
       {
         selector: 'node[kind="catalogReference"]',
-        style: { shape: 'round-diamond' }
+        // A diamond's text area is half its box, so a paper's shortened title
+        // needs a taller, narrower-set box than the default to stay inside it.
+        style: { shape: 'round-diamond', 'width': 128, 'height': 62, 'text-max-width': 84 }
       },
       {
         selector: 'node[kind="catalogProtocol"]',
