@@ -13,10 +13,11 @@
 // See docs/technical/PATCH_STUDIO.md §10 and §11.5.
 //
 // The studio checks are fast (about fifteen seconds) and run on every push.
-// The graph round trip is behind --with-graph: in a production build the graph
-// route blocks for roughly three and a half minutes before a hash selection
-// resolves, which is too slow for a per-push gate and is itself recorded as a
-// performance question in PATCH_STUDIO.md §11.5.
+// The graph round trip is behind --with-graph. It was put there when the graph
+// route blocked for roughly three and a half minutes in a production build
+// before a hash selection resolved; re-measured 2026-10-23, the whole check
+// with the round trip took 11 seconds on a laptop. PATCH_STUDIO.md §11.5 says
+// what deciding to run it on every push still needs.
 //
 // Usage:
 //   node scripts/studio-browser-check.mjs [dist] [mount] [--with-graph]

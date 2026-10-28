@@ -841,7 +841,7 @@ export const STAKEHOLDERS = [
     modalities: ['visual'],
     review: 'candidate',
     era: 'active',
-    url: 'https://sltbr.org',
+    url: 'https://www.sltbr.org/',
     summary: 'Scientific society for research on light treatment and biological rhythms.',
   },
   {

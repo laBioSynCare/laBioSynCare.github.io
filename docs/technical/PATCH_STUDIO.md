@@ -801,11 +801,12 @@ Open, and not yet decided:
   1000px.
 - Unused Visual and Haptic columns still occupy half the viewport on a wide
   screen; only the stacked phone layout collapses them.
-- The graph route blocks for roughly three and a half minutes in a production
-  build before a `#term` selection resolves, measured while building the browser
-  checks. The loading panel is shown throughout, so nothing appears broken, but
-  it is why the graph round trip sits behind `WITH_GRAPH=1` rather than running
-  on every push. Worth reading against the `await` pitfall in `CLAUDE.md` §9.
+- The graph round trip still sits behind `WITH_GRAPH=1`. It was put there when
+  the graph route blocked for roughly three and a half minutes in a production
+  build before a `#term` selection resolved. Re-measured 2026-10-23 on a
+  `/sstim`-mounted build, the whole check including the round trip took 11
+  seconds on a laptop, so the reason no longer holds there; a CI runner's time
+  is unmeasured, and that is what deciding to run it on every push needs.
 - The geometry and reachability claims above **are** now covered by
   `make studio-browser-check` (§11.3). What remains uncovered by any automated
   check is the subjective half: whether the density is *readable*, and whether
