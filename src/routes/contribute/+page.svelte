@@ -54,9 +54,12 @@
       placeholder="e.g. tactile stimulation" />
 
     <label for="feedback-iri">SSTIM concept URL <span>(optional)</span></label>
+    <!-- Judged only once something is typed: aria-invalid="false" on an empty
+         field drew Pico's green check beside the placeholder, which then read
+         as a value already entered. The example is a real term. -->
     <input id="feedback-iri" type="url" bind:value={targetIri}
-      aria-invalid={!validTarget} maxlength="1024"
-      placeholder="https://w3id.org/sstim#Stimulus" />
+      aria-invalid={targetIri.trim() ? !validTarget : undefined} maxlength="1024"
+      placeholder="https://w3id.org/sstim#StimulationSignal" />
     {#if !validTarget}
       <p class="input-error" role="alert">Enter a valid w3id.org/sstim concept URL, or leave it blank.</p>
     {/if}

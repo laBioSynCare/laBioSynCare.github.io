@@ -111,6 +111,36 @@
 
   function onDblClick() { emit((min + max) / 2) }
 
+  // The ARIA slider keys. The knob declared role="slider" and took focus but
+  // answered no key, so a keyboard user could reach it and not move it. A
+  // small step is a hundredth of the range (the drag's resolution), Shift
+  // gives the knob's own step, as Shift-drag does, and Enter types a value.
+  // Home goes to the minimum, which silences a gain. End, optional in the
+  // ARIA pattern, is left out on purpose: one keypress would take a gain to
+  // full scale on someone's headphones mid-session.
+  function onKeydown(event) {
+    const span = max - min
+    const small = event.shiftKey ? step : Math.max(step, span / 100)
+    let next
+    switch (event.key) {
+      case 'ArrowUp':
+      case 'ArrowRight': next = value + small; break
+      case 'ArrowDown':
+      case 'ArrowLeft': next = value - small; break
+      case 'PageUp': next = value + span / 10; break
+      case 'PageDown': next = value - span / 10; break
+      case 'Home': next = min; break
+      case 'Enter':
+        event.preventDefault()
+        startEditing()
+        return
+      default:
+        return
+    }
+    event.preventDefault()
+    emit(next)
+  }
+
   async function startEditing() {
     editText = Number.isFinite(value) ? parseFloat(value.toPrecision(6)).toString() : ''
     editing = true
@@ -146,7 +176,10 @@
   {:else}
     <span class="knob-label">{label}</span>
   {/if}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <!-- The modulation button sits beside the slider rather than inside it: a
+       control nested in a control is announced as one, and its tabindex of -1
+       left modulation unreachable from the keyboard. -->
+  <div class="knob-dial">
   <div
     class="knob-svg-wrap"
     class:dragging
@@ -155,10 +188,12 @@
     onpointerup={onPointerUp}
     onpointercancel={onPointerUp}
     ondblclick={onDblClick}
+    onkeydown={onKeydown}
     role="slider"
     aria-valuemin={min}
     aria-valuemax={max}
     aria-valuenow={value}
+    aria-valuetext={display}
     aria-label={label}
     tabindex="0"
   >
@@ -180,6 +215,7 @@
         />
       {/if}
     </svg>
+  </div>
 
     {#if modAvailable}
       <button
@@ -187,7 +223,8 @@
         class:mod-dot-active={modActive}
         onclick={(e) => { e.stopPropagation(); onmod() }}
         title="Modulation"
-        tabindex="-1"
+        aria-label={`Modulate ${label}`}
+        aria-pressed={modActive}
         type="button"
       >M</button>
     {/if}
@@ -223,6 +260,13 @@
     user-select: none;
   }
 
+  /* Holds the slider and, centred over it, the modulation button. */
+  .knob-dial {
+    position: relative;
+    width: 44px;
+    height: 44px;
+  }
+
   .knob-svg-wrap {
     position: relative;
     width: 44px;
@@ -245,7 +289,7 @@
     border-radius: 50%;
     border: 1px solid var(--knob-track, #263040);
     background: var(--knob-mod-bg, #161c26e8);
-    color: var(--mut, var(--app-muted-2, #8ea0b0));
+    color: var(--mut, var(--app-muted, #8ea0b0));
     font-size: 0.52rem;
     font-weight: 700;
     font-family: inherit;
@@ -257,10 +301,12 @@
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
 
-  .mod-dot:hover {
+  .mod-dot:hover,
+  .mod-dot:focus-visible {
     border-color: var(--acc, var(--app-accent, #3b9eff));
     color: var(--acc, var(--app-accent, #3b9eff));
   }
+  .mod-dot:focus-visible { outline: 2px solid var(--acc, var(--app-accent, #3b9eff)); outline-offset: 1px; }
   .mod-dot-active {
     border-color: var(--acc, var(--app-accent, #3b9eff));
     background: var(--acc-s, var(--app-accent-soft, #1a3a5c));
@@ -271,7 +317,7 @@
     height: 14px;
     margin-bottom: 1px;
     font-size: 0.55rem;
-    color: var(--mut, var(--app-muted-2, #5a7080));
+    color: var(--mut, var(--app-muted, #5a7080));
     text-transform: lowercase;
     letter-spacing: 0.03em;
     line-height: 14px;

@@ -194,7 +194,7 @@
       </div>
     </div>
 
-    <aside class="trust-note" aria-labelledby="trust-note-title">
+    <aside role="note" class="trust-note" aria-labelledby="trust-note-title">
       <span class="trust-icon" aria-hidden="true">i</span>
       <div>
         <h2 id="trust-note-title">What “evidence” means here</h2>
@@ -428,7 +428,7 @@
             </dl>
 
             {#if preset.cautions.length}
-              <aside class="safety-note" aria-label="Safety information">
+              <aside role="note" class="safety-note" aria-label="Safety information">
                 <span class="safety-symbol" aria-hidden="true">!</span>
                 <div>
                   <strong>{joinLabels(preset.cautions)}</strong>

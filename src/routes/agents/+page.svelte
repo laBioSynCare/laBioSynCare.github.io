@@ -65,7 +65,7 @@
         <li><strong>Propose a remedy, if possible.</strong> State uncertainties and potential semantic or compatibility costs.</li>
       </ol>
     </div>
-    <aside class="workflow">
+    <aside role="note" class="workflow">
       <p class="eyebrow">HOW CONTRIBUTION WORKS TODAY</p>
       <h3>Read. Examine. Suggest. Review.</h3>
       <p>For AI clients, the published <code>@sstim/mcp</code> server offers read-only access to released concepts and a tool that prepares a feedback link.</p>

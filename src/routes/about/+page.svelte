@@ -205,7 +205,7 @@
       </p>
     </div>
 
-    <aside class="trust-panel" aria-labelledby="trust-title">
+    <aside role="note" class="trust-panel" aria-labelledby="trust-title">
       <p class="trust-kicker">Trust at a glance</p>
       <h2 id="trust-title">Know what you are using</h2>
       <dl>
@@ -286,7 +286,7 @@
       {/each}
     </div>
 
-    <aside class="callout">
+    <aside role="note" class="callout">
       <span class="callout-emoji" aria-hidden="true">✍️</span>
       <div class="callout-body">
         <h3>Annotate the ontology</h3>
@@ -317,7 +317,7 @@
       one opaque data file. Its manifest defines dependency closures and adoption profiles; SHACL,
       OWL reasoning, link checks, snapshots, and release rehearsal are automated repository gates.
     </p>
-    <aside class="release-note">
+    <aside role="note" class="release-note">
       <span aria-hidden="true">✓</span>
       <p>
         <strong>For citation, use released SSTIM.</strong> The DOI resolves to the latest

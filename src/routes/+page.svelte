@@ -162,7 +162,7 @@
       </p>
     </div>
 
-    <aside class="knowledge-visual" aria-label="Conceptual map of connected sensory-stimulation knowledge">
+    <figure class="knowledge-visual" aria-label="Conceptual map of connected sensory-stimulation knowledge">
       <div class="visual-top">
         <span>REFERENCE / KNOWLEDGE RELATIONS</span>
         <span>v{RELEASE_VERSION}</span>
@@ -220,7 +220,7 @@
         <span>IDENTIFIERS · PROVENANCE · RELATIONSHIPS</span>
         <span aria-hidden="true">◎</span>
       </div>
-    </aside>
+    </figure>
   </section>
 
   <section class="principles" aria-label="Four distinctions that make the science interpretable">
@@ -414,7 +414,7 @@
   .hero-footnote { display: flex; flex-wrap: wrap; align-items: center; gap: .34rem; font-size: .75rem; color: var(--app-muted); }
   .hero-footnote a { color: inherit; text-decoration: underline; text-underline-offset: .14rem; }
   .status-dot { display: inline-block; width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: #3da58f; margin-right: .3rem; }
-  .knowledge-visual { position: relative; min-width: 0; padding: 1.1rem 1.3rem .8rem; overflow: hidden; border-radius: 16px; background: radial-gradient(ellipse at 56% 41%, #184448, #0d272d 60%, #081921 100%); color: #d6f6ec; border: 1px solid #2f595a; box-shadow: 0 24px 70px #092a2822, inset 0 0 0 1px #ffffff09; }
+  .knowledge-visual { position: relative; min-width: 0; margin: 0; padding: 1.1rem 1.3rem .8rem; overflow: hidden; border-radius: 16px; background: radial-gradient(ellipse at 56% 41%, #184448, #0d272d 60%, #081921 100%); color: #d6f6ec; border: 1px solid #2f595a; box-shadow: 0 24px 70px #092a2822, inset 0 0 0 1px #ffffff09; }
   .knowledge-visual::after { content: ''; pointer-events: none; position: absolute; inset: 0; background: linear-gradient(130deg,#ffffff05, transparent 47%, #f0c88d06); }
   .visual-top, .visual-bottom { display: flex; justify-content: space-between; align-items: center; gap: 1rem; color: #a7c9c1; font-family: var(--app-font-mono); font-size: .59rem; letter-spacing: .105em; }
   .visual-top { border-bottom: 1px solid #c9eee325; padding-bottom: .85rem; }
@@ -450,7 +450,7 @@
   .door { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-surface); padding: 1.65rem; min-height: 288px; transition: border-color .2s ease, transform .2s ease; }
   .door:hover { border-color: var(--app-accent); transform: translateY(-2px); }
   .door-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.7rem; font-family: var(--app-font-mono); font-size: .69rem; letter-spacing: .10em; }
-  .door-index { color: var(--app-muted-2); }
+  .door-index { color: var(--app-muted); }
   .door-eyebrow { color: var(--app-accent); font-weight: 750; text-transform: uppercase; }
   .door h3 { max-width: 25ch; font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.22; letter-spacing: -.025em; margin: 0 0 .8rem; color: var(--app-text-strong); }
   .door-copy { color: var(--app-muted); line-height: 1.62; font-size: .9rem; max-width: 52ch; }
@@ -460,7 +460,7 @@
   .door-secondary a, .door-secondary button { color: var(--app-muted); text-decoration: underline; text-underline-offset: .17rem; }
   .door-secondary button, .entrance-footer button { border: 0; background: none; padding: 0; width: auto; font: inherit; cursor: pointer; }
   .door-secondary button:hover, .door-secondary a:hover { color: var(--app-accent); }
-  .separator { color: var(--app-muted-2); }
+  .separator { color: var(--app-muted); }
   .evolution { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(1.6rem, 4vw, 4rem); padding: clamp(2rem, 4.4vw, 4.2rem); border-radius: 14px; background: #122c32; color: #d8e9e3; }
   .evolution .section-tag { color: #8ad5c3; }
   .evolution h2 { color: #f6f6ef; max-width: 14ch; }
@@ -483,7 +483,7 @@
   .closing-actions { display: grid; border-top: 1px solid var(--app-border); }
   .closing-actions a { display: grid; grid-template-columns: 2rem 1fr 1rem; align-items: center; gap: .9rem; padding: 1.1rem .1rem; border-bottom: 1px solid var(--app-border); text-decoration: none; color: var(--app-text-strong); }
   .closing-actions a:hover { color: var(--app-accent); }
-  .closing-actions a span:first-child { font: 650 .68rem var(--app-font-mono); color: var(--app-muted-2); }
+  .closing-actions a span:first-child { font: 650 .68rem var(--app-font-mono); color: var(--app-muted); }
   .closing-actions a strong { font-size: .98rem; }
   .entrance-footer { margin-top: clamp(4rem, 7vw, 7rem); border-top: 1px solid var(--app-border); padding-top: 1.4rem; }
   .entrance-footer p { font-size: .83rem; color: var(--app-muted); line-height: 1.7; max-width: 92ch; }

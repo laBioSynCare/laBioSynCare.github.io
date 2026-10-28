@@ -1467,7 +1467,11 @@
   }
 </script>
 
-<div class="studio" class:playing={draft.playing}>
+<!-- The Studio is the page's main content. It had no main landmark and no
+     h1, so a screen reader landed in an unlabelled region with no heading to
+     orient by; the visible title is the editable patch name. -->
+<main class="studio" class:playing={draft.playing}>
+  <h1 class="sr-only">Patch Studio</h1>
 
   {#if incomingLink}
     <div class="link-offer" role="alertdialog" aria-labelledby="link-offer-heading">
@@ -2662,7 +2666,7 @@
     </dialog>
   {/if}
 
-</div>
+</main>
 
 <style>
   /* Incoming patch link (ADR 0039, Tier 1). Modal because accepting replaces
@@ -2771,13 +2775,25 @@
   }
 
   /* ── Design tokens ─────────────────────────────────────────────────────────── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .studio {
     --bg:     var(--app-bg, #0b0f14);
     --sur:    var(--app-surface, #111820);
     --sur2:   var(--app-surface-2, #161e28);
     --bdr:    var(--app-border, #1c2a38);
     --txt:    var(--app-text, #c0d0e0);
-    --mut:    var(--app-muted-2, #445866);
+    --mut:    var(--app-muted, #445866);
     --acc:    var(--app-accent, #3b9eff);
     --acc-s:  var(--app-accent-soft, #0c2440);
     --ok:     var(--app-ok, #27ae60);
@@ -3073,9 +3089,12 @@
     letter-spacing: 0.06em;
     white-space: nowrap;
   }
-  .b-ok   { background: #0a2016; color: var(--ok); }
-  .b-warn { background: #2a1a05; color: var(--warn); }
-  .b-err  { background: #2a0805; color: var(--err); }
+  /* Tinted from the status colour over the skin's own surface. The fixed
+     dark fills these replace suited only the dark skins: in Paper the OK
+     badge read at 3:1. A 10% tint holds 4.5:1 in all five skins. */
+  .b-ok   { background: color-mix(in srgb, var(--ok) 10%, var(--sur)); color: var(--ok); }
+  .b-warn { background: color-mix(in srgb, var(--warn) 10%, var(--sur)); color: var(--warn); }
+  .b-err  { background: color-mix(in srgb, var(--err) 10%, var(--sur)); color: var(--err); }
 
   .act-btn {
     display: inline-flex;
@@ -3953,12 +3972,14 @@
     align-items: baseline;
     margin-top: 4px;
     font-size: 10px;
-    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    /* The widget is near-black in every skin, so its labels are light in
+       every skin: the light skins' dark text tokens made them dark on dark. */
+    color: #9fb2c4;
     font-variant-numeric: tabular-nums;
   }
 
   .dur-label-c {
-    color: var(--cc);
+    color: color-mix(in srgb, var(--cc) 55%, #ffffff);
     font-weight: 700;
   }
 

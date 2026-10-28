@@ -1268,7 +1268,7 @@ LIMIT 25</code></pre>
     font-size: 0.64rem;
     white-space: nowrap;
   }
-  .unbound { color: var(--app-muted-2); }
+  .unbound { color: var(--app-muted); }
   .external-cell { white-space: nowrap; }
 
   .side-column {

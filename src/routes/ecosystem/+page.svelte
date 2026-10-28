@@ -162,7 +162,7 @@
       </article>
     </div>
 
-    <aside class="meaning-note">
+    <aside role="note" class="meaning-note">
       <h3>What “includes” means here</h3>
       <p>
         On this page, ecosystem inclusion means relevance, participation, use, support, or another
@@ -224,7 +224,7 @@
       </article>
     </div>
 
-    <aside class="conformance-note">
+    <aside role="note" class="conformance-note">
       <strong>Conformance applies to named artifacts, not whole applications.</strong>
       A defensible result identifies the artifact, SSTIM release, profile or shape package,
       test, and date. “Adopts SSTIM” does not silently become “the application is SSTIM compliant.”

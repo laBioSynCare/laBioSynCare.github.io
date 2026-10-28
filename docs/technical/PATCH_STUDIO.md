@@ -733,7 +733,7 @@ roadmapped Phase-2 work
 ### 11.5 Usability and discoverability
 
 The studio is dense by design: it is an authoring surface, not a player. Density
-is not the defect; density that hides a control or destroys work is. Five such
+is not the defect; density that hides a control or destroys work is. These
 defects were found and fixed:
 
 - **Knob captions are abbreviated on purpose.** `Knob.svelte`'s `.knob-label`
@@ -758,6 +758,13 @@ defects were found and fixed:
   Its affordance was `cursor: help` plus a hover underline, so the whole bridge
   was invisible to anyone not already sweeping the mouse across it. A dotted
   underline now marks it at rest.
+- **Knobs answer the keyboard.** A knob declared `role="slider"` and took
+  focus but handled no key, so it could be reached and not moved. The arrows
+  move it by a hundredth of its range (Shift by its own step), Page Up and
+  Page Down by a tenth, Home to its minimum, and Enter types a value. End is
+  left out on purpose: one keypress would put a gain at full scale on someone's
+  headphones. The modulation button no longer sits inside the slider, where
+  `tabindex="-1"` had made modulation unreachable without a mouse.
 
 Open, and not yet decided:
 

@@ -47,19 +47,41 @@
     --app-border-width: 1px;
     --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --app-font-mono: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --pico-border-radius: var(--app-radius);
+    --pico-font-family: var(--app-font-ui);
+  }
+
+  /* Pico declares its colours on `:root:not([data-theme=dark])` and
+     `[data-theme=dark]`, and the first outranks a plain `:root`, so colour
+     bindings placed above never applied: Pico-styled links and buttons kept
+     Pico's own azure (#0172ad, 4.25:1 on surface-2) in every skin.
+     `html:root[data-theme]` outranks both, and app.html sets data-theme
+     before first paint. The primary background is the accent itself, with
+     on-accent text: binding it to accent-soft, as the dead rule did, would
+     have put white text on pale blue the moment it took effect. */
+  :global(html:root[data-theme]) {
     --pico-background-color: var(--app-bg);
     --pico-card-background-color: var(--app-surface);
     --pico-color: var(--app-text);
     --pico-muted-color: var(--app-muted);
     --pico-muted-border-color: var(--app-border);
     --pico-primary: var(--app-accent);
-    --pico-primary-background: var(--app-accent-soft);
+    --pico-primary-background: var(--app-accent);
     --pico-primary-border: var(--app-accent);
-    --pico-border-radius: var(--app-radius);
-    --pico-font-family: var(--app-font-ui);
+    --pico-primary-underline: color-mix(in srgb, var(--app-accent) 50%, transparent);
+    --pico-primary-hover: color-mix(in srgb, var(--app-accent) 82%, var(--app-text-strong));
+    --pico-primary-hover-background: color-mix(in srgb, var(--app-accent) 82%, var(--app-text-strong));
+    --pico-primary-hover-border: color-mix(in srgb, var(--app-accent) 82%, var(--app-text-strong));
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+    --pico-primary-focus: color-mix(in srgb, var(--app-accent) 45%, transparent);
+    --pico-primary-inverse: var(--app-on-accent);
   }
 
-  /* Default skin (paper) — also applied when no data-skin is set yet. */
+  /* Default skin (paper), also applied when no data-skin is set yet.
+     Text tokens (muted, accent and the status and lane colours) hold 4.5:1
+     on bg, surface and surface-2 in every skin, the WCAG AA ratio for small
+     text. --app-muted-2 does not, by design: it is for borders and other
+     non-text marks, and small text uses --app-muted. */
   :global(:root),
   :global(:root[data-skin='paper']) {
     color-scheme: light;
@@ -80,10 +102,10 @@
     --app-dock-active: var(--app-accent);
     --app-control: #8a5a00;
     --app-audio: #3366a3;
-    --app-visual: #7c5cc4;
+    --app-visual: #7255b4;
     --app-haptic: #28745e;
-    --app-ok: #317a43;
-    --app-warn: #9a6500;
+    --app-ok: #2f7440;
+    --app-warn: #8e5d00;
     --app-error: #a94438;
   }
 
@@ -106,7 +128,7 @@
     --app-dock-active: var(--app-accent);
     --app-control: #e67e22;
     --app-audio: #3b9eff;
-    --app-visual: #9b5fd3;
+    --app-visual: #a56fd7;
     --app-haptic: #16a085;
     --app-ok: #35c46d;
     --app-warn: #e8a23c;
@@ -177,18 +199,18 @@
     --app-border-subtle: #d6e2ea;
     --app-text: #1c2b37;
     --app-text-strong: #07131f;
-    --app-muted: #5f7282;
+    --app-muted: #5b6d7d;
     --app-muted-2: #758897;
-    --app-accent: #0b72c9;
+    --app-accent: #0a6cbf;
     --app-accent-soft: #d7ebfb;
     --app-on-accent: #ffffff;
     --app-dock-active: #07558f;
-    --app-control: #c46a00;
-    --app-audio: #0b72c9;
-    --app-visual: #745bd3;
-    --app-haptic: #16856f;
-    --app-ok: #1f8a4c;
-    --app-warn: #ad6600;
+    --app-control: #a35800;
+    --app-audio: #0a6cbf;
+    --app-visual: #6f57cb;
+    --app-haptic: #147965;
+    --app-ok: #1b7943;
+    --app-warn: #9c5c00;
     --app-error: #b33c2e;
   }
 

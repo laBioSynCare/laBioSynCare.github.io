@@ -316,11 +316,11 @@
     vertical-align: top;
   }
 
-  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.75; font-weight: 600; }
+  /* Muted by colour, not opacity: opacity on small text took it to 3:1. */
+  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--app-muted); font-weight: 600; }
   tbody tr:last-child td { border-bottom: none; }
 
   code { font-size: 0.82em; overflow-wrap: anywhere; }
-  .iri { opacity: 0.85; }
 
   .curl {
     margin-top: 0.9rem;
@@ -362,6 +362,7 @@
   .card strong { font-size: 0.87rem; }
   .card span { font-size: 0.78rem; line-height: 1.45; opacity: 0.8; }
 
-  .foot { font-size: 0.8rem; line-height: 1.6; opacity: 0.85; }
+  /* Opacity dimmed its links to 4:1; the muted colour leaves them at full strength. */
+  .foot { font-size: 0.8rem; line-height: 1.6; color: var(--app-muted); }
   .foot p { margin: 0; }
 </style>

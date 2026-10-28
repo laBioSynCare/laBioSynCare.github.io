@@ -801,7 +801,7 @@
   .gate-dismiss {
     background: transparent;
     border: none;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     font-size: 0.8rem;
     cursor: pointer;
     padding: 0.3rem;
@@ -945,7 +945,7 @@
   }
   .book-count {
     font-size: 0.72rem;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     flex-shrink: 0;
   }
 
@@ -956,7 +956,7 @@
     place-items: center;
     background: transparent;
     border: none;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     font-size: 0.72rem;
     border-radius: 4px;
     cursor: pointer;
@@ -999,7 +999,7 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     margin-right: 0.15rem;
   }
   .filter-chip {
@@ -1040,7 +1040,7 @@
     padding: 3rem 1rem;
     border: 1px dashed var(--app-border);
     border-radius: var(--app-radius);
-    color: var(--app-muted-2);
+    color: var(--app-muted);
   }
 
   .empty-state p { margin: 0 0 1rem; font-size: 0.9rem; }
@@ -1138,7 +1138,7 @@
 
   .entry-date {
     font-size: 0.75rem;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     margin-left: auto;
   }
 
@@ -1182,7 +1182,7 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     margin: 0;
   }
 
@@ -1210,7 +1210,7 @@
     place-items: center;
     background: transparent;
     border: 1px solid transparent;
-    color: var(--app-muted-2);
+    color: var(--app-muted);
     font-size: 0.78rem;
     border-radius: 4px;
     cursor: pointer;
