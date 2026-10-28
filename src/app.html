@@ -3,15 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Site-wide fallback description, for routes that set none of
-         their own. It is the entrance subhead verbatim, and must stay in sync
-         with SHARE_DESCRIPTION in src/routes/+page.svelte: a page that sets its
-         own `name="description"` does not replace this one, it appends a second
-         tag after it, and a crawler reading only the first would have shown the
-         shell's weaker wording for the homepage. The entrance therefore relies
-         on this tag and adds only the og:/twitter: pair, which nothing here
-         duplicates. -->
-    <meta name="description" content="An open, evolving knowledge foundation for sensory stimulation, connecting research, technology, and AI through citable references, precise descriptions, and transparent evidence." />
+    <!-- No title element or description here. SvelteKit appends a page's own after
+         the shell's rather than replacing them, and a crawler or link preview
+         reads only the first, so a static pair here titled every page
+         "SSTIM Workbench" and described it as the homepage. Every route sets
+         both (scripts/smoke-static.mjs checks), and +error.svelte covers the
+         404 fallback. -->
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
     <!-- PWA: installable, offline-capable. See docs/technical/PWA_SERVICE_WORKER.md
          (incl. the compliance matrix). theme-color is the default (paper) skin;
@@ -25,7 +22,6 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="SSTIM Workbench" />
-    <title>SSTIM Workbench</title>
     <script>
       // Apply the stored (or default) skin before first paint to avoid a
       // flash of the wrong theme. Must stay in sync with src/ui/theme/skins.js.

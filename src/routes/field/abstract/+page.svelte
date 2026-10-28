@@ -12,6 +12,7 @@
 
 <svelte:head>
   <title>Abstraction compatibility link | SSTIM Workbench</title>
+  <meta name="description" content="An earlier address of the Abstraction starter, which now opens in Patch Studio." />
 </svelte:head>
 
 <main>

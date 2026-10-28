@@ -65,6 +65,7 @@
 
 <svelte:head>
   <title>Graph Navigator | SSTIM Workbench</title>
+  <meta name="description" content="Browse SSTIM's terms, controlled vocabulary and public records as a connected graph, with each one's definition, persistent identifier, source and relations." />
 </svelte:head>
 
 {#if entryDecided && offerEntry}

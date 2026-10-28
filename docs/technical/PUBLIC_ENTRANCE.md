@@ -44,8 +44,8 @@ direction without changing their factual architecture.
 purpose-built static semantic network illustration, source-labeled signal
 diagrams, four accessible action cards, and no extra dependencies or externally
 hosted assets. Existing `?example=` and graph deep links survive. A reduced
-motion preference is respected. The hero description and share metadata must
-stay identical to the site-wide `app.html` meta description.
+motion preference is respected. The page's description and share metadata are
+the subhead verbatim.
 
 ---
 

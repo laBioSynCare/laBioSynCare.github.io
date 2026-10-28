@@ -81,6 +81,7 @@
 
 <svelte:head>
   <title>Profile · SSTIM Workbench</title>
+  <meta name="description" content="The optional name and details attached to the notes you write in SSTIM Workbench." />
 </svelte:head>
 
 <main class="profile-page">

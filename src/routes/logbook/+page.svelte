@@ -493,6 +493,7 @@
 
 <svelte:head>
   <title>Logbook | SSTIM Workbench</title>
+  <meta name="description" content="A private logbook for notes on your own sensory-stimulation work, kept in this browser and separate from the published SSTIM reference." />
 </svelte:head>
 
 <!-- ── Loading state ──────────────────────────────────────────────────── -->

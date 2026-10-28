@@ -27,6 +27,7 @@
 
 <svelte:head>
   <title>Suggest an improvement to SSTIM · SSTIM Workbench</title>
+  <meta name="description" content="Report a gap, an incorrect definition or an unmet need in SSTIM. The form prepares a public GitHub issue draft for you to review; nothing is sent automatically." />
 </svelte:head>
 
 <main class="feedback">

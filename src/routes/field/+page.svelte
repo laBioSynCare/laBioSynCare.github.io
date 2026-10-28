@@ -12,6 +12,7 @@
 
 <svelte:head>
   <title>Sensory Field compatibility link | SSTIM Workbench</title>
+  <meta name="description" content="An earlier address of the Sensory Field starter, which now opens in Patch Studio." />
 </svelte:head>
 
 <main>

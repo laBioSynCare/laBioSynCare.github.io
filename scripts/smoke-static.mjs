@@ -79,6 +79,19 @@ async function main() {
       if (!r.ok) bad(`GET ${route}`, `status ${r.status}`)
       else if (!body.includes(marker)) bad(`GET ${route}`, `missing marker "${marker}"`)
       else ok(`GET ${route}`, `${r.status}, ${body.length} bytes`)
+
+      // One title and one description, the page's own. SvelteKit appends a
+      // page's tags after any the shell carries, and a crawler or link preview
+      // reads only the first: a static pair in app.html once titled every page
+      // "SSTIM Workbench" and described it as the homepage.
+      if (r.ok) {
+        const head = body.slice(0, body.indexOf('</head>'))
+        const titles = head.match(/<title>/g)?.length ?? 0
+        const descriptions = head.match(/<meta name="description"/g)?.length ?? 0
+        titles === 1 && descriptions === 1
+          ? ok(`${route} head`, 'one title, one description')
+          : bad(`${route} head`, `${titles} <title> and ${descriptions} description tags, expected one of each`)
+      }
     }
 
     // Former Field screens are compatibility aliases, not primary application

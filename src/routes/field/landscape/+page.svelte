@@ -12,6 +12,7 @@
 
 <svelte:head>
   <title>3D Landscape compatibility link | SSTIM Workbench</title>
+  <meta name="description" content="An earlier address of the 3D Landscape starter, which now opens in Patch Studio." />
 </svelte:head>
 
 <main>

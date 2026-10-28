@@ -15,8 +15,7 @@
     ghBlob,
   } from '../ui/externalLinks.js'
 
-  // A public direction, not a claim to exclusive scientific authority. Keep
-  // the share description identical to the app.html fallback meta description.
+  // A public direction, not a claim to exclusive scientific authority.
   const SHARE_TITLE = 'A living reference for sensory stimulation'
   const SHARE_DESCRIPTION =
     'An open, evolving knowledge foundation for sensory stimulation, connecting ' +
@@ -129,8 +128,7 @@
 
 <svelte:head>
   <title>SSTIM · {SHARE_TITLE}</title>
-  <!-- Description is inherited from app.html: adding another name=description
-       would duplicate it rather than replace it during SvelteKit SSR. -->
+  <meta name="description" content={SHARE_DESCRIPTION} />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="SSTIM Workbench" />
   <meta property="og:title" content={SHARE_TITLE} />
