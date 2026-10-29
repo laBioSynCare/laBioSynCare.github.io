@@ -519,11 +519,46 @@ explicit instruction naming each file.
   `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`). *Not in 0.20.0: on
   2026-10-19 the maintainer chose to cut 0.20.0 without it, so it moves to
   the 0.21.0 line.*
-  - *Next step:* decide which ADR 0036 and 0037 exclusions are true
-    disjointness. Assert them in OWL at the process layer, and as a SHACL rule
-    on `participantEngagementMode` at the technique layer. Add entailment
-    fixtures in both directions. Probably an ADR amendment.
-  - *Done when* HermiT rejects a process typed on both sides of the split.
+  - *Decided 2026-10-29 by the maintainer in session* ("your Neurostimulation
+    proposal"; implementation deferred, this entry is the task). The true
+    disjointness is the one `sstim:Neurostimulation`'s own definition states:
+    it is delivered without the individual's active self-regulation, and
+    `sstim:SensoryNeurostimulation`'s scope note already calls that
+    "Neurostimulation's own exclusion of self-directed cases".
+    Interventional and self-directed neuromodulation stay overlapping, as
+    ADR 0036 §4 decided: not disjoint, because some cases blur, such as
+    paced-breathing guidance, which is guided-following and self-regulation
+    at once. The maintainer chose "Neurostimulation vs self-directed" over
+    making interventional and self-directed disjoint, and has already named
+    both files for modification.
+  - *Next step, in order:*
+    1. `sstim-neuromodulation.ttl`: `sstim:Neurostimulation owl:disjointWith
+       sstim:SelfDirectedNeuromodulation`, with a `skos:historyNote` naming
+       0.21.0 and the ADR below. Nothing more at the process layer:
+       `SensoryNeurostimulation` inherits it as a subclass.
+    2. `sstim-shapes.ttl`: a SHACL-SPARQL constraint on
+       `sstim:NeurostimulationTechnique` rejecting
+       `sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory`.
+       Measured 2026-10-29 over the modules and every committed instance: no
+       neurostimulation technique carries that mode, and the three that do
+       (`techNeurofeedback`, `techBiofeedback`, `techSonification`) are not
+       neurostimulation techniques, so no record changes.
+    3. Fixtures in both directions under `test/fixtures/rdf/disjointness/`:
+       one individual typed `Neurostimulation` and
+       `SelfDirectedNeuromodulation`, which HermiT must reject as
+       inconsistent; one typed `InterventionalNeuromodulation` and
+       `SelfDirectedNeuromodulation`, which must stay consistent, so the
+       overlap ADR 0036 kept cannot be closed by accident. A
+       `make disjointness-check` target runs ROBOT once per fixture over the
+       Full semantic modules, requires the first to fail with an
+       inconsistency (not merely to fail) and the second to pass, and joins
+       `RELEASE_SOURCE_VALIDATION_TARGETS`. Add one adversarial SHACL case for
+       step 2 where the shape tests live.
+    4. An ADR amending ADR 0036 §4: which exclusion is disjointness and why
+       the other is not, with an index row.
+  - *Done when* HermiT rejects a process typed both `Neurostimulation` and
+    `SelfDirectedNeuromodulation`, still accepts one typed interventional and
+    self-directed, and the technique rule rejects its adversarial case.
 - [x] **GB-06 Deprecation hygiene** (*protected*). *Closed 2026-10-06 for
   0.19.0: of the 25 deprecated terms without `dct:isReplacedBy`, 12 now
   name a successor and 13 say they have none and why (`hapticPattern` already
