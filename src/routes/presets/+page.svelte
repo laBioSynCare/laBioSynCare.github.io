@@ -189,9 +189,16 @@
         <a href={applicationRoute('/agents/')}>Report an inaccurate or incomplete record.</a>
       </p>
       <div class="hero-actions" aria-label="Catalog actions">
-        <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio <span aria-hidden="true">→</span></a>
+        <a class="primary-action" href="#catalog">Browse the catalog <span aria-hidden="true">↓</span></a>
         <a class="secondary-action" href={applicationRoute('/sparql/')}>Query the source data</a>
       </div>
+      <!-- The primary action used to be "Open Patch Studio", which read as the
+           place a preset opens. None does: Studio loads examples and starters,
+           and the catalog-to-patch adapter is not built (CLAUDE.md §11). -->
+      <p class="studio-note">
+        Catalog presets do not open in Patch Studio, where you build patches of your own.
+        <a href={applicationRoute('/creator/')}>Open Patch Studio</a>
+      </p>
     </div>
 
     <aside role="note" class="trust-note" aria-labelledby="trust-note-title">
@@ -212,7 +219,10 @@
     </aside>
   </header>
 
-  <section class="catalog-facts" aria-label="Catalog at a glance" aria-busy={loading}>
+  <!-- The hero's anchor: always rendered, unlike the browser below it, which
+       appears only once the graph has loaded, so a prerendered page still
+       has the id the link names. -->
+  <section id="catalog" class="catalog-facts" aria-label="Catalog at a glance" aria-busy={loading}>
     <div>
       <strong>{loading ? '—' : presets.length}</strong>
       <span>published record{presets.length === 1 ? '' : 's'}</span>
@@ -612,6 +622,14 @@
     color: var(--app-text-strong);
     background: var(--app-surface);
     border: var(--app-border-width) solid var(--app-border);
+  }
+
+  .studio-note {
+    max-width: 68ch;
+    margin: 0.85rem 0 0;
+    color: var(--app-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
   }
 
   .primary-action:hover,
