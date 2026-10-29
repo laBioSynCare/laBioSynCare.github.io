@@ -1912,9 +1912,11 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
 - [ ] Announce CG on relevant mailing lists and forums `P1`
 - [ ] First CG meeting: agree on scope, initial vocabulary items,
       contribution process `P2`
-- [ ] First CG report: draft vocabulary specification for sensory
+- [~] First CG report: draft vocabulary specification for sensory
       stimulation modalities and protocol types `P2`
-      *This becomes the seed content for a future W3C Working Group
+      *Registered as a Draft report on 2026-09-07 (the "Publish a W3C
+      Community Group report" item above); a Final report is still open.
+      This becomes the seed content for a future W3C Working Group
       if traction develops*
 
 ### Phase 1-2 community

@@ -310,9 +310,13 @@ The main gaps are design and coverage gaps, not current parser failures:
 - **The modality scheme names six senses and disagrees with the channel list.**
   `sstim-ex:StimulusChannel` recognises gustatory and electromagnetic paths that
   no modality concept backs. Direction §4a.
-- **Martigli and Symmetry parameters sit in the core namespace.** They are named
-  specific techniques, not universal primitives, and belong in protocol-scoped
-  namespaces. Direction §3.
+- **Martigli and Symmetry parameters no longer sit in SSTIM's namespaces.**
+  [ADR 0061](../decisions/0061-universal-namespaces-carry-no-framework-structure.md)
+  moved the BSC catalog's voice classes, preset groups, Martigli parameters and
+  permutation coding to the BSC framework vocabulary (`bsc-v:`, in
+  `static/ontology/frameworks/bsc/`), which no SSTIM release carries. The
+  `sstim:` names still resolve, deprecated, each naming its replacement.
+  Direction §3 (corrected 2026-10-29; the earlier wording predated ADR 0061).
 
 - `SessionSpecification` and `masterVolume` remain audio-shaped, but the
   executed-session gap closed on 2026-08-13. The native contract

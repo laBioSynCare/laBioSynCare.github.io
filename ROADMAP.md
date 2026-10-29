@@ -4,11 +4,19 @@
 > phase the project is in, what is being built next, and what must not be
 > built yet. The granular task list is in `TODO.md`.
 >
-> **Current phase: Phase 1 public foundation, with much of Phase 2 software
-> already shipped.** Phase 0 is complete. The BSC Lab v0.1 knowledge browser is
-> substantially delivered; what remains in Phase 1 is non-software — defensive
-> publication filings, trademarks, the first web article, and partner/advisory
-> commitments. Evidence collection is Phase 3 and must still not be built now.
+> **Current phase (2026-10-28): Phase 1 public foundation, with much of Phase 2
+> and some of Phase 3 delivered out of order.** Phase 0 is complete. The
+> knowledge browser this roadmap calls BSC Lab v0.1 is deployed as SSTIM
+> Workbench at `w3c-cg.github.io/sstim` and is well past that scope; SSTIM's
+> latest release is 0.20.0, and the W3C Community Group has published a Draft
+> report. What remains in Phase 1 is non-software: defensive publication
+> filings, trademarks, the first web article, and partner/advisory commitments.
+> Evidence collection is Phase 3 and must still not be built now.
+>
+> **Names.** BSC Lab was the platform's public name when this roadmap was
+> written, and the phase headings below keep it. The platform is now SSTIM
+> Workbench; BSC Lab survives in stable IRIs, records and `bsclab-*` formats
+> (CLAUDE.md §1).
 >
 > **Checkbox legend:** `[x]` shipped · `[~]` partially shipped, qualifier in the
 > item text · `[ ]` not started. A `[~]` means *do not assume this works
@@ -30,22 +38,21 @@
 > [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
 > for everything shipped that this roadmap never listed.
 >
-> **Integration status 2026-08-08:** Sensory Field capabilities are now ordinary
-> first-class colour-field and spatial visual tracks in the canonical Studio
-> document. The shared composition stage, Field starters, report-producing
-> adapters, non-destructive migration offer, `/field/*` redirects, and global
-> navigation consolidation have shipped. Disabled sources are retained inactive;
-> Add appends live with explicit keep/apply-stage choices; the full report and review acknowledgement are in the
-> conversion flow; and vector spatial blend plus bounded SIRDS refresh execute.
-> Runtime/controller extraction, exact trajectory/clamp fidelity and lifecycle
-> proof, a unified delivered-state `ExposureProfile` with producer-adjacent SHACL,
-> the full acceptance matrix, and legacy deprecation/removal remain open. See
+> **Sensory Field integration** into Patch Studio is tracked in
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
-> and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md).
+> and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md), which
+> own its status; the Phase 2 item below summarizes it.
 
 ---
 
 ## Vision
+
+> SSTIM's project-level vision is now
+> [`REFERENCE_VISION.md`](docs/concept/REFERENCE_VISION.md) (2026-10-10): a
+> living, continuously improving reference for stimuli and sensory stimulation
+> across research, technology, people and AI. What follows is the platform
+> vision this roadmap was planned from, kept because the phases are sequenced
+> against it.
 
 BSC Lab is open scientific and technical infrastructure for sensory
 stimulation: the intentional, measurable design and delivery of auditory,
@@ -109,13 +116,13 @@ primarily with AI-assisted development.
 
 
 **Who owns what.** Four documents carry forward-looking work, and they do not
-overlap: this one for strategy and phase sequencing, [`ROADMAP.md`](ROADMAP.md) for strategy and phase
-sequencing, [`TODO.md`](TODO.md) for operational tasks, and
+overlap: this one for strategy and phase sequencing, [`TODO.md`](TODO.md) for
+operational tasks,
 [`docs/ontology/IMPROVEMENT_PLAN.md`](docs/ontology/IMPROVEMENT_PLAN.md) for the
-audit-driven ontology sequence and its release gates. What exists *now* is
-[`docs/ontology/CURRENT_STATE.md`](docs/ontology/CURRENT_STATE.md); where the
-model is going is
-[`docs/ontology/SSTIM_DIRECTIONS.md`](docs/ontology/SSTIM_DIRECTIONS.md). A fact
+audit-driven ontology sequence and its release gates, and
+[`docs/ontology/SSTIM_DIRECTIONS.md`](docs/ontology/SSTIM_DIRECTIONS.md) for
+where the model is going. What exists *now* is
+[`docs/ontology/CURRENT_STATE.md`](docs/ontology/CURRENT_STATE.md). A fact
 stated in one of them is not restated in another.
 
 ---
@@ -209,6 +216,18 @@ Five themes, none of them in the original phases:
   with CI running every command inside it so contributor and CI environments
   match exactly; GitHub Actions for build, check, validate and deploy; and the
   w3id.org route matrix merged upstream and verified against the deployment.
+- **Published protocols and adoption surfaces.** Nine published stimulation
+  protocols encoded from their papers, with stated magnitudes, schedules, arms
+  and control laws, and a page that sets them side by side
+  ([ADRs 0063](docs/decisions/0063-stimulus-magnitudes-at-delivery-stages.md),
+  [0064](docs/decisions/0064-published-protocols-schedules-arms-and-control-laws.md),
+  [0066](docs/decisions/0066-eight-things-the-full-texts-asked-for.md)).
+  Client packages (`sstim` on PyPI, `@sstim/core` on npm) and an MCP server
+  (`@sstim/mcp`), described in
+  [`ADOPTION.md`](docs/ecosystem/ADOPTION.md); a reviewed contribution path for
+  people and AI agents (`/agents/`, `/contribute/`); and a stakeholder
+  directory of the field
+  ([ADR 0062](docs/decisions/0062-sensory-stimulation-ecosystem-contributor.md)).
 
 ---
 
@@ -313,9 +332,9 @@ the knowledge navigation layer.
       2026-07-11 route × representation matrix, #6378 2026-07-17 catalog and live
       ecosystem routes, #6480 2026-08-03 the modular module/profile/manifest
       routes, verified live 2026-08-04 across 19 route/`Accept` combinations.
-      `Accept: text/html` on `w3id.org/sstim` resolves to the entrance at `/`,
-      not `/graph` — retargeting the HTML branches is an open follow-up in
-      `PUBLIC_ENTRANCE.md`)*
+      Production moved to `w3c-cg.github.io/sstim` in #6609 on 2026-08-27.
+      `Accept: text/html` on a term's IRI opens it in the graph, while the bare
+      `w3id.org/sstim` opens the entrance by design)*
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
       *(submission material prepared in `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md`;
@@ -551,8 +570,9 @@ reference presets are published as RDF. But the swappable engines drive
 *patches*, not catalog presets: there is no preset player, no orchestrator, and
 no preset→runtime JSON path. Session recording has a contract, a recorder and a
 validated RDF projection as of 2026-08-13, but nothing calls it yet — that waits
-on the player. The CG is launched with 4 participants against a ≥ 5 target.
-BioSynCare revenue remains negligible.
+on the player. The CG is launched with 4 participants against a ≥ 5 target
+(counted on its participants page on 2026-10-28). BioSynCare revenue remains
+negligible.
 
 ---
 
@@ -588,8 +608,11 @@ or group.
       raw data, and open research questions
 - [ ] Juliana's mechanism hypothesis documented (ask pending from
       April 2026 conversation)
-- [ ] First W3C CG report: vocabulary specification draft for sensory
-      stimulation modalities and protocol types
+- [~] First W3C CG report: vocabulary specification draft for sensory
+      stimulation modalities and protocol types *(registered as a Draft report
+      on 2026-09-07 and listed in the W3C community reports; see
+      [`INBOUND_REFERENCES.md`](docs/ontology/INBOUND_REFERENCES.md) §2.7. Not
+      yet a Final report)*
 
 ### Community
 
@@ -685,7 +708,7 @@ until BioSynCare reaches acquisition-relevant scale.
 | Catalog preset session player | 2 | Not yet |
 | Patch Studio → SSTIM projection | 2 | Partial — package/projection and recursive loss accounting built; unified exposure and producer-adjacent SHACL open |
 | Optional BSC catalog adapter | 2 | After merged model and coalition/consumer gate |
-| Session recorder | 2 | Not yet |
+| Session recorder | 2 | Partial: contract, recorder and RDF projection shipped; no caller until the preset player |
 | WASM audio processors | 3 | Shipped early (WAT kernel); further DSP ports: yes |
 | User feedback / self-report collection | 3 | Not yet |
 | Session data export pipeline | 3 | Not yet |
@@ -710,5 +733,6 @@ When marking an item shipped, prefer `[~]` with a one-line qualifier over `[x]`
 whenever the delivered thing differs from what the item describes. An
 unqualified `[x]` that overstates reality is worse than an honest `[~]`.
 
-*Last updated: 2026-07-27 — Renato Fabbri. Status reconciled against the
-repository at `v0.11.0`; the phase lists above had drifted since April 2026.*
+*Last updated: 2026-10-28. Status reconciled against the repository at
+`v0.20.0` and the 0.21.0-dev line; the previous reconciliation was at `v0.11.0`
+on 2026-07-27.*
