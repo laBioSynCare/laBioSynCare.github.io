@@ -707,9 +707,10 @@ ecosystem-publish:
 snapshot:
 	node scripts/snapshot-ontology.mjs $(VERSION) $(if $(FORCE),--force,) $(if $(RELEASE_DATE),--release-date=$(RELEASE_DATE),)
 
-## Run Vitest
+## Run Vitest, then the locate-iri tests
 test:
 	npm test
+	$(PYTHON) scripts/locate-iri.test.py
 
 ## Measure the audio engines in a real browser (BROWSER=chrome|firefox|all, JSON=path)
 audio-verify:
@@ -760,7 +761,8 @@ sstim-package-build:
 ## Answer "does SSTIM define this IRI, and where?" across all five places it
 ## could live -- live modules, committed instances, frozen snapshots, and the
 ## external live ecosystem store a repository grep structurally cannot see.
-## Reports INCOMPLETE rather than "absent" when the live store is unreachable.
+## Reports INCOMPLETE rather than "absent" when the live store is unreachable,
+## and a name found only in comments or text as mentioned, not defined.
 ##   make locate IRI=sstim:composedOfTrack
 locate:
 	$(PYTHON) scripts/locate-iri.py $(IRI) $(if $(OFFLINE),--offline,)

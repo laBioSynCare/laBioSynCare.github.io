@@ -353,7 +353,9 @@ python3 scripts/locate-iri.py https://w3id.org/sstim/organization/aeterni-anima
 
 It checks all five places, including the live store, and reports **INCOMPLETE**
 rather than "absent" when it cannot reach one — an unreachable instrument must
-never read as evidence of absence.
+never read as evidence of absence. It also separates a definition (the term is
+the subject of a statement) from a use and from a mere mention in a comment or
+text, so a word that merely appears in prose does not read as a term.
 
 ### 3.7 A push reaches both remotes, or it has not happened
 
