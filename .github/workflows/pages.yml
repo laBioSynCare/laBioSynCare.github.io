@@ -203,10 +203,14 @@ jobs:
       # costing ~14 minutes of every deploy.
       #
       # The list is the union of validate-rdf.yml's trigger paths and the
-      # documents the gates actually read: docs/decisions (adr-index),
-      # docs/ontology (term-index-check reads TERM_INDEX.md), docs/technical
-      # (preset-contract compares PRESET_FORMAT.md ranges), static/schemas
-      # (preset-contract). It is deliberately wider than strictly necessary.
+      # files the gates actually read: docs/decisions (adr-index),
+      # docs/ontology (term-index-check reads TERM_INDEX.md),
+      # docs/technical/PRESET_FORMAT.md (preset-contract compares its ranges),
+      # static/schemas (preset-contract), examples (examples-check), packages
+      # (sstim-package), CITATION.cff and src/ui/externalLinks.js
+      # (codemeta-check) and .zenodo.json (release-dryrun). It was once all of
+      # docs/technical, which sent every Patch Studio or entrance doc edit
+      # through the full contract; only the one file a gate reads is listed.
       #
       # ADD A PATH HERE when you add a gate that reads one. The failure mode is
       # silent: a gate whose input is not listed simply stops running on the
@@ -226,7 +230,7 @@ jobs:
           fi
           changed="$(git diff --name-only "$base" "${{ github.sha }}")"
           if grep -qE \
-              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|docs/ontology/|docs/decisions/|docs/technical/|docs/ecosystem/w3id/|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)' \
+              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|examples/|packages/|docs/ontology/|docs/decisions/|docs/technical/PRESET_FORMAT\.md$|docs/ecosystem/w3id/|src/ui/externalLinks\.js$|CITATION\.cff$|\.zenodo\.json$|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)' \
               <<< "$changed"; then
             echo "full=true" >> "$GITHUB_OUTPUT"
             echo "RDF-relevant paths changed — running the full contract."
