@@ -38,8 +38,8 @@ your consumers inherit.
 | Profile | What it adds | Take it when |
 |---|---|---|
 | **Kernel** | Two process anchors, no shapes | You are aligning an upper ontology and want an anchor, nothing more |
-| **Core** | Engine-independent stimulus description: signals, channels, renderings | You want to say what reaches the subject, with the fewest dependencies |
-| **Core Plus** | Reusable descriptors and calibrated quantities, including frequency extents | Anyone has to query or compare the numbers |
+| **Core** | Engine-independent stimulus description: signals and their frequency, channels, renderings | You want to say what reaches the subject, with the fewest dependencies |
+| **Core Plus** | Reusable descriptors and calibrated quantities: levels, stated magnitudes, named bands | Anyone has to know how much reached the subject |
 | **Full** | Techniques, protocols, configurations, sessions, evidence, exposure, the SKOS vocabulary | You name a published technique, record a session, or state an evidence claim |
 
 Moving up later is additive, so starting small costs you nothing.
@@ -77,7 +77,7 @@ cannot drift into describing a version of SSTIM that no longer exists.
 | File | Profile | Shows |
 |---|---|---|
 | [`01-stimulus-core.ttl`](../examples/01-stimulus-core.ttl) | Core | One signal rendered through two channels, asserted to be the same signal |
-| [`02-stimulus-core-plus.ttl`](../examples/02-stimulus-core-plus.ttl) | Core Plus | The same file plus a frequency extent. Diff them to see a profile boundary |
+| [`02-stimulus-core-plus.ttl`](../examples/02-stimulus-core-plus.ttl) | Core Plus | The same file plus calibrated levels. Diff them to see a profile boundary |
 | [`03-protocol-full.ttl`](../examples/03-protocol-full.ttl) | Full | Your own framework, a published technique |
 | [`04-session-full.ttl`](../examples/04-session-full.ttl) | Full | Configuration, plan and execution kept apart |
 

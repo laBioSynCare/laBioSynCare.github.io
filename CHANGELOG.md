@@ -17,7 +17,34 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.21.0-dev line.
+**Upgrading from 0.20.0.** Nothing is removed, renamed or deprecated. One rule
+is added: a magnitude at the subject-relative stage must name the quantity it
+sets with `sstim:relativeQuantity`, so data stating one needs that triple.
+
+### Added
+
+- **The quantity a relative value sets**
+  ([ADR 0067](docs/decisions/0067-core-frequency-relative-quantity-and-one-rate.md)).
+  `sstim:relativeQuantity` says what a subject-relative magnitude is a value
+  of: 110% of each patient's baseline cadence is a tempo, 30 dB above their
+  hearing threshold a sound pressure level. Thaut 1996's three tempi and the
+  Lane 1998 and Galambos 1981 levels state it.
+- **A channel's rate agrees with its signal** (ADR 0067). A channel's flicker,
+  modulation or beat rate must lie within the frequency extent of a signal it
+  renders, as its carrier already had to match its rendering's. Every
+  committed record already did.
+
+### Changed
+
+- **Core states a signal's frequency** (ADR 0067). `sstim:hzMin` and
+  `sstim:hzMax` are declared in the Stimulus module, so the Core profile can
+  give a signal's frequency as well as a rendering's carrier. Their IRIs and
+  meaning are unchanged, and their domain stays in Common. The Core shapes
+  check a stated extent; example 02's step up to Core Plus is now calibrated
+  levels.
+- **Definitions stand alone** (ADR 0067). No definition cites an ADR or an
+  audit finding any more: 64 did. The provenance is in `rdfs:seeAlso` and
+  `skos:historyNote`, and `make definition-coverage` fails on a citation.
 
 ## [0.20.0] - 2026-10-19
 

@@ -46,7 +46,7 @@ bsclab-protocol:thaut-1996-rhythmic-auditory-stimulation-gait a sstim:SensorySti
     skos:editorialNote "Encoded from the full text (Movement Disorders 11(2):193-200), Methodology, read 2026-10-15. The three tempi are stated for the first week as percentages of each patient's pretest cadence. The paper calls the fast tempo 'an additional 5 to 10% faster' than the quick one without saying whether the percentages compound, so its range, 110 to 121%, covers both readings. The weekly rise of every tempo by 5 to 10% and the ceiling of 130 steps per minute use the progression terms ADR 0066 added for them. The paper chose each step within that range by the subject's ability to match the tempi, and its ceiling binds the fastest tempo, so it holds for all three. The design is a randomized controlled trial because the subject pool was randomly divided into the three groups. The playback level is not stated."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-16"^^xsd:date ;
+    dct:modified "2026-10-30"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 t1996:population a sstim:PopulationDescriptor ;
@@ -140,6 +140,7 @@ t1996:tempo-normal a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitPercent ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:relativeQuantity sstim-v:quantityTempo ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "For the first week of training, the normal tempo was the pretest cadence" ;
     sstim:hasProgression t1996:progression .
@@ -151,6 +152,7 @@ t1996:tempo-quick a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitPercent ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:relativeQuantity sstim-v:quantityTempo ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "the quick tempo was 5 to 10% faster" ;
     sstim:hasProgression t1996:progression .
@@ -162,6 +164,7 @@ t1996:tempo-fast a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitPercent ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:relativeQuantity sstim-v:quantityTempo ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "and the fast tempo an additional 5 to 10% faster" ;
     sstim:hasProgression t1996:progression .

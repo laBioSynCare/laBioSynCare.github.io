@@ -50,11 +50,13 @@ The gate runs as part of `make validate`.
 Recorded because the next person will hit them too, and because an example that
 quietly routes around a rough edge teaches the reader to route around it as well.
 
-**Core states a carrier but not a rate.** `sstim:renderingCarrierHz` is in the
-Core closure, while `sstim:hzMin` and `sstim:hzMax` are in Common, which is
-Core Plus. So a Core consumer can read the 200 Hz tone being modulated but not
-the 10 Hz modulating it, which is usually the number that matters. That is why
-example 02 exists rather than being a footnote in 01.
+**Core stated a carrier but not a rate, until 0.21.0.** `sstim:renderingCarrierHz`
+was in the Core closure while `sstim:hzMin` and `sstim:hzMax` were in Common,
+so a Core consumer could read the 200 Hz tone being modulated but not the
+10 Hz modulating it, which is usually the number that matters. [ADR
+0067](../docs/decisions/0067-core-frequency-relative-quantity-and-one-rate.md)
+moved the two bounds into the Stimulus module, so example 01 states its
+signal's frequency and example 02's step up is now the calibrated levels.
 
 **A session needs a preset.** `sstim:SessionSpecification` must reference
 exactly one `sstim:Preset`, so there is no way to record a session of a

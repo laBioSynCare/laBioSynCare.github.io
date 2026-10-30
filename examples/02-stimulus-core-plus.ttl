@@ -2,17 +2,18 @@
 #
 # sstim-profile: core-plus
 #
-# This file is example 01 plus three lines. Run `diff examples/01-stimulus-core.ttl
+# This file is example 01 plus two lines. Run `diff examples/01-stimulus-core.ttl
 # examples/02-stimulus-core-plus.ttl` and the profile boundary is the whole diff.
 #
-# Core Plus adds the Common module, and with it hzMin and hzMax: the frequency
-# extent a signal occupies. That is what turns "10 Hz" from a word in a label
-# into a number a consumer can filter, compare and reason over. A range rather
-# than a point, because noise spans one and a sine does not.
+# Core already says what is delivered and at what rate. Core Plus adds the
+# Common module, and with it calibrated levels: how loud the sound is at the
+# subject's ear, in dB SPL, and how bright the screen is, in candelas per
+# square metre. A normalized engine gain is not a level, and Core has no way to
+# state one that is.
 #
 # Take Core when you need the description to travel with the fewest possible
-# dependencies. Take Core Plus the moment anyone has to query the numbers.
-# The rule is the smallest profile that carries what you actually assert.
+# dependencies. Take Core Plus the moment anyone needs to know how much reached
+# the subject. The rule is the smallest profile that carries what you assert.
 
 @prefix ex:       <https://example.org/stimuli/> .
 @prefix dct:      <http://purl.org/dc/terms/> .
@@ -29,8 +30,7 @@ ex:alpha-audiovisual a sstim:StimulusSpecification ;
     sstim:hasStimulusChannel ex:audio-channel, ex:visual-channel .
 
 # The signal is modality-free on purpose. It is not a sound and not a light;
-# it is the thing both of them carry. Now it also states what it occupies, so
-# the 10 Hz is an assertion rather than a word in a label.
+# it is the thing both of them carry, and it states the extent it occupies.
 ex:alpha-signal a sstim:StimulationSignal ;
     rdfs:label "10 Hz modulation"@en ;
     sstim:hzMin 10.0 ;
@@ -39,11 +39,13 @@ ex:alpha-signal a sstim:StimulationSignal ;
 ex:audio-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Audio channel, headphones"@en ;
     sstim:channelDurationSeconds 600.0 ;
+    sstim:soundPressureLevelDb 60.0 ;
     sstim:hasSignalRendering ex:audio-rendering .
 
 ex:visual-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Visual channel, screen"@en ;
     sstim:channelDurationSeconds 600.0 ;
+    sstim:luminanceCdM2 100.0 ;
     sstim:hasSignalRendering ex:visual-rendering .
 
 # Carrier and modulation are different facts. The 200 Hz here is the tone being

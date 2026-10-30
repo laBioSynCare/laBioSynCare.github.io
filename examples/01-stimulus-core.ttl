@@ -33,11 +33,14 @@ ex:alpha-audiovisual a sstim:StimulusSpecification ;
     sstim:hasStimulusChannel ex:audio-channel, ex:visual-channel .
 
 # The signal is modality-free on purpose. It is not a sound and not a light;
-# it is the thing both of them carry. Core cannot state its frequency extent:
-# hzMin and hzMax live in the Common module, which is the Core Plus profile.
-# Example 02 is this file plus that one step. Diff them.
+# it is the thing both of them carry. It also states the frequency extent it
+# occupies, which turns "10 Hz" from a word in a label into a number a consumer
+# can filter, compare and reason over: a range rather than a point, because
+# noise spans one and a sine does not. These are Core terms from 0.21.0.
 ex:alpha-signal a sstim:StimulationSignal ;
-    rdfs:label "10 Hz modulation"@en .
+    rdfs:label "10 Hz modulation"@en ;
+    sstim:hzMin 10.0 ;
+    sstim:hzMax 10.0 .
 
 ex:audio-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Audio channel, headphones"@en ;

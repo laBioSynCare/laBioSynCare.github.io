@@ -41,6 +41,14 @@ mechanical proxy for "says something new" that does not require judgement. 17 te
 waived, so a new concept cannot ship with a definition that restates its label,
 and the existing eleven stay visible until someone who knows the domain rewrites
 them. Writing neuroscience definitions is not a job for a mechanical gate.
+
+The fourth part keeps a definition self-contained. 62 definitions cited an ADR,
+and three an internal audit finding, such as "(RDF-08,
+2026-07-24 audit)" in the public definition of `targetsFrequencyBand`. A reader
+of the reference documentation cannot follow either, and a definition has to
+say what the term means without them. Where a term came from belongs in
+`rdfs:seeAlso` or a `skos:historyNote`, which is where those citations moved in
+0.21.0 (ADR 0067).
 """
 
 from __future__ import annotations
@@ -171,6 +179,16 @@ def main() -> int:
                         f"{kind} {name}: no longer restates its label — remove it "
                         f"from RESTATES_LABEL so the recorded debt stays honest."
                     )
+
+    # ── self-contained definitions ──────────────────────────────────────────
+    citation = re.compile(r"\bADR[ -]?\d{4}|\b(?:RDF|GB|KR)-\d{2}\b|\bP\d\.\d\b")
+    for term, definition in graph.subject_objects(SKOS.definition):
+        if ours(term) and citation.search(str(definition)):
+            failures.append(
+                f"{local(term)}: the definition cites {citation.search(str(definition)).group(0)!r}. "
+                f"Say what the term means without it, and keep the provenance in "
+                f"rdfs:seeAlso or a skos:historyNote."
+            )
 
     # ── notation uniqueness, per category ───────────────────────────────────
     from collections import defaultdict

@@ -68,7 +68,7 @@ sstim:EvidenceModalityTag a owl:Class ;
         sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Evidence Modality Tag (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: the tag conflated sensory modality (AUD, AV, VIS, TACTILE, MULTISENSORY), intervention (BREATH), study model (PRECLINICAL), and synthesis type (REVIEW). Authoritative data uses the orthogonal basis axes; the class survives only for the generated non-authoritative 0.7 compatibility view and is removed no earlier than 1.0."@en ;
+    skos:definition "Deprecated: the tag conflated sensory modality (AUD, AV, VIS, TACTILE, MULTISENSORY), intervention (BREATH), study model (PRECLINICAL), and synthesis type (REVIEW). Authoritative data uses the orthogonal basis axes; the class survives only for the generated non-authoritative 0.7 compatibility view and is removed no earlier than 1.0."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
@@ -128,7 +128,7 @@ sstim:hasModalityTag a owl:ObjectProperty ;
         sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention ;
     rdfs:range  sstim:EvidenceModalityTag ;
     rdfs:label  "has modality tag (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: the tag mixed sensory modality with study model and synthesis type. Authoritative data uses the orthogonal basis axes (basisSensoryModality, basisModalityApplicability, basisStudyModel, basisSynthesisType, basisIntervention). Appears only in the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
+    skos:definition "Deprecated: the tag mixed sensory modality with study model and synthesis type. Authoritative data uses the orthogonal basis axes (basisSensoryModality, basisModalityApplicability, basisStudyModel, basisSynthesisType, basisIntervention). Appears only in the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
@@ -138,7 +138,7 @@ sstim:supportsRelation a owl:ObjectProperty ;
     rdfs:subPropertyOf sstim:evaluatesSubject ;
     rdfs:range  [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
     rdfs:label  "supports relation (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: the property name encodes a supporting direction the claim may not have. Use sstim:evaluatesSubject; direction lives exclusively in hasClaimDirection. Removed no earlier than 1.0."@en ;
+    skos:definition "Deprecated: the property name encodes a supporting direction the claim may not have. Use sstim:evaluatesSubject; direction lives exclusively in hasClaimDirection. Removed no earlier than 1.0."@en ;
     skos:historyNote "Deprecated 2026-07-13 in favour of sstim:evaluatesSubject (ADR 0027); original range decision from ADR 0013 is preserved on the replacement."@en ,
         "SSTIM's public data asserted it beside sstim:evaluatesSubject as a compatibility alias until 0.19.0, which stopped. Its range never admitted the neural oscillation types ADR 0049 made assessable, so the alias was wrong for those claims."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0013-evidence-support-relation-range.md> ,
@@ -149,7 +149,9 @@ sstim:citesReference a owl:ObjectProperty ;
     rdfs:domain sstim:EvidenceClaim ;
     rdfs:range  sstim:BibliographicReference ;
     rdfs:label  "cites reference"@en ;
-    skos:definition "Links an evidence assessment to a bibliographic reference. For every bibliographic basis source the assessment carries a matching citesReference triple (ADR 0027); publication clearance is a separate concern (ADR 0029)."@en ;
+    skos:definition "Links an evidence assessment to a bibliographic reference. For every bibliographic basis source the assessment carries a matching citesReference triple; publication clearance is a separate concern."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0029-bsc-lab-public-claim-publication-profile.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:hasClaimDirection a owl:ObjectProperty, owl:FunctionalProperty ;
@@ -164,7 +166,8 @@ sstim:hasEffectDirection a owl:ObjectProperty, owl:FunctionalProperty ;
     dct:isReplacedBy sstim:basisObservedEffectDirection ;
     rdfs:range  sstim:EffectDirection ;
     rdfs:label  "has effect direction (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: observed effect direction is source-level metadata; use sstim:basisObservedEffectDirection on the qualified evidence basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    skos:definition "Deprecated: observed effect direction is source-level metadata; use sstim:basisObservedEffectDirection on the qualified evidence basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
@@ -172,7 +175,7 @@ sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
     dct:isReplacedBy sstim:EvidenceReviewDecision ;
     rdfs:range  sstim:ReviewStatus ;
     rdfs:label  "has review status (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: review state is derived from immutable EvidenceReviewDecision records, not stored as a mutable status. A non-authoritative 0.7 compatibility view may derive it; it is excluded from validation and authorization."@en ;
+    skos:definition "Deprecated: review state is derived from immutable EvidenceReviewDecision records, not stored as a mutable status. A non-authoritative 0.7 compatibility view may derive it; it is excluded from validation and authorization."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
@@ -181,7 +184,8 @@ sstim:evidenceOutcome a owl:DatatypeProperty ;
     dct:isReplacedBy sstim:basisObservedOutcome, sstim:basisOutcomeNote ;
     rdfs:range  xsd:string ;
     rdfs:label  "evidence outcome (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: use the identified sstim:basisObservedOutcome concept plus sstim:basisOutcomeNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    skos:definition "Deprecated: use the identified sstim:basisObservedOutcome concept plus sstim:basisOutcomeNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:studyPopulation a owl:DatatypeProperty ;
@@ -189,7 +193,8 @@ sstim:studyPopulation a owl:DatatypeProperty ;
     dct:isReplacedBy sstim:basisStudyPopulation, sstim:basisPopulationNote ;
     rdfs:range  xsd:string ;
     rdfs:label  "study population (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: use the identified sstim:basisStudyPopulation descriptor plus sstim:basisPopulationNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    skos:definition "Deprecated: use the identified sstim:basisStudyPopulation descriptor plus sstim:basisPopulationNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:comparator a owl:DatatypeProperty ;
@@ -197,7 +202,8 @@ sstim:comparator a owl:DatatypeProperty ;
     dct:isReplacedBy sstim:basisComparator, sstim:basisComparatorNote ;
     rdfs:range  xsd:string ;
     rdfs:label  "comparator (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: use the identified sstim:basisComparator descriptor plus sstim:basisComparatorNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    skos:definition "Deprecated: use the identified sstim:basisComparator descriptor plus sstim:basisComparatorNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:evidenceDate a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -205,7 +211,8 @@ sstim:evidenceDate a owl:DatatypeProperty, owl:FunctionalProperty ;
     dct:isReplacedBy dct:issued, prov:endedAtTime ;
     rdfs:range  xsd:date ;
     rdfs:label  "evidence date (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: source publication dates stay as dct:issued on the bibliographic reference; assessment and review dates come from their generating activities. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    skos:definition "Deprecated: source publication dates stay as dct:issued on the bibliographic reference; assessment and review dates come from their generating activities. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:reviewedBy a owl:DatatypeProperty ;
@@ -213,14 +220,15 @@ sstim:reviewedBy a owl:DatatypeProperty ;
     dct:isReplacedBy prov:qualifiedAssociation ;
     rdfs:range  xsd:string ;
     rdfs:label  "reviewed by (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: reviewer identity and role live on the review activity's prov:qualifiedAssociation as agent IRIs, not name literals. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    skos:definition "Deprecated: reviewer identity and role live on the review activity's prov:qualifiedAssociation as agent IRIs, not name literals. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:hasPublicClaimLevel a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:PublicClaimLevel ;
     rdfs:label  "has public claim level"@en ;
-    skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that supporting evidence meets the level's required tier."@en ;
+    skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint in PresetShape checks that supporting evidence meets the level's required tier."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 

@@ -160,6 +160,9 @@ class OfflineTest(unittest.TestCase):
 
 class ValidateTest(unittest.TestCase):
     def test_every_shipped_example_passes_its_own_profile(self):
+        # The examples follow the development line, not a frozen release:
+        # example 01 states its signal's frequency with hzMin and hzMax, Core
+        # terms only from 0.21.0 (ADR 0067), so 0.17.0's Core rejects it.
         cases = {
             "01-stimulus-core.ttl": "core",
             "02-stimulus-core-plus.ttl": "core-plus",
@@ -169,7 +172,7 @@ class ValidateTest(unittest.TestCase):
         for filename, profile in cases.items():
             with self.subTest(example=filename):
                 report = sstim.validate(
-                    EXAMPLES / filename, profile=profile, manifest=FROZEN
+                    EXAMPLES / filename, profile=profile, manifest=LIVE
                 )
                 self.assertTrue(report.ok, str(report))
 
@@ -192,16 +195,19 @@ class ValidateTest(unittest.TestCase):
         turtle = """
         @prefix ex: <https://example.org/s/> .
         @prefix sstim: <https://w3id.org/sstim#> .
+        @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
         @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
         ex:s a sstim:StimulusSpecification ;
             rdfs:label "claims core"@en ;
             sstim:stimulusRegime "determinate" ;
-            sstim:hasSignal ex:sig .
-        ex:sig a sstim:StimulationSignal ; sstim:hzMin 10.0 .
+            sstim:hasStimulusChannel ex:ch .
+        ex:ch a sstim-ex:StimulusChannel ;
+            rdfs:label "a calibrated channel"@en ;
+            sstim:soundPressureLevelDb 60.0 .
         """
         core = sstim.validate(turtle, profile="core", manifest=FROZEN)
         self.assertTrue(core.conforms, "shapes alone do not catch this")
-        self.assertIn("https://w3id.org/sstim#hzMin", core.undefined)
+        self.assertIn("https://w3id.org/sstim#soundPressureLevelDb", core.undefined)
         self.assertFalse(core.ok)
 
         wider = sstim.validate(turtle, profile="core-plus", manifest=FROZEN)
@@ -223,7 +229,7 @@ class ValidateTest(unittest.TestCase):
 
     def test_report_is_falsy_when_it_failed(self):
         report = sstim.validate(
-            EXAMPLES / "01-stimulus-core.ttl", profile="core", manifest=FROZEN
+            EXAMPLES / "01-stimulus-core.ttl", profile="core", manifest=LIVE
         )
         self.assertTrue(report)
         report.minted = ["https://w3id.org/sstim#X"]
@@ -238,7 +244,7 @@ class CliTest(unittest.TestCase):
     def test_validate_exit_codes(self):
         from sstim.cli import main
         ok = main(["validate", str(EXAMPLES / "01-stimulus-core.ttl"),
-                   "--profile", "core", "--manifest", str(FROZEN)])
+                   "--profile", "core", "--manifest", str(LIVE)])
         self.assertEqual(ok, 0)
 
     def test_unknown_profile_exits_two(self):

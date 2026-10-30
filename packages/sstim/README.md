@@ -49,8 +49,8 @@ additive, so starting small costs nothing.
 | Profile | What it adds |
 |---|---|
 | `kernel` | Two process anchors. A discovery entry point, with no shapes |
-| `core` | Engine-independent stimulus description: signals, channels, renderings |
-| `core-plus` | Reusable descriptors and calibrated quantities, including frequency extents |
+| `core` | Engine-independent stimulus description: signals and their frequency, channels, renderings |
+| `core-plus` | Reusable descriptors and calibrated quantities: levels, stated magnitudes, named bands |
 | `full` | Techniques, protocols, configurations, sessions, evidence, exposure, vocabulary |
 
 ```bash

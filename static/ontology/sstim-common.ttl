@@ -214,21 +214,13 @@ sstim:signalOverlapsBand a owl:ObjectProperty ;
     skos:definition "The signal's frequency extent and the band intersect, with neither containing the other. Recorded rather than inferred, because a partial overlap is a design decision worth stating."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
-sstim:hzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "Hz minimum"@en ;
-    skos:definition "Lower bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
-    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the lower edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+# hzMin and hzMax are declared in Stimulus, so a Core description can state the
+# frequency of its signal. Their domain names sstim:FrequencyBand, declared
+# here, so the union stays here as one intact axiom, as hasStimulationTarget's
+# does in Session: two rdfs:domain statements would intersect, not union.
+sstim:hzMin rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] .
 
-sstim:hzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "Hz maximum"@en ;
-    skos:definition "Upper bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
-    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the upper edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+sstim:hzMax rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] .
 
 sstim:cautionSeverityRank a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:CautionSeverity ;
@@ -420,6 +412,14 @@ sstim:relativeToParticipantMeasure a owl:ObjectProperty, owl:FunctionalProperty 
     rdfs:range  sstim:ParticipantReference ;
     rdfs:label  "relative to participant measure"@en ;
     skos:definition "The measure of the subject's own that a subject-relative magnitude is stated against. Present exactly when the stage is subject-relative, which a SHACL constraint checks in both directions."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:relativeQuantity a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusMagnitude ;
+    rdfs:range  sstim:QuantityKind ;
+    rdfs:label  "relative quantity"@en ;
+    skos:definition "The kind of quantity a subject-relative magnitude sets, which is also the kind of the participant measure it is stated against: the tempo of a cue set at 110% of the subject's baseline cadence is a tempo, and the level of a tone set 30 dB above their hearing threshold is a sound pressure level. The magnitude's own quantity, a ratio to reference or a level above reference, says only how its value relates to that measure. Present exactly when the stage is subject-relative, which a SHACL constraint checks in both directions."@en ;
+    skos:historyNote "Added in 0.21.0 by ADR 0067, after the published protocols showed a cue tempo set from each patient's own cadence being read as a level, because nothing in its record said it was a tempo."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:measurementDistanceMetres a owl:DatatypeProperty, owl:FunctionalProperty ;

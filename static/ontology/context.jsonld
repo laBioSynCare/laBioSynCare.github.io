@@ -1646,6 +1646,10 @@
       "@id": "sstim:relativeToParticipantMeasure",
       "@type": "@id"
     },
+    "relativeQuantity": {
+      "@id": "sstim:relativeQuantity",
+      "@type": "@id"
+    },
     "measurementDistanceMetres": {
       "@id": "sstim:measurementDistanceMetres",
       "@type": "xsd:decimal"

@@ -27,7 +27,7 @@
 <https://w3id.org/sstim/core-shapes> a owl:Ontology ;
     owl:versionInfo "0.21.0-dev" ;
     dct:title "SSTIM Core Profile SHACL Shapes"@en ;
-    dct:description "Weak SHACL Core constraints for the minimal SSTIM Core Profile: labelled stimulus descriptions with a regime, optional process references, labelled declared channels, and positive channel duration when asserted."@en ;
+    dct:description "Weak SHACL Core constraints for the minimal SSTIM Core Profile: labelled stimulus descriptions with a regime, optional process references, labelled declared channels, positive channel duration when asserted, and a signal frequency extent that runs the right way when stated."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/stimulus> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
@@ -105,4 +105,23 @@ core-sh:ChannelDurationShape a sh:NodeShape ;
         sh:datatype xsd:decimal ;
         sh:minExclusive 0 ;
         sh:message "channelDurationSeconds, when asserted, must be one positive decimal value."@en
+    ] .
+
+
+# A signal's frequency extent, when stated: one bound each, in hertz, the lower
+# not above the upper. Core does not require a signal to state its frequency,
+# as Full does; sh:lessThanOrEquals keeps this SHACL Core rather than SPARQL.
+core-sh:SignalFrequencyExtentShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulationSignal ;
+    sh:name "Signal frequency extent"@en ;
+    sh:property [
+        sh:path sstim:hzMin ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:lessThanOrEquals sstim:hzMax ;
+        sh:message "A signal states at most one lower frequency bound, a non-negative decimal in hertz, and it may equal the upper bound but not exceed it."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hzMax ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "A signal states at most one upper frequency bound, a non-negative decimal in hertz."@en ;
     ] .

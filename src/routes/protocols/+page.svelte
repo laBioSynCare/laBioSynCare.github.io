@@ -114,9 +114,11 @@
     return law ? `closed loop, follows the ${lower(law.oscillation)}` : ''
   }
 
-  // A cue tempo set from each patient's own cadence has no single rate in Hz.
-  function rateFromCadence(row) {
-    return row.levels.some(level => level.relativeTo === 'Baseline cadence') ? "set from each patient's cadence" : ''
+  // A cue tempo set from each subject's own measure has no single rate in Hz.
+  // The record says it is a tempo (sstim:relativeQuantity), so no label is matched.
+  function rateFromSubjectMeasure(row) {
+    const level = row.levels.find(candidate => candidate.relativeQuantityId === 'quantityTempo' && candidate.relativeTo)
+    return level ? `tempo set from each subject's own ${lower(level.relativeTo)}` : ''
   }
 
   function renderingText(rendering) {
@@ -129,7 +131,10 @@
   }
 
   function levelText(level) {
-    return [level.label && lower(level.label), lower(level.quantity), lower(level.stage), lower(level.basis),
+    const quantity = level.relativeQuantity
+      ? `${lower(level.relativeQuantity)} as a ${lower(level.quantity)}`
+      : lower(level.quantity)
+    return [level.label && lower(level.label), quantity, lower(level.stage), lower(level.basis),
       level.relativeTo && `relative to ${lower(level.relativeTo)}`]
       .filter(Boolean).join(' · ')
   }
@@ -310,14 +315,14 @@
                 {#if row.encodedFrom === 'abstract'}<span class="badge">abstract only</span>{/if}
               </th>
               <td data-label="Senses">{list(row.senses) || '—'}</td>
-              <td data-label="Rate">{row.rates || rateFromControlLaw(row) || rateFromCadence(row) || 'not encoded'}</td>
+              <td data-label="Rate">{row.rates || rateFromControlLaw(row) || rateFromSubjectMeasure(row) || 'not encoded'}</td>
               <td data-label="Levels, and where they hold">
                 {#if row.levels.length}
                   <ul class="plain">
                     {#each row.levels as level}
                       <li>
                         <strong>{formatMagnitude(level)}</strong>
-                        <span class="muted">{[lower(level.label || level.quantity), level.relativeTo ? `relative to ${lower(level.relativeTo)}` : lower(level.stage)].filter(Boolean).join(', ')}</span>
+                        <span class="muted">{[lower(level.label || level.relativeQuantity || level.quantity), level.relativeTo ? `relative to ${lower(level.relativeTo)}` : lower(level.stage)].filter(Boolean).join(', ')}</span>
                       </li>
                     {/each}
                   </ul>

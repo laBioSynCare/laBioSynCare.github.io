@@ -72,18 +72,27 @@ describe('listPublishedProtocols', () => {
     expect(galambos).toEqual([expect.objectContaining({
       quantity: 'Level above reference', minimum: 5, maximum: 50, unit: 'dB',
       stageId: 'stageSubjectRelative', relativeTo: 'Hearing threshold',
+      relativeQuantityId: 'quantitySoundPressureLevel',
     })])
 
     const thaut = protocolLevels(byId('thaut-1996-rhythmic-auditory-stimulation-gait'))
     expect(thaut.map(formatMagnitude)).toEqual(['100 %', '105 to 110 %', '110 to 121 %'])
-    for (const tempo of thaut) expect(tempo).toMatchObject({ stageId: 'stageSubjectRelative', relativeTo: 'Baseline cadence' })
+    // A percentage of cadence is a tempo, and the record says so rather than
+    // leaving it to be guessed from the measure's name.
+    for (const tempo of thaut) {
+      expect(tempo).toMatchObject({
+        stageId: 'stageSubjectRelative', relativeTo: 'Baseline cadence', relativeQuantityId: 'quantityTempo',
+      })
+    }
 
     const lane = byId('lane-1998-binaural-beats-vigilance')
     expect(protocolLevels(lane)).toEqual([
-      expect.objectContaining({ value: 0, relativeTo: 'Most comfortable level' }),
+      expect.objectContaining({
+        value: 0, relativeTo: 'Most comfortable level', relativeQuantityId: 'quantitySoundPressureLevel',
+      }),
       expect.objectContaining({
         label: 'Carrier tones above the pink noise', quantity: 'Level above another component',
-        value: 15, unit: 'dB', stageId: 'stageConfigured', relativeTo: '',
+        value: 15, unit: 'dB', stageId: 'stageConfigured', relativeTo: '', relativeQuantity: '',
       }),
     ])
   })

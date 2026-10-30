@@ -1,0 +1,31 @@
+###########################################################################
+# Adversarial Core fixture: a signal whose frequency extent runs backwards.
+#
+# Core does not require a signal to state its frequency, but a stated extent
+# must be readable: 40 Hz to 10 Hz describes no signal at all, and a consumer
+# filtering on the bounds would silently miss or misplace it.
+# SignalFrequencyExtentShape rejects it with sh:lessThanOrEquals.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/core-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification whose signal runs backwards"@en ;
+    dct:identifier "core-adversarial-inverted-signal-extent" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasSignal example:signal .
+
+example:signal a sstim:StimulationSignal ;
+    rdfs:label "An extent from 40 Hz down to 10 Hz"@en ;
+    sstim:hzMin "40.0"^^xsd:decimal ;
+    sstim:hzMax "10.0"^^xsd:decimal .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

@@ -223,7 +223,8 @@ sstim-eco:publicationStatus a owl:ObjectProperty ;
     rdfs:label "publication status"@en ;
     rdfs:domain sstim-eco:EcosystemRelationship ;
     rdfs:range sstim-eco:EngagementOutcome ;
-    skos:definition "The current lifecycle status of a qualified ecosystem relationship — one controlled outcome (e.g. notification sent, consent granted, publication approved) matching the engagementOutcome of the relationship's chronologically most recent engagement activity. Introduced by ADR 0032 as a second, explicit admission basis for the public ecosystem graph: a relationship may be admitted with any truthful status via this property, not only a final publication-approved one, so that the person or organization it describes — and anyone else — can see exactly where the relationship stands, including its context, without waiting for approval to become visible at all. Only a publicationStatus of outcomePublicationApproved for a relationship whose agent is a person still requires that person's own prior consent or self-publication; every other status requires no consent to display, precisely because it does not claim confirmation. A relationship admitted through the legacy path (ending in a PublicationDecisionActivity with no explicit publicationStatus) is treated as approved for backward compatibility."@en ;
+    skos:definition "The current lifecycle status of a qualified ecosystem relationship — one controlled outcome (e.g. notification sent, consent granted, publication approved) matching the engagementOutcome of the relationship's chronologically most recent engagement activity. It is a second, explicit admission basis for the public ecosystem graph: a relationship may be admitted with any truthful status via this property, not only a final publication-approved one, so that the person or organization it describes — and anyone else — can see exactly where the relationship stands, including its context, without waiting for approval to become visible at all. Only a publicationStatus of outcomePublicationApproved for a relationship whose agent is a person still requires that person's own prior consent or self-publication; every other status requires no consent to display, precisely because it does not claim confirmation. A relationship admitted through the legacy path (ending in a PublicationDecisionActivity with no explicit publicationStatus) is treated as approved for backward compatibility."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0032-visible-pending-status-ecosystem-records.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/ecosystem> .
 
 sstim-eco:hasEngagementActivity a owl:ObjectProperty ;
@@ -334,7 +335,8 @@ sstim-eco:consentStatus a owl:DatatypeProperty ;
     rdfs:label "consent status"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
-    skos:definition "Listing-tier consent state: implicit-public, notified, consent-requested, consent-granted, consent-declined, removal-requested, or withdrawn (ADR 0024)."@en ;
+    skos:definition "Listing-tier consent state: implicit-public, notified, consent-requested, consent-granted, consent-declined, removal-requested, or withdrawn."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0024-stakeholder-ecosystem-modeling.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/ecosystem> .
 
 sstim-eco:archivalConsent a owl:DatatypeProperty ;
@@ -343,7 +345,8 @@ sstim-eco:archivalConsent a owl:DatatypeProperty ;
     rdfs:label "archival consent"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:boolean ;
-    skos:definition "True only when the agent has given specific, informed consent that the record may enter a permanent, citable archive and cannot then be fully erased (ADR 0024 §6). Absent or false permits only mutable live publication outside the Zenodo-tracked release repository; removal can be honored in the controlled store, but third-party public copies cannot be recalled."@en ;
+    skos:definition "True only when the agent has given specific, informed consent that the record may enter a permanent, citable archive and cannot then be fully erased. Absent or false permits only mutable live publication outside the Zenodo-tracked release repository; removal can be honored in the controlled store, but third-party public copies cannot be recalled."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0024-stakeholder-ecosystem-modeling.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/ecosystem> .
 
 sstim-eco:notificationStatus a owl:DatatypeProperty ;
@@ -693,7 +696,9 @@ sstim-eco:purposeArchivalPublication a owl:NamedIndividual, sstim-eco:EcosystemP
                    "Publicação arquivística"@pt,
                    "Publicación archivística"@es ;
     skos:notation "archival-publication" ;
-    skos:definition "Eligibility for permanent citable archival publication. The archival pipeline is not implemented by ADR 0031."@en .
+    skos:definition "Eligibility for permanent citable archival publication."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0031-qualified-ecosystem-records.md> ;
+    skos:historyNote "Introduced with the qualified ecosystem records of ADR 0031, which named this purpose without implementing the archival pipeline."@en .
 
 
 ###########################################################################

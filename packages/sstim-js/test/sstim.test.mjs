@@ -146,8 +146,11 @@ describe('validating', () => {
     ['04-session-full.ttl', 'full']
   ]
 
+  // The examples follow the development line, not a frozen release: example
+  // 01 states its signal's frequency with hzMin and hzMax, Core terms only
+  // from 0.21.0 (ADR 0067), so 0.17.0's Core rejects it.
   it.each(cases)('%s passes its own profile (%s)', async (file, profile) => {
-    const report = await validate(example(file), { profile, manifest: FROZEN })
+    const report = await validate(example(file), { profile, manifest: LIVE })
     expect(report.ok, String(report)).toBe(true)
   })
 
@@ -201,7 +204,7 @@ describe('the SPARQL-constraint limitation is reported, not hidden', () => {
   // carry no sh:sparql, and a loud PARTIAL where they do.
   it('is complete for core and core-plus, whose shapes carry none', async () => {
     for (const profile of ['core', 'core-plus']) {
-      const report = await validate(example('01-stimulus-core.ttl'), { profile, manifest: FROZEN })
+      const report = await validate(example('01-stimulus-core.ttl'), { profile, manifest: LIVE })
       expect(report.unevaluated).toBe(0)
       expect(report.partial).toBe(false)
     }
@@ -234,7 +237,7 @@ describe('the command line', () => {
   it('exits 0 on a good file and 2 on a bad profile', async () => {
     const { main } = await import('../src/cli.js')
     expect(await main(['validate', example('01-stimulus-core.ttl'),
-      '--profile', 'core', '--manifest', FROZEN])).toBe(0)
+      '--profile', 'core', '--manifest', LIVE])).toBe(0)
     expect(await main(['modules', '--profile', 'nonsense', '--manifest', FROZEN])).toBe(2)
   })
 
@@ -260,7 +263,7 @@ describe('the command line', () => {
       symlinkSync(new URL('../src/cli.js', import.meta.url).pathname, link)
       const run = spawnSync(process.execPath, [
         link, 'validate', example('01-stimulus-core.ttl'),
-        '--profile', 'core', '--manifest', FROZEN
+        '--profile', 'core', '--manifest', LIVE
       ], { encoding: 'utf8' })
       expect(run.stdout, 'the CLI produced no output through a symlink').toMatch(/SHACL conformance/)
       expect(run.status).toBe(0)

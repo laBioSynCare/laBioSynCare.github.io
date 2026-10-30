@@ -120,7 +120,7 @@ sstim-ex:ExposureEffectClaim a owl:Class ;
         sstim-ex:KnowledgeStatusAssertion ;
     rdfs:subClassOf sstim:EvidenceClaim ;
     rdfs:label "Exposure Effect Claim (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: this class mixed hypotheses, questions, boundary applicability, requirements, design objectives, planned outcomes, and status assertions under evidence semantics. Its instances migrate to the role-specific statement classes; removed no earlier than 1.0."@en ;
+    skos:definition "Deprecated: this class mixed hypotheses, questions, boundary applicability, requirements, design objectives, planned outcomes, and status assertions under evidence semantics. Its instances migrate to the role-specific statement classes; removed no earlier than 1.0."@en ;
     skos:historyNote "Deprecated 2026-07-13 by ADR 0027; the 27 live instances migrate per the ADR 0027 migration ledger."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0010-exposure-delivery-modality.md> ,
@@ -186,7 +186,8 @@ sstim-ex:VisualNoiseType a owl:Class ;
 sstim-ex:EffectDimension a owl:Class ;
     rdfs:subClassOf sstim:EvidenceOutcomeConcept ;
     rdfs:label "Effect Dimension"@en ;
-    skos:definition "Controlled vocabulary class for comfort, risk, perception, and physiological dimensions that a hypothesis, research question, design objective, or planned outcome can concern. A subclass of sstim:EvidenceOutcomeConcept (ADR 0027), so existing dimension values are reusable as outcome concepts without ad hoc dual typing."@en ;
+    skos:definition "Controlled vocabulary class for comfort, risk, perception, and physiological dimensions that a hypothesis, research question, design objective, or planned outcome can concern. A subclass of sstim:EvidenceOutcomeConcept, so existing dimension values are reusable as outcome concepts without ad hoc dual typing."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:ExposureLimit a owl:Class ;
@@ -311,7 +312,7 @@ sstim-ex:hasEffectClaim a owl:ObjectProperty ;
         sstim-ex:hasKnowledgeStatusAssertion ;
     rdfs:range sstim-ex:ExposureEffectClaim ;
     rdfs:label "has effect claim (deprecated)"@en ;
-    skos:definition "Deprecated ADR 0027: the single link mixed hypotheses, questions, boundary applicability, requirements, design objectives, and planned outcomes. Use the role-specific hasHypothesis, hasResearchQuestion, hasBoundaryApplicability, hasProtocolRequirement, hasDesignObjective, hasPlannedOutcome, or hasKnowledgeStatusAssertion; removed no earlier than 1.0."@en ;
+    skos:definition "Deprecated: the single link mixed hypotheses, questions, boundary applicability, requirements, design objectives, and planned outcomes. Use the role-specific hasHypothesis, hasResearchQuestion, hasBoundaryApplicability, hasProtocolRequirement, hasDesignObjective, hasPlannedOutcome, or hasKnowledgeStatusAssertion; removed no earlier than 1.0."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
@@ -325,7 +326,9 @@ sstim-ex:hasExperimentContext a owl:ObjectProperty ;
 sstim-ex:hasKnowledgeStatus a owl:ObjectProperty ;
     rdfs:range sstim-ex:KnowledgeStatus ;
     rdfs:label "has knowledge status"@en ;
-    skos:definition "Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled knowledge or capability status value. Carries no OWL domain (ADR 0027, KR-05): SHACL enforces allowed subjects, admitting the DeviceCapability use promised here and preventing status links from re-inferring evidence semantics."@en ;
+    skos:definition "Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled knowledge or capability status value. Carries no OWL domain: SHACL enforces allowed subjects, admitting the DeviceCapability use promised here and preventing status links from re-inferring evidence semantics."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    skos:historyNote "Left without an OWL domain under ADR 0027 and the KR-05 repair of OWL domains that contradicted their definitions (closed 2026-08-14), so that SHACL alone decides its allowed subjects."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasStimulusPattern a owl:ObjectProperty ;
@@ -338,7 +341,8 @@ sstim-ex:hasStimulusPattern a owl:ObjectProperty ;
 sstim-ex:concernsEffectDimension a owl:ObjectProperty ;
     rdfs:range sstim-ex:EffectDimension ;
     rdfs:label "concerns effect dimension"@en ;
-    skos:definition "Links a hypothesis, research question, design objective, or planned-outcome specification to the comfort, risk, perception, or physiological dimension it concerns. Carries no OWL domain (ADR 0027): allowed subjects are enforced in SHACL so use on a non-evidence statement cannot re-infer the deprecated ExposureEffectClaim."@en ;
+    skos:definition "Links a hypothesis, research question, design objective, or planned-outcome specification to the comfort, risk, perception, or physiological dimension it concerns. Carries no OWL domain: allowed subjects are enforced in SHACL so use on a non-evidence statement cannot re-infer the deprecated ExposureEffectClaim."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExposureLimit a owl:ObjectProperty ;

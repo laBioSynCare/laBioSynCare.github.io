@@ -32,7 +32,7 @@
 <https://w3id.org/sstim/stimulus> a owl:Ontology ;
     owl:versionInfo "0.21.0-dev" ;
     dct:title "SSTIM Core Stimulus Description Module"@en ;
-    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, optional stimulation target, signals and their renderings, measurement units, and the control laws of adaptive specifications."@en ;
+    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, optional stimulation target, signals with their frequency extent and their renderings, measurement units, and the control laws of adaptive specifications."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
@@ -175,6 +175,22 @@ sstim:signalSourceAsset a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:range  iao:0000030 ;
     rdfs:label  "signal source asset"@en ;
     skos:definition "The recorded material a sampled signal is taken from — a violin note, a voice, rainfall. Required when the shape is sampled and meaningless otherwise: a sampled signal is only reproducible if the sample is identified."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz minimum"@en ;
+    skos:definition "Lower bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
+    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the lower edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ,
+        "Declared in the Stimulus module from 0.21.0 (ADR 0067), so a Core description can state the frequency of its signal: until then it could state a rendering's carrier but gave the signal's own rate only in a label. The IRI and the meaning are unchanged. The domain, which names sstim:FrequencyBand, stays in Common with that class."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz maximum"@en ;
+    skos:definition "Upper bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
+    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the upper edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ,
+        "Declared in the Stimulus module from 0.21.0 (ADR 0067), so a Core description can state the frequency of its signal: until then it could state a rendering's carrier but gave the signal's own rate only in a label. The IRI and the meaning are unchanged. The domain, which names sstim:FrequencyBand, stays in Common with that class."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
 sstim:hasSignalRendering a owl:ObjectProperty ;

@@ -63,7 +63,7 @@ REQUIRED_CLASSES = {
 }
 REQUIRED_PROPERTIES = {
     SSTIM: ["hasMagnitude", "magnitudeQuantity", "magnitudeUnit", "magnitudeValue", "magnitudeMinimum",
-            "magnitudeMaximum", "deliveryStage", "valueBasis", "relativeToParticipantMeasure",
+            "magnitudeMaximum", "deliveryStage", "valueBasis", "relativeToParticipantMeasure", "relativeQuantity",
             "measurementDistanceMetres", "reportedAs", "quantityUnit", "hasControlLaw",
             "controlInputSignal", "trackedOscillation", "targetOscillationPhase",
             "detectionThresholdValue", "detectionThresholdUnit", "triggerDelaySeconds",
@@ -207,6 +207,7 @@ ex:relative a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitDecibel ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceHearingThreshold ;
+    sstim:relativeQuantity sstim-v:quantitySoundPressureLevel ;
     sstim:valueBasis sstim-v:valueSpecified ;
     sstim:hasProgression ex:level-progression .
 
@@ -222,6 +223,7 @@ ex:tempo a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitPercent ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;
+    sstim:relativeQuantity sstim-v:quantityTempo ;
     sstim:valueBasis sstim-v:valueSpecified ;
     sstim:hasProgression ex:tempo-progression .
 
@@ -363,6 +365,16 @@ CASES = [
     ("a participant measure on a magnitude that is not subject-relative",
      swap("    sstim:deliveryStage sstim-v:stageSubjectRelative ;", "    sstim:deliveryStage sstim-v:stageAtSubject ;"),
      "must name the participant measure"),
+    ("a percentage of baseline cadence that does not say it is a tempo",
+     drop(BASELINE, "    sstim:relativeQuantity sstim-v:quantityTempo ;\n"),
+     "must name the quantity it sets"),
+    ("a relative quantity on a magnitude that is not subject-relative",
+     swap("    sstim:deliveryStage sstim-v:stageSubjectRelative ;\n    sstim:relativeToParticipantMeasure sstim-v:referenceBaselineCadence ;\n",
+          "    sstim:deliveryStage sstim-v:stageAtSubject ;\n"),
+     "must name the quantity it sets"),
+    ("a relative quantity that is the ratio itself",
+     swap("    sstim:relativeQuantity sstim-v:quantityTempo ;", "    sstim:relativeQuantity sstim-v:quantityRatioToReference ;"),
+     "names the quantity being set"),
     ("a reported value without the source's words",
      drop(BASELINE, '    sstim:reportedAs "between 60 and 70 dB" .\n').replace(
          "    sstim:valueBasis sstim-v:valueReported ;\n", "    sstim:valueBasis sstim-v:valueReported .\n"),

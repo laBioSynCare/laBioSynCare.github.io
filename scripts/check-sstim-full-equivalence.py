@@ -450,6 +450,79 @@ ADR_0061_MIGRATION_FIELDS = {
 GB_06_DEFINITION_FIELDS = {
     (SSTIM.supportsRelation, SKOS.definition),
 }
+# ADR 0067 (2026-10-30): no definition cites an ADR or an audit finding. 64
+# did, 44 of them already in 0.12, such as "(RDF-08, 2026-07-24 audit)" in the
+# public definition of sstim:targetsFrequencyBand. Each citation moved to
+# rdfs:seeAlso or a skos:historyNote, and the rewording around it changes no
+# term's meaning: InterventionalNeuromodulation names the techniques ADR 0034's
+# "contrast set" meant, and primaryFrequencyBand says why the primary band has
+# to be stated. make definition-coverage now fails on a citation.
+ADR_0067_DEFINITION_FIELDS = {
+    (SSTIM.definedByFramework, SKOS.definition),
+    (SSTIM.targetsFrequencyBand, SKOS.definition),
+    (SSTIM.primaryFrequencyBand, SKOS.definition),
+    (SSTIM.masterVolume, SKOS.definition),
+    (SSTIM.masterBrightness, SKOS.definition),
+    (SSTIM.EvidenceModalityTag, SKOS.definition),
+    (SSTIM.hasModalityTag, SKOS.definition),
+    (SSTIM.supportsRelation, SKOS.definition),
+    (SSTIM.citesReference, SKOS.definition),
+    (SSTIM.hasEffectDirection, SKOS.definition),
+    (SSTIM.hasReviewStatus, SKOS.definition),
+    (SSTIM.evidenceOutcome, SKOS.definition),
+    (SSTIM.studyPopulation, SKOS.definition),
+    (SSTIM.comparator, SKOS.definition),
+    (SSTIM.evidenceDate, SKOS.definition),
+    (SSTIM.reviewedBy, SKOS.definition),
+    (SSTIM.hasPublicClaimLevel, SKOS.definition),
+    (SSTIM.InterventionalNeuromodulation, SKOS.definition),
+    (SSTIM.SelfDirectedNeuromodulation, SKOS.definition),
+    (SSTIM.Neurostimulation, SKOS.definition),
+    (SSTIM_V.delta, SKOS.definition),
+    (SSTIM_V.theta, SKOS.definition),
+    (SSTIM_V.alpha, SKOS.definition),
+    (SSTIM_V.smr, SKOS.definition),
+    (SSTIM_V.beta, SKOS.definition),
+    (SSTIM_V.gamma, SKOS.definition),
+    (SSTIM_V.lowDelta, SKOS.definition),
+    (SSTIM_V.highDelta, SKOS.definition),
+    (SSTIM_V.lowTheta, SKOS.definition),
+    (SSTIM_V.highTheta, SKOS.definition),
+    (SSTIM_V.lowAlpha, SKOS.definition),
+    (SSTIM_V.highAlpha, SKOS.definition),
+    (SSTIM_V.alpha10, SKOS.definition),
+    (SSTIM_V.lowBeta, SKOS.definition),
+    (SSTIM_V.midBeta, SKOS.definition),
+    (SSTIM_V.highBeta, SKOS.definition),
+    (SSTIM_V.gamma40, SKOS.definition),
+    (SSTIM_V.EvidenceModalityScheme, SKOS.definition),
+    (SSTIM_V.reviewProvisional, SKOS.definition),
+    (SSTIM_V.reviewReviewed, SKOS.definition),
+    (SSTIM_V.reviewNeedsUpdate, SKOS.definition),
+    (SSTIM_V.modalitySomatosensory, SKOS.definition),
+    (SSTIM_V.ModalityApplicabilityScheme, SKOS.definition),
+    (SSTIM_V.StudyDesignScheme, SKOS.definition),
+    (SSTIM_V.StudyModelScheme, SKOS.definition),
+    (SSTIM_V.EvidenceSynthesisTypeScheme, SKOS.definition),
+    (SSTIM_V.EvidencePropositionFormScheme, SKOS.definition),
+    (SSTIM_V.ScopeMarkerScheme, SKOS.definition),
+    (SSTIM_V.ReviewerRelationshipScheme, SKOS.definition),
+    (SSTIM_V.IndependenceDeterminationScheme, SKOS.definition),
+    (SSTIM_V.ReviewDecisionScheme, SKOS.definition),
+    (SSTIM_V.ConflictDisclosureScheme, SKOS.definition),
+    (SSTIM_V.NeuromodulatoryEffectCollection, SKOS.definition),
+    (SSTIM_V.engagementActiveSelfRegulatory, SKOS.definition),
+    (SSTIM_V.stageAtSubject, SKOS.definition),
+    (SSTIM_EX.ExposureEffectClaim, SKOS.definition),
+    (SSTIM_EX.EffectDimension, SKOS.definition),
+    (SSTIM_EX.hasEffectClaim, SKOS.definition),
+    (SSTIM_EX.hasKnowledgeStatus, SKOS.definition),
+    (SSTIM_EX.concernsEffectDimension, SKOS.definition),
+    (SSTIM_ECO.publicationStatus, SKOS.definition),
+    (SSTIM_ECO.consentStatus, SKOS.definition),
+    (SSTIM_ECO.archivalConsent, SKOS.definition),
+    (SSTIM_ECO.purposeArchivalPublication, SKOS.definition),
+}
 # ADR 0061, completed in the 0.19.0 release review (2026-10-07). The migration
 # rewrote the definitions the ADR's census counted, and this review found the
 # rest of the same thing by searching every current term's annotations:
@@ -652,6 +725,8 @@ def normalized(
             continue
         if (subject, predicate) in GB_06_DEFINITION_FIELDS:
             continue
+        if (subject, predicate) in ADR_0067_DEFINITION_FIELDS:
+            continue
         if (subject, predicate) in ADR_0061_COMPLETION_FIELDS:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
@@ -683,7 +758,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052/0061/0064 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052/0061/0064/0067 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )

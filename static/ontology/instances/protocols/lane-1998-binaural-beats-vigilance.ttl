@@ -45,7 +45,7 @@ bsclab-protocol:lane-1998-binaural-beats-vigilance a sstim:SensoryStimulationPro
     skos:editorialNote "Encoded from the full text (Physiology and Behavior 63(2):249-252), Materials and Methods, read 2026-10-15. The comparison is beta against theta/delta, so beta is the experimental arm and theta/delta the active comparator, another frequency; the paper's directional hypothesis was that beta would do better. The control tape is not an arm: it was always played in the first, training session and never compared, so it is kept as that session's sound. The beat signals are sine: each beat is the difference between two pure tones. The carrier tones' level 15 dB above the noise uses the term ADR 0066 added for a level relative to another part of the same sound. The noise's spectrum, flat from 40 to 320 Hz and falling 12 dB per octave above and below, has no SSTIM term and is in the description only. The intended neural phenomenon is the paper's rationale, entrainment of the EEG bands named, which it did not measure."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-16"^^xsd:date ;
+    dct:modified "2026-10-30"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 l1998:population a sstim:PopulationDescriptor ;
@@ -127,6 +127,7 @@ l1998:listening-level a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitDecibel ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceComfortableLevel ;
+    sstim:relativeQuantity sstim-v:quantitySoundPressureLevel ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "Auditory volume was adjusted to a comfortable listening level for the participant that would block perception of external sounds." .
 

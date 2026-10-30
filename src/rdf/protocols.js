@@ -88,6 +88,7 @@ function unitSymbol(store, unit) {
 function magnitudeDetail(store, magnitude, { followProgression = true } = {}) {
   const stage = first(store, magnitude, SSTIM('deliveryStage'))
   const basis = first(store, magnitude, SSTIM('valueBasis'))
+  const relativeQuantity = first(store, magnitude, SSTIM('relativeQuantity'))
   return {
     iri: magnitude.value,
     // Only the magnitude's own label: a level above another component names
@@ -103,6 +104,9 @@ function magnitudeDetail(store, magnitude, { followProgression = true } = {}) {
     basis: labelOf(store, basis),
     basisId: localName(basis?.value),
     relativeTo: labelOf(store, first(store, magnitude, SSTIM('relativeToParticipantMeasure'))),
+    // What a subject-relative value is of: 110% of baseline cadence is a tempo.
+    relativeQuantity: labelOf(store, relativeQuantity),
+    relativeQuantityId: localName(relativeQuantity?.value),
     distanceMetres: number(store, magnitude, SSTIM('measurementDistanceMetres')),
     reportedAs: text(store, magnitude, SSTIM('reportedAs')),
     progression: followProgression ? progressionDetail(store, first(store, magnitude, SSTIM('hasProgression'))) : null,

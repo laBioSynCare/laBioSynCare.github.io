@@ -440,6 +440,40 @@ sstim-sh:ChannelCarrierAgreementShape a sh:NodeShape ;
         """ ;
     ] .
 
+# The rate twin of the carrier rule above. A channel that renders a signal and
+# also states its flicker, modulation or beat rate says the same frequency
+# twice, as Iaccarino 2016 does for its 40 Hz. The signal is where SSTIM states
+# a frequency (ADR 0067); the channel rates stay because the photosensitivity
+# rules key on them, so they must agree with a signal the channel renders. A
+# carrier or tone frequency is a different fact and is not compared, and a
+# channel rendering several signals agrees when one of them contains its rate.
+sstim-sh:ChannelRateAgreementShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:StimulusChannel ;
+    sh:name "StimulusChannel rate agreement"@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A channel's flicker, modulation or beat rate must lie within the frequency extent of a signal it renders: the signal states the frequency, and the channel's rate restates it."@en ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ?rate ?value .
+                FILTER( ?rate IN ( <https://w3id.org/sstim/exposure#hasFlickerRateHz>,
+                                   <https://w3id.org/sstim/exposure#hasModulationFrequencyHz>,
+                                   <https://w3id.org/sstim/exposure#hasBeatFrequencyHz> ) )
+                FILTER EXISTS {
+                    $this <https://w3id.org/sstim#hasSignalRendering>/<https://w3id.org/sstim#rendersSignal> ?stated .
+                    ?stated <https://w3id.org/sstim#hzMin> ?statedLow ;
+                            <https://w3id.org/sstim#hzMax> ?statedHigh .
+                }
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim#hasSignalRendering>/<https://w3id.org/sstim#rendersSignal> ?signal .
+                    ?signal <https://w3id.org/sstim#hzMin> ?low ;
+                            <https://w3id.org/sstim#hzMax> ?high .
+                    FILTER( ?value >= ?low && ?value <= ?high )
+                }
+            }
+        """ ;
+    ] .
+
 sstim-sh:SignalRenderingShape a sh:NodeShape ;
     sh:targetClass sstim:SignalRendering ;
     sh:name "SignalRendering"@en ;
@@ -4314,6 +4348,35 @@ sstim-sh:StimulusMagnitudeShape a sh:NodeShape ;
             }
         """ ;
     ] ;
+    # A ratio or a level above the subject's own measure says how a value
+    # relates to that measure, not what the value is of: 110% of baseline
+    # cadence is a tempo, and the record has to say so (ADR 0067).
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A subject-relative magnitude must name the quantity it sets with sstim:relativeQuantity, such as a tempo or a sound pressure level, and only a subject-relative magnitude may name one."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                {
+                    $this <https://w3id.org/sstim#deliveryStage> <https://w3id.org/sstim/vocab#stageSubjectRelative> .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#relativeQuantity> ?quantity }
+                } UNION {
+                    $this <https://w3id.org/sstim#relativeQuantity> ?quantity .
+                    FILTER NOT EXISTS { $this <https://w3id.org/sstim#deliveryStage> <https://w3id.org/sstim/vocab#stageSubjectRelative> }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "sstim:relativeQuantity names the quantity being set, not how its value relates to the subject's measure: a ratio to reference or a level above reference is the magnitude's own quantity."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#relativeQuantity> ?quantity .
+                FILTER( ?quantity IN ( <https://w3id.org/sstim/vocab#quantityRatioToReference>,
+                                       <https://w3id.org/sstim/vocab#quantityLevelAboveReference> ) )
+            }
+        """ ;
+    ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "A value reported by a source must keep the source's own words in sstim:reportedAs, so the structured reading can be checked against what was said."@en ;
@@ -4338,8 +4401,8 @@ sstim-sh:StimulusMagnitudeShape a sh:NodeShape ;
 sstim-sh:StimulusMagnitudeRangeShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim:magnitudeQuantity, sstim:magnitudeUnit, sstim:magnitudeValue,
         sstim:magnitudeMinimum, sstim:magnitudeMaximum, sstim:deliveryStage, sstim:valueBasis,
-        sstim:relativeToParticipantMeasure, sstim:measurementDistanceMetres, sstim:reportedAs,
-        sstim:hasProgression ;
+        sstim:relativeToParticipantMeasure, sstim:relativeQuantity, sstim:measurementDistanceMetres,
+        sstim:reportedAs, sstim:hasProgression ;
     sh:name "Stimulus magnitude ranges"@en ;
     sh:property [
         sh:path sstim:hasProgression ; sh:maxCount 1 ; sh:class sstim:MagnitudeProgression ;
@@ -4376,6 +4439,10 @@ sstim-sh:StimulusMagnitudeRangeShape a sh:NodeShape ;
     sh:property [
         sh:path sstim:relativeToParticipantMeasure ; sh:maxCount 1 ; sh:class sstim:ParticipantReference ;
         sh:message "sstim:relativeToParticipantMeasure takes one sstim:ParticipantReference value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:relativeQuantity ; sh:maxCount 1 ; sh:class sstim:QuantityKind ;
+        sh:message "sstim:relativeQuantity takes one sstim:QuantityKind value."@en ;
     ] ;
     sh:property [
         sh:path sstim:measurementDistanceMetres ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;

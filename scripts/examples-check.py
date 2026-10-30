@@ -150,15 +150,17 @@ NEGATIVE_FIXTURES = (
     (
         "declares core, uses a Core Plus term",
         """# sstim-profile: core
-@prefix ex:    <https://example.org/stimuli/> .
-@prefix sstim: <https://w3id.org/sstim#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:       <https://example.org/stimuli/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 ex:spec a sstim:StimulusSpecification ;
     rdfs:label "Claims Core, reaches into Common"@en ;
     sstim:stimulusRegime "determinate" ;
-    sstim:hasSignal ex:signal .
-ex:signal a sstim:StimulationSignal ;
-    sstim:hzMin 10.0 .
+    sstim:hasStimulusChannel ex:channel .
+ex:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "A channel with a calibrated level"@en ;
+    sstim:soundPressureLevelDb 60.0 .
 """,
         "outside the 'core' closure",
     ),

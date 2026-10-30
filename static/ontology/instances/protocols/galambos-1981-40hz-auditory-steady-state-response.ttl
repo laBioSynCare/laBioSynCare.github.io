@@ -41,7 +41,7 @@ bsclab-protocol:galambos-1981-40hz-auditory-steady-state-response a sstim:Sensor
     skos:editorialNote "Encoded from the full text (PNAS 78(4):2643-2647, scanned), read 2026-10-15. The 40 per second condition is the one encoded as the signal: the rate series (3.3 to about 55 per second), the intensity series and the tone frequencies were exploratory series on a few subjects, not arms, so they are stated in the description. Levels are in decibels above each listener's own threshold (dB SL), so they are subject-relative. The stimulation was monaural and the paper does not say which ear, so the channel uses the one-ear placement ADR 0066 added. Several earphone types were used, including a hearing-aid transducer. techClickTrain and techIsochronicTones cover the clicks and the gated tone bursts; techGamma40Auditory is not used, because its defining objective is to modulate gamma activity and this protocol records a response."@en ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-13"^^xsd:date ;
-    dct:modified "2026-10-16"^^xsd:date ;
+    dct:modified "2026-10-30"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 g1981:population a sstim:PopulationDescriptor ;
@@ -73,6 +73,7 @@ g1981:level a sstim:StimulusMagnitude ;
     sstim:magnitudeUnit sstim-v:unitDecibel ;
     sstim:deliveryStage sstim-v:stageSubjectRelative ;
     sstim:relativeToParticipantMeasure sstim-v:referenceHearingThreshold ;
+    sstim:relativeQuantity sstim-v:quantitySoundPressureLevel ;
     sstim:valueBasis sstim-v:valueReported ;
     sstim:reportedAs "The signals used included clicks and tones (250, 350, and 500 Hz) presented at intensities between 5 and 50 dBSL." .
 

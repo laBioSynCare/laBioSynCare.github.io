@@ -73,7 +73,8 @@ sstim:targetsFrequencyBand a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:FrequencyBand ;
     rdfs:label  "targets frequency band"@en ;
-    skos:definition "Links a preset to 1–2 target frequency bands. RDF property values are unordered; use sstim:primaryFrequencyBand to identify which one is primary (RDF-08, 2026-07-24 audit)."@en ;
+    skos:definition "Links a preset to 1–2 target frequency bands. RDF property values are unordered; use sstim:primaryFrequencyBand to identify which one is primary."@en ;
+    skos:historyNote "The pointer to sstim:primaryFrequencyBand answers finding RDF-08 of the 2026-07-24 RDF structure and publication audit."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:primaryFrequencyBand a owl:ObjectProperty, owl:FunctionalProperty ;
@@ -81,7 +82,8 @@ sstim:primaryFrequencyBand a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:FrequencyBand ;
     rdfs:label  "primary frequency band"@en ;
-    skos:definition "The single primary band among a preset's sstim:targetsFrequencyBand values, when more than one is declared. Corrects the former convention of an implicit 'first entry is primary' ordering, which RDF property values do not carry (RDF-08, 2026-07-24 audit)."@en ;
+    skos:definition "The single primary band among a preset's sstim:targetsFrequencyBand values, when more than one is declared. RDF property values carry no order, so which band is primary has to be stated rather than implied by position."@en ;
+    skos:historyNote "Added for finding RDF-08 of the 2026-07-24 RDF structure and publication audit, to replace the convention that the first band listed was the primary one: an order RDF property values do not carry."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:forImplementation a owl:ObjectProperty, owl:FunctionalProperty ;
@@ -141,7 +143,8 @@ sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
     # As sstim:durationSeconds above — a configuration may carry a default gain.
     rdfs:range  xsd:decimal ;
     rdfs:label  "master volume"@en ;
-    skos:definition "Normalized master output gain, from 0 (silent) to 1 (implementation maximum); an engine control, not a calibrated sound-pressure level. The delivered level belongs to sstim:StimulusSpecification (ADR 0041)."@en ;
+    skos:definition "Normalized master output gain, from 0 (silent) to 1 (implementation maximum); an engine control, not a calibrated sound-pressure level. The delivered level belongs to sstim:StimulusSpecification."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:specifiedBy a owl:ObjectProperty ;
@@ -155,7 +158,8 @@ sstim:specifiedBy a owl:ObjectProperty ;
 sstim:masterBrightness a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "master brightness"@en ;
-    skos:definition "Normalized master visual output level, from 0 (dark) to 1 (implementation maximum); an engine control, not a calibrated luminance. The visual counterpart of sstim:masterVolume, whose absence was the audio-centrism ADR 0041 corrected. The delivered luminance is sstim:luminanceCdM2."@en ;
+    skos:definition "Normalized master visual output level, from 0 (dark) to 1 (implementation maximum); an engine control, not a calibrated luminance. The visual counterpart of sstim:masterVolume; until it was added, the engine controls had an audio level and no visual one. The delivered luminance is sstim:luminanceCdM2."@en ;
+    rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.20.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:Track a owl:Class ;

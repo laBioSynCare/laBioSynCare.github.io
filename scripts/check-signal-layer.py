@@ -68,6 +68,7 @@ PREAMBLE = """
 @prefix ex:      <https://example.org/adr52-fixture/> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sstim:   <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 """
@@ -165,6 +166,25 @@ CASES = [
      BASELINE.replace("sstim:signalWithinBand sstim-v:alpha",
                       "sstim:signalOverlapsBand sstim-v:delta"),
      "neither containing the other"),
+    # A channel restating its signal's frequency must restate it correctly
+    # (ADR 0067). A carrier is a different fact, so it is never compared.
+    ("a flicker rate that disagrees with the signal its channel renders",
+     BASELINE + """
+ex:light a sstim-ex:StimulusChannel ;
+    rdfs:label "a light flickering at the wrong rate"@en ;
+    sstim:hasSignalRendering ex:visual-rendering ;
+    sstim-ex:hasFlickerRateHz 40.0 .
+""",
+     "must lie within the frequency extent"),
+    ("a modulation rate that disagrees with the signal its channel renders",
+     BASELINE + """
+ex:tone a sstim-ex:StimulusChannel ;
+    rdfs:label "a tone modulated at the wrong rate"@en ;
+    sstim:hasSignalRendering ex:audio-rendering ;
+    sstim-ex:hasModulationFrequencyHz 20.0 ;
+    sstim-ex:hasCarrierFrequencyHz 250.0 .
+""",
+     "must lie within the frequency extent"),
     ("a rendering that names no presence",
      BASELINE.replace("    sstim:hasRenderingPresence sstim-v:presencePhysical ;\n    sstim:renderingCarrierHz 250.0 .",
                       "    sstim:renderingCarrierHz 250.0 ."),
@@ -247,8 +267,12 @@ def main() -> int:
     # fixture failed for this reason.
     shapes = Graph().parse(SHAPES, format="turtle")
 
+    # Not r"\bex:": a hyphen is a word boundary, so that pattern also rewrote
+    # sstim-ex:StimulusChannel into a class nothing targets, and the first
+    # fixture to use an exposure term passed every shape unseen.
+    # check-protocol-layer.py had already learned this.
     def namespaced(fixture: str, tag: str) -> str:
-        return re.sub(r"\bex:", f"ex:{tag}-", fixture)
+        return re.sub(r"(?<![\w-])ex:", f"ex:{tag}-", fixture)
 
     combined = Graph()
     for triple in graph:

@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "2b373c01c5c568cb5a29c64316c2243a4c6af42d0adf6e54618b69f29d0f06e4"
+        "sha256": "a9cc854df2b5cb027b2f5893ec1175474c916366b7b2804741139822ce88528d"
       },
       "runtime": {
         "url": "sstim-stimulus.ttl",
@@ -149,7 +149,7 @@
       "source": {
         "path": "static/ontology/sstim-core-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1a35f48487a315ee1aad316c32582a328afec7901512041b5894bed33e4c60d4"
+        "sha256": "1ad606208b658b9758c60d576f65e8b712bb1940c628de1de37004679b517526"
       },
       "runtime": {
         "url": "sstim-core-shapes.ttl",
@@ -183,7 +183,7 @@
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "ab88dede32b6429b353e646835a2c98fc2f0b278d3a3e78c9e9f4761cf7087eb"
+        "sha256": "2b71fc64bb890b9b4693f866f390396a997ba36966378a835c6e34dab8c78326"
       },
       "runtime": {
         "url": "sstim-common.ttl",
@@ -215,7 +215,7 @@
       "source": {
         "path": "static/ontology/sstim-technique.ttl",
         "mediaType": "text/turtle",
-        "sha256": "a5c7dab2fd84a655be81922ecac789de9aedc5b5d29bf339706531fb5e8b35a1"
+        "sha256": "ccc824fdafe27d71a4b6f24d474996d8553191b0266d05deeb38d84670adf02b"
       },
       "runtime": {
         "url": "sstim-technique.ttl",
@@ -248,7 +248,7 @@
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "37532290d21fa51a0cc762a4a553244f373668f93122ce3bf3f48cd01961aee9"
+        "sha256": "702c708da5fc2d63bc9be0fc3585c8e93e9552962acf69780a17eafa0ac32133"
       },
       "runtime": {
         "url": "sstim-configuration.ttl",
@@ -317,7 +317,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "01ff1e441306ec860756304e74bf3a648a05d4fcc6d5ca20284dc533b6f06f1a"
+        "sha256": "9bd07a585ad0c4a1c7ca64fdaedfc1ea00d769937ae875abf05f712ff71a4c40"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -351,7 +351,7 @@
       "source": {
         "path": "static/ontology/sstim-neuromodulation.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e82f21a98996e42699e1f02f05c290cf42aadef1a2fc837f39e5490372902c33"
+        "sha256": "0df8ad51711d6f853067c1a0e0e7dbe977653504246b05ab6c7f0f4274bb510d"
       },
       "runtime": {
         "url": "sstim-neuromodulation.ttl",
@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "12301a3f5fa1b33c8c1e7ae368c619ae4c27608a696cacdbc7ad4c6b646a794a"
+        "sha256": "46c4d814e4e400baae4905800bbda14394564bea61ea3e4cb1476c345d3ac018"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -460,7 +460,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e21cf7d202cdee0be759bb2ed3ff125e424e627ccfc6d389a190c2c1fea945b7"
+        "sha256": "d4a3bb09aaf5cd31186fcd7f4fa3c9f5b467448d63a766d38f2031dc84d9a0af"
       },
       "runtime": {
         "url": "sstim-exposure.ttl",
@@ -497,7 +497,7 @@
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e20ab532b9620436009f5569e0b138b262393920998cd17ced7eb1819ca7d459"
+        "sha256": "db262d8633dd64cc3423131a54fe877f5c422901a8745b23883a2cbe927971b2"
       },
       "runtime": {
         "url": "sstim-ecosystem.ttl",
@@ -672,7 +672,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "08b19a2aa11d3604612c87733fa4b378e2fb91595d61a7d2f19bdc0b033b8c8e"
+        "sha256": "c9df19f09adac91c9e05efe45d8f2fb429c40e6c24c438600c27a53006dcbd31"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -780,7 +780,8 @@
       ],
       "fixtures": {
         "positive": [
-          "test/fixtures/rdf/core-profile/positive-minimal-stimulus.ttl"
+          "test/fixtures/rdf/core-profile/positive-minimal-stimulus.ttl",
+          "test/fixtures/rdf/core-profile/positive-signal-frequency.ttl"
         ],
         "outOfScope": [
           "test/fixtures/rdf/core-profile/out-of-scope-full-concerns.ttl"
@@ -788,13 +789,14 @@
         "adversarial": [
           "test/fixtures/rdf/core-profile/adversarial-untyped-channel.ttl",
           "test/fixtures/rdf/core-profile/adversarial-literal-target.ttl",
-          "test/fixtures/rdf/core-profile/adversarial-nonpositive-duration.ttl"
+          "test/fixtures/rdf/core-profile/adversarial-nonpositive-duration.ttl",
+          "test/fixtures/rdf/core-profile/adversarial-inverted-signal-extent.ttl"
         ]
       },
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "bd141688824f835894f15781b9546d5cfacedf41b80f0763a23fbbec0303278c"
+      "sha256": "4537cfb5fe095770fcf96b08da5219e3eb3cf1da6552b19b80a32efe206a2764"
     },
     {
       "id": "core-plus",
@@ -842,7 +844,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "f1beabc7080115634df997790fd16c571dfc6e493befa7c3ea9c89580bdfd565"
+      "sha256": "037f66a57accba431180cca20858b9c54ba89e2d7be8873eb0cdb2b07edd6d74"
     },
     {
       "id": "full",
@@ -905,7 +907,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "d813dfd68a4334db58b7eac50b1bcf815fd9903e6c42e8b56f32e07a5555a000"
+      "sha256": "3c44ac332873b6bf7b5d8e33e6ce07f2abf79f43399b175c4f8657e1dbad1537"
     }
   ]
 }
