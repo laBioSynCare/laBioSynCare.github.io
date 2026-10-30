@@ -132,8 +132,15 @@ def collect(sources: list[tuple[str, Path]]) -> tuple[list, list, list, int]:
     seen: set[str] = set()
     deprecated = 0
 
-    for module_id, path in sources:
-        graph = Graph().parse(path, format="turtle")
+    # A property's domain may live in a later module than its declaration, as
+    # sstim:hasStimulationTarget's does in Session and sstim:hzMin's in Common,
+    # so domains and ranges are read from every module at once.
+    graphs = [(module_id, Graph().parse(path, format="turtle")) for module_id, path in sources]
+    merged = Graph()
+    for _, graph in graphs:
+        merged += graph
+
+    for module_id, graph in graphs:
 
         for subject in set(graph.subjects(RDF.type, OWL.Class)):
             name = shorten(subject) if isinstance(subject, URIRef) else None
@@ -156,10 +163,10 @@ def collect(sources: list[tuple[str, Path]]) -> tuple[list, list, list, int]:
                 if not name or name in seen:
                     continue
                 seen.add(name)
-                domain = next(graph.objects(subject, RDFS.domain), None)
-                rng = next(graph.objects(subject, RDFS.range), None)
+                domain = next(merged.objects(subject, RDFS.domain), None)
+                rng = next(merged.objects(subject, RDFS.range), None)
                 signature = " → ".join(
-                    label_of(graph, n) if n is not None else "—" for n in (domain, rng)
+                    label_of(merged, n) if n is not None else "—" for n in (domain, rng)
                 )
                 note = deprecation(graph, subject)
                 deprecated += bool(note)
