@@ -126,6 +126,28 @@ Stated openly, because an operator deserves to know what has not been done:
 Progress against these is tracked in
 [`docs/technical/PORTABLE_DEPLOYMENT.md`](docs/technical/PORTABLE_DEPLOYMENT.md) §4.
 
+## Dependency advisories
+
+`npm audit` is not empty. What it still reports, and why each is left, as
+measured on 2026-10-31:
+
+- **`@grpc/grpc-js` below 1.13.6** (high, four entries through `firebase`).
+  `@firebase/firestore` pins `~1.9` in every Firebase release up to 13.1, so no
+  Firebase upgrade fixes it. It is Firestore's Node transport: the browser
+  build uses WebChannel, and no file of the built site mentions grpc. Revisit
+  when a Firebase release depends on a fixed version.
+- **Comunica 3** (moderate, eight entries: its expression evaluator and
+  `uuid`). Fixed only in `@comunica/query-sparql-rdfjs` 5, a major upgrade of
+  the SPARQL engine that CLAUDE.md §2 pins at 3.x, so it is a decision rather
+  than a patch.
+- **SvelteKit 2** (low, six entries: `cookie`, `deepmerge`, and two advisories
+  about enhanced form submission). Fixed only in SvelteKit 3. The site is
+  prerendered by `adapter-static` with no server route and no enhanced form.
+
+The two critical advisories, both in the test runner, were cleared by moving to
+vitest 5. Reaching a deployed instance through one of the above would be in
+scope below.
+
 ## Scope
 
 In scope: data-boundary violations, authentication-identifier leaks, safety-cap
