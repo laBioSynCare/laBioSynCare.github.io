@@ -124,6 +124,8 @@ sstim:SelfDirectedNeuromodulation a owl:Class ;
 
 sstim:Neurostimulation a owl:Class ;
     rdfs:subClassOf sstim:InterventionalNeuromodulation ;
+    owl:disjointWith sstim:SelfDirectedNeuromodulation ;
+    skos:historyNote "Declared disjoint with sstim:SelfDirectedNeuromodulation in 0.21.0 (ADR 0068), making formal the exclusion this class's definition and sstim:SensoryNeurostimulation's scope note already stated. Interventional and self-directed neuromodulation as a whole stay overlapping, as ADR 0036 decided."@en ;
     rdfs:label "Neurostimulation"@en,
                "Neurostimolazione"@it,
                "Neuroestimulação"@pt,

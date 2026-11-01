@@ -91,6 +91,7 @@ annotations lives here.
 | [0065](0065-committed-records-resolve-by-family-pattern.md) | Committed records resolve by family pattern: one w3id.org rule per family, each record to a document that describes it alone | Accepted |
 | [0066](0066-eight-things-the-full-texts-asked-for.md) | Eight things the full texts asked for: a detection's stimulus spacing, adaptive thresholds, calibrated delays, sleep stages, progressions, tempo, a level above another component, one ear | Accepted |
 | [0067](0067-core-frequency-relative-quantity-and-one-rate.md) | Frequency in Core, the quantity of a relative value, one stated rate, and definitions that stand alone | Accepted |
+| [0068](0068-neurostimulation-excludes-self-directed-neuromodulation.md) | Neurostimulation excludes self-directed neuromodulation: an OWL disjointness and a technique rule; interventional and self-directed stay an overlap | Accepted |
 
 ## ADR lifecycle and revision policy
 

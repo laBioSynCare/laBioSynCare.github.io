@@ -1,0 +1,9 @@
+# Must stay consistent (make disjointness-check). ADR 0036 kept interventional
+# and self-directed neuromodulation overlapping because some cases are both,
+# such as paced-breathing guidance the individual follows; ADR 0068 made only
+# neurostimulation disjoint with self-direction. If this fixture is ever
+# rejected, that overlap has been closed by accident.
+@prefix example: <https://example.org/sstim/disjointness-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+
+example:process a sstim:InterventionalNeuromodulation, sstim:SelfDirectedNeuromodulation .

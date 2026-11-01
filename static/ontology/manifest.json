@@ -351,7 +351,7 @@
       "source": {
         "path": "static/ontology/sstim-neuromodulation.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0df8ad51711d6f853067c1a0e0e7dbe977653504246b05ab6c7f0f4274bb510d"
+        "sha256": "756da0292a317af580bc2873b7f0edddf01b95be520d22860f891a9dfcd2d446"
       },
       "runtime": {
         "url": "sstim-neuromodulation.ttl",
@@ -672,7 +672,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "c9df19f09adac91c9e05efe45d8f2fb429c40e6c24c438600c27a53006dcbd31"
+        "sha256": "39c6fedec6615bd354d4f069b5cf3a3790c0ceb7aed5627fbe579d58e35f6523"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -900,14 +900,15 @@
           "test/fixtures/rdf/full-profile/out-of-scope-foreign-vocabulary.ttl"
         ],
         "adversarial": [
-          "test/fixtures/rdf/full-profile/adversarial-undelivered-channel.ttl"
+          "test/fixtures/rdf/full-profile/adversarial-undelivered-channel.ttl",
+          "test/fixtures/rdf/full-profile/adversarial-self-regulatory-neurostimulation.ttl"
         ]
       },
       "competencyQueries": [
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "3c44ac332873b6bf7b5d8e33e6ce07f2abf79f43399b175c4f8657e1dbad1537"
+      "sha256": "819691c654211c3bc26677ce34283a9dbb16aa05a6545fb5536a84ca61707abd"
     }
   ]
 }

@@ -1,0 +1,7 @@
+# Must be rejected by HermiT (make disjointness-check). Neurostimulation is
+# delivered without the individual's active self-regulation, so one process
+# cannot be both neurostimulation and self-directed neuromodulation (ADR 0068).
+@prefix example: <https://example.org/sstim/disjointness-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+
+example:process a sstim:Neurostimulation, sstim:SelfDirectedNeuromodulation .

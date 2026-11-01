@@ -1406,6 +1406,23 @@ sstim-sh:NeuromodulationTechniqueShape a sh:NodeShape ;
         sh:message "Every neuromodulation technique must declare at least one sstim:intendedNeuralTargetSite."@en ;
     ] .
 
+# Neurostimulation is delivered without the individual's active self-regulation
+# (ADR 0068). The process layer states that in OWL, as Neurostimulation
+# owl:disjointWith SelfDirectedNeuromodulation; a technique carries it on the
+# participant-engagement facet, which only SHACL can check.
+sstim-sh:NeurostimulationTechniqueEngagementShape a sh:NodeShape ;
+    sh:targetClass sstim:NeurostimulationTechnique ;
+    sh:name "Neurostimulation technique engagement"@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A neurostimulation technique is delivered without the individual's active self-regulation, so its participant-engagement mode cannot be active-self-regulatory. A technique the individual actively self-regulates, such as neurofeedback, is a neuromodulation technique but not a neurostimulation technique."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#participantEngagementMode> <https://w3id.org/sstim/vocab#engagementActiveSelfRegulatory> .
+            }
+        """ ;
+    ] .
+
 # The overlap constraint. Conditional sh:sparql rather than sh:SPARQLTarget:
 # pySHACL ignores SPARQL-based targets unless advanced mode is enabled, and the
 # repository gates do not enable it, whereas sh:sparql CONSTRAINTS are core

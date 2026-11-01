@@ -2,7 +2,11 @@
 
 **Status:** Accepted — 2026-07-23 · released in SSTIM 0.10.0 · amended by
 [ADR 0037](0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)
-in SSTIM 0.11.0
+in SSTIM 0.11.0, and §4 by
+[ADR 0068](0068-neurostimulation-excludes-self-directed-neuromodulation.md) on
+the 0.21.0 line: neurostimulation is now disjoint with self-directed
+neuromodulation, while the interventional and self-directed split stays an
+overlap
 
 Disambiguates the two senses of "neuromodulation" (intervention vs. effect),
 adds `Neurostimulation` as the stimulation-based branch, splits neuromodulation

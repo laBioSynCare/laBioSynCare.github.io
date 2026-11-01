@@ -99,7 +99,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push pull deploy-firestore-rules firestore-rules-test dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer protocol-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: disjointness-check build check migrate-test session-conformance truth-audit verify-deploy push pull deploy-firestore-rules firestore-rules-test dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer protocol-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -674,6 +674,37 @@ reason:
 	fi; \
 	echo "reason: ROBOT $(REASONER) consistency check passed ($(words $(FULL_SEMANTIC_MODULES)) semantic modules)"
 
+## Prove the OWL disjointness ADR 0068 asserts, in both directions: HermiT
+## must reject a process typed neurostimulation and self-directed, and must
+## still accept one typed interventional and self-directed, the overlap ADR 0036
+## kept. A rejection only counts when ROBOT reports an inconsistency.
+disjointness-check:
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	rejected=0; accepted=0; \
+	for fixture in test/fixtures/rdf/disjointness/inconsistent-*.ttl; do \
+		cat $(call modules,FULL_SEMANTIC_MODULES) "$$fixture" > "$$tmpdir/merged.ttl"; \
+		if $(ROBOT) reason --input "$$tmpdir/merged.ttl" --reasoner $(REASONER) > "$$tmpdir/robot.log" 2>&1; then \
+			echo "disjointness-check: FAILED $$fixture was accepted; it must be inconsistent" >&2; exit 1; \
+		fi; \
+		grep -qi 'inconsistent' "$$tmpdir/robot.log" || { \
+			cat "$$tmpdir/robot.log" >&2; \
+			echo "disjointness-check: FAILED $$fixture was rejected, but not as inconsistent" >&2; exit 1; \
+		}; \
+		rejected=$$((rejected + 1)); \
+	done; \
+	for fixture in test/fixtures/rdf/disjointness/consistent-*.ttl; do \
+		cat $(call modules,FULL_SEMANTIC_MODULES) "$$fixture" > "$$tmpdir/merged.ttl"; \
+		$(ROBOT) reason --input "$$tmpdir/merged.ttl" --reasoner $(REASONER) > "$$tmpdir/robot.log" 2>&1 || { \
+			cat "$$tmpdir/robot.log" >&2; \
+			echo "disjointness-check: FAILED $$fixture must stay consistent" >&2; exit 1; \
+		}; \
+		accepted=$$((accepted + 1)); \
+	done; \
+	[ "$$rejected" -gt 0 ] && [ "$$accepted" -gt 0 ] || { echo "disjointness-check: no fixtures found" >&2; exit 1; }; \
+	echo "disjointness-check: passed ($$rejected inconsistent fixture(s) rejected, $$accepted consistent fixture(s) accepted)"
+
 ## Run ontology SPARQL sanity checks
 sparql-sanity:
 	node scripts/sstim-exposure-sanity.mjs
@@ -949,7 +980,7 @@ validate-status:
 ## require `void.ttl`'s selected frozen directory to exist yet. This explicit
 ## phase is used after release-prepare and before `make snapshot`; the complete
 ## `validate` target remains the post-snapshot gate.
-RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries source-links core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check sstim-package term-index-check migration-guide-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer protocol-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
+RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries source-links core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason disjointness-check sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check sstim-package term-index-check migration-guide-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer protocol-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
 
 validate-release-source: $(RELEASE_SOURCE_VALIDATION_TARGETS)
 	@echo "validate-release-source: release-prepared semantic sources passed; snapshot-dependent gates remain"
@@ -1182,6 +1213,7 @@ help:
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"
+	@echo "  make disjointness-check  HermiT rejects and accepts the ADR 0068 disjointness fixtures"
 	@echo "  make shacl-core       Validate the Core profile closure against Core shapes"
 	@echo "  make shacl-full       Validate the Full semantic closure against the Full shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"

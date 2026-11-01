@@ -515,10 +515,13 @@ explicit instruction naming each file.
     annotation graphs and with an explicit decision on the live ecosystem
     projection; correct CLAUDE.md §5.3.
   - *Done when* a test runs the CLAUDE.md queries and checks their row counts.
-- [ ] **GB-05 Neuromodulation exclusions** (*protected*:
+- [x] **GB-05 Neuromodulation exclusions** (*protected*:
   `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`). *Not in 0.20.0: on
   2026-10-19 the maintainer chose to cut 0.20.0 without it, so it moves to
-  the 0.21.0 line.*
+  the 0.21.0 line. Closed 2026-11-01 for 0.21.0 by
+  [ADR 0068](../decisions/0068-neurostimulation-excludes-self-directed-neuromodulation.md):
+  the four steps below are done. `make disjointness-check` runs HermiT on both
+  fixtures inside `make validate` and fails when the axiom is removed.*
   - *Decided 2026-10-29 by the maintainer in session* ("your Neurostimulation
     proposal"; implementation deferred, this entry is the task). The true
     disjointness is the one `sstim:Neurostimulation`'s own definition states:

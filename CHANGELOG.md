@@ -17,9 +17,12 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-**Upgrading from 0.20.0.** Nothing is removed, renamed or deprecated. One rule
-is added: a magnitude at the subject-relative stage must name the quantity it
-sets with `sstim:relativeQuantity`, so data stating one needs that triple.
+**Upgrading from 0.20.0.** Nothing is removed, renamed or deprecated. Three
+rules are added: a magnitude at the subject-relative stage must name the
+quantity it sets with `sstim:relativeQuantity`, so data stating one needs that
+triple; a process cannot be both neurostimulation and self-directed
+neuromodulation; and a neurostimulation technique cannot be
+active-self-regulatory.
 
 ### Added
 
@@ -29,6 +32,13 @@ sets with `sstim:relativeQuantity`, so data stating one needs that triple.
   of: 110% of each patient's baseline cadence is a tempo, 30 dB above their
   hearing threshold a sound pressure level. Thaut 1996's three tempi and the
   Lane 1998 and Galambos 1981 levels state it.
+- **Neurostimulation excludes self-directed neuromodulation**
+  ([ADR 0068](docs/decisions/0068-neurostimulation-excludes-self-directed-neuromodulation.md)).
+  `sstim:Neurostimulation` is disjoint with `sstim:SelfDirectedNeuromodulation`,
+  the exclusion its definition already stated, and a SHACL rule keeps a
+  neurostimulation technique from being active-self-regulatory. Interventional
+  and self-directed neuromodulation stay an overlap, as ADR 0036 decided.
+  `make disjointness-check` proves both directions with HermiT.
 - **A channel's rate agrees with its signal** (ADR 0067). A channel's flicker,
   modulation or beat rate must lie within the frequency extent of a signal it
   renders, as its carrier already had to match its rendering's. Every

@@ -1,0 +1,25 @@
+###########################################################################
+# Adversarial fixture for the SSTIM Full Profile: a neurostimulation technique
+# marked active-self-regulatory.
+#
+# Neurostimulation is delivered without the individual's active
+# self-regulation (ADR 0068), so a technique cannot be both. Everything else
+# here is a complete neurostimulation technique, modelled on the catalogue's
+# rTMS entry, so that the engagement mode is the only thing wrong with it and
+# NeurostimulationTechniqueEngagementShape the only shape that rejects it.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/full-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+example:self-regulated-coil a sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique ;
+    rdfs:label "Magnetic pulses the individual is asked to steer"@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain ;
+    sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedMagneticField, sstim-ex:mediumAppliedElectricField ;
+    sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory .
