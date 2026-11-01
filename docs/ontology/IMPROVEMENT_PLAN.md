@@ -12,7 +12,7 @@ and phase numbering below is dependency order, not a version.
 findings GB-01 to GB-11, sequenced in [§1.6](#16-close-what-a-green-gate-does-not-see).
 
 For the implemented baseline and the ordered work that remains after the
-`0.20.0` release, start with the maintained
+`0.21.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
 logic and acceptance gates; it is not a claim that every bullet is still open.
 
@@ -516,9 +516,9 @@ explicit instruction naming each file.
     projection; correct CLAUDE.md §5.3.
   - *Done when* a test runs the CLAUDE.md queries and checks their row counts.
 - [x] **GB-05 Neuromodulation exclusions** (*protected*:
-  `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`). *Not in 0.20.0: on
-  2026-10-19 the maintainer chose to cut 0.20.0 without it, so it moves to
-  the 0.21.0 line. Closed 2026-11-01 for 0.21.0 by
+  `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`). *Released in 0.21.0. It
+  was left out of 0.20.0, which the maintainer chose to cut on 2026-10-19
+  without it, and moved to the 0.21.0 line. Closed 2026-11-01 by
   [ADR 0068](../decisions/0068-neurostimulation-excludes-self-directed-neuromodulation.md):
   the four steps below are done. `make disjointness-check` runs HermiT on both
   fixtures inside `make validate` and fails when the axiom is removed.*

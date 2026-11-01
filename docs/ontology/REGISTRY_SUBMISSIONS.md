@@ -959,7 +959,7 @@ assigns its own node URI on save.
 | Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
 | Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
 | Languages | en, it, pt, es |
-| Size | `182 classes, 371 properties, 645 concepts, 80 concept schemes (SSTIM 0.20.0, 2026-10)` |
+| Size | `182 classes, 372 properties, 645 concepts, 80 concept schemes (SSTIM 0.21.0, 2026-11)` |
 
 *Structure:*
 

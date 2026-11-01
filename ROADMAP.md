@@ -8,7 +8,7 @@
 > and some of Phase 3 delivered out of order.** Phase 0 is complete. The
 > knowledge browser this roadmap calls BSC Lab v0.1 is deployed as SSTIM
 > Workbench at `w3c-cg.github.io/sstim` and is well past that scope; SSTIM's
-> latest release is 0.20.0, and the W3C Community Group has published a Draft
+> latest release is 0.21.0, and the W3C Community Group has published a Draft
 > report. What remains in Phase 1 is non-software: defensive publication
 > filings, trademarks, the first web article, and partner/advisory commitments.
 > Evidence collection is Phase 3 and must still not be built now.

@@ -13,16 +13,16 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.21.0-dev`, reopened when `0.20.0` was frozen | [`manifest.json`](../../static/ontology/manifest.json) |
-| What can be cited? | `0.20.0`, released 2026-10-19 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| What is being edited? | `0.21.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.21.0`, released 2026-11-01 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
 | Which DOI identifies that release? | `10.5281/zenodo.23480076` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
-| What changed? | Published protocols: nine published protocols are encoded from their papers, levels are stated at a stage of delivery (ADR 0063), protocols gain schedules, arms, populations, designs and control laws and may cite their paper instead of a framework (ADR 0064), and eight more terms complete four of them from their full texts (ADR 0066); no term is removed or deprecated | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| What changed? | Follow-through: Core can state a signal's frequency, a subject-relative magnitude names the quantity it sets, a channel's rate must lie within its signal's extent, and no definition cites an ADR or an audit finding (ADR 0067); neurostimulation is disjoint with self-directed neuromodulation (ADR 0068); no term is removed or deprecated | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
 The live line is mutable, carries no `owl:versionIRI`, and is not a citable
-release. The frozen [`0.20.0/`](../../static/ontology/0.20.0/) directory is the
+release. The frozen [`0.21.0/`](../../static/ontology/0.21.0/) directory is the
 latest immutable whole-set snapshot. Its version IRI resolves to the frozen
 namespace catalogue rather than to `sstim-core.ttl`, which is now only the
 two-class Kernel.
@@ -236,7 +236,7 @@ Its most practical uses today are:
    evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
    entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
    `/sstim/profile/core-plus`, and `/sstim/profile/full`.
-2. **Pin a release for published work.** Use the immutable `0.20.0` profile and
+2. **Pin a release for published work.** Use the immutable `0.21.0` profile and
    module URLs for a paper or dataset. Use the `-dev` line only when
    intentionally testing mutable development sources.
 3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and

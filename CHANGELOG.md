@@ -17,6 +17,10 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Nothing yet on the 0.22.0-dev line.
+
+## [0.21.0] - 2026-11-01
+
 **Upgrading from 0.20.0.** Nothing is removed, renamed or deprecated. Three
 rules are added: a magnitude at the subject-relative stage must name the
 quantity it sets with `sstim:relativeQuantity`, so data stating one needs that
@@ -1749,7 +1753,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/w3c-cg/sstim/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/w3c-cg/sstim/compare/v0.21.0...HEAD
+[0.21.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.21.0
 [0.20.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.20.0
 [0.19.0]: https://github.com/w3c-cg/sstim/releases/tag/v0.19.0
 [0.18.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.18.0
