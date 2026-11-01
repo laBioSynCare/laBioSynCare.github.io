@@ -15,7 +15,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.21.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.21.0`, released 2026-11-01 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.23480076` | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.23868027` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | Follow-through: Core can state a signal's frequency, a subject-relative magnitude names the quantity it sets, a channel's rate must lie within its signal's extent, and no definition cites an ADR or an audit finding (ADR 0067); neurostimulation is disjoint with self-directed neuromodulation (ADR 0068); no term is removed or deprecated | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
