@@ -2090,11 +2090,11 @@ Not project-specific — run on a schedule.
 
 **Monthly:**
 - [ ] Review npm audit output and update dependencies `recurring`
-      *Last run 2026-10-31: vitest 5 cleared both critical advisories and an
-      in-range update cleared Vite's and source-map-js's, 24 to 18. What
-      remains needs Comunica 5 or SvelteKit 3, or a Firebase release with a
-      fixed grpc-js; `SECURITY.md` "Dependency advisories" says why each
-      is left.*
+      *Last run 2026-11-01: vitest 5 cleared both critical advisories, an
+      in-range update Vite's and source-map-js's, and Comunica 5 the eight
+      moderate ones, 24 to 10. What remains needs SvelteKit 3, or a Firebase
+      release with a fixed grpc-js; `SECURITY.md` "Dependency advisories"
+      says why each is left.*
 - [ ] Check pySHACL for new releases; update CI if needed `recurring`
 - [ ] Review BioSynCare user feedback and extract actionable items `recurring`
 - [ ] Record trademark filing progress in `TODO.md` §2 and `IP_STRATEGY.md` `recurring`

@@ -25,31 +25,36 @@ WHERE {
             rdfs:label ?label .
 
     OPTIONAL { ?preset sstim:presetVersion ?version . }
-    OPTIONAL { ?preset sstim:targetsFrequencyBand ?band . }
     OPTIONAL { ?preset sstim:breathGuideTrack ?breathGuide . }
-    OPTIONAL { ?preset bsc-v:inGroup ?group . }
 
     OPTIONAL { ?preset dct:description ?description . }
     OPTIONAL { ?preset dct:created ?created . }
     OPTIONAL { ?preset dct:modified ?modified . }
     OPTIONAL { ?preset sstim:followsProtocol ?protocol . }
     OPTIONAL { ?preset sstim:forImplementation ?implementation . }
-    OPTIONAL { ?preset sstim:hasPublicClaimLevel ?publicClaimLevel . }
-    OPTIONAL { ?preset sstim:hasCautionTag ?caution . }
   }
 
+  # Each label is looked up inside the OPTIONAL that binds what it labels.
+  # Written as OPTIONAL { FILTER(BOUND(?group)) GRAPH ?g { ... } }, the filter
+  # is the left join's own condition, which SPARQL tests after the join, so it
+  # never stopped an unbound ?group from matching every labelled concept; and
+  # Comunica 5 has no join actor for that shape at all.
   OPTIONAL {
-    FILTER(BOUND(?group))
-    GRAPH ?groupGraph {
-      ?group skos:prefLabel ?groupLabel .
-      FILTER(LANG(?groupLabel) = "en")
+    GRAPH ?presetGraph { ?preset bsc-v:inGroup ?group . }
+    OPTIONAL {
+      GRAPH ?groupGraph {
+        ?group skos:prefLabel ?groupLabel .
+        FILTER(LANG(?groupLabel) = "en")
+      }
     }
   }
   OPTIONAL {
-    FILTER(BOUND(?band))
-    GRAPH ?bandGraph {
-      ?band skos:prefLabel ?bandLabel .
-      FILTER(LANG(?bandLabel) = "en")
+    GRAPH ?presetGraph { ?preset sstim:targetsFrequencyBand ?band . }
+    OPTIONAL {
+      GRAPH ?bandGraph {
+        ?band skos:prefLabel ?bandLabel .
+        FILTER(LANG(?bandLabel) = "en")
+      }
     }
   }
 
@@ -81,25 +86,29 @@ WHERE {
     }
   }
   OPTIONAL {
-    FILTER(BOUND(?publicClaimLevel))
-    GRAPH ?claimLevelGraph {
-      ?publicClaimLevel skos:prefLabel ?publicClaimLevelLabel .
-      FILTER(LANG(?publicClaimLevelLabel) = "en")
+    GRAPH ?presetGraph { ?preset sstim:hasPublicClaimLevel ?publicClaimLevel . }
+    OPTIONAL {
+      GRAPH ?claimLevelGraph {
+        ?publicClaimLevel skos:prefLabel ?publicClaimLevelLabel .
+        FILTER(LANG(?publicClaimLevelLabel) = "en")
+      }
     }
   }
   OPTIONAL {
-    FILTER(BOUND(?caution))
-    GRAPH ?cautionGraph {
-      OPTIONAL {
+    GRAPH ?presetGraph { ?preset sstim:hasCautionTag ?caution . }
+    OPTIONAL {
+      GRAPH ?cautionLabelGraph {
         ?caution skos:prefLabel ?cautionLabel .
         FILTER(LANG(?cautionLabel) = "en")
       }
-      OPTIONAL {
+    }
+    OPTIONAL {
+      GRAPH ?cautionDefinitionGraph {
         ?caution skos:definition ?cautionDefinition .
         FILTER(LANG(?cautionDefinition) = "en")
       }
-      OPTIONAL { ?caution sstim:recommendedAction ?cautionAction . }
     }
+    OPTIONAL { GRAPH ?cautionActionGraph { ?caution sstim:recommendedAction ?cautionAction . } }
   }
 
   OPTIONAL {
@@ -262,5 +271,10 @@ export async function listPresets(store) {
     })
   }
 
+  // Cautions arrive in whatever order the engine emits rows, which changed
+  // between Comunica 3 and 5; the page lists them, so fix the order here.
+  for (const preset of byPreset.values()) {
+    preset.cautions.sort((a, b) => a.label.localeCompare(b.label))
+  }
   return [...byPreset.values()].sort((a, b) => a.label.localeCompare(b.label))
 }

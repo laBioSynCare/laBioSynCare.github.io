@@ -268,7 +268,7 @@
           # Regenerate after any package-lock.json change:
           #   nix build 2>&1 | grep -A2 'specified:'
           # or: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
-          npmDepsHash = "sha256-fqJushSz5jFKLuMQRl1ZeOisQOFu3LPfL4Q9qe9zP+E=";
+          npmDepsHash = "sha256-SRfDEUHCad/E2wPYaG09eRmjCPo9gJ1ClYpDvFck76I=";
 
           nodejs = pkgs.nodejs_24;     # same major as the dev shell and CI
 

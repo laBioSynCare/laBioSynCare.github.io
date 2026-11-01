@@ -13,7 +13,7 @@
     "check": "svelte-kit sync && svelte-check"
   },
   "dependencies": {
-    "@comunica/query-sparql-rdfjs": "^3.3.0",
+    "@comunica/query-sparql-rdfjs": "^5.4.1",
     "@picocss/pico": "^2.0.6",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.57.1",

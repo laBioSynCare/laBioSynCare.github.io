@@ -138,7 +138,7 @@ in to the live source.
 
 ## `query.js`
 
-Wraps Comunica SPARQL execution. **Comunica is lazy-loaded** (~500 KB gzipped)
+Wraps Comunica SPARQL execution. **Comunica is lazy-loaded** (about 450 KB gzipped)
 to avoid blocking the initial app load.
 
 ```javascript

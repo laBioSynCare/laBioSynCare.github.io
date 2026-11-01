@@ -100,7 +100,7 @@ are chosen but not yet installed — do not describe them as how the app works.
 | Build | Vite | 6.x | ESM-native dev, fast HMR, SvelteKit static build |
 | UI framework | Svelte 5 | 5.x | Compiler-based, near-vanilla bundle, reactive stores fit SPARQL result rendering |
 | RDF parsing/store | N3.js | 1.17+ | Parses Turtle/TriG/N-Quads, in-memory triple store |
-| SPARQL engine | Comunica | `@comunica/query-sparql-rdfjs` 3.x | SPARQL 1.1 in browser against N3 store |
+| SPARQL engine | Comunica | `@comunica/query-sparql-rdfjs` 5.x | SPARQL 1.1 in browser against N3 store |
 | RDF validation | rdf-validate-shacl | 0.5+ | Installed, but used only by tests today (`*.shacl.test.js`, `adr-0027-negative-fixtures.test.mjs`). Browser-side validation is **(planned)** — see §5.4. `make validate` uses pySHACL |
 | Graph visualization | Cytoscape.js | 3.28+ | RDF ontology/evidence graph navigation |
 | Visual engine (default) | PixiJS | v8.x | **(planned — not installed.)** Auto WebGPU/WebGL, unified renderer API. Visuals today are CSS/DOM in the Patch Studio |
@@ -796,8 +796,16 @@ origin as the app. If runtime hosting moves away from GitHub Pages, keep the
 same-source-file pattern: the app origin serves runtime copies, and GitHub Pages
 continues to serve the citable/stable copies used by w3id redirects.
 
-**Comunica bundle size.** `@comunica/query-sparql` is ~500KB+ gzipped. Use dynamic
-import to lazy-load it only when the SPARQL interface is opened, not at app startup.
+**Comunica bundle size.** `@comunica/query-sparql-rdfjs` 5 is about 450 KB gzipped
+(measured 2026-11-01). Use dynamic import to lazy-load it only when the SPARQL
+interface is opened, not at app startup.
+
+**Comunica 5 refuses a FILTER placed directly in an OPTIONAL group** when the
+group also holds a GRAPH pattern, e.g. `OPTIONAL { FILTER(BOUND(?x)) GRAPH ?g { … } }`:
+the query fails with "none of the configured actors were able to handle the join
+type optional". Bind the variable inside the same OPTIONAL instead, as
+`src/rdf/presets.js` does. That shape was never safe anyway: SPARQL tests such a
+filter after the join, so it never stopped an unbound `?x` matching everything.
 
 **Service worker — three binding constraints.** The PWA service worker
 (`src/service-worker.js`, spec in `docs/technical/PWA_SERVICE_WORKER.md`, ADR

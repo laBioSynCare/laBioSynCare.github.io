@@ -4,7 +4,8 @@
 // default graph empty, so a query without a GRAPH clause, the kind every SPARQL
 // tutorial and CLAUDE.md §5.3 write, matched nothing and said nothing about why.
 // Comunica's `unionDefaultGraph` option did not help: version 3.3 ignores it for
-// an RDF/JS store (measured 2026-09-29).
+// an RDF/JS store (measured 2026-09-29). The wrapper stays on Comunica 5 for a
+// reason that option could never meet: it unions only the authoritative graphs.
 //
 // This wraps the store as a Comunica source. A pattern on the default graph
 // matches the RDF merge of the store's own default graph and the authoritative
