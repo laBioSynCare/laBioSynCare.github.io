@@ -277,6 +277,15 @@ indexed, examiner-searchable records.
       Released 2026-10-19 and check the Version IRI reads
       `https://w3id.org/sstim/0.20.0`, the release that was then current.*
 
+      *2026-11-01: 0.21.0 went out with ledger bytes 1574820 (sha256
+      `44dd0bc0…42cf068`). The pull URL serves the latest frozen release, so
+      once this deploy lands BioPortal's nightly pull sees 0.21.0: if 0.20.0
+      never got a row, no pull will now create one. Whether it did was not
+      measured; the public page answered 403 to a scripted request. After the
+      pull creates the 0.21.0 row, capture its ID, confirm it survives a second
+      unchanged pull, then PATCH it to Released 2026-11-01 and check the
+      Version IRI reads `https://w3id.org/sstim/0.21.0`.*
+
 - [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
@@ -1064,6 +1073,16 @@ indexed, examiner-searchable records.
             terms first released in 0.19.0 (`sstim:breathGuideTrack` and four exposure
             values); unversioned IRIs serve the latest release, so they appear
             with 0.19.0 itself, together with the deprecations that name them.*
+- [x] **Cut 0.21.0** `P1`
+      *Cut 2026-11-01: tag `v0.21.0` on both remotes, the
+      [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.21.0) on
+      `w3c-cg/sstim`, and version DOI
+      [10.5281/zenodo.23868027](https://doi.org/10.5281/zenodo.23868027), deposited
+      over the API into the concept series, which resolves to it. The
+      follow-through release: ADRs 0067 and 0068, adding 1 property and 3
+      shapes and removing or deprecating nothing. The line reopened as
+      0.22.0-dev the same day. Remaining: BioPortal's row for 0.21.0 (the
+      BioPortal item above) and the Community Group announcement.*
 - [x] **Cut 0.20.0** `P1`
       *Cut 2026-10-19, the previous release: tag `v0.20.0` on both remotes, the
       [GitHub release](https://github.com/w3c-cg/sstim/releases/tag/v0.20.0), which was published on
