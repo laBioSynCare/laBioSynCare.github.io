@@ -140,8 +140,8 @@ ecosystem projection use separate graph and storage boundaries.
 
 ## Validation and publication state
 
-The complete pinned gate passed on 2026-10-19, on the frozen `0.20.0` release
-tree (`make validate`, and 1147 tests in 90 files under `make test`, with 11
+The complete pinned gate passed on 2026-11-01, on the frozen `0.21.0` release
+tree (`make validate`, and 1180 tests in 91 files under `make test`, with 11
 skipped):
 
 ```bash

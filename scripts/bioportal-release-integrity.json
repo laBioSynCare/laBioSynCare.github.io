@@ -37,6 +37,13 @@
       "sourceClosureSha256": "8a0b0e7a804536382afa0bbd3fe9a6e2ec0c76bc0ea330d491b3e042b075b2be",
       "bytes": 1562519,
       "triples": 14373
+    },
+    "0.21.0": {
+      "sha256": "44dd0bc0e3a4ab198d4435c02b5e53b5ae63e946fad75b34d0766369b42cf068",
+      "canonicalGraphSha256": "4733deb722098c3d8862a88744adc5fbd2770da0f2bdff40eb82e041744d9b1a",
+      "sourceClosureSha256": "906e869c13551c9a7dca347ac2c64132018a28f88182d29717311cda30e3465d",
+      "bytes": 1574820,
+      "triples": 14441
     }
   }
 }

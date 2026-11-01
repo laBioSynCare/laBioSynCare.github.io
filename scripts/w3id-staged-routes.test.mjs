@@ -181,9 +181,9 @@ test('every frozen release path is retargeted without changing snapshot semantic
   // computed expectation could not tell a missing snapshot from a smaller one.
   // Update them when cutting a release; 0.17.0 took them from 15/204 to 16/232,
   // 0.18.0, another 27-file snapshot, to 17/260, 0.19.0, a third, to 18/288,
-  // and 0.20.0, a fourth, to 19/316.
-  expect(inventory).toHaveLength(19)
-  expect(checked).toBe(316)
+  // 0.20.0, a fourth, to 19/316, and 0.21.0, a fifth, to 20/344.
+  expect(inventory).toHaveLength(20)
+  expect(checked).toBe(344)
 })
 
 test('the live smoke checks candidate targets while skipping the external projection', async () => {
