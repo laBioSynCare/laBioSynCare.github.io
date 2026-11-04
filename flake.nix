@@ -20,11 +20,16 @@
           # secretstorage. The pinned revision has no cached build of it, so CI
           # builds it and runs its upstream tests, where test_recv_after_connect
           # fails at random ("DID NOT RAISE TimeoutError"). That killed the shell
-          # before any gate ran on ebdd21b, 686b913 and d624dfa. Its tests are
-          # upstream's to keep; we only need the package.
+          # before any gate ran on ebdd21b, 686b913 and d624dfa. Deselect that one
+          # test and keep the rest: doCheck = false also drops trio, which the
+          # package's own import check of jeepney.io.trio needs (f444100 failed so).
           py = pkgs.python312.override {
             packageOverrides = _: super: {
-              jeepney = super.jeepney.overridePythonAttrs (_: { doCheck = false; });
+              jeepney = super.jeepney.overridePythonAttrs (old: {
+                preCheck = (old.preCheck or "") + ''
+                  export PYTEST_ADDOPTS="--deselect jeepney/io/tests/test_asyncio.py::test_recv_after_connect"
+                '';
+              });
             };
           };
 
