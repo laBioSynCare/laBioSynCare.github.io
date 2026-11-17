@@ -38,7 +38,7 @@ export function buildServer(client = source) {
     'Read-only: search released SSTIM sensory stimulation terminology by label, identifier or definition. Returns release-qualified source terms; not proof of clinical efficacy.',
     {
       query: z.string().min(2).max(160).describe('Search phrase, minimum 2 characters'),
-      release: z.string().regex(/^\\d+\\.\\d+\\.\\d+$/).optional().describe('Optional frozen release, e.g. 0.19.0'),
+      release: z.string().regex(/^\d+\.\d+\.\d+$/).optional().describe('Optional frozen release, e.g. 0.19.0'),
       kind: z.enum(['class', 'property', 'concept']).optional(),
       limit: z.number().int().min(1).max(20).default(10),
       includeDeprecated: z.boolean().default(false),
@@ -47,13 +47,13 @@ export function buildServer(client = source) {
     'Read-only: retrieve an exact released term with definitions, mappings, declared relations and source provenance. Use a CURIE or IRI obtained from search.',
     {
       identifier: z.string().min(1).max(1024).describe('Exact SSTIM CURIE or IRI'),
-      release: z.string().regex(/^\\d+\\.\\d+\\.\\d+$/).optional(),
+      release: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
     }, (args) => client.getConcept(args))
   register(server, 'sstim_prepare_feedback',
     'Read-only: construct a reviewable contribution-page URL for a term or missing-knowledge suggestion. Nothing is saved or submitted; user reviews any public issue.',
     {
       identifier: z.string().min(1).max(1024).optional(),
-      release: z.string().regex(/^\\d+\\.\\d+\\.\\d+$/).optional(),
+      release: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
     }, (args) => client.prepareFeedback(args))
   return server
 }
