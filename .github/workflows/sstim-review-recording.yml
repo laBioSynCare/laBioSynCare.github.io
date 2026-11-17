@@ -1,0 +1,36 @@
+name: Record SSTIM live review walkthrough
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sstim-review-recording.yml'
+      - 'services/sstim-mcp-remote/verification/record-review.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser recorder
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --no-save playwright@1.58.0
+          npx playwright install --with-deps chromium
+        working-directory: services/sstim-mcp-remote
+      - name: Record browser performing real MCP calls
+        run: node services/sstim-mcp-remote/verification/record-review.mjs
+      - name: Commit the reviewer-accessible video to the live Netlify site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add services/sstim-mcp-remote/public/review/sstim-mcp-walkthrough.mp4
+          git commit -m "docs(plugin): publish live MCP reviewer walkthrough recording"
+          git push origin HEAD:main
