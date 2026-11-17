@@ -2,6 +2,7 @@
 // Run on a GitHub-hosted runner after the Netlify site is deployed.
 // Tests the actual remote HTTP endpoint, not an in-process handler.
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 
 const url = process.env.SSTIM_MCP_ENDPOINT || 'https://sstim-mcp.netlify.app/mcp'
 const headers = {
@@ -29,6 +30,16 @@ function jsonText(result) {
   assert.ok(result.content?.some(x => x.type === 'text'))
   return JSON.parse(result.content.find(x => x.type === 'text').text)
 }
+// OpenAI requires the raw token (not HTML) at the hostname root.
+const expectedChallenge = await readFile(new URL('../public/.well-known/openai-apps-challenge', import.meta.url), 'utf8')
+const challengeUrl = new URL('/.well-known/openai-apps-challenge', url)
+const challengeResponse = await fetch(challengeUrl, { signal: AbortSignal.timeout(20000) })
+assert.equal(challengeResponse.status, 200, 'Challenge URL returned HTTP ' + challengeResponse.status)
+const actualChallenge = await challengeResponse.text()
+assert.equal(actualChallenge.trim(), expectedChallenge.trim(),
+  'OpenAI domain challenge payload differs from the published source')
+assert.ok(!actualChallenge.includes('<html'), 'Expected raw token, not an HTML page')
+console.log('SSTIM OpenAI domain challenge PASS:', challengeUrl.href)
 const get = await fetch(url, { signal: AbortSignal.timeout(20000) })
 assert.equal(get.status, 405, 'GET should not open a serverless SSE stream')
 const initialized = await invoke('initialize', {

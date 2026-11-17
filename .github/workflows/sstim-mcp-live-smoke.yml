@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/sstim-mcp-live-smoke.yml'
       - 'services/sstim-mcp-remote/verification/live-smoke.mjs'
+      - 'services/sstim-mcp-remote/public/.well-known/openai-apps-challenge'
   workflow_dispatch:
 permissions:
   contents: read
