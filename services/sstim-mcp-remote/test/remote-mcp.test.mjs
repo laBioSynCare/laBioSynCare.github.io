@@ -24,7 +24,8 @@ test('exposes only the intended /mcp path and restricts methods', async () => {
   assert.equal(config.path, '/mcp')
   const get = await handler(req('GET'))
   assert.equal(get.status, 405)
-  assert.equal((await handler(req('POST', init, { origin: 'https://evil.example' })).status), 403)
+  const blocked = await handler(req('POST', init, { origin: 'https://evil.example' }))
+  assert.equal(blocked.status, 403)
 })
 test('initializes using stateless Streamable HTTP JSON response', async () => {
   const { response, data } = await rpc(init)
