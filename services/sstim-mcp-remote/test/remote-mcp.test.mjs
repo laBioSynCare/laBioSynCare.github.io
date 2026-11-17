@@ -50,7 +50,7 @@ test('can prepare contribution link without external calls or writes', async () 
   const { data } = await rpc({ jsonrpc: '2.0', id: 3, method: 'tools/call',
     params: { name: 'sstim_prepare_feedback', arguments: {} } })
   assert.equal(data.result.isError, undefined)
-  assert.match(data.result.content[0].text, /w3c-cg\\.github\\.io\\/sstim\\/contribute/)
+  assert.ok(data.result.content[0].text.includes('w3c-cg.github.io/sstim/contribute/'))
 })
 test('rejects unauthorized contribution writes and invalid schemas', async () => {
   const { data } = await rpc({ jsonrpc: '2.0', id: 4, method: 'tools/call',
