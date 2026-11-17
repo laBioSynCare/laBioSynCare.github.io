@@ -24,6 +24,8 @@ jobs:
           npm install --ignore-scripts --no-audit --no-fund --no-save playwright@1.58.0
           npx playwright install --with-deps chromium
         working-directory: services/sstim-mcp-remote
+      - name: Install MP4 encoder
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Record browser performing real MCP calls
         run: node services/sstim-mcp-remote/verification/record-review.mjs
       - name: Commit the reviewer-accessible video to the live Netlify site
