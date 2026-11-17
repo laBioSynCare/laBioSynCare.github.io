@@ -54,9 +54,13 @@ pkgs.testers.runNixOSTest {
   testScript = ''
     import json
 
-    start_all()
-
+    # These independent VMs have no cross-node network dependency. Start them
+    # sequentially: booting both at once on a shared CI KVM runner has triggered
+    # an early kernel BUG in the second guest while modules were loading
+    # (arch/x86/kernel/alternative.c:2531), followed by a /sysroot mount timeout.
+    # The two deployment checks below still execute against both real VMs.
     for machine in (server, operator):
+        machine.start()
         machine.wait_for_unit("nginx.service")
         machine.wait_for_open_port(8080)
 
