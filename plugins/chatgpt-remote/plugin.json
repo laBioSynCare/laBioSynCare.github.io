@@ -36,7 +36,9 @@
           "Find the canonical SSTIM definition and provenance for binaural stimulation.",
           "Compare the SSTIM description of a sensory phenomenon between frozen releases.",
           "Prepare a user-reviewed SSTIM feedback link for a missing concept."
-        ]
+        ],
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/icon.svg"
       }
     }
   }
