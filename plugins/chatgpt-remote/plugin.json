@@ -1,0 +1,43 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "sstim-reference",
+  "version": "0.1.0",
+  "description": "Reference for sensory stimulation terminology, definitions, provenance and versioned ontology concepts.",
+  "author": {
+    "name": "SSTIM W3C Community Group",
+    "url": "https://www.w3.org/community/sstim/"
+  },
+  "homepage": "https://w3c-cg.github.io/sstim/",
+  "repository": "https://github.com/w3c-cg/sstim",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sensory-stimulation",
+    "neuroscience",
+    "ontology",
+    "perception",
+    "research",
+    "MCP"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "SSTIM Reference",
+        "shortDescription": "Sensory science reference",
+        "longDescription": "Explore SSTIM's published sensory-stimulation concepts, find exact IRIs and source definitions, compare frozen releases, and prepare a feedback link for human review. The server reads public semantic data and never modifies SSTIM.",
+        "developerName": "SSTIM W3C Community Group",
+        "category": "Education",
+        "capabilities": [
+          "Read"
+        ],
+        "websiteURL": "https://w3c-cg.github.io/sstim/",
+        "privacyPolicyURL": "https://github.com/w3c-cg/sstim/blob/main/docs/ecosystem/SSTIM_MCP_PRIVACY.md",
+        "termsOfServiceURL": "https://github.com/w3c-cg/sstim/blob/main/docs/ecosystem/SSTIM_MCP_TERMS.md",
+        "defaultPrompt": [
+          "Find the canonical SSTIM definition and provenance for binaural stimulation.",
+          "Compare the SSTIM description of a sensory phenomenon between frozen releases.",
+          "Prepare a user-reviewed SSTIM feedback link for a missing concept."
+        ]
+      }
+    }
+  }
+}
