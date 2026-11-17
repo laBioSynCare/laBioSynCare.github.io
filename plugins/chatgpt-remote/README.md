@@ -1,8 +1,8 @@
-# SSTIM remote ChatGPT plugin (staged)
+# SSTIM remote ChatGPT plugin (submission-ready)
 
-This standalone portable plugin is prepared for OpenAI's **With MCP** submission process. Its transport is the read-only HTTPS endpoint deployed from `services/sstim-mcp-remote/`.
+This standalone portable plugin is prepared for OpenAI's **With MCP** ZIP-upload submission process. Its transport is the read-only HTTPS endpoint deployed from `services/sstim-mcp-remote/`.
 
-**Status:** manifests committed, Netlify site allocated, **endpoint not live until the site is connected and deployed**, and **not submitted to or approved by OpenAI**. The existing `plugins/chatgpt/` remains a local stdio package and is not overwritten.
+**Status:** public read-only MCP endpoint live and verified via GitHub Actions; packaged plugin and review materials prepared. **Not yet uploaded to, submitted to, or approved by OpenAI.** The existing `plugins/chatgpt/` remains a local stdio package and is not overwritten.
 
 ## Prerequisites
 

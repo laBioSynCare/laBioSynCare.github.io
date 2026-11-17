@@ -8,13 +8,13 @@ A public, **read-only** Streamable HTTP MCP adapter for SSTIM's existing release
 
 `sstim_list_releases`, `sstim_search_concepts`, `sstim_get_concept`, and `sstim_prepare_feedback`. All are read-only. The local stdio package retains additional contribution draft/read/submit tools, but `sstim_submit_contribution` is intentionally **not exposed** here. Use the human-reviewed [Contribution Bridge](https://w3c-cg.github.io/sstim/contribute/) instead.
 
-## Netlify deployment
+## Netlify deployment (live since 2026-11-17)
 
-1. In the existing Netlify Free-plan team, use project `sstim-mcp` (site ID `b5681e47-3190-4366-8815-504899d12108`).
+1. In the Netlify Free-plan team, use project `sstim-mcp` (site ID `b5681e47-3190-4366-8815-504899d12108`).
 2. Connect the **w3c-cg/sstim** GitHub repository to this *new*, independent Netlify site.
 3. Set **Base directory** to `services/sstim-mcp-remote` and production branch `main`. Netlify will read this directory's `netlify.toml`, install package dependencies, and bundle `netlify/functions/mcp.mjs`.
 4. Keep the project public and on the Free plan. Do not configure tokens or GitHub Issues write secrets.
-5. Verify a deployed response at `https://sstim-mcp.netlify.app/mcp` using MCP Inspector. The root page is informational; MCP requests are POST.
+5. The endpoint `https://sstim-mcp.netlify.app/mcp` is **deployed and live smoke-tested** in [GitHub Actions](https://github.com/w3c-cg/sstim/actions/runs/44186545274). The root page is informational; MCP requests use POST.
 6. When OpenAI prompts for domain verification, place **the exact challenge string** at the URL it provides. Do not fabricate a token. It can be served by a dedicated Netlify function or a static `public/.well-known/openai-apps-challenge` file.
 
 Do not attempt to host this on GitHub Pages: the MCP endpoint needs server-side POST handling, while the [Concept Reference API](https://w3c-cg.github.io/sstim/api/v1/index.json) remains static.
@@ -28,7 +28,7 @@ npm test
 npx netlify dev
 ```
 
-Use `npx @modelcontextprotocol/inspector` with Streamable HTTP at `http://localhost:8888/mcp`, or point a compatible MCP client directly to the public HTTPS URL after deployment. Validate `tools/list` and a release-pinned lookup. The tests do not replace live-endpoint acceptance.
+Use `npx @modelcontextprotocol/inspector` with Streamable HTTP at `http://localhost:8888/mcp`, or point a compatible MCP client directly to the public HTTPS URL after deployment. Validate `tools/list` and a release-pinned lookup. The separate GitHub Actions live smoke workflow also checks the deployed HTTPS endpoint end to end.
 
 ### Data and safety
 

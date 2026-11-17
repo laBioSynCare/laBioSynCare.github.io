@@ -113,15 +113,15 @@ are chosen but not yet installed — do not describe them as how the app works.
 | PWA / offline | SvelteKit native service worker | built-in | Installable, offline-capable from the same static `dist/`. No `vite-plugin-pwa`. Three binding constraints — see ADR 0009 + `docs/technical/PWA_SERVICE_WORKER.md` |
 | Dev toolchain | Nix flake | flakes | First-class: `flake.nix` pins Node, Python+pySHACL, WABT; CI runs inside it. `flake.lock` is the source of truth — regenerate via `nix flake update` |
 
-**Remote MCP adapter (staged, 2026-11-17).** The existing `@sstim/mcp`
+**Remote MCP adapter (deployed, 2026-11-17).** The existing `@sstim/mcp`
 stdio server and official MCP Registry entry remain unchanged. A separate
 read-only Streamable HTTP service is implemented in
-`services/sstim-mcp-remote/` for deployment to its own Netlify site, with
+`services/sstim-mcp-remote/` and deployed independently on Netlify, with
 `plugins/chatgpt-remote/` as the public OpenAI plugin candidate. Its source
 is the frozen, public Concept Reference API on GitHub Pages; it is not a
-replacement for Workbench hosting. The service must **not** be described as
-live until the Netlify repository connection, build, and remote MCP smoke
-tests succeed. It exposes four knowledge/feedback-link tools and **never**
+replacement for Workbench hosting. The Netlify service at `https://sstim-mcp.netlify.app/mcp` passed live
+end-to-end MCP smoke tests in [CI](https://github.com/w3c-cg/sstim/actions/runs/44186545274).
+The OpenAI public plugin is not yet submitted or approved. It exposes four knowledge/feedback-link tools and **never**
 `sstim_submit_contribution`, accepts no credentials, and cannot mutate
 canonical RDF. Keep the local stdio plugin distinct, and do not change this
 boundary without review. See
