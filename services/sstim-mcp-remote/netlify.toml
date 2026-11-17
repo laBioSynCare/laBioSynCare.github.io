@@ -1,0 +1,12 @@
+# IMPORTANT: Netlify site base directory must be services/sstim-mcp-remote.
+# The SSTIM GitHub Pages SvelteKit build is intentionally not deployed here.
+[build]
+  publish = "public"
+  command = "echo 'Read-only SSTIM MCP: no site build required'"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -1,0 +1,25 @@
+name: SSTIM remote MCP adapter
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/sstim-mcp-remote/**'
+      - '.github/workflows/sstim-mcp-remote.yml'
+      - 'plugins/chatgpt-remote/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install isolated adapter dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+        working-directory: services/sstim-mcp-remote
+      - name: Test MCP handler and tool exposure
+        run: npm test
+        working-directory: services/sstim-mcp-remote

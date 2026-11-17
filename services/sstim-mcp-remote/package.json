@@ -1,0 +1,18 @@
+{
+  "name": "sstim-mcp-remote",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Stateless read-only Streamable HTTP adapter for the released SSTIM Concept Reference API",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "@sstim/mcp": "0.3.0",
+    "zod": "^3.25.0"
+  }
+}
