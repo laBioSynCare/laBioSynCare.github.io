@@ -24,8 +24,8 @@
         "displayName": "SSTIM Reference",
         "shortDescription": "Sensory science reference",
         "longDescription": "Explore SSTIM's published sensory-stimulation concepts, find exact IRIs and source definitions, compare frozen releases, and prepare a feedback link for human review. The server reads public semantic data and never modifies SSTIM.",
-        "developerName": "SSTIM W3C Community Group",
-        "category": "Education",
+        "developerName": "Renato Fabbri",
+        "category": "Education & Research",
         "capabilities": [
           "Read"
         ],
