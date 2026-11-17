@@ -8,6 +8,11 @@
       "name": "sstim-sensory-reference",
       "source": "./plugins/claude-code/sstim",
       "description": "SSTIM senses, perception and sensory research MCP with a scientific reference skill"
+    },
+    {
+      "name": "sstim-reference",
+      "source": "./plugins/claude/sstim-reference",
+      "description": "Public read-only SSTIM semantic reference with live HTTP MCP server and research skill"
     }
   ]
 }

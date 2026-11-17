@@ -1,0 +1,28 @@
+{
+  "name": "sstim-reference",
+  "displayName": "SSTIM Reference",
+  "version": "0.1.0",
+  "description": "Research sensory-stimulation terminology with versioned definitions, identifiers, provenance and safe feedback links from the public SSTIM reference.",
+  "author": {
+    "name": "SSTIM Community Group contributors",
+    "url": "https://www.w3.org/community/sstim/"
+  },
+  "homepage": "https://w3c-cg.github.io/sstim/",
+  "repository": "https://github.com/w3c-cg/sstim",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sensory-stimulation",
+    "neuroscience",
+    "ontology",
+    "MCP",
+    "research",
+    "perception",
+    "psychoacoustics"
+  ],
+  "icon": "./assets/icon-192.png",
+  "documentationUrl": "https://github.com/w3c-cg/sstim/tree/main/plugins/claude/sstim-reference",
+  "supportUrl": "https://github.com/w3c-cg/sstim/issues",
+  "privacyPolicyUrl": "https://github.com/w3c-cg/sstim/blob/main/docs/ecosystem/SSTIM_MCP_PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/w3c-cg/sstim/blob/main/docs/ecosystem/SSTIM_MCP_TERMS.md",
+  "defaultEnabled": true
+}

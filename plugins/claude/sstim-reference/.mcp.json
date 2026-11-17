@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sstim": {
+      "type": "http",
+      "url": "https://sstim-mcp.netlify.app/mcp"
+    }
+  }
+}

@@ -6,6 +6,13 @@ import { z } from 'zod'
 
 const serverInfo = { name: 'sstim-reference', version: '0.3.0' }
 const source = createConceptClient()
+// Human-readable titles support Anthropic directory review and other MCP clients.
+const TOOL_TITLES = {
+  sstim_list_releases: 'List SSTIM releases',
+  sstim_search_concepts: 'Search SSTIM concepts',
+  sstim_get_concept: 'Get an SSTIM concept',
+  sstim_prepare_feedback: 'Prepare SSTIM feedback link',
+}
 const readAnnotations = {
   readOnlyHint: true,
   destructiveHint: false,
@@ -13,10 +20,12 @@ const readAnnotations = {
   idempotentHint: true,
 }
 function register(server, name, description, inputSchema, run) {
+  const title = TOOL_TITLES[name]
   server.registerTool(name, {
+    title,
     description,
     inputSchema,
-    annotations: readAnnotations,
+    annotations: { ...readAnnotations, title },
   }, async (args) => {
     try {
       const data = await run(args)

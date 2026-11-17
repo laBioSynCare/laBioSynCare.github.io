@@ -1,8 +1,6 @@
 # SSTIM Agent Plugins and GitHub-backed MCP proposals
 
-Status: @sstim/mcp@0.3.0 is published on npm and in the official MCP Registry
-(2026-10-11). The plugins have not yet been published to public plugin
-marketplaces or verified against every named client.
+Status (2026-11): @sstim/mcp@0.3.0 is on npm and in the official MCP Registry. A public read-only remote MCP is deployed at https://sstim-mcp.netlify.app/mcp, and the OpenAI plugin has been configured by its publisher. A separate Claude remote plugin is staged for Anthropic review, but neither public-directory approval nor publication is asserted here.
 
 ## Scope and value
 
@@ -19,9 +17,12 @@ does an ontology entry prove a therapeutic outcome.
 - Portable Agent Plugins 1.0 directory: plugins/sstim/
   Includes a sensory-reference skill and stdio MCP for VS Code and other
   compatible Agent Plugins hosts.
-- Claude Code: plugins/claude-code/sstim/
-  Includes native .claude-plugin manifest, MCP config and skill. The
-  repository root .claude-plugin/marketplace.json provides discovery.
+- Claude Code (original local stdio): plugins/claude-code/sstim/
+  Includes the eight-tool local MCP package and proposal draft/read/submit tools.
+- Claude public read-only: plugins/claude/sstim-reference/
+  Includes native .claude-plugin manifest, HTTPS Streamable HTTP MCP config, icon,
+  research skill and public directory submission materials. No GitHub writes.
+  The root .claude-plugin/marketplace.json exposes both options.
 - ChatGPT: plugins/chatgpt/
   Portable skill plus optional local stdio MCP. Compatible ChatGPT Desktop
   installations may run the local MCP after required permissions and setup.
@@ -85,3 +86,7 @@ the current stdio service as publicly deployable.
    GitHub issue permissions. The current static site does not provide it.
 5. Keep the separate deferred RDF and annotation invitation plan deferred:
    no protected RDF or frozen releases change here.
+
+## 2026-11 Anthropic publication update
+
+The public Claude plugin uses the existing production Netlify endpoint and does not require a new service or authentication. See [Anthropic submission checklist](ANTHROPIC_PLUGIN_SUBMISSION.md). The original local MCP has additional submission tools disabled by default; it remains separate. The official Anthropic Plugin Directory is not the same as this repository's self-hosted marketplace and requires a developer submission and review.

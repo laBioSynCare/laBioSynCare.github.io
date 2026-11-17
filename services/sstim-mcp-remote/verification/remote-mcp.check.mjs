@@ -42,6 +42,8 @@ test('advertises four read-only, source-aware tools', async () => {
     'sstim_get_concept', 'sstim_list_releases',
     'sstim_prepare_feedback', 'sstim_search_concepts'])
   for (const tool of data.result.tools) {
+    assert.ok(tool.title && tool.title.length > 5)
+    assert.equal(tool.annotations.title, tool.title)
     assert.equal(tool.annotations.readOnlyHint, true)
     assert.equal(tool.annotations.destructiveHint, false)
     assert.equal(tool.annotations.openWorldHint, true)

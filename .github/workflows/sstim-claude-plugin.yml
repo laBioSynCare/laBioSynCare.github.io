@@ -1,0 +1,22 @@
+name: Validate SSTIM Claude plugin
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/claude/**'
+      - '.claude-plugin/marketplace.json'
+      - '.github/workflows/sstim-claude-plugin.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate plugin manifest, MCP config and skill paths
+        run: npx --yes @anthropic-ai/claude-code@latest plugin validate ./plugins/claude/sstim-reference --strict
