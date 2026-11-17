@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSTIM Reference | MCP Live Review Walkthrough</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#091b20;color:#ecf3ed}
+*{box-sizing:border-box}body{margin:0}.top{display:flex;justify-content:space-between;align-items:center;height:82px;padding:0 40px;border-bottom:1px solid #31565a;background:#10262a}
+.brand{font-size:23px;letter-spacing:-.6px;font-weight:750}.brand span{color:#77d6b0}.micro{font-size:13px;color:#b5c9c4}.status{display:flex;align-items:center;gap:10px;font-size:14px;background:#153833;border:1px solid #387b66;padding:10px 15px;border-radius:9px;color:#a7f5ca}.dot{width:8px;height:8px;border-radius:50%;background:#75d4a5}
+.layout{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 82px)}aside{padding:29px 19px;border-right:1px solid #31565a;background:#0f262a}aside h2{font-size:12px;color:#80b8a7;letter-spacing:2px;margin:0 14px 22px}
+.test{display:flex;align-items:center;gap:12px;font-size:14px;color:#a8bfbb;padding:11px 14px;border-radius:10px;margin-bottom:5px;min-height:45px}
+.test .idx{display:grid;place-items:center;width:24px;height:24px;border:1px solid #447572;border-radius:7px;font-size:12px;flex:none}
+.test.active{background:#1a4343;color:white;border:1px solid #2b7a67}
+.test.complete .idx{color:#72e9a5;border-color:#72e9a5}
+main{padding:34px 42px 14px;max-width:100%;overflow:hidden}.kicker{text-transform:uppercase;font-size:12px;letter-spacing:2.2px;color:#9dddbd;margin-bottom:15px}
+h1{font-size:30px;line-height:1.15;margin:0 0 14px;letter-spacing:-1.1px}.sub{font-size:15px;color:#bad0c9;line-height:1.55;margin-bottom:24px;max-width:825px}.pill{display:inline-block;margin-right:7px;color:#95e4c4;border:1px solid #315e55;padding:4px 11px;border-radius:20px;font-size:11px}
+.grid{display:grid;grid-template-columns:46% 54%;gap:13px;margin-right:15px}.panel{min-height:292px;border:1px solid #356365;background:#102c31;border-radius:13px;overflow:hidden}.panel h3{margin:0;border-bottom:1px solid #315b5b;padding:15px 17px;font-size:12px;letter-spacing:1.5px;color:#80d7bb}
+pre{white-space:pre-wrap;word-break:break-word;font:12.3px/1.58 ui-monospace,SFMono-Regular,Consolas,monospace;margin:0;padding:17px;color:#dae8e3;max-height:315px;overflow:hidden}
+.btnrow{margin-top:22px;display:flex;align-items:center;gap:14px}button{border:0;border-radius:8px;background:#7bd7b4;color:#09352d;font-weight:800;font-size:15px;padding:13px 20px;cursor:pointer}button:disabled{opacity:.45;cursor:default}
+#case-state{color:#8edec2;font-size:14px}.foot{margin-top:24px;border-top:1px solid #2a5455;padding-top:15px;font-size:12px;color:#94aeac;display:flex;justify-content:space-between}.tag{color:#f1d68c}
+</style>
+</head>
+<body>
+<header class="top"><div><div class="brand"><span>SSTIM</span> Reference <span style="font-weight:400;color:#92aaa6">/ remote MCP</span></div><div class="micro">Live MCP protocol demonstration. No simulated server responses.</div></div><div class="status"><span class="dot"></span><span>PUBLIC · READ-ONLY · NO AUTH</span></div></header>
+<div class="layout">
+<aside><h2>REVIEW SCENARIOS</h2><div id="list"></div></aside>
+<main>
+<div class="kicker" id="kicker">REVIEW WALKTHROUGH · LIVE SERVER</div>
+<h1 id="heading">SSTIM Reference: live MCP demonstration</h1>
+<div class="sub" id="description">Eight reviewer scenarios call the public SSTIM Streamable HTTP server. Each response shown is returned by the live endpoint or is a clearly labeled evidence boundary. This page does not impersonate ChatGPT.</div>
+<div><span class="pill" id="scope">https://sstim-mcp.netlify.app/mcp</span><span class="pill">SSTIM released Concept Reference API</span></div>
+<div style="height:22px"></div>
+<div class="grid">
+<section class="panel"><h3>REQUEST / TEST</h3><pre id="request">Select “Run next scenario” to begin the walkthrough.</pre></section>
+<section class="panel"><h3>ACTUAL RESPONSE / ASSESSMENT</h3><pre id="response">The server is live and responds to Streamable HTTP POST. No credentials or GitHub write permissions.</pre></section>
+</div>
+<div class="btnrow"><button id="next">Run next scenario</button><div id="case-state">Ready to start</div></div>
+<footer class="foot"><span>Source: github.com/w3c-cg/sstim · verified domain: sstim-mcp.netlify.app</span><span class="tag">Published terminology ≠ independent evidence of efficacy</span></footer>
+</main></div>
+<script>
+const names=[
+ ['Initialize MCP','Protocol handshake'],
+ ['List releases','Positive: release inventory'],
+ ['Search concepts','Positive: canonical search'],
+ ['Retrieve full concept','Positive: exact term and provenance'],
+ ['Compare frozen releases','Positive: version pinning'],
+ ['Prepare feedback','Positive: user-reviewed link'],
+ ['Reject write call','Negative: unavailable submission tool'],
+ ['Reject fictional release','Negative: unsupported source identity'],
+ ['Clinical evidence boundary','Negative: no treatment guarantee']
+];
+const list=document.querySelector('#list'); names.forEach((n,i)=>{const el=document.createElement('div');el.className='test';el.id='case-'+i;el.innerHTML='<span class="idx">'+String(i+1).padStart(2,'0')+'</span><span>'+n[0]+'</span>';list.append(el)});
+let current=-1, state={}, busy=false;
+const $=s=>document.querySelector(s);
+function stringy(x,max=1300){const s=JSON.stringify(x,null,2);return s.length>max?s.slice(0,max)+'\n… [truncated for display]':s}
+async function rpc(method, params, id){const data={jsonrpc:'2.0',id,method,params}; const response=await fetch('/mcp',{method:'POST',headers:{'content-type':'application/json','accept':'application/json, text/event-stream','mcp-protocol-version':'2025-11-25'},body:JSON.stringify(data)});const payload=await response.json();return {status:response.status,payload}}
+function unwrap(result){return JSON.parse(result.payload.result.content.find(x=>x.type==='text').text)}
+const tasks=[
+async()=>{const x=await rpc('initialize',{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'sstim-review-walkthrough',version:'1.0.0'}},1);return ['initialize',{protocolVersion:'2025-11-25'}, {http:x.status,server:x.payload.result?.serverInfo,capabilities:x.payload.result?.capabilities}]},
+async()=>{const x=await rpc('tools/call',{name:'sstim_list_releases',arguments:{}},2);const d=unwrap(x);state.releases=d;return ['sstim_list_releases',{}, {latestRelease:d.latestRelease,releases:d.releases.slice(-4),api:d.api}]},
+async()=>{const x=await rpc('tools/call',{name:'sstim_search_concepts',arguments:{query:'stimulat',limit:3}},3);const d=unwrap(x);state.search=d;return ['sstim_search_concepts',{query:'stimulat',limit:3},{release:d.release,totalMatches:d.totalMatches,results:d.results.slice(0,3).map(y=>({curie:y.curie,label:y.label,iri:y.iri}))}]},
+async()=>{const f=state.search.results[0];const x=await rpc('tools/call',{name:'sstim_get_concept',arguments:{identifier:f.curie||f.iri,release:state.search.release}},4);const d=unwrap(x);state.term=f;return ['sstim_get_concept',{identifier:f.curie||f.iri,release:state.search.release},{release:d.release,term:{iri:d.term.iri,label:d.term.label,definition:d.term.definition,version:d.term.version},detailUrl:d.detailUrl}]},
+async()=>{const release=state.releases.releases.map(r=>r.version).find(v=>v!==state.search.release);const f=state.term;const x=await rpc('tools/call',{name:'sstim_get_concept',arguments:{identifier:f.curie||f.iri,release}},5);const result=x.payload.result;return ['sstim_get_concept',{identifier:f.curie||f.iri,release},{checkedRelease:release,result:result?.isError?{available:false,message:result.content[0].text}:{available:true,term:unwrap(x).term?.iri}}]},
+async()=>{const x=await rpc('tools/call',{name:'sstim_prepare_feedback',arguments:{}},6);const d=unwrap(x);return ['sstim_prepare_feedback',{}, {url:d.url,notice:d.notice,writePerformed:false}]},
+async()=>{const x=await rpc('tools/call',{name:'sstim_submit_contribution',arguments:{}},7);return ['sstim_submit_contribution',{}, {error:x.payload.error||x.payload.result?.isError,explanation:'The public server has no issue-submission tool; GitHub writes are impossible through this plugin.'}]},
+async()=>{const x=await rpc('tools/call',{name:'sstim_get_concept',arguments:{identifier:'sstim:TotallyFictionalTerm',release:'999.999.999'}},8);return ['sstim_get_concept',{identifier:'sstim:TotallyFictionalTerm',release:'999.999.999'}, {isError:x.payload.result?.isError,detail:x.payload.result?.content?.[0]?.text||x.payload.error,sourceFabricated:false}]},
+async()=>{const x=await rpc('tools/list',{},9);return ['tools/list',{}, {registeredReadOnlyTools:x.payload.result.tools.map(t=>t.name),clinicalClaim:'No ontology definition is evidence of a guaranteed treatment outcome.',constraint:'No diagnosis, therapy prescription, or clinical efficacy tool is exposed.'}]},
+];
+window.__demoDone=false;
+$('#next').onclick=async()=>{if(busy)return;busy=true;$('#next').disabled=true;current++;const [name,description]=names[current];document.querySelectorAll('.test').forEach((el,i)=>{el.classList.toggle('active',i===current);el.classList.toggle('complete',i<current)});$('#kicker').textContent='SSTIM REFERENCE · SCENARIO '+(current+1)+' OF '+names.length;$('#heading').textContent=name;$('#description').textContent=description+' · Actual call to https://sstim-mcp.netlify.app/mcp';$('#request').textContent='Calling live server…';$('#response').textContent='Awaiting MCP response…';$('#case-state').textContent='Running live tool call';try{const [tool,args,result]=await tasks[current]();$('#request').textContent='Tool/method: '+tool+'\n\nArguments:\n'+stringy(args);$('#response').textContent=stringy(result,1800);$('#case-state').textContent='PASS · Live response received';}catch(e){$('#response').textContent='ERROR: '+e.message;$('#case-state').textContent='FAILED · Investigate live server';}busy=false;window.__demoDone=true;if(current===tasks.length-1){$('#next').textContent='Walkthrough complete';$('#next').disabled=true}else{$('#next').disabled=false}}
+</script>
+</body>
+</html>
