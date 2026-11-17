@@ -52,6 +52,8 @@ const listed = await invoke('tools/list', {}, 2)
 const names = listed.tools.map(x => x.name).sort()
 assert.deepEqual(names, ['sstim_get_concept', 'sstim_list_releases', 'sstim_prepare_feedback', 'sstim_search_concepts'])
 assert.ok(listed.tools.every(x => x.annotations?.readOnlyHint === true && x.annotations?.destructiveHint === false))
+assert.ok(listed.tools.every(x => typeof x.title === 'string' && x.title.length > 5 &&
+  x.annotations?.title === x.title), 'Anthropic requires a readable title for every tool')
 
 const releases = jsonText(await invoke('tools/call', { name:'sstim_list_releases', arguments:{} }, 3))
 assert.match(releases.latestRelease, /^\d+\.\d+\.\d+$/)
