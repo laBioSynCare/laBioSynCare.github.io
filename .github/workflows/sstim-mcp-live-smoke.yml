@@ -1,0 +1,21 @@
+name: SSTIM remote MCP live smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sstim-mcp-live-smoke.yml'
+      - 'services/sstim-mcp-remote/verification/live-smoke.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify deployed SSTIM MCP HTTP endpoint and real catalog lookups
+        run: node services/sstim-mcp-remote/verification/live-smoke.mjs
