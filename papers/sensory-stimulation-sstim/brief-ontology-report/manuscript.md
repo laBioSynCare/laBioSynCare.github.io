@@ -5,7 +5,7 @@
 **Author:** Renato Fabbri  
 **Affiliation:** Independent researcher, Modena, Italy  
 **ORCID:** https://orcid.org/0000-0002-9699-629X  
-**Correspondence:** Renato Fabbri (contact details to be supplied in the submission system)
+**Correspondence:** Renato Fabbri, renato.fabbri@gmail.com
 
 ## Abstract
 
@@ -72,7 +72,7 @@ SSTIM's release pipeline includes parsing, ontology consistency checking, shape 
 
 ## 5. Relationship to existing standards
 
-SSTIM does not replace general ontologies or research-data conventions. The **Ontology for Biomedical Investigations (OBI)** supports formal descriptions of investigation processes, roles, specimens, assays and data (Bandrowski et al., 2016). **BIDS** structures research datasets and metadata (Gorgolewski et al., 2016). **Hierarchical Event Descriptors (HED)** supports portable annotation of events, while **PROV-O** and the FAIR principles offer general provenance and data-reuse foundations (Moreau & Missier, 2013; Wilkinson et al., 2016).
+SSTIM does not replace general ontologies or research-data conventions. The **Ontology for Biomedical Investigations (OBI)** supports formal descriptions of investigation processes, roles, specimens, assays and data (Bandrowski et al., 2016). **BIDS** structures research datasets and metadata (Gorgolewski et al., 2016). **Hierarchical Event Descriptors (HED)** supports portable annotation of events (Robbins et al., 2021), while **W3C PROV** and the FAIR principles offer general provenance and data-reuse foundations (Moreau & Missier, 2013; Wilkinson et al., 2016).
 
 SSTIM's intended complementarity is more specific: it supplies reusable, parameterized concepts for *sensory stimuli, sensory-access routes, perceptual conditions, planned versus actual exposures, and evidence-qualified sensory claims*. One can describe an experiment in OBI, distribute a behavioral dataset through BIDS and annotate its events in HED while using SSTIM for stimulus- and exposure-specific meaning. This is an architectural proposal for semantic integration, not a claim that complete mappings to every standard have already been implemented.
 
@@ -114,16 +114,18 @@ Renato Fabbri: conceptualization, ontology architecture and development, methodo
 
 ## References
 
-Bandrowski, A., et al. (2016). The Ontology for Biomedical Investigations. *PLOS ONE, 11*(4), e0154556. https://doi.org/10.1371/journal.pone.0154556
+Bandrowski, A., Brinkman, R., Brochhausen, M., Brush, M. H., Bug, B., Chibucos, M. C., Clancy, K., Courtot, M., Derom, D., Dumontier, M., Fan, L., Fostel, J., Fragoso, G., Gibson, F., Gonzalez-Beltran, A., Haendel, M. A., He, Y., Heiskanen, M., Hernandez-Boussard, T., ... Zheng, J. (2016). The Ontology for Biomedical Investigations. *PLOS ONE, 11*(4), e0154556. https://doi.org/10.1371/journal.pone.0154556
 
-Duecker, K., et al. (2024). Challenges and approaches in the study of neural entrainment. *The Journal of Neuroscience, 44*(40). https://doi.org/10.1523/JNEUROSCI.1234-24.2024
+Duecker, K., Doelling, K. B., Breska, A., Coffey, E. B. J., Sivarao, D. V., & Zoefel, B. (2024). Challenges and approaches in the study of neural entrainment. *The Journal of Neuroscience, 44*(40), e1234242024. https://doi.org/10.1523/JNEUROSCI.1234-24.2024
 
 Fabbri, R. (2026). *SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology* (Version 0.21.0) [Software and ontology]. Zenodo. https://doi.org/10.5281/zenodo.23868027
 
-Gorgolewski, K. J., et al. (2016). The brain imaging data structure, a format for organizing and describing outputs of neuroimaging experiments. *Scientific Data, 3*, 160044. https://doi.org/10.1038/sdata.2016.44
+Gorgolewski, K. J., Auer, T., Calhoun, V. D., Craddock, R. C., Das, S., Duff, E. P., Flandin, G., Ghosh, S. S., Glatard, T., Halchenko, Y. O., Handwerker, D. A., Hanke, M., Keator, D., Li, X., Michael, Z., Maumet, C., Nichols, B. N., Nichols, T. E., Pellman, J., ... Poldrack, R. A. (2016). The brain imaging data structure, a format for organizing and describing outputs of neuroimaging experiments. *Scientific Data, 3*, 160044. https://doi.org/10.1038/sdata.2016.44
 
 Moreau, L., & Missier, P. (Eds.). (2013). *PROV-DM: The PROV data model*. W3C Recommendation. https://www.w3.org/TR/prov-dm/
 
+Robbins, K., Truong, D., Appelhoff, S., Delorme, A., & Makeig, S. (2021). Capturing the nature of events and event context using hierarchical event descriptors (HED). *NeuroImage, 245*, 118766. https://doi.org/10.1016/j.neuroimage.2021.118766
+
 SSTIM. (2026). *Sensory stimulation: Conceptual foundation* [Project documentation]. https://github.com/w3c-cg/sstim/blob/main/docs/concept/SENSORY_STIMULATION.md
 
-Wilkinson, M. D., et al. (2016). The FAIR Guiding Principles for scientific data management and stewardship. *Scientific Data, 3*, 160018. https://doi.org/10.1038/sdata.2016.18
+Wilkinson, M. D., Dumontier, M., Aalbersberg, I. J. J., Appleton, G., Axton, M., Baak, A., Blomberg, N., Boiten, J.-W., Bonino da Silva Santos, L., Bourne, P. E., Bouwman, J., Brookes, A. J., Clark, T., Crosas, M., Dillo, I., Dumon, O., Edmunds, S., Evelo, C. T., Finkers, R., ... Mons, B. (2016). The FAIR Guiding Principles for scientific data management and stewardship. *Scientific Data, 3*, 160018. https://doi.org/10.1038/sdata.2016.18
