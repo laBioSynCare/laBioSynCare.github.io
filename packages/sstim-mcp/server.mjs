@@ -8,7 +8,7 @@ import { createInterface } from 'node:readline'
 import { createConceptClient, DEFAULT_API_BASE } from './client.mjs'
 import { createContributionClient, KINDS } from './contribution.mjs'
 
-const info = { name: 'sstim-reference', version: '0.3.0' }
+const info = { name: 'sstim-reference', version: '0.3.1' }
 const MODERN = '2026-07-28'
 const legacyVersions = new Set(['2025-11-25', '2025-06-18', '2024-11-05'])
 const VERSION_META = 'io.modelcontextprotocol/protocolVersion'
@@ -43,7 +43,7 @@ const tools = [
       type: 'object', additionalProperties: false,
       properties: {
         query: { type: 'string', description: 'Search phrase, at least 2 characters' },
-        release: { type: 'string', description: 'Frozen release, for example 0.19.0; defaults to latest' },
+        release: { type: 'string', description: 'Frozen release, for example 0.21.0; defaults to latest' },
         kind: { type: 'string', enum: ['class', 'property', 'concept'] },
         limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 },
         includeDeprecated: { type: 'boolean', default: false },

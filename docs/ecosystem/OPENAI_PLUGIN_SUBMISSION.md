@@ -2,7 +2,7 @@
 
 Prepared 17 November 2026. **Remote MCP endpoint live and smoke-tested. ChatGPT plugin not yet submitted or approved.**
 
-Canonical source: `w3c-cg/sstim`. The existing local `@sstim/mcp@0.3.0` remains available over stdio; a separate **read-only** remote adapter at `services/sstim-mcp-remote/` provides four tools over Streamable HTTP for public users.
+Canonical source: `w3c-cg/sstim`. The existing local `@sstim/mcp@0.3.1` remains available over stdio; a separate **read-only** remote adapter at `services/sstim-mcp-remote/` provides four tools over Streamable HTTP for public users.
 
 ## Deploy the endpoint
 

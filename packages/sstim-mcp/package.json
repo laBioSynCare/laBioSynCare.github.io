@@ -1,6 +1,6 @@
 {
   "name": "@sstim/mcp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "mcpName": "io.github.w3c-cg/sstim",
   "description": "SSTIM living reference MCP for the senses, stimuli, perception, research, technology and reviewed community proposals.",
   "keywords": [

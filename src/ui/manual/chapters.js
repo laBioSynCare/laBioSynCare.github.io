@@ -111,10 +111,10 @@ export const MANUAL_CHAPTERS = [
     examples:[
       {title:'Install the MCP server in VS Code/Copilot',goal:'Make SSTIM terms available to your coding assistant with no SSTIM checkout.',
        steps:['Ensure Node.js 20+ and npx are installed.','Put the following JSON in your project’s .vscode/mcp.json, start the server from VS Code’s MCP command palette, then enable its tools in Copilot Agent.'],
-       language:'json',code:'{\n  "servers": {\n    "sstim": {\n      "type": "stdio",\n      "command": "npx",\n      "args": ["--yes", "@sstim/mcp@0.3.0"]\n    }\n  }\n}'},
+       language:'json',code:'{\n  "servers": {\n    "sstim": {\n      "type": "stdio",\n      "command": "npx",\n      "args": ["--yes", "@sstim/mcp@0.3.1"]\n    }\n  }\n}'},
       {title:'Install in Codex, Claude Code or Cursor',goal:'Reuse the same public package from another AI coding client.',
        steps:['For Codex (CLI and VS Code extension), append this to ~/.codex/config.toml.', 'Claude Code: use claude mcp add. Cursor: use .cursor/mcp.json with mcpServers instead of VS Code’s servers.'],
-       language:'toml',code:'[mcp_servers.sstim]\ncommand = "npx"\nargs = ["--yes", "@sstim/mcp@0.3.0"]',
+       language:'toml',code:'[mcp_servers.sstim]\ncommand = "npx"\nargs = ["--yes", "@sstim/mcp@0.3.1"]',
        links:[{label:'All client-specific configurations',href:'https://github.com/w3c-cg/sstim/tree/main/packages/sstim-mcp/examples'}]},
       {title:'Ask which vocabulary terms match your software model',goal:'Map parameter fields onto shared ontology identifiers, flagging gaps rather than inventing names.',
        steps:['Ask your agent to inspect an existing application schema or JSON document.', 'Have it search SSTIM and then retrieve exact term records; review its proposed mapping yourself.'],

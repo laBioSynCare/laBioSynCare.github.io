@@ -23,7 +23,7 @@ const packResult = output => {
 describe('SSTIM MCP standalone npm distribution', () => {
   it('aligns authorship, package ownership metadata, and registry identity', () => {
     expect(meta.name).toBe('@sstim/mcp')
-    expect(meta.version).toBe('0.3.0')
+    expect(meta.version).toBe('0.3.1')
     expect(meta.mcpName).toBe('io.github.w3c-cg/sstim')
     expect(meta.publishConfig.access).toBe('public')
     expect(meta.author.name).toBe('SSTIM W3C Community Group')

@@ -178,7 +178,7 @@ dual-typed OWL individuals and SKOS concepts. See the
 
 ## SSTIM MCP: installable reference for AI agents
 
-**Published:** [`@sstim/mcp@0.3.0`](https://www.npmjs.com/package/@sstim/mcp),
+**Published:** [`@sstim/mcp@0.3.1`](https://www.npmjs.com/package/@sstim/mcp),
 official MCP Registry identity `io.github.w3c-cg/sstim`
 ([canonical OIDC registration](https://github.com/w3c-cg/sstim/actions/workflows/publish-mcp-registry.yml)).
 The local **stdio** MCP adapter exposes four read-only knowledge tools: list
@@ -199,14 +199,14 @@ to run the published package with Node.js 20+.
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.3.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.1"]
     }
   }
 }
 ```
 
 For Codex use `[mcp_servers.sstim]` with `command = "npx"` and
-`args = ["--yes", "@sstim/mcp@0.3.0"]`.
+`args = ["--yes", "@sstim/mcp@0.3.1"]`.
 [Installation instructions for Codex, Claude Code, Gemini CLI, Cursor and
 Neovim](packages/sstim-mcp/README.md) include the appropriate client-specific
 configuration.

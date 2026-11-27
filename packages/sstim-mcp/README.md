@@ -1,13 +1,15 @@
 # SSTIM MCP: senses, stimuli, perception and research
 
-**Status:** version 0.3.0 adds an explicitly authorized, GitHub-backed
-contribution workflow to the read-only knowledge tools. It supports the
-**current MCP `2026-07-28` stateless protocol** and legacy
+**Status:** since version 0.3.0, an explicitly authorized, GitHub-backed
+contribution workflow accompanies the read-only knowledge tools. The server
+supports the **current MCP `2026-07-28` stateless protocol** and legacy
 initialization-based clients (`2025-11-25`, `2025-06-18`, `2024-11-05`).
 
 The adapter retrieves frozen SSTIM release data from the
-[Concept Reference API](../../docs/technical/CONCEPT_REFERENCE_API.md). It is
-not an ontology write interface or hosted remote MCP endpoint.
+[Concept Reference API](../../docs/technical/CONCEPT_REFERENCE_API.md). It runs
+locally over stdio and is not an ontology write interface. A separately hosted,
+read-only endpoint is described under
+[Protocol versions and constraints](#protocol-versions-and-constraints).
 The four knowledge tools remain available without credentials.
 Four additional proposal tools can draft suggestions, browse GitHub review issues,
 and, **only when an authorized operator has configured an Issues-write token and
@@ -28,20 +30,20 @@ Community Group work is not a W3C Recommendation or a W3C-endorsed product.
 
 ### Install from npm (published)
 
-**`@sstim/mcp@0.3.0` is published on npm.** It is listed as
+**`@sstim/mcp@0.3.1` is published on npm.** It is listed as
 `io.github.w3c-cg/sstim` in the official
 [MCP Registry](https://registry.modelcontextprotocol.io/), registered by
 [the canonical W3C Community Group repository via OIDC](https://github.com/w3c-cg/sstim/actions/workflows/publish-mcp-registry.yml).
 
 With Node.js 20+ and a compatible stdio MCP client, set **command** `npx`
-and **arguments** `["--yes", "@sstim/mcp@0.3.0"]`. The server needs no
+and **arguments** `["--yes", "@sstim/mcp@0.3.1"]`. The server needs no
 checkout or API token. For a smoke test, run it outside
 `packages/sstim-mcp/`: npm may resolve the local package there instead of
 the published executable.
 
 ```bash
 cd /tmp
-npx --yes @sstim/mcp@0.3.0
+npx --yes @sstim/mcp@0.3.1
 ```
 
 The command waits for protocol messages; silence is expected until the
@@ -84,12 +86,12 @@ ordinary reasoning and project access with *read-only released SSTIM data*:
 |---|---|---|
 | Code/data schema alignment | "Inspect my session JSON and map frequency, technique, channels and session fields to SSTIM" | Canonical term IRIs and module/release provenance; **not** an automatically validated mapping |
 | Research terminology review | "Compare meanings of binaural and isochronous techniques without conflating stimulation with EEG bands" | Definitions and related concept links |
-| Version migration | "Retrieve this exact IRI in 0.18.0 and 0.19.0; report asserted differences" | Version-pinned details, deprecation and mappings |
+| Version migration | "Retrieve this exact IRI in 0.20.0 and 0.21.0; report asserted differences" | Version-pinned details, deprecation and mappings |
 | Cross-ontology interoperability | "List external alignments for this term, including the precise SKOS relation" | Mapped external IRIs and relation strengths |
 | Codebase audit | "Find fields in my code matching published SSTIM properties; flag unknown ones" | Stable identifiers; human review of inferred matches |
 | Write scientific documentation | "Explain these terms with source references; distinguish evidence from labels" | Released definitions, source module and hashes |
 | Correct the standard | "Find this term or gap and prepare a link for me to submit a correction" | A user-reviewed Contribution Bridge link, **not a submission** |
-| Repeatable research | "Use only release 0.19.0 for all SSTIM terms cited in this protocol" | Release-qualified records for reproducibility |
+| Repeatable research | "Use only release 0.21.0 for all SSTIM terms cited in this protocol" | Release-qualified records for reproducibility |
 
 These MCP tools do **not** perform automatic SHACL validation,
 execute a stimulation protocol, diagnose anything, or modify the ontology.
@@ -157,7 +159,7 @@ Create or update `.vscode/mcp.json` in **your project** using the
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.3.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.1"]
     }
   }
 }
@@ -181,7 +183,7 @@ project-scoped `.codex/config.toml`). Append the contents of
 ```toml
 [mcp_servers.sstim]
 command = "npx"
-args = ["--yes", "@sstim/mcp@0.3.0"]
+args = ["--yes", "@sstim/mcp@0.3.1"]
 ```
 
 Or configure the server via the Codex IDE extension:
@@ -196,7 +198,7 @@ Reference: [Codex MCP configuration](https://developers.openai.com/codex/mcp).
 Run in a terminal (using the same Claude Code installation as your extension):
 
 ```bash
-claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.3.0
+claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.3.1
 claude mcp get sstim
 ```
 
@@ -218,7 +220,7 @@ Add to your user `~/.gemini/settings.json` or project
   "mcpServers": {
     "sstim": {
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.3.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.1"]
     }
   }
 }
@@ -228,7 +230,7 @@ See [`examples/gemini.settings.json`](examples/gemini.settings.json).
 Alternatively use:
 
 ```bash
-gemini mcp add -s user sstim npx --yes @sstim/mcp@0.3.0
+gemini mcp add -s user sstim npx --yes @sstim/mcp@0.3.1
 ```
 
 Open Gemini CLI and use **/mcp** to inspect connectivity and exposed tools.
@@ -248,7 +250,7 @@ with the contents of [`examples/cursor.mcp.json`](examples/cursor.mcp.json):
   "mcpServers": {
     "sstim": {
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.3.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.1"]
     }
   }
 }
@@ -270,7 +272,7 @@ require("codecompanion").setup({
   mcp = {
     servers = {
       sstim = {
-        cmd = { "npx", "--yes", "@sstim/mcp@0.3.0" },
+        cmd = { "npx", "--yes", "@sstim/mcp@0.3.1" },
       },
     },
     opts = {
@@ -296,7 +298,7 @@ After configuring your chosen client, ask:
 
 > Use the SSTIM MCP tools to list the current released version, search for
 > “binaural”, and explain one matched concept using its canonical IRI and
-> source provenance. Compare the results for v0.18.0 and v0.19.0 if applicable.
+> source provenance. Compare the results for v0.20.0 and v0.21.0 if applicable.
 
 The search tools may be automatically chosen by the agent, but whether a tool
 is called depends on client settings and model behavior. You can also inspect
@@ -331,8 +333,11 @@ with every named editor release.
   real installed clients, including some Neovim plugins.
 
 The modern revision does **not** mean the server must be remote: stdio remains
-a defined transport. There is currently **no Streamable HTTP endpoint** for
-SSTIM MCP; remote ChatGPT connectors would require a separate deployment.
+a defined transport, and this package uses it. For clients that need a remote
+server, a separately deployed, read-only Streamable HTTP endpoint at
+`https://sstim-mcp.netlify.app/mcp` offers the four knowledge tools and none of
+the proposal tools. Its source is
+[`services/sstim-mcp-remote`](../../services/sstim-mcp-remote/).
 
 Protocol references:
 [MCP 2026-07-28 versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning),
@@ -340,9 +345,10 @@ Protocol references:
 [discovery](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/server/discover.mdx).
 
 The latest frozen release comes from API discovery, not from a hard-coded
-runtime constant. At the time of this update it is **v0.19.0**; the separately
-maintained development line is **v0.20.0-dev**. For repeatable research use an
-explicit frozen release in tool arguments.
+runtime constant, so `sstim_list_releases` always names the current one. When
+this version was published it was **v0.21.0**, with development continuing
+separately as **v0.22.0-dev**. For repeatable research use an explicit frozen
+release in tool arguments.
 
 **Operational limits:** read-only ontology catalog; up to 20 search results;
 no hosted `?q=` search; no live ontology inference,

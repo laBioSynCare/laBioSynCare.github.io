@@ -34,7 +34,7 @@ listing or accepted pull request.
 - **Canonical repository:** [w3c-cg/sstim](https://github.com/w3c-cg/sstim).
 - **Acknowledgement:** [BioSynCare](https://biosyncare.com), for contributions
   to and support of SSTIM's ecosystem.
-- **Published npm package:** [@sstim/mcp@0.3.0](https://www.npmjs.com/package/@sstim/mcp).
+- **Published npm package:** [@sstim/mcp@0.3.1](https://www.npmjs.com/package/@sstim/mcp).
 - **Official registry identity:** `io.github.w3c-cg/sstim`.
 - **Transport:** local stdio, not a hosted HTTP connector.
 - **Licensing:** Apache-2.0 for the MCP implementation. The underlying
@@ -50,7 +50,7 @@ BioSynCare as the owner of the standard or the registry namespace.
 package's own source directory:
 
 ```bash
-npx --yes @sstim/mcp@0.3.0
+npx --yes @sstim/mcp@0.3.1
 ```
 
 The command is a stdio service and waits for client requests. To configure
@@ -62,7 +62,7 @@ VS Code/Copilot, set `.vscode/mcp.json`:
     "sstim": {
       "type": "stdio",
       "command": "npx",
-      "args": ["--yes", "@sstim/mcp@0.3.0"]
+      "args": ["--yes", "@sstim/mcp@0.3.1"]
     }
   }
 }
@@ -90,7 +90,7 @@ and provenance.
 > local stdio MCP with modern and legacy protocols.
 > Authored and stewarded by the SSTIM W3C Community Group. With thanks to
 > BioSynCare (https://biosyncare.com). Install with
-> `npx --yes @sstim/mcp@0.3.0`.
+> `npx --yes @sstim/mcp@0.3.1`.
 > Source: https://github.com/w3c-cg/sstim.
 
 **Suggested keywords:** sensory stimulation, neuroscience, auditory,
@@ -119,7 +119,7 @@ text.
    in through the site's GitHub login if requested.
 2. Supply `https://github.com/w3c-cg/sstim` as the source repository.
    For a monorepo, identify `packages/sstim-mcp/` and npm
-   `@sstim/mcp@0.3.0` if the submission UI provides these fields.
+   `@sstim/mcp@0.3.1` if the submission UI provides these fields.
 3. Use the title and description above. The root
    [`glama.json`](../../glama.json) authorizes GitHub user `ttm` to
    **claim/manage the listing**, not to replace the Community Group as
@@ -145,7 +145,7 @@ category of `README.md`, and open a PR. A candidate listing line (replace
 `REAL_GLAMA_PATH` only with the confirmed actual path) is:
 
 ```markdown
-- [w3c-cg/sstim](https://github.com/w3c-cg/sstim) 📇 ☁️ 🍎 🪟 🐧 - Read-only SSTIM ontology reference MCP server for released sensory-stimulation terms, mappings and provenance; install with `npx -y @sstim/mcp@0.3.0`. [![SSTIM MCP score](https://glama.ai/mcp/servers/REAL_GLAMA_PATH/badges/score.svg)](https://glama.ai/mcp/servers/REAL_GLAMA_PATH)
+- [w3c-cg/sstim](https://github.com/w3c-cg/sstim) 📇 ☁️ 🍎 🪟 🐧 - Read-only SSTIM ontology reference MCP server for released sensory-stimulation terms, mappings and provenance; install with `npx -y @sstim/mcp@0.3.1`. [![SSTIM MCP score](https://glama.ai/mcp/servers/REAL_GLAMA_PATH/badges/score.svg)](https://glama.ai/mcp/servers/REAL_GLAMA_PATH)
 ```
 
 `☁️` is appropriate because the local client reads an online concept
