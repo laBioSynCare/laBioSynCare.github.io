@@ -1,8 +1,8 @@
-# SSTIM remote ChatGPT plugin (submission-ready)
+# SSTIM remote ChatGPT plugin (published)
 
-This standalone portable plugin is prepared for OpenAI's **With MCP** ZIP-upload submission process. Its transport is the read-only HTTPS endpoint deployed from `services/sstim-mcp-remote/`.
+This standalone portable plugin is OpenAI's **With MCP** ZIP upload of SSTIM Reference. Its transport is the read-only HTTPS endpoint deployed from `services/sstim-mcp-remote/`.
 
-**Status:** public read-only MCP endpoint live and verified via GitHub Actions; packaged plugin and review materials prepared. **Not yet uploaded to, submitted to, or approved by OpenAI.** The existing `plugins/chatgpt/` remains a local stdio package and is not overwritten.
+**Status:** published. Version 0.1.0 is in ChatGPT's plugin directory as SSTIM Reference (seen 2026-11-27). The upload is this directory without this README: `plugin.json`, `mcp.json`, `assets/` and `skills/`, byte for byte. The [submission record](../../docs/ecosystem/OPENAI_PLUGIN_SUBMISSION.md#what-openai-holds-version-010) gives the uploaded archive's hash and how to rebuild it. The existing `plugins/chatgpt/` remains a local stdio package and is not overwritten.
 
 ## Prerequisites
 

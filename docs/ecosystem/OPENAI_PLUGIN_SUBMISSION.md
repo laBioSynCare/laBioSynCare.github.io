@@ -7,6 +7,37 @@ ChatGPT's plugin directory finds it (search "sstim"; publisher Renato Fabbri,
 "Sensory science reference"). Both were seen from the publisher's own accounts;
 visibility to other accounts was not checked separately.
 
+## What OpenAI holds (version 0.1.0)
+
+The live listing was uploaded on 17 November 2026 as
+`SSTIM_OpenAI_Plugin_Individual_Publisher_v2.zip` (3,963 bytes, sha256
+`39e94c0255a665bce6029b7f62854976b46a5e0614821e2f8fc9b6a73f357284`), built at
+22:18 UTC from commit `360c57a`. It holds four files, `plugin.json`, `mcp.json`,
+`assets/icon.svg` and `skills/sstim-sensory-reference/SKILL.md`, and each is
+byte-identical to its copy in [`plugins/chatgpt-remote/`](../../plugins/chatgpt-remote/);
+only that directory's README is left out. Until 2026-11-27 the repository's
+icon kept the Workbench icon's generator comment where the upload has a
+one-line attribution; the drawing was always the same.
+
+It was the second upload. The first, built at 22:07 UTC from `ffc1cb8`, named
+the Community Group as developer with the category "Education"; `360c57a`
+replaced them with "Education & Research" and the verified individual's name.
+ChatGPT's listing shows the developer "Renato Fabbri", which only the second
+upload carries.
+
+To rebuild the upload from the repository, from its root:
+
+```bash
+mkdir -p dist
+(cd plugins/chatgpt-remote && zip -X -D -r ../../dist/sstim-reference-chatgpt.zip plugin.json mcp.json assets skills)
+```
+
+The archive's own bytes vary with timestamps and zip version, so compare the
+four files inside, not the archive's hash. On 2026-11-27 a rebuild matched the
+uploaded files exactly. Redeploying the server behind
+`https://sstim-mcp.netlify.app/mcp` without changing its tools, as that day's
+0.3.1 update did, leaves this package unchanged.
+
 Canonical source: `w3c-cg/sstim`. The existing local `@sstim/mcp@0.3.1` remains available over stdio; a separate **read-only** remote adapter at `services/sstim-mcp-remote/` provides four tools over Streamable HTTP for public users.
 
 ## Deploy the endpoint
