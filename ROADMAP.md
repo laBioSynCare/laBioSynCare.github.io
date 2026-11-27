@@ -224,7 +224,9 @@ Five themes, none of them in the original phases:
   [0066](docs/decisions/0066-eight-things-the-full-texts-asked-for.md)).
   Client packages (`sstim` on PyPI, `@sstim/core` on npm) and an MCP server
   (`@sstim/mcp`), described in
-  [`ADOPTION.md`](docs/ecosystem/ADOPTION.md); a reviewed contribution path for
+  [`ADOPTION.md`](docs/ecosystem/ADOPTION.md), with a hosted read-only MCP
+  endpoint and plugins for ChatGPT and Claude
+  ([`MCP_DISTRIBUTION.md`](docs/ecosystem/MCP_DISTRIBUTION.md)); a reviewed contribution path for
   people and AI agents (`/agents/`, `/contribute/`); and a stakeholder
   directory of the field
   ([ADR 0062](docs/decisions/0062-sensory-stimulation-ecosystem-contributor.md)).

@@ -9,6 +9,34 @@ Anthropic reviewer." Anthropic's official marketplace
 had no SSTIM entry the same day. Do not confuse this with the SSTIM plugin
 already listed in SSTIM's own Claude Code marketplace.
 
+## What Anthropic scanned
+
+Anthropic holds no uploaded file. The portal reads
+[`plugins/claude/sstim-reference/`](../../plugins/claude/sstim-reference/)
+from `w3c-cg/sstim` and shows only a scan date. The folder has a single commit,
+`6814a3c`, which GitHub's activity log shows reaching `w3c-cg` at 23:05 UTC on
+17 November 2026. Its contents were identical at every state of `main` from
+then through the 19 November scan, with no force pushes, so the scan read the
+folder as it is now: `.claude-plugin/plugin.json` (`sstim-reference` 0.1.0),
+`.mcp.json` (the hosted endpoint), `README.md`, `assets/icon-192.png` and
+`skills/sstim-sensory-reference/SKILL.md`. Checked 27 November 2026.
+
+Leave the folder unchanged until the review ends: if it changes, the reviewer
+may see a version that did not pass the scan. After the decision, update this
+record and the plugin README's last line, which calls the plugin a
+directory-submission candidate.
+
+To repeat the check:
+
+```bash
+git log --format='%h %cI %s' -- plugins/claude/sstim-reference
+gh api 'repos/w3c-cg/sstim/activity?ref=refs/heads/main' \
+  --jq '.[] | [.timestamp, .activity_type, .before[0:7], .after[0:7]] | @tsv'
+```
+
+Then diff the folder at each `after` commit in the window against the current
+one.
+
 ## Recommended distribution
 
 **Primary: Claude Plugin Directory**, public GitHub source with remote MCP + skill. **CURRENT official submission location (2026-11-18): [claude.ai/directory/manage](https://claude.ai/directory/manage)**. Anthropic moved new submissions away from Console; `platform.claude.com/plugins/submit` now shows a banner saying Console can no longer create or submit. The new developer portal is open to users on paid Claude plans (Anthropic 2026-09-25 announcement). Select **Plugin bundle** and submit this public GitHub repository `https://github.com/w3c-cg/sstim` with relative path `plugins/claude/sstim-reference` when asked. Do not submit the OpenAI plugin ZIP: Claude's source is the directory `plugins/claude/sstim-reference/` in GitHub, with `.claude-plugin/plugin.json`, `.mcp.json`, `skills/`, and `assets/`.

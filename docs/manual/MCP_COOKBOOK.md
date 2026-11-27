@@ -3,16 +3,16 @@
 The released [SSTIM MCP server](../../packages/sstim-mcp/README.md) gives
 compatible coding assistants *read-only* access to the
 [Concept Reference API](../technical/CONCEPT_REFERENCE_API.md). The server
-is published as [\`@sstim/mcp@0.3.1\`](https://www.npmjs.com/package/@sstim/mcp)
-and registered under \`io.github.w3c-cg/sstim\`.
+is published as [`@sstim/mcp@0.3.1`](https://www.npmjs.com/package/@sstim/mcp)
+and registered under `io.github.w3c-cg/sstim`.
 
 **User-facing tutorial:** [SSTIM Manual: MCP](https://w3c-cg.github.io/sstim/manual/mcp/).
 
 ## Install in a coding assistant
 
-**VS Code Copilot Agent**, \`.vscode/mcp.json\`:
+**VS Code Copilot Agent**, `.vscode/mcp.json`:
 
-\`\`\`json
+```json
 {
   "servers": {
     "sstim": {
@@ -22,26 +22,45 @@ and registered under \`io.github.w3c-cg/sstim\`.
     }
   }
 }
-\`\`\`
+```
 
-**Codex extension or CLI**, \`~/.codex/config.toml\`:
+**Codex extension or CLI**, `~/.codex/config.toml`:
 
-\`\`\`toml
+```toml
 [mcp_servers.sstim]
 command = "npx"
 args = ["--yes", "@sstim/mcp@0.3.1"]
-\`\`\`
+```
 
 **Claude Code** CLI or extension:
 
-\`\`\`bash
+```bash
 claude mcp add --transport stdio --scope user sstim -- npx --yes @sstim/mcp@0.3.1
-\`\`\`
+```
 
 Use the [client-specific setup](../../packages/sstim-mcp/README.md) for
 Gemini CLI, Cursor and Neovim. Node.js 20+ and network access to SSTIM's
 public release reference API are required. The package has no SSTIM-checkout
 prerequisite.
+
+**No install, for clients that accept a remote MCP server:** use the hosted,
+read-only endpoint `https://sstim-mcp.netlify.app/mcp` (Streamable HTTP). It
+serves the four knowledge tools and none of the proposal tools. In VS Code:
+
+```json
+{
+  "servers": {
+    "sstim": {
+      "type": "http",
+      "url": "https://sstim-mcp.netlify.app/mcp"
+    }
+  }
+}
+```
+
+In Claude Code, `claude mcp add --transport http sstim https://sstim-mcp.netlify.app/mcp`.
+In ChatGPT, add **SSTIM Reference** from the plugin directory; in Claude, add
+the URL as a custom connector. See [the plugins](../../plugins/README.md).
 
 ## Eight useful agent tasks
 
@@ -52,11 +71,11 @@ enabled, not HTTP query syntax.
 
 ### 1. Map an application's JSON or database fields
 
-> Inspect my stimulus/session JSON schema. Call \`sstim_search_concepts\`
-> and \`sstim_get_concept\` to find exact released SSTIM classes or properties
+> Inspect my stimulus/session JSON schema. Call `sstim_search_concepts`
+> and `sstim_get_concept` to find exact released SSTIM classes or properties
 > for the signal, carrier, modulation, channel, exposure and session fields.
 > Return a table of existing field → SSTIM IRI → source release/module →
-> rationale → open questions. Do not mint new \`sstim:\` IRIs.
+> rationale → open questions. Do not mint new `sstim:` IRIs.
 
 **Use for:** planning a semantic interop layer or research dataset export.
 The mapping is a **proposal** that still needs manual review and SHACL checks.
@@ -72,8 +91,8 @@ The mapping is a **proposal** that still needs manual review and SHACL checks.
 
 ### 3. Compare versions before a migration
 
-> Look up the same canonical term IRI in SSTIM releases 0.18.0 and 0.19.0
-> with \`sstim_get_concept\`. Compare definitions, labels, relations, external
+> Look up the same canonical term IRI in SSTIM releases 0.20.0 and 0.21.0
+> with `sstim_get_concept`. Compare definitions, labels, relations, external
 > mappings, deprecation flags and source hashes. Describe only differences
 > supported by the returned records. Flag a missing term explicitly.
 
@@ -83,7 +102,7 @@ not the same as the npm package version.
 ### 4. Align with other controlled vocabularies
 
 > For the SSTIM term(s) relevant to sensory stimulation, retrieve external
-> mappings. Preserve \`exactMatch\`, \`closeMatch\`, \`broadMatch\` and other
+> mappings. Preserve `exactMatch`, `closeMatch`, `broadMatch` and other
 > relation types. Return target IRIs and provenance; do not assert that a
 > mapping proves scientific, clinical or regulatory equivalence.
 
@@ -92,8 +111,8 @@ not the same as the npm package version.
 ### 5. Audit a source codebase
 
 > Search this repository's stimulation parameters and names. Find potential
-> SSTIM matches with \`sstim_search_concepts\` and verify each match with
-> \`sstim_get_concept\`. Show source lines, canonical IRIs, mismatched units,
+> SSTIM matches with `sstim_search_concepts` and verify each match with
+> `sstim_get_concept`. Show source lines, canonical IRIs, mismatched units,
 > module dependencies, and fields with no verified match. Ask before edits.
 
 **Use for:** technical debt reduction and interoperable naming.
@@ -110,7 +129,7 @@ not the same as the npm package version.
 ### 7. Propose a correction without publishing it
 
 > Determine if SSTIM already defines my proposed concept. If a correction
-> is justified, use \`sstim_prepare_feedback\` for the exact term and give me
+> is justified, use `sstim_prepare_feedback` for the exact term and give me
 > the reviewable Contribution Bridge link and a clear issue draft. Do not
 > open, submit or automatically publish any issue.
 
@@ -119,10 +138,10 @@ the link**, with the public identifier and term label, not an issue or a write.
 
 ### 8. Make a reproducible, release-pinned agent plan
 
-> For this sensory-stimulation dataset, only use SSTIM version 0.19.0.
+> For this sensory-stimulation dataset, only use SSTIM version 0.21.0.
 > Search for relevant terms, cite full IRIs and source modules, note what is
 > absent, and outline how I could validate the exported Turtle with Python
-> \`sstim validate --profile full --version 0.19.0\`. Do not claim that
+> `sstim validate --profile full --version 0.21.0`. Do not claim that
 > calling MCP performs the validation.
 
 **Use for:** integrating AI assistance with actual programmatic SHACL
@@ -132,17 +151,17 @@ validation and traceable data provenance.
 
 | Tool | Actual capability |
 |---|---|
-| \`sstim_list_releases\` | Discover supported frozen SSTIM ontology releases |
-| \`sstim_search_concepts\` | Search indexed released terms with query/kind/limit |
-| \`sstim_get_concept\` | Fetch exact IRI/CURIE term record and source provenance |
-| \`sstim_prepare_feedback\` | Produce a user-reviewable Contribution Bridge link |
+| `sstim_list_releases` | Discover supported frozen SSTIM ontology releases |
+| `sstim_search_concepts` | Search indexed released terms with query/kind/limit |
+| `sstim_get_concept` | Fetch exact IRI/CURIE term record and source provenance |
+| `sstim_prepare_feedback` | Produce a user-reviewable Contribution Bridge link |
 
 The MCP server does **not** perform SPARQL queries, validate datasets against
 SHACL, generate/publish final research protocols, write to SSTIM, run an
 audio/visual stimulation engine, or prove outcomes. For actual validation use
-[\`sstim\` Python](../../packages/sstim/README.md), which performs complete
-Full-profile SHACL checks, or [\`@sstim/core\` JavaScript](../../packages/sstim-js/README.md),
-whose Full-profile \`sh:sparql\` result is **PARTIAL**. For a working
+[`sstim` Python](../../packages/sstim/README.md), which performs complete
+Full-profile SHACL checks, or [`@sstim/core` JavaScript](../../packages/sstim-js/README.md),
+whose Full-profile `sh:sparql` result is **PARTIAL**. For a working
 reference environment, use [SSTIM Workbench](https://w3c-cg.github.io/sstim/).
 
 **Project author/steward:** [SSTIM W3C Community Group](https://www.w3.org/community/sstim/).

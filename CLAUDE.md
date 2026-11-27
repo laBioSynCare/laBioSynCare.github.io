@@ -751,6 +751,7 @@ the thing lives:
 | Ontology sources and design | [`static/ontology/README.md`](static/ontology/README.md) |
 | Live ontology module inventory | `static/ontology/manifest.json` (machine-readable, authoritative) |
 | **Does SSTIM already have this term?** | [`docs/ontology/TERM_INDEX.md`](docs/ontology/TERM_INDEX.md) — generated, CI-checked. **Grep it before saying a term is missing.** 18 modules is more than anyone searches reliably by hand |
+| Published packages, hosted MCP endpoint and agent plugins | [`packages/README.md`](packages/README.md), [`plugins/README.md`](plugins/README.md), [`docs/ecosystem/MCP_DISTRIBUTION.md`](docs/ecosystem/MCP_DISTRIBUTION.md) |
 | Tracked work | [`TODO.md`](TODO.md), [`ROADMAP.md`](ROADMAP.md) |
 
 The paths that carry invariants, and are therefore worth naming here:

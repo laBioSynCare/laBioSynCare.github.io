@@ -1,5 +1,25 @@
 # SSTIM MCP distribution and directory submissions
 
+## Where it is available
+
+SSTIM's MCP server reaches users through these channels. The packages
+themselves, their release history and the release procedure are in
+[`packages/README.md`](../../packages/README.md); the plugin folders are in
+[`plugins/README.md`](../../plugins/README.md).
+
+| Channel | What users get | State, checked 27 November 2026 | Details |
+|---|---|---|---|
+| npm, [`@sstim/mcp`](https://www.npmjs.com/package/@sstim/mcp) | Stdio server, eight tools | 0.3.1 is `latest` | [below](#npm-and-the-official-mcp-registry) |
+| [Official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.w3c-cg/sstim), `io.github.w3c-cg/sstim` | The npm package over stdio; the entry lists no remote | 0.3.1 is the latest version | [below](#npm-and-the-official-mcp-registry) |
+| Hosted endpoint, `https://sstim-mcp.netlify.app/mcp` | Streamable HTTP, four knowledge tools, nothing to install, no account | Live, reports 0.3.1 | [`services/sstim-mcp-remote`](../../services/sstim-mcp-remote/README.md) |
+| ChatGPT plugin directory, SSTIM Reference | The hosted endpoint plus a skill | Published, plugin version 0.1.0 | [OpenAI record](OPENAI_PLUGIN_SUBMISSION.md) |
+| Anthropic plugin directory, SSTIM Reference | The hosted endpoint plus a skill | Scan passed 19 November; waiting for an Anthropic reviewer | [Anthropic record](ANTHROPIC_PLUGIN_SUBMISSION.md) |
+| This repository's Claude Code marketplace | Both Claude plugins, hosted or stdio | Installable | [`plugins/`](../../plugins/README.md) |
+| mcprush.com | A listing for this repository | Claim filed 13 October; no decision recorded | [below](#mcprushcom-claim-pending) |
+| Glama, Awesome MCP Servers, MCP.so | | Not submitted | [below](#community-directory-publishing) |
+
+## npm and the official MCP Registry
+
 **Verified publication state (27 November 2026):** `@sstim/mcp@0.3.1` is
 `latest` on npm, and `io.github.w3c-cg/sstim` 0.3.1 is the latest version in
 the **official MCP Registry**, published by
@@ -32,14 +52,10 @@ cannot be read from here, because `npm trust list` answers 403 to a token that
 bypasses 2FA. The same commit (`4e26a6f`) was then published with the
 maintainer's local granular token, as 0.2.0 was, and its tarball shasum
 (`97111d7d…`) matched the one CI had tested. 0.3.0 therefore carries no
-provenance attestation. Before the next release, add the trusted publisher in
-the `@sstim/mcp` package settings on npmjs.com: GitHub Actions, organization
+provenance attestation. 0.3.1 went out the same way, because the trusted
+publisher was still not configured. Before the next release, add it in the
+`@sstim/mcp` package settings on npmjs.com: GitHub Actions, organization
 `w3c-cg`, repository `sstim`, workflow `publish-mcp-npm.yml`.
-
-**Not yet verified/submitted:** Glama, Awesome MCP Servers, MCP.so and other
-community directories. Public registry publication does not itself prove a
-separate directory entry exists. Do not mark them complete without a live
-listing or accepted pull request.
 
 ## Project ownership and attribution
 
@@ -49,7 +65,9 @@ listing or accepted pull request.
   to and support of SSTIM's ecosystem.
 - **Published npm package:** [@sstim/mcp@0.3.1](https://www.npmjs.com/package/@sstim/mcp).
 - **Official registry identity:** `io.github.w3c-cg/sstim`.
-- **Transport:** local stdio, not a hosted HTTP connector.
+- **Transport:** local stdio. The npm package and the registry entry carry no
+  hosted connector; the separate hosted endpoint is listed
+  [above](#where-it-is-available).
 - **Licensing:** Apache-2.0 for the MCP implementation. The underlying
   ontology term content has its separately documented attribution and license.
 
@@ -126,6 +144,21 @@ text.
 
 ## Community directory publishing
 
+**Not yet submitted:** Glama, Awesome MCP Servers, MCP.so and other community
+directories. Public registry publication does not itself prove a separate
+directory entry exists. Do not mark them complete without a live listing or
+accepted pull request.
+
+### mcprush.com (claim pending)
+
+On 13 October 2026 the repository committed
+[`.well-known/mcprush.com-claim.txt`](../../.well-known/mcprush.com-claim.txt)
+(`4c459eb`) to claim mcprush's listing "SSTIM MCP: Sensory Stimulation
+Reference" for `w3c-cg/sstim`. mcprush announces its decision by email, and no
+decision is recorded here. Keep the file until the decision arrives, then
+delete it. The site answers scripted requests with a challenge page, so the
+listing can only be checked in a browser.
+
 ### Glama (first)
 
 1. Open [Glama: Add MCP Server](https://glama.ai/mcp/servers/add) and sign
@@ -193,8 +226,10 @@ the repository's protected, manually triggered
 on `w3c-cg/sstim` main. It authenticates using GitHub Actions OIDC,
 without npm tokens or personal owner credentials. First synchronize
 the exact same commit to both SSTIM remotes using `make push`.
-The 0.3.0 registry publication has already succeeded; do **not**
-rerun publishing merely to list the same artifact elsewhere.
+The 0.3.1 registry publication has already succeeded; do **not**
+rerun publishing merely to list the same artifact elsewhere. The whole release
+order, including the hosted adapter, is in
+[`packages/README.md`](../../packages/README.md#release).
 
 Before any npm release, run `npm publish --dry-run` in `packages/sstim-mcp/`
 and read its warnings. npm 11.21 removes a bin declared as `./server.mjs` at

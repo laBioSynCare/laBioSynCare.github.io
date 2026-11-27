@@ -14,6 +14,9 @@ does an ontology entry prove a therapeutic outcome.
 
 ## Packages
 
+Five plugin folders. [plugins/README.md](../../plugins/README.md) gives each
+one's host, MCP transport, distribution channel and current state.
+
 - Portable Agent Plugins 1.0 directory: plugins/sstim/
   Includes a sensory-reference skill and stdio MCP for VS Code and other
   compatible Agent Plugins hosts.
@@ -23,15 +26,19 @@ does an ontology entry prove a therapeutic outcome.
   Includes native .claude-plugin manifest, HTTPS Streamable HTTP MCP config, icon,
   research skill and public directory submission materials. No GitHub writes.
   The root .claude-plugin/marketplace.json exposes both options.
-- ChatGPT: plugins/chatgpt/
+- ChatGPT public read-only: plugins/chatgpt-remote/
+  The package published in ChatGPT's plugin directory as SSTIM Reference: the
+  hosted endpoint's four read-only tools plus a research skill. No GitHub
+  writes. This is the ChatGPT route for web and mobile.
+- ChatGPT local: plugins/chatgpt/
   Portable skill plus optional local stdio MCP. Compatible ChatGPT Desktop
   installations may run the local MCP after required permissions and setup.
-  This is not yet a remote ChatGPT MCP app; web/mobile access requires a
-  separately hosted, accessible HTTPS endpoint.
 
-All configured MCP commands use npx --yes @sstim/mcp@latest, which has
-resolved 0.3.0 with its proposal tools since 2026-10-11. Submission stays
-disabled unless the operator opts in, as described below.
+The three local folders run npx --yes @sstim/mcp@latest, which resolves 0.3.1
+since 2026-11-27 (0.3.0, with the same eight tools, from 2026-10-11).
+Submission stays disabled unless the operator opts in, as described below.
+The two public folders use https://sstim-mcp.netlify.app/mcp, which has no
+proposal tools.
 
 ## Local development
 
@@ -55,35 +62,42 @@ No automatic evidence acceptance or human-review bypass exists.
 Claude Code with a compatible version may use:
   claude plugin marketplace add w3c-cg/sstim
   claude plugin install sstim-sensory-reference@sstim
+  claude plugin install sstim-reference@sstim
+
+The first plugin runs the local stdio server with all eight tools; the second
+uses the hosted endpoint and its four read-only tools.
 
 If marketplace support differs, use the standalone documented MCP
 installation in packages/sstim-mcp/README.md instead.
 
 VS Code and Copilot users may load the portable folder plugins/sstim/
-via their installed Agent Plugins feature, or use the existing
-.vscode/mcp.json example for read-only MCP access. A VSIX is not required
-for basic MCP usage. Client-specific behavior still needs testing.
+via their installed Agent Plugins feature, or copy
+packages/sstim-mcp/examples/vscode.mcp.json into their project's
+.vscode/mcp.json for MCP access. A VSIX is not required for basic MCP usage.
+Client-specific behavior still needs testing.
 
-ChatGPT users may install the skill and, on compatible desktop hosts, use the local stdio MCP with the necessary permissions. A ChatGPT
-plugin combining the new MCP tools with that skill awaits a real hosted
-Streamable HTTP endpoint, user-specific authorization, directory review
-and proof of secure write behavior. Do not invent an endpoint or present
-the current stdio service as publicly deployable.
+ChatGPT users can add SSTIM Reference from ChatGPT's plugin directory: the
+hosted endpoint's four read-only tools plus the skill (plugins/chatgpt-remote/).
+On desktop hosts that run local MCP servers, plugins/chatgpt/ adds the stdio
+server with its proposal tools. A public ChatGPT plugin with proposal tools
+would still need user-specific authorization, moderation, rate limits and
+proof of secure write behavior; the hosted endpoint deliberately has no write
+tool.
 
 ## Release gates
 
 1. Verify source mock-backed tests, protocol dispatcher, security cases,
    static build, RDF CI and deployment tests on main.
-2. Done 2026-10-11 except trusted publication. @sstim/mcp@0.3.0 is on npm
+2. Done except trusted publication. @sstim/mcp@0.3.1 (2026-11-27) is on npm
    and is the official registry's latest version, and a real install lists
-   eight tools. The OIDC publish run got E404, so the release went out with
-   the maintainer's token; configure the npm trusted publisher before the
-   next release (MCP_DISTRIBUTION.md).
-3. Test plugins in real Claude Code, VS Code/Copilot and ChatGPT clients,
-   then package and submit to applicable marketplaces.
-4. Deploy an authenticated remote MCP service for ChatGPT only after
-   specifying user identities, consent, moderation, rate limits and
-   GitHub issue permissions. The current static site does not provide it.
+   eight tools. Like 0.3.0 it went out with the maintainer's token, because
+   the npm trusted publisher is still not configured (MCP_DISTRIBUTION.md).
+3. Partly done. The ChatGPT plugin is published and the Claude plugin is
+   waiting for Anthropic's review. Tests of the local folders in real Claude
+   Code and VS Code/Copilot clients are still to be recorded.
+4. The read-only remote MCP (four tools, no accounts) is deployed. A remote
+   service with proposal tools still waits on specified user identities,
+   consent, moderation, rate limits and GitHub issue permissions.
 5. Keep the separate deferred RDF and annotation invitation plan deferred:
    no protected RDF or frozen releases change here.
 

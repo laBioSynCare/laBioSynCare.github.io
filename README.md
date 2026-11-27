@@ -140,6 +140,9 @@ conformance, containment, and namespace discipline.
   so Full-profile results are marked `PARTIAL` with the count skipped; Kernel,
   Core and Core Plus carry none.
 
+Release history, how to check what each registry serves, and the release
+procedure are in [`packages/README.md`](packages/README.md).
+
 Consumers that previously merged the eight pre-modular sources should select
 the Full profile. New reusable integrations should start with Core or Core Plus and
 add concern modules through their manifest-resolved dependency closure. Shapes
@@ -210,6 +213,16 @@ For Codex use `[mcp_servers.sstim]` with `command = "npx"` and
 [Installation instructions for Codex, Claude Code, Gemini CLI, Cursor and
 Neovim](packages/sstim-mcp/README.md) include the appropriate client-specific
 configuration.
+
+**No install:** a hosted, read-only endpoint,
+`https://sstim-mcp.netlify.app/mcp` (Streamable HTTP), serves the four
+knowledge tools to any client that accepts a remote MCP server, for example
+`claude mcp add --transport http sstim https://sstim-mcp.netlify.app/mcp`.
+The SSTIM Reference plugin in ChatGPT's plugin directory uses it, and so does
+the Claude plugin that is waiting for Anthropic's review; Claude Code can
+install either Claude plugin from this repository's marketplace. See
+[`plugins/`](plugins/README.md) and the
+[hosted adapter](services/sstim-mcp-remote/README.md).
 
 **Try asking your agent:** “Use SSTIM to find the canonical terminology for
 binaural beats, retrieve each relevant term's source and provenance, and

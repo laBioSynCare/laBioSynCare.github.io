@@ -2005,6 +2005,20 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       monotonic clock that timed audio, two modality schemes with no stated
       relation, and the mandatory preset.*
 
+- [ ] **MCP and package distribution: the open items** `P2`
+      *State in [`MCP_DISTRIBUTION.md`](docs/ecosystem/MCP_DISTRIBUTION.md),
+      checked 2026-11-27. (1) Configure npm's trusted publisher for
+      `@sstim/mcp` (GitHub Actions, `w3c-cg/sstim`, `publish-mcp-npm.yml`):
+      every npm upload so far used a maintainer token, so none carries
+      provenance. (2) When Anthropic decides on the Claude plugin, update
+      [`ANTHROPIC_PLUGIN_SUBMISSION.md`](docs/ecosystem/ANTHROPIC_PLUGIN_SUBMISSION.md)
+      and the last line of the plugin's README; leave
+      `plugins/claude/sstim-reference/` unchanged until then. (3) When mcprush
+      emails its decision, delete `.well-known/mcprush.com-claim.txt`.
+      (4) Glama, then Awesome MCP Servers and MCP.so: never submitted.
+      (5) `@sstim/mcp@0.0.0-stage`, the placeholder that created the package
+      name, is still installable and could be deprecated.*
+
 ---
 
 ## 8. BioSynCare Commercial (parallel track)

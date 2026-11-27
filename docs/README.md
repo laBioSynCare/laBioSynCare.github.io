@@ -25,6 +25,9 @@ the two disagree, the code and the as-built docs win.
   JavaScript, gated by `make test` and published as
   [`@sstim/core`](https://www.npmjs.com/package/@sstim/core). `PARTIAL` on the
   Full profile, because `rdf-validate-shacl` cannot evaluate `sh:sparql`.
+- [`../packages/README.md`](../packages/README.md): what each published
+  package is, its release history, how to check what a registry really serves,
+  and the release procedure.
 
 ## `concept/` — what the domain is and what we claim
 
@@ -47,6 +50,10 @@ the two disagree, the code and the as-built docs win.
 - [`technical/CONCEPT_REFERENCE_API.md`](technical/CONCEPT_REFERENCE_API.md): release-versioned read-only JSON concept reference, generated from frozen ontology modules.
 
 - [`../packages/sstim-mcp/`](../packages/sstim-mcp/): locally runnable read-only MCP server for AI systems, using the generated Concept Reference API and preserving published-release provenance.
+
+- [`../services/sstim-mcp-remote/`](../services/sstim-mcp-remote/): the hosted, read-only Streamable HTTP endpoint `https://sstim-mcp.netlify.app/mcp`, with the four knowledge tools, deployed on Netlify.
+
+- [`../plugins/`](../plugins/README.md): the five agent plugin folders (ChatGPT, Claude, Claude Code, portable Agent Plugins), what each runs, and where each is distributed.
 
 - [`technical/AI_CONTRIBUTION_IN_RDF_PLAN.md`](technical/AI_CONTRIBUTION_IN_RDF_PLAN.md): explicitly deferred, separately authorized work to make feedback invitations visible inside RDF headers and annotation metadata; no protected RDF or immutable releases are changed by the website call.
 
@@ -133,7 +140,10 @@ of `static/favicon.svg` and `static/icons/`.
 
 ## `ecosystem/` — IP, governance, outreach
 
-- [`MCP_DISTRIBUTION.md`](ecosystem/MCP_DISTRIBUTION.md): npm packaging, official MCP Registry, Glama and community-directory publishing gates; attribution and verification.
+- [`MCP_DISTRIBUTION.md`](ecosystem/MCP_DISTRIBUTION.md): every channel the MCP server reaches users through (npm, the official MCP Registry, the hosted endpoint, the ChatGPT and Claude plugin directories, community directories) with its state; attribution and verification.
+- [`AGENT_PLUGINS_AND_CONTRIBUTIONS.md`](ecosystem/AGENT_PLUGINS_AND_CONTRIBUTIONS.md): the plugin packages and the operator-gated GitHub proposal workflow.
+- [`OPENAI_PLUGIN_SUBMISSION.md`](ecosystem/OPENAI_PLUGIN_SUBMISSION.md) and [`ANTHROPIC_PLUGIN_SUBMISSION.md`](ecosystem/ANTHROPIC_PLUGIN_SUBMISSION.md): what each plugin directory holds, how it was submitted, and its review state.
+- [`SSTIM_MCP_PRIVACY.md`](ecosystem/SSTIM_MCP_PRIVACY.md) and [`SSTIM_MCP_TERMS.md`](ecosystem/SSTIM_MCP_TERMS.md): the privacy notice and terms that the hosted endpoint and the plugin listings link to.
 
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living

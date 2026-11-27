@@ -337,7 +337,9 @@ a defined transport, and this package uses it. For clients that need a remote
 server, a separately deployed, read-only Streamable HTTP endpoint at
 `https://sstim-mcp.netlify.app/mcp` offers the four knowledge tools and none of
 the proposal tools. Its source is
-[`services/sstim-mcp-remote`](../../services/sstim-mcp-remote/).
+[`services/sstim-mcp-remote`](../../services/sstim-mcp-remote/). The SSTIM
+Reference plugins for ChatGPT and Claude use it; see
+[`plugins/`](../../plugins/README.md).
 
 Protocol references:
 [MCP 2026-07-28 versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning),

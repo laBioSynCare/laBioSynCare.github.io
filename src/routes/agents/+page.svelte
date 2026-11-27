@@ -68,7 +68,7 @@
     <aside role="note" class="workflow">
       <p class="eyebrow">HOW CONTRIBUTION WORKS TODAY</p>
       <h3>Read. Examine. Suggest. Review.</h3>
-      <p>For AI clients, the published <code>@sstim/mcp</code> server offers read-only access to released concepts and a tool that prepares a feedback link.</p>
+      <p>For AI clients, the published <code>@sstim/mcp</code> server offers read-only access to released concepts and a tool that prepares a feedback link. Clients that accept a remote MCP server can reach the same read-only tools at <code>https://sstim-mcp.netlify.app/mcp</code> without installing anything.</p>
       <p><strong>No autonomous ontology edits or automatic submissions are performed.</strong> A user or contributor opens and reviews the GitHub issue draft before publishing. Maintainers review contributions under the existing governance process.</p>
       <a href={ghBlob('packages/sstim-mcp/README.md')} rel="external">MCP installation and tools ↗</a>
       <a href={ghBlob('docs/ecosystem/AGENT_PLUGINS_AND_CONTRIBUTIONS.md')} rel="external">Integrations for Claude, VS Code and ChatGPT ↗</a>

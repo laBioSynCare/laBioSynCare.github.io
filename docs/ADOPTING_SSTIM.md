@@ -51,7 +51,7 @@ For anything you publish, pin a release. The mutable line moves.
 ```bash
 # Core, at a pinned release: the two modules plus the shapes that validate them
 for f in sstim-core.ttl sstim-stimulus.ttl sstim-core-shapes.ttl; do
-  curl -sL -O "https://w3id.org/sstim/0.17.0/$f"
+  curl -sL -O "https://w3id.org/sstim/0.21.0/$f"
 done
 ```
 
@@ -116,7 +116,7 @@ sstim validate my-stimulus.ttl --profile core
 
 ```
 my-stimulus.ttl
-  profile core at https://w3id.org/sstim/0.17.0
+  profile core at https://w3id.org/sstim/0.21.0
   ok     SHACL conformance
   ok     every SSTIM term is defined in the core closure
   ok     nothing minted under https://w3id.org/sstim
