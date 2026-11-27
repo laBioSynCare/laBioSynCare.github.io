@@ -1,6 +1,6 @@
 # SSTIM Agent Plugins and GitHub-backed MCP proposals
 
-Status (2026-11): @sstim/mcp@0.3.1 is on npm and in the official MCP Registry. A public read-only remote MCP is deployed at https://sstim-mcp.netlify.app/mcp, and the OpenAI plugin has been configured by its publisher. A separate Claude remote plugin is staged for Anthropic review, but neither public-directory approval nor publication is asserted here.
+Status (2026-11-27): @sstim/mcp@0.3.1 is on npm and in the official MCP Registry. A public read-only remote MCP is deployed at https://sstim-mcp.netlify.app/mcp. The OpenAI plugin is published: version 0.1.0 appears in ChatGPT's plugin directory. The Claude remote plugin passed Anthropic's scan and is waiting for an Anthropic reviewer, so it is not yet published. Details are in the [OpenAI](OPENAI_PLUGIN_SUBMISSION.md) and [Anthropic](ANTHROPIC_PLUGIN_SUBMISSION.md) submission records.
 
 ## Scope and value
 

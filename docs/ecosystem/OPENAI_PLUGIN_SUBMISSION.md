@@ -1,6 +1,11 @@
 # SSTIM: OpenAI public Plugin Directory submission
 
-Prepared 17 November 2026. **Remote MCP endpoint live and smoke-tested. ChatGPT plugin not yet submitted or approved.**
+Prepared 17 November 2026. **Status, seen 27 November 2026: published.** The
+OpenAI Platform's Plugins page lists SSTIM Reference with publication
+"Version 0.1.0", MCP configuration "Configured" and no review status, and
+ChatGPT's plugin directory finds it (search "sstim"; publisher Renato Fabbri,
+"Sensory science reference"). Both were seen from the publisher's own accounts;
+visibility to other accounts was not checked separately.
 
 Canonical source: `w3c-cg/sstim`. The existing local `@sstim/mcp@0.3.1` remains available over stdio; a separate **read-only** remote adapter at `services/sstim-mcp-remote/` provides four tools over Streamable HTTP for public users.
 

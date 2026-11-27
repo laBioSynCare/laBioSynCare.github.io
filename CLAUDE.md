@@ -117,15 +117,17 @@ are chosen but not yet installed — do not describe them as how the app works.
 stdio server and official MCP Registry entry remain unchanged. A separate
 read-only Streamable HTTP service is implemented in
 `services/sstim-mcp-remote/` and deployed independently on Netlify, with
-`plugins/chatgpt-remote/` as the public OpenAI plugin candidate. Its source
+`plugins/chatgpt-remote/` as the public OpenAI plugin. Its source
 is the frozen, public Concept Reference API on GitHub Pages; it is not a
 replacement for Workbench hosting. The Netlify service at `https://sstim-mcp.netlify.app/mcp` passed live
 end-to-end MCP smoke tests in [CI](https://github.com/w3c-cg/sstim/actions/runs/44186545274).
-The OpenAI public plugin is not yet submitted or approved. It exposes four knowledge/feedback-link tools and **never**
-`sstim_submit_contribution`, accepts no credentials, and cannot mutate
-canonical RDF. Keep the local stdio plugin distinct, and do not change this
-boundary without review. See
-[OpenAI submission preparation](docs/ecosystem/OPENAI_PLUGIN_SUBMISSION.md).
+The OpenAI public plugin is published (version 0.1.0, seen 2026-11-27); the
+Claude plugin awaits Anthropic review. Both use this endpoint: four
+knowledge/feedback-link tools and **never** `sstim_submit_contribution`, no
+credentials, and no way to mutate canonical RDF. Keep the local stdio plugin
+distinct, and do not change this boundary without review. See the
+[OpenAI](docs/ecosystem/OPENAI_PLUGIN_SUBMISSION.md) and
+[Anthropic](docs/ecosystem/ANTHROPIC_PLUGIN_SUBMISSION.md) submission records.
 
 **Namespace arrivals (ADR 0055).** HTML at `w3id.org/sstim` lands on
 `/namespace/`; the staged HTML target for `w3id.org/sstim/exposure` is

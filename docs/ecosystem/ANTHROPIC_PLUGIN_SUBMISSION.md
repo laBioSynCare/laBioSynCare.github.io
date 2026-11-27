@@ -1,6 +1,13 @@
 # SSTIM Reference: Anthropic / Claude publication checklist
 
-Prepared November 2026. **Status: plugin prepared in GitHub; NOT submitted, reviewed, or published by Anthropic.** Do not confuse this with the SSTIM plugin already listed in SSTIM's own Claude Code marketplace.
+Prepared November 2026. **Status, seen 27 November 2026: submitted, waiting for
+review, not yet published.** [claude.ai/directory/manage](https://claude.ai/directory/manage)
+lists the SSTIM Reference plugin (source `w3c-cg/sstim`) with "Scan passed",
+last scanned 19 November, and "Publish requested. Your request is waiting for an
+Anthropic reviewer." Anthropic's official marketplace
+([anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official))
+had no SSTIM entry the same day. Do not confuse this with the SSTIM plugin
+already listed in SSTIM's own Claude Code marketplace.
 
 ## Recommended distribution
 
