@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Tests for the sstim client package.
 
-Offline by design. Everything resolves against the frozen 0.17.0 manifest and
-the live manifest in this repository, so the suite proves the resolver against
-real published manifests without a network call that could fail for reasons
-having nothing to do with the code.
+Offline by design. Everything resolves against the frozen manifest of the most
+recent release (RELEASE below) and the live manifest in this repository, so the
+suite proves the resolver against real published manifests without a network
+call that could fail for reasons having nothing to do with the code.
 
 The network paths that cannot be exercised offline (release discovery from the
 stable IRI, checksum verification of fetched bytes) are covered by asserting the
@@ -28,7 +28,10 @@ sys.path.insert(0, str(ROOT / "packages" / "sstim" / "src"))
 import sstim  # noqa: E402
 from sstim._resolve import Closure, Module, _cached  # noqa: E402
 
-FROZEN = ROOT / "static" / "ontology" / "0.17.0" / "manifest.json"
+# The most recent frozen release. Move it when the next one is cut; test_session.py
+# and the JavaScript suites name the same release.
+RELEASE = "0.21.0"
+FROZEN = ROOT / "static" / "ontology" / RELEASE / "manifest.json"
 LIVE = ROOT / "static" / "ontology" / "manifest.json"
 EXAMPLES = ROOT / "examples"
 
@@ -38,7 +41,7 @@ class ResolveTest(unittest.TestCase):
         for name in ("kernel", "core", "core-plus", "full"):
             closure = sstim.resolve_profile(name, manifest=FROZEN)
             self.assertEqual(closure.profile, name)
-            self.assertEqual(closure.version, "0.17.0")
+            self.assertEqual(closure.version, RELEASE)
             self.assertEqual(closure.status, "released")
             self.assertFalse(closure.is_development)
             self.assertTrue(closure.semantic_modules)
@@ -84,7 +87,7 @@ class ResolveTest(unittest.TestCase):
 
     def test_version_iri_is_the_citable_one(self):
         closure = sstim.resolve_profile("core", manifest=FROZEN)
-        self.assertEqual(closure.version_iri, "https://w3id.org/sstim/0.17.0")
+        self.assertEqual(closure.version_iri, f"https://w3id.org/sstim/{RELEASE}")
 
 
 class IntegrityTest(unittest.TestCase):
@@ -94,7 +97,7 @@ class IntegrityTest(unittest.TestCase):
         against a graph that is not SSTIM."""
         with self.assertRaises(sstim.SstimError) as caught:
             _cached(
-                "https://w3id.org/sstim/0.17.0/sstim-core.ttl",
+                f"https://w3id.org/sstim/{RELEASE}/sstim-core.ttl",
                 hashlib.sha256(b"not the module").hexdigest(),
                 offline=True,
             )
@@ -102,7 +105,7 @@ class IntegrityTest(unittest.TestCase):
 
     def test_offline_refuses_to_fetch(self):
         closure = Closure(
-            profile="core", version="0.17.0", status="released", source="test",
+            profile="core", version=RELEASE, status="released", source="test",
             modules=[Module(id="x", url="https://example.invalid/x.ttl",
                             sha256="0" * 64, graph_iri=None, is_shapes=False)],
         )
@@ -114,8 +117,8 @@ class OfflineTest(unittest.TestCase):
     """A run pinned to a release works with no network once that release is
     cached: modules by checksum, and the frozen manifest by version, since a
     released manifest never changes. The cache here is primed from this
-    checkout's frozen 0.18.0 directory, whose files hash to what its manifest
-    says, so nothing is fetched."""
+    checkout's frozen directory of the most recent release, whose files hash
+    to what its manifest says, so nothing is fetched."""
 
     def setUp(self):
         self.cache = tempfile.TemporaryDirectory()
@@ -147,22 +150,23 @@ class OfflineTest(unittest.TestCase):
 
     def test_pinned_but_uncached_refuses_rather_than_fetch(self):
         with self.assertRaises(sstim.SstimError) as caught:
-            sstim.resolve_profile("core", version="0.18.0", offline=True)
+            sstim.resolve_profile("core", version=RELEASE, offline=True)
         self.assertIn("not cached", str(caught.exception))
 
     def test_a_pinned_cached_release_validates_with_no_network(self):
-        self.prime("0.18.0")
+        self.prime(RELEASE)
         report = sstim.validate(EXAMPLES / "04-session-full.ttl", profile="full",
-                                version="0.18.0", offline=True)
+                                version=RELEASE, offline=True)
         self.assertTrue(report.ok, str(report))
-        self.assertEqual(report.version_iri, "https://w3id.org/sstim/0.18.0")
+        self.assertEqual(report.version_iri, f"https://w3id.org/sstim/{RELEASE}")
 
 
 class ValidateTest(unittest.TestCase):
     def test_every_shipped_example_passes_its_own_profile(self):
-        # The examples follow the development line, not a frozen release:
-        # example 01 states its signal's frequency with hzMin and hzMax, Core
-        # terms only from 0.21.0 (ADR 0067), so 0.17.0's Core rejects it.
+        # The examples follow the development line, which can lead the most
+        # recent release: example 01 stated its signal's frequency with hzMin
+        # and hzMax before 0.21.0 made them Core terms (ADR 0067). So they are
+        # held to the live manifest, not to RELEASE.
         cases = {
             "01-stimulus-core.ttl": "core",
             "02-stimulus-core-plus.ttl": "core-plus",

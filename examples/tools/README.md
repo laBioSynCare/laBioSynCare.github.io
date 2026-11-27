@@ -45,7 +45,7 @@ session.write("run-001.ttl")          # validates against Full first; writes not
 
 `write()` validates before writing, and the first run needs the network to
 fetch the release. Later runs can be offline if they pin it:
-`session.write(path, version="0.18.0", offline=True)` reads it from the cache.
+`session.write(path, version="0.21.0", offline=True)` reads it from the cache.
 An unpinned run always asks the network which release is newest. The PsychoPy
 example therefore keeps the record as
 `flicker-001.unvalidated.ttl` if `write()` refuses, because a run is not free

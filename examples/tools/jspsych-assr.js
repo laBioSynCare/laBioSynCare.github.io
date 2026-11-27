@@ -8,7 +8,7 @@
 //   <script src="https://unpkg.com/jspsych@8"></script>
 //   <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2"></script>
 //   <script type="importmap">{ "imports": {
-//     "@sstim/core/session": "https://esm.sh/@sstim/core@0.2.0/session" } }</script>
+//     "@sstim/core/session": "https://esm.sh/@sstim/core@0.2.1/session" } }</script>
 //   <script type="module">
 //     import { assrBlock } from './jspsych-assr.js'
 //     const jsPsych = initJsPsych()

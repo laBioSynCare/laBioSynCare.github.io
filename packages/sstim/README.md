@@ -15,7 +15,7 @@ sstim validate my-stimulus.ttl --profile core
 
 ```
 my-stimulus.ttl
-  profile core at https://w3id.org/sstim/0.18.0
+  profile core at https://w3id.org/sstim/0.21.0
   ok     SHACL conformance
   ok     every SSTIM term is defined in the core closure
   ok     nothing minted under https://w3id.org/sstim
@@ -61,12 +61,13 @@ sstim modules --profile full        # what that profile pulls in, and from where
 ## Versions are resolved, not guessed
 
 With no `--version`, the newest **frozen release** is resolved by reading
-`owl:versionIRI` from the stable IRI. This matters more than it looks: the
-manifest served at `https://w3id.org/sstim/manifest` is the *development* line,
-so code that fetches it and believes it pinned something has pinned nothing.
+`owl:versionIRI` from the stable IRI, and the report names the release it used.
+Unversioned routes such as `https://w3id.org/sstim/manifest` serve that same
+release, but they move when the next one is cut, so code that fetches one has
+pinned nothing. Pin a version when a result has to be reproducible:
 
 ```bash
-sstim validate my.ttl --profile core --version 0.17.0   # pin explicitly
+sstim validate my.ttl --profile core --version 0.21.0   # pin explicitly
 ```
 
 Every module listed in a manifest carries a sha256, and the bytes served are
@@ -79,7 +80,7 @@ entry can never be stale. An unpinned run still asks the network which release
 is newest.
 
 ```bash
-sstim validate my.ttl --version 0.18.0 --offline   # from the cache; fail rather than fetch
+sstim validate my.ttl --version 0.21.0 --offline   # from the cache; fail rather than fetch
 sstim cache                         # where the cache lives
 ```
 
@@ -93,8 +94,8 @@ if not report:
     print(report)
 
 # Resolve once, validate many
-closure = sstim.resolve_profile("full", version="0.17.0")
-closure.version_iri          # 'https://w3id.org/sstim/0.17.0'
+closure = sstim.resolve_profile("full", version="0.21.0")
+closure.version_iri          # 'https://w3id.org/sstim/0.21.0'
 [m.id for m in closure.semantic_modules]
 reports = [sstim.validate(p, closure=closure) for p in paths]
 ```

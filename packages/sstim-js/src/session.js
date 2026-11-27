@@ -162,6 +162,7 @@ export const CONTROLLED = {
     ears: 'placementEars',
     'ear-left': 'placementEarLeft',
     'ear-right': 'placementEarRight',
+    'ear-one': 'placementOneEar',
     eyes: 'placementEyes',
     'eye-left': 'placementEyeLeft',
     'eye-right': 'placementEyeRight',

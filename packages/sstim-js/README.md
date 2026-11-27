@@ -15,7 +15,7 @@ npx sstim validate my-stimulus.ttl --profile core
 
 ```
 my-stimulus.ttl
-  profile core at https://w3id.org/sstim/0.18.0
+  profile core at https://w3id.org/sstim/0.21.0
   ok     SHACL conformance
   ok     every SSTIM term is defined in the core closure
   ok     nothing minted under https://w3id.org/sstim
@@ -50,7 +50,7 @@ constraints cannot be evaluated in JavaScript.
   equivalent:
 
 ```
-  PARTIAL  69 sh:sparql constraint(s) were not evaluated: this runtime has no
+  PARTIAL  93 sh:sparql constraint(s) were not evaluated: this runtime has no
            SPARQL constraint component.
            For a complete Full-profile check use the Python client
            (pip install sstim) or pySHACL.
@@ -78,12 +78,13 @@ npx sstim modules --profile full     # what that profile pulls in, and from wher
 ## Versions are resolved, not guessed
 
 With no `--version`, the newest **frozen release** is resolved by reading
-`owl:versionIRI` from the stable IRI. This matters more than it looks: the
-manifest served at `https://w3id.org/sstim/manifest` is the *development* line,
-so code that fetches it and believes it pinned something has pinned nothing.
+`owl:versionIRI` from the stable IRI, and the report names the release it used.
+Unversioned routes such as `https://w3id.org/sstim/manifest` serve that same
+release, but they move when the next one is cut, so code that fetches one has
+pinned nothing. Pin a version when a result has to be reproducible:
 
 ```bash
-npx sstim validate my.ttl --profile core --version 0.17.0
+npx sstim validate my.ttl --profile core --version 0.21.0
 ```
 
 Every module a manifest lists carries a sha256, and the served bytes are checked
@@ -103,8 +104,8 @@ const report = await validate('my-stimulus.ttl', { profile: 'core' })
 if (!report.ok) console.log(String(report))
 
 // Resolve once, validate many
-const closure = await resolveProfile('full', { version: '0.17.0' })
-closure.versionIri                       // 'https://w3id.org/sstim/0.17.0'
+const closure = await resolveProfile('full', { version: '0.21.0' })
+closure.versionIri                       // 'https://w3id.org/sstim/0.21.0'
 closure.semanticModules.map(m => m.id)
 const reports = await Promise.all(files.map(f => validate(f, { closure })))
 ```

@@ -8,10 +8,11 @@ import { Session, SstimError, validate } from '../src/index.js'
 import { CONTROLLED } from '../src/session.js'
 import { assrBlock } from '../../../examples/tools/jspsych-assr.js'
 
-// Offline, like the rest of this suite: validation resolves the frozen 0.18.0
-// manifest in this repository.
+// Offline, like the rest of this suite: validation resolves the frozen manifest
+// of the most recent release in this repository, the RELEASE sstim.test.mjs names.
+const RELEASE = '0.21.0'
 const ROOT = new URL('../../../', import.meta.url)
-const MANIFEST = new URL('static/ontology/0.18.0/manifest.json', ROOT).pathname
+const MANIFEST = new URL(`static/ontology/${RELEASE}/manifest.json`, ROOT).pathname
 const read = (path) => readFileSync(new URL(path, ROOT), 'utf8')
 const START = '2026-09-17T09:00:00Z'
 
@@ -126,7 +127,7 @@ describe('the vocabulary table', () => {
   // The builder resolves notations from a table rather than a network call;
   // this keeps it honest against the frozen release, both ways.
   const frozen = ['sstim-vocab.ttl', 'sstim-stimulus.ttl', 'sstim-exposure.ttl']
-    .flatMap(m => new Parser().parse(read(`static/ontology/0.18.0/${m}`)))
+    .flatMap(m => new Parser().parse(read(`static/ontology/${RELEASE}/${m}`)))
   const TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
   const NOTATION = 'http://www.w3.org/2004/02/skos/core#notation'
   const CLASSES = {

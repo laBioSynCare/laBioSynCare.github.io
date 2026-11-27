@@ -167,6 +167,7 @@ CONTROLLED: dict[str, dict[str, str]] = {
         "ears": "placementEars",
         "ear-left": "placementEarLeft",
         "ear-right": "placementEarRight",
+        "ear-one": "placementOneEar",
         "eyes": "placementEyes",
         "eye-left": "placementEyeLeft",
         "eye-right": "placementEyeRight",

@@ -9,11 +9,14 @@ import {
   Closure, SstimError, resolveProfile, validate
 } from '../src/index.js'
 
-// Offline by design. Everything resolves against the frozen 0.17.0 manifest and
-// the live manifest in this repository, so a failure always means the code and
-// never the network.
+// Offline by design. Everything resolves against the frozen manifest of the
+// most recent release and the live manifest in this repository, so a failure
+// always means the code and never the network. Move RELEASE when the next
+// release is cut; session.test.mjs and the Python suites name the same one.
+const RELEASE = '0.21.0'
 const ROOT = new URL('../../../', import.meta.url)
-const FROZEN = new URL('static/ontology/0.17.0/manifest.json', ROOT).pathname
+const RELEASE_DIR = new URL(`static/ontology/${RELEASE}/`, ROOT)
+const FROZEN = new URL('manifest.json', RELEASE_DIR).pathname
 const LIVE = new URL('static/ontology/manifest.json', ROOT).pathname
 const example = (name) => new URL(`examples/${name}`, ROOT).pathname
 
@@ -22,7 +25,7 @@ describe('resolving a profile', () => {
     for (const name of ['kernel', 'core', 'core-plus', 'full']) {
       const closure = await resolveProfile(name, { manifest: FROZEN })
       expect(closure.profile).toBe(name)
-      expect(closure.version).toBe('0.17.0')
+      expect(closure.version).toBe(RELEASE)
       expect(closure.status).toBe('released')
       expect(closure.isDevelopment).toBe(false)
       expect(closure.semanticModules.length).toBeGreaterThan(0)
@@ -76,7 +79,7 @@ describe('resolving a profile', () => {
 
   it('reports the citable version IRI', async () => {
     const closure = await resolveProfile('core', { manifest: FROZEN })
-    expect(closure.versionIri).toBe('https://w3id.org/sstim/0.17.0')
+    expect(closure.versionIri).toBe(`https://w3id.org/sstim/${RELEASE}`)
   })
 })
 
@@ -84,7 +87,7 @@ describe('integrity', () => {
   it('refuses to fetch in offline mode rather than reaching the network', async () => {
     const closure = new Closure({
       profile: 'core',
-      version: '0.17.0',
+      version: RELEASE,
       status: 'released',
       source: 'test',
       modules: [{ id: 'x', url: 'https://example.invalid/x.ttl', sha256: '0'.repeat(64), isShapes: false }]
@@ -96,23 +99,23 @@ describe('integrity', () => {
 describe('offline', () => {
   // A run pinned to a release works with no network once that release is
   // cached: modules by checksum, and the frozen manifest by version, since a
-  // released manifest never changes. Primed from this checkout's frozen 0.18.0
-  // directory, whose files hash to what its manifest says.
+  // released manifest never changes. Primed from this checkout's frozen
+  // directory of the most recent release, whose files hash to what its
+  // manifest says.
   const withCache = async (prime, body) => {
     const dir = mkdtempSync(join(tmpdir(), 'sstim-cache-'))
     const previous = process.env.XDG_CACHE_HOME
     process.env.XDG_CACHE_HOME = dir
     try {
       if (prime) {
-        const frozen = new URL('static/ontology/0.18.0/', ROOT)
-        const document = JSON.parse(readFileSync(new URL('manifest.json', frozen), 'utf8'))
+        const document = JSON.parse(readFileSync(new URL('manifest.json', RELEASE_DIR), 'utf8'))
         const base = join(dir, 'sstim')
         mkdirSync(join(base, 'manifests'), { recursive: true })
-        writeFileSync(join(base, 'manifests', '0.18.0.json'), JSON.stringify(document))
+        writeFileSync(join(base, 'manifests', `${RELEASE}.json`), JSON.stringify(document))
         for (const module of document.modules) {
           const sha = module.source.sha256
           mkdirSync(join(base, sha.slice(0, 2)), { recursive: true })
-          writeFileSync(join(base, sha.slice(0, 2), sha), readFileSync(new URL(module.runtime.url, frozen)))
+          writeFileSync(join(base, sha.slice(0, 2), sha), readFileSync(new URL(module.runtime.url, RELEASE_DIR)))
         }
       }
       await body()
@@ -128,13 +131,13 @@ describe('offline', () => {
   }))
 
   it('refuses to fetch a pinned release that is not cached', () => withCache(false, async () => {
-    await expect(resolveProfile('core', { version: '0.18.0', offline: true })).rejects.toThrow('not cached')
+    await expect(resolveProfile('core', { version: RELEASE, offline: true })).rejects.toThrow('not cached')
   }))
 
   it('validates against a pinned, cached release with no network', () => withCache(true, async () => {
-    const report = await validate(example('04-session-full.ttl'), { profile: 'full', version: '0.18.0', offline: true })
+    const report = await validate(example('04-session-full.ttl'), { profile: 'full', version: RELEASE, offline: true })
     expect(report.ok, String(report)).toBe(true)
-    expect(report.versionIri).toBe('https://w3id.org/sstim/0.18.0')
+    expect(report.versionIri).toBe(`https://w3id.org/sstim/${RELEASE}`)
   }))
 })
 
@@ -146,9 +149,10 @@ describe('validating', () => {
     ['04-session-full.ttl', 'full']
   ]
 
-  // The examples follow the development line, not a frozen release: example
-  // 01 states its signal's frequency with hzMin and hzMax, Core terms only
-  // from 0.21.0 (ADR 0067), so 0.17.0's Core rejects it.
+  // The examples follow the development line, which can lead the most recent
+  // release: example 01 stated its signal's frequency with hzMin and hzMax
+  // before 0.21.0 made them Core terms (ADR 0067). So they are held to the live
+  // manifest, not to RELEASE.
   it.each(cases)('%s passes its own profile (%s)', async (file, profile) => {
     const report = await validate(example(file), { profile, manifest: LIVE })
     expect(report.ok, String(report)).toBe(true)
@@ -166,19 +170,24 @@ describe('validating', () => {
   })
 
   it('catches a Core Plus term used in a Core file, which SHACL cannot', async () => {
+    // A calibrated level, not a frequency: 0.21.0 made hzMin and hzMax Core
+    // terms (ADR 0067), so a signal's extent no longer leaves the closure.
     const turtle = `
       @prefix ex: <https://example.org/s/> .
       @prefix sstim: <https://w3id.org/sstim#> .
+      @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
       @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
       ex:s a sstim:StimulusSpecification ;
         rdfs:label "claims core"@en ;
         sstim:stimulusRegime "determinate" ;
-        sstim:hasSignal ex:sig .
-      ex:sig a sstim:StimulationSignal ; sstim:hzMin 10.0 .
+        sstim:hasStimulusChannel ex:ch .
+      ex:ch a sstim-ex:StimulusChannel ;
+        rdfs:label "a calibrated channel"@en ;
+        sstim:soundPressureLevelDb 60.0 .
     `
     const core = await validate(turtle, { profile: 'core', manifest: FROZEN })
     expect(core.conforms, 'shapes alone do not catch this').toBe(true)
-    expect(core.undefined).toContain('https://w3id.org/sstim#hzMin')
+    expect(core.undefined).toContain('https://w3id.org/sstim#soundPressureLevelDb')
     expect(core.ok).toBe(false)
 
     const wider = await validate(turtle, { profile: 'core-plus', manifest: FROZEN })
@@ -219,10 +228,10 @@ describe('the SPARQL-constraint limitation is reported, not hidden', () => {
   })
 
   it('counts exactly the sh:sparql constraints the shape module carries', async () => {
-    // Counted by parsing, not by grepping: three of the mentions in that file
-    // are inside comments, and a text count reports 71 where the graph has 69.
+    // Counted by parsing, not by grepping: some mentions in that file are inside
+    // comments, so a text count overstates it (96 lines against 93 in 0.21.0).
     const shapes = new Store(new Parser().parse(
-      readFileSync(new URL('static/ontology/0.17.0/sstim-shapes.ttl', ROOT), 'utf8')
+      readFileSync(new URL('sstim-shapes.ttl', RELEASE_DIR), 'utf8')
     ))
     const inGraph = shapes.getQuads(
       null, DataFactory.namedNode('http://www.w3.org/ns/shacl#sparql'), null, null

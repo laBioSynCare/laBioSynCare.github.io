@@ -1,6 +1,6 @@
 {
   "name": "@sstim/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Validate and write sensory-stimulation descriptions against a published SSTIM profile",
   "keywords": [
     "sstim",

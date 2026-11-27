@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Tests for the session builder, and for the tool examples that use it.
 
-Offline by design, like test_sstim.py: validation resolves the frozen 0.18.0
-manifest in this repository. The tool examples run against small stand-ins for
-PsychoPy and pyxdf, because what is under test is the record they write, not
-the tools.
+Offline by design, like test_sstim.py: validation resolves the frozen manifest
+of the most recent release in this repository. The tool examples run against
+small stand-ins for PsychoPy and pyxdf, because what is under test is the
+record they write, not the tools.
 """
 
 from __future__ import annotations
@@ -28,7 +28,8 @@ from rdflib.namespace import SKOS  # noqa: E402
 import sstim  # noqa: E402
 from sstim._session import CONTROLLED, EXPOSURE_CATEGORIES, PERCEPTUAL_MECHANISMS  # noqa: E402
 
-FROZEN = ROOT / "static" / "ontology" / "0.18.0"
+RELEASE = "0.21.0"  # the most recent frozen release, as in test_sstim.py
+FROZEN = ROOT / "static" / "ontology" / RELEASE
 MANIFEST = FROZEN / "manifest.json"
 FIXTURES = ROOT / "packages" / "fixtures"
 TOOLS = ROOT / "examples" / "tools"
@@ -119,7 +120,7 @@ class ParityTest(unittest.TestCase):
         check that covers both."""
         report = fixture_session().validate(manifest=MANIFEST)
         self.assertTrue(report.ok, str(report))
-        self.assertEqual(report.version, "0.18.0")
+        self.assertEqual(report.version, RELEASE)
 
 
 class VocabularyTableTest(unittest.TestCase):
