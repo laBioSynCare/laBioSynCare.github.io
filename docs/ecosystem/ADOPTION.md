@@ -234,6 +234,23 @@ SPARQL constraints unevaluated, as designed) and again offline from the cache.
 The esm.sh address the jsPsych example's import map names loads in headless
 Chrome and builds a session.
 
+**`sstim` 0.2.1 and `@sstim/core` 0.2.1 published 2026-11-27**, on Renato's
+instruction, so that PyPI and npm show READMEs written for the 0.21.0 release
+and carry a session builder that knows the placement 0.20.0 added. The 0.2.0
+READMEs still called the unversioned manifest route the development line,
+untrue since ADR 0060 went live, and the 0.2.0 builder refused `ear-one`
+(`sstim-ex:placementOneEar`, ADR 0066). The client suites had been pinned to
+the 0.17.0 and 0.18.0 snapshots; holding them to 0.21.0 is what exposed the
+missing placement (`9e2b061`). Verified from the registries into empty
+directories: PyPI took the files at 04:54 UTC, and within ten minutes pip's own
+request resolved `sstim==0.2.1` to a wheel with the local build's sha256
+(`bd36b7d0…`); `sstim -V` answers 0.2.1; the shipped examples validate against
+0.21.0 over the live network; and a one-ear session records `placementOneEar`
+and validates in Full, with SPARQL active in Python and reported `PARTIAL` (93
+constraints) in JavaScript. npm now answers "being processed" after a publish:
+it stamped `@sstim/core` 0.2.1 at 04:55:52 UTC and served it seconds later.
+The jsPsych example's esm.sh address answers for 0.2.1.
+
 ### D. An exporter for a tool researchers already run
 
 [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md)

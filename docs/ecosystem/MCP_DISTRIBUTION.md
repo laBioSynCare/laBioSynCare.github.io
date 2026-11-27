@@ -1,11 +1,24 @@
 # SSTIM MCP distribution and directory submissions
 
-**Verified publication state (11 October 2026):** SSTIM MCP
-`@sstim/mcp@0.3.0` is published on npm as `latest`. Installed from the
+**Verified publication state (27 November 2026):** `@sstim/mcp@0.3.1` is
+`latest` on npm, and `io.github.w3c-cg/sstim` 0.3.1 is the latest version in
+the **official MCP Registry**, published by
+[GitHub Actions run #45942968734](https://github.com/w3c-cg/sstim/actions/runs/45942968734).
+0.3.1 changes no behaviour. Its README names the hosted endpoint, which the
+0.3.0 README on npm said did not exist, and the 0.21.0 release, where 0.3.0's
+named 0.19.0. Installed from the registry into an empty directory, it reported
+version 0.3.1, listed eight tools over stdio and answered `sstim_list_releases`
+with 0.21.0 as the latest release. Like 0.3.0 it was published with the local
+token rather than the workflow, so it carries no provenance attestation. The
+hosted adapter in `services/sstim-mcp-remote` depends on 0.3.1 from the same
+day.
+
+**Earlier verified state (11 October 2026):** SSTIM MCP
+`@sstim/mcp@0.3.0` was published on npm as `latest`. Installed from the
 registry into an empty directory, its executable listed eight tools over
 stdio, answered a live `sstim_list_releases` call, and refused
 `sstim_submit_contribution` in an environment without the operator opt-in.
-`io.github.w3c-cg/sstim` 0.3.0 is the latest version in the **official MCP
+`io.github.w3c-cg/sstim` 0.3.0 was the latest version in the **official MCP
 Registry**, published by [GitHub Actions run #38163932454](https://github.com/w3c-cg/sstim/actions/runs/38163932454).
 0.2.0 (10 October, [run #38037758861](https://github.com/w3c-cg/sstim/actions/runs/38037758861))
 remains installable.

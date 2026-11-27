@@ -2,7 +2,7 @@
 
 A public, **read-only** Streamable HTTP MCP adapter for SSTIM's existing released Concept Reference API. This is an independently deployed service, **not** the SSTIM Workbench static site. The ontology, frozen releases, and GitHub Pages content remain the authority.
 
-**Source**: `@sstim/mcp/client` from the published `@sstim/mcp@0.3.0` package. **Runtime**: official MCP SDK in a stateless Netlify Function. No user accounts, database, credentials or submission tool.
+**Source**: `@sstim/mcp/client` from the published `@sstim/mcp@0.3.1` package. **Runtime**: official MCP SDK in a stateless Netlify Function. No user accounts, database, credentials or submission tool.
 
 ## Tools
 

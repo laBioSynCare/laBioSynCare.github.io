@@ -4,7 +4,7 @@ import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/
 import { createConceptClient } from '@sstim/mcp/client'
 import { z } from 'zod'
 
-const serverInfo = { name: 'sstim-reference', version: '0.3.0' }
+const serverInfo = { name: 'sstim-reference', version: '0.3.1' }
 const source = createConceptClient()
 // Human-readable titles support Anthropic directory review and other MCP clients.
 const TOOL_TITLES = {
