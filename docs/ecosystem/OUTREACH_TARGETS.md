@@ -47,7 +47,7 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
 | Research | **UCL Multi-Sensory Devices Group** (Marianna Obrist) — "sensory-driven microinterventions" | Nominate one protocol to encode | not-contacted |
 | Implementation | **Web Audio Conference** + **W3C Audio Community Group** | Natural home for Patch Studio, timing, browser synthesis, reproducibility | not-contacted |
 | Policy | **European Brain Council** + Charter for Responsible Development of Neurotechnologies | BioSynCare *may* endorse the Charter (ethical commitment only) | not-contacted |
-| Entrepreneurial | **Clust-ER Health & Wellness** (Emilia-Romagna) | Regional BSC pilot (~€500 + IVA, ≤50 people); keep pilot evidence separate from research validation | not-contacted |
+| Entrepreneurial | **Clust-ER Health & Wellness** (Emilia-Romagna) | Regional BSC pilot (~€500 + IVA, ≤50 people); keep pilot evidence separate from research validation | **contacted** 2026-09-21 by email, as a BioSynCare enquiry; outcome in the private tracker |
 | Community | **NeuroTechX** (30+ chapters) | Join and demonstrate BSC Lab — do **not** create a new community/moderation burden | not-contacted |
 | Events | **Brain Innovation Days 2026** (Brussels, 18–19 Nov) | Innovation Hall application | **dropped 2026-09-15** — the 1 September deadline and the unconfirmed 15 September extension both passed with the row untouched. Kept so it is not re-proposed |
 
@@ -83,4 +83,11 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
 
 | Date | Target | Channel | Response | recordSource | Status |
 |---|---|---|---|---|---|
-| — | — | — | — | — | Pending first outreach |
+| 2026-09-19 to 2026-11-27 | Researchers, companies and foundations, mostly in Italy, Ireland and the UK | Email from the maintainer's outreach mailbox; meetings in Dublin, 28 to 30 October 2026 | Several conversations open; no outside data, dependent or new Community Group participant yet | private tracker | in progress |
+
+**The per-contact log is private.** Outreach since 2026-09-19 runs from the
+maintainer's mailbox and a private tracker, under the rule in ADR 0031 that the
+messages themselves, and who said what, are not published. A reply that changes
+what we do is recorded as a statement in the document that owns it, and a
+target above changes status here when one of them is contacted. Whether the
+outreach is producing use is measured in [USAGE_SIGNALS.md](USAGE_SIGNALS.md).

@@ -154,6 +154,11 @@ of `static/favicon.svg` and `static/icons/`.
   having adopted it (citation, tooling and data are three different things), the
   segment map with the unit of adoption per segment, and the measurement with
   its named instruments. Who to contact stays in `OUTREACH_TARGETS.md`.
+- [`USAGE_SIGNALS.md`](ecosystem/USAGE_SIGNALS.md): dated readings of every
+  public instrument that can see SSTIM being fetched, installed, studied or
+  joined (Zenodo, PyPI, npm, jsDelivr, GitHub, the W3C participation API, code
+  search), the third parties already using SSTIM as material, and what the
+  instruments cannot see.
 - [`W3C_REPOSITORY_MIGRATION.md`](ecosystem/W3C_REPOSITORY_MIGRATION.md) —
   **executed 2026-08-23; still not production-cutover authorization.** Decision
   analysis, gates and checkpointed plan for moving the complete repository and

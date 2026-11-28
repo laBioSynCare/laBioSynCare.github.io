@@ -48,16 +48,19 @@ Per `CLAUDE.md` §3.6, every reading below names the instrument that produced it
 | Question | Instrument | Reading |
 |---|---|---|
 | Does any external record point at SSTIM? | `make wikidata-inbound`, `make registry-verify`, [INBOUND_REFERENCES.md](../ontology/INBOUND_REFERENCES.md) §1 | Yes, across registries, the scholarly graph, w3.org and Wikidata |
-| Is there anything to install? | `curl` against `registry.npmjs.org/sstim`, `registry.npmjs.org/sstim-js`, `pypi.org/pypi/sstim/json`, 2026-09-17 | 404 on all three. The names are unclaimed |
+| Is there anything to install? | the PyPI and npm registries, 2026-11-28 | Yes: `sstim` on PyPI and `@sstim/core` on npm since 2026-09-18, `@sstim/mcp` since 2026-10-10 ([packages/README.md](../../packages/README.md)). On 2026-09-17, before §3 C, all three names answered 404 |
 | Has anyone outside encoded anything in SSTIM? | every instance file under `static/ontology/instances/` is single-author, as [USE_CASES_AND_REQUIREMENTS.md](USE_CASES_AND_REQUIREMENTS.md) states of its own source material; [PARTNERS.md](PARTNERS.md) records no formally active partner | No |
-| Has the outreach been sent? | [OUTREACH_TARGETS.md](OUTREACH_TARGETS.md) target table and log | One target engaged (HED). Every other row reads `not-contacted`, and the log still reads "Pending first outreach" |
+| Has the outreach been sent? | the maintainer's outreach mailbox and private tracker, 2026-11-28 | Yes, since 2026-09-19: researchers, companies and foundations by email, and researchers met in person in Dublin in late October 2026. Several conversations are open. None has yet produced outside data, a dependent or a new Community Group participant. The per-contact log is private; see the [OUTREACH_TARGETS.md](OUTREACH_TARGETS.md) log |
+| Is anything being fetched, installed or joined? | [USAGE_SIGNALS.md](USAGE_SIGNALS.md), first reading 2026-11-28 | Release views are rising, one outside party fetched a whole release through a CDN, and six third parties use SSTIM as material. No dependents, citations or new participants |
 
-**One instrument is missing and should be built.** Nothing here reads whether
-the artifacts are being *fetched*. The GitHub traffic snapshots cover repository
-pages only, not Pages requests, w3id resolutions or BioPortal pulls. Zenodo's
-REST record does carry view and download counters (`stats` on the record), and
-they are readable today without credentials. Until something samples them, both
-"nobody is using this" and "people are using this quietly" are guesses.
+**The fetch instrument exists since 2026-11-28.** Until then nothing here read
+whether the artifacts were being *fetched*, and both "nobody is using this" and
+"people are using this quietly" were guesses. [USAGE_SIGNALS.md](USAGE_SIGNALS.md)
+reads Zenodo's view and download counters, the package registries, jsDelivr,
+GitHub, the W3C participation API and code search, names the command for each,
+and keeps dated readings. The GitHub traffic snapshots still cover repository
+pages only, and Pages requests, w3id resolutions and BioPortal pulls remain
+unread.
 
 **A caveat that adoption pitches lean on.** The survey in
 [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md)
@@ -388,7 +391,10 @@ individual is named in this file.
 3. **Send the outreach that is already written.** The one data point available
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good
-   enough and the messages are not being sent.
+   enough and the messages are not being sent. *Updated 2026-11-28:* broad
+   outreach has gone out since 2026-09-19 (§2). The most specific ask is still
+   unsent from the outreach mailbox: asking the authors of the published
+   protocols in `static/ontology/instances/protocols/` to check our encodings.
 4. **Build C.** ✅ Both clients published 2026-09-18: `sstim` on PyPI, `@sstim/core` on npm.
 5. **Build D against whichever tool the first engaged lab actually uses.**
    Choosing before then is a guess with a large build attached. The
