@@ -65,7 +65,7 @@ is somebody else's work that SSTIM is now part of.
 | [svelte-vitals](https://github.com/oekazuma/svelte-vitals) | A SvelteKit static analyser lists `w3c-cg/sstim` among the 671 applications in its test corpus | before 2026-11-27 |
 | [The Gilde](https://github.com/bendyline/gilde) | A tool catalog auto-imported `@sstim/mcp` 0.3.0 from the MCP Registry as a community toolset, unreviewed by its maintainers | after 2026-10-11 |
 | [MCPScan](https://github.com/Just-Denzel/MCPScan) | An MCP-server scanning project includes `@sstim/mcp` 0.3.0 in its control sample | before 2026-11-23 |
-| [Open Knowledge Graphs](https://openknowledgegraphs.com/resource/sstim/) | A catalog built from Wikidata lists SSTIM under Social and Behavioral Sciences. It shows 0.18.0 as the latest release, because the Wikidata item still ranks that version preferred | by 2026-11-12 |
+| [Open Knowledge Graphs](https://openknowledgegraphs.com/resource/sstim/) | A catalog built from Wikidata lists SSTIM under Social and Behavioral Sciences. It showed 0.18.0 as the latest release, because the Wikidata item ranked that version preferred; the rank moved to 0.21.0 the same day | by 2026-11-12 |
 | [dbpedia/kg-catalog#90](https://github.com/dbpedia/kg-catalog/issues/90) | The DBpedia KG Catalog's full download test downloaded SSTIM's one file successfully | 2026-10-23 |
 
 ---

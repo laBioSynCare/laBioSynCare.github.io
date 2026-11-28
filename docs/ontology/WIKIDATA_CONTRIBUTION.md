@@ -125,6 +125,21 @@ ORCID is not one.
 
 It needed a signed-in human rather than further work, and got one.
 
+#### Release statements (`P348`) are kept by a bot
+
+Github-wiki-bot adds every GitHub release of `w3c-cg/sstim`, the repository in
+the item's `P1324`, as a `P348` version, and moves the preferred rank to the
+newest. Once a repository has releases it reads those and ignores tags, and it
+will not move the rank while the preferred version is not among them. No
+version before 0.19.0 has a GitHub release on `w3c-cg/sstim`, so 0.18.0 kept
+the rank through 0.19.0, 0.20.0 and 0.21.0, and Open Knowledge Graphs, which is
+built from Wikidata, showed 0.18.0 as the latest. On 2026-11-28 the rank was
+moved to 0.21.0 through the bot password
+([revision 2575640384](https://www.wikidata.org/w/index.php?diff=2575640384&oldid=2563830698)),
+which hands it back to the bot. Two rules keep it there: publish every release
+as a GitHub release on `w3c-cg/sstim`, and never give the preferred rank to a
+version that exists only as a tag.
+
 #### The credential, which is what actually blocks stages 1 and 2
 
 Neither stage is blocked by the account's standing. `Rfabbri` has edited since
